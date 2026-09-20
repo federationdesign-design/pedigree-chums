@@ -4077,6 +4077,27 @@ export default function BreedTree({
   // Held null until the display face is painting, so the first (server-matched)
   // render uses the flat average and only the measured pass uses canvas.
   const [labelFont, setLabelFont] = useState<string | null>(null);
+  /* HOW EVERY NODE'S NAME WRAPS, one entry per node, in node order so it lines up
+     with the circles group (W1 stage 3).
+
+     ONLY THE WRAP IS DECIDED HERE, never the size. fitLabel is called at the
+     node's own radius with no view scale, because the line breaking is
+     scale-invariant: scaling the radius scales every candidate size by the same
+     factor and the best arrangement does not change. The drawn size is computed
+     per frame from the drop-time scale, against THESE lines, so the two can never
+     disagree about what is on screen.
+
+     widthEm IS MEASURED ONCE, here, because the frame writer needs it every frame
+     to turn a requested width into a font size, and measureEm is a canvas call. */
+  const orphanFits = useMemo(
+    () => nodes.map((d) => {
+      const lines = fitLabel(d.data.name.toUpperCase(), d.r * LABEL_SAFE, 132, labelFont).lines;
+      return { lines, widthEm: Math.max(...lines.map((l) => measureEm(l, labelFont))) || 1 };
+    }),
+    [nodes, labelFont],
+  );
+  const orphanFitsRef = useRef(orphanFits);
+  useEffect(() => { orphanFitsRef.current = orphanFits; }, [orphanFits]);
   useEffect(() => {
     const read = () => {
       const v = getComputedStyle(document.documentElement).getPropertyValue("--font-display").trim();
@@ -5103,7 +5124,10 @@ export default function BreedTree({
      only callers wanted coordinates; dogClose now removes the body itself rather
      than flagging it for the step loop, so it needs the handle and the two flags
      the loop reads. Same object either way, only the declared surface widened. */
-  const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean; mb?: object; mbIn?: boolean; blown?: boolean } | undefined; owned: Set<Node> } | null>(null);
+  // `a` is the body's angle. It was never listed because a circle is round and
+  // nothing read it; an orphan's NAME has to tumble with its body, so it is now
+  // part of the contract rather than an untyped runtime extra.
+  const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; a?: number; held?: boolean; mb?: object; mbIn?: boolean; blown?: boolean } | undefined; owned: Set<Node> } | null>(null);
   // Each dropped name's real drawn box, measured off the DOM at drop time and
   // converted into world units. Measured rather than derived: the label sits
   // inside a group that zoomTo has already scaled, and its text block is offset
@@ -5128,6 +5152,31 @@ export default function BreedTree({
      single at minute three is measured in the same units as one that dropped as
      a word. Zero until the first drop, which is the probe's "no pit yet". */
   const dropKRef = useRef<number>(0);
+  /* W1 STAGE 3: AN ORPHANED TWIN BECOMES ITS NAME (owner, 20 September 2026:
+     when a twin gets orphaned the circle changes to black, I want it to pop from
+     the circle into the text name object).
+
+     IT REPLACES THE BLACK FILL, nothing else. The population is exactly
+     chSingle's: a breed that HAD a twin in this level and now has one copy left.
+     A breed that was never doubled keeps its circle and its photograph.
+
+     IT IS A LATCH, NOT A LIVE TEST, and it has to be. chSingle is computed from
+     `paintable`, and `paintable` is false for a word, so reading the live test
+     every frame would turn the word straight back into a circle. Once a circle
+     has popped it stays popped for the rest of the round.
+
+     THE BODY KEEPS ITS SHAPE. It is still a circle; it is grown to a radius that
+     encloses the drawn name, so the picture and the collider agree without a
+     shape swap and without touching anything that reads `held`. The cost is a
+     generous hit area on a wide one-line name. See wordGrowRef. */
+  const orphanSetRef = useRef<Set<Node>>(new Set());
+  const orphanPopRef = useRef<Map<Node, number>>(new Map());
+  const owordsGRef = useRef<SVGGElement | null>(null);
+  const wordGrowRef = useRef<((n: Node, rPx: number) => void) | null>(null);
+  // The stage and the pixel scale, both frozen at the drop in the units a word
+  // is drawn in. See pitWordFit.
+  const stageWvRef = useRef<number>(0);
+  const pxPerViewRef = useRef<number>(0);
   // Whether the last press came from a finger. Touch has no hover, so this flag
   // keeps the tap path and the mouse-hover path apart: browsers fire a synthetic
   // mouseenter on tap, which would set hovered before the click landed and make
@@ -6115,6 +6164,7 @@ export default function BreedTree({
       }
     }
     const cg = circlesRef.current;
+    const owg = owordsGRef.current;
     const bb = badgeBodiesRef.current;
     if (bb) {
       const bg = badgesRef.current;
@@ -6250,7 +6300,13 @@ export default function BreedTree({
       // Once the pit is live a level dog IS its name, drawn in its own group
       // below, so the circle stands down. Keyed off depth alone: no lookup, no
       // way for it to half-apply.
-      const isWordNode = PIT_DRAWS_WORDS && fellRef.current && d.depth === 1 && !twinNamesRef.current.has(d.data.name);
+      /* TWO WAYS TO BE A WORD NOW. Single from the drop, which is decided once
+         from the layout and is depth 1 only (stage 2), or orphaned during the
+         round at any depth, which is the latch (stage 3). Both hide the circle
+         and both make the node unpaintable, so everything downstream treats them
+         alike without knowing which it is. */
+      const orphanWord = orphanSetRef.current.has(d);
+      const isWordNode = orphanWord || (PIT_DRAWS_WORDS && fellRef.current && d.depth === 1 && !twinNamesRef.current.has(d.data.name));
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       /* A CIRCLE IN THE CHAIN IS INVERTED:
          light blue where it was navy, and navy where its outline was. It wore a
@@ -6359,6 +6415,29 @@ export default function BreedTree({
         && (pitBreedCount.get(d.data.name) ?? 0) === 1
         && everTwinRef.current.has(d.data.name)
         && pitPlainCount >= DOG_SINGLE_MIN_PLAIN;
+      /* THE POP (W1 stage 3). chSingle is the moment the black fill would have
+         been written, so this is exactly the population the owner asked to
+         change, at every depth. Latched on the first frame it is true, and the
+         body is grown once, here, rather than every frame.
+
+         `now` is zero on every caller that is not the physics loop, and a zero
+         start would leave the pop frozen at nothing, so the clock falls back to
+         the wall clock rather than to no animation. */
+      if (chSingle && !orphanWord) {
+        orphanSetRef.current.add(d);
+        orphanPopRef.current.set(d, now || performance.now());
+        const of = orphanFitsRef.current[i];
+        const kD = dropKRef.current || k;
+        if (of && pxPerViewRef.current) {
+          const rv = d.r * kD;
+          const want = Math.min(rv * 2 * PIT_WORD_WIDTH, (stageWvRef.current || Infinity) * PIT_WORD_MAX_STAGE);
+          const fsw = want / of.widthEm;
+          const hvw = of.lines.length * fsw * LABEL_LINE_H;
+          // the circle that encloses the drawn block, so nothing of the name
+          // hangs outside its own collider
+          wordGrowRef.current?.(d, 0.5 * Math.hypot(want, hvw) * pxPerViewRef.current);
+        }
+      }
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
@@ -6593,6 +6672,51 @@ export default function BreedTree({
             q.dataset.tapped = tap;
             qi.setAttribute("href", tap === "1" ? QMARK_TAPPED_SRC : QMARK_SRC);
           }
+        }
+      }
+      /* THE ORPHAN'S NAME, drawn over its own circle's position (W1 stage 3).
+
+         ONE GROUP, NODE INDEXED, so it stacks and pages exactly like the circles
+         group and needs no second list to keep in step. The depth-1 words keep
+         their own group: they are indexed by the drop's body array, which does
+         not reach below depth 1, and that is the whole reason this one exists.
+
+         THE SIZE IS COMPUTED HERE, NOT IN THE RENDER. The wrap comes from
+         orphanFits, which is fixed, and the size is whatever makes THAT wrap
+         PIT_WORD_WIDTH diameters wide at the drop-time scale, capped by the
+         stage. So the drawn width is the rule by construction, and the render
+         never has to know the view.
+
+         IT FOLLOWS THE BODY'S ANGLE. A circle is round and never needed one; a
+         name has to tumble with the thing it has become. */
+      const ow = owg?.children[i] as SVGGElement | undefined;
+      if (ow) {
+        const ob = pitBodiesRef.current?.find(d);
+        /* A WORD FOLLOWS ITS DOG OUT OF THE PIT, the same two tests the drop's
+           words use: `held` covers the moment it is up on the learn layer, and
+           removedNodes covers it having been learnt for good. Read off the body,
+           never off React state, because this loop holds an older closure. */
+        const oShow = orphanWord && !ob?.held && !removedNodesRef.current.has(d);
+        if (ow.style.display !== (oShow ? "inline" : "none")) ow.style.display = oShow ? "inline" : "none";
+        const of2 = orphanFitsRef.current[i];
+        if (oShow && of2) {
+          const kD = dropKRef.current || k;
+          const want = Math.min(d.r * kD * 2 * PIT_WORD_WIDTH, (stageWvRef.current || Infinity) * PIT_WORD_MAX_STAGE);
+          const fsw = want / of2.widthEm;
+          const ang = typeof ob?.a === "number" ? ob.a * 57.2958 : 0;
+          // the same pop the drop's words use, run from this circle's own moment
+          let osc = 1;
+          const t0 = orphanPopRef.current.get(d);
+          if (now && t0) {
+            const t = (now - t0) / WORD_POP_MS;
+            if (t < 1) osc = t < 0.6 ? (t / 0.6) * 1.15 : 1.15 - 0.15 * ((t - 0.6) / 0.4);
+          }
+          const ot = ow.firstElementChild as SVGTextElement | null;
+          if (ot) {
+            ot.style.fontSize = `${fsw}px`;
+            ot.style.strokeWidth = `${Math.max(2, fsw * 0.16)}`;
+          }
+          ow.setAttribute("transform", `translate(${tx},${ty}) rotate(${ang + PIT_WORD_ANGLE})${osc !== 1 ? ` scale(${osc})` : ""}`);
         }
       }
       const l = wrap?.children[1] as SVGGElement | undefined;
@@ -7227,6 +7351,9 @@ export default function BreedTree({
       // The scale every pit word is measured against for the rest of the round.
       // See dropKRef and pitWordFit.
       dropKRef.current = k;
+      // a fresh round owns no orphans yet
+      orphanSetRef.current = new Set();
+      orphanPopRef.current = new Map();
       const st = stageRef.current;
       const stageH = st ? Math.max(st.clientHeight, 1) : SIZE;
       const asp = st ? st.clientWidth / stageH : aspect;
@@ -7329,6 +7456,27 @@ export default function BreedTree({
       // vbWf is the stage in the very units the word is drawn in, so it is the
       // cap PIT_WORD_MAX_STAGE measures against. See pitWordFit.
       const wordFits = d1.map((n) => pitWordFit(n.data.name, n.r * k, labelFont, vbWf));
+      /* THE TWO FIGURES AN ORPHAN NEEDS LATER, frozen here with everything else
+         the drop freezes. The stage is the cap; pxPerView converts a width in
+         view units into the pixels Matter bodies actually live in. */
+      stageWvRef.current = vbWf;
+      pxPerViewRef.current = pxPerWorld / k;
+      /* GROW THE CIRCLE TO FIT THE NAME (W1 stage 3). The body stays a CIRCLE, so
+         nothing that reads `held` changes and no collider is rebuilt: only the
+         radius moves, and only outwards. Matter keeps circleRadius on a circle
+         body and scales it with the body, so the two cannot fall out of step.
+
+         ONCE, AND ONLY UP. The caller latches, so this runs on the transition
+         frame alone, and a factor at or below 1 is ignored rather than shrinking
+         a circle that is already bigger than its name. */
+      wordGrowRef.current = (n: Node, rPx: number) => {
+        const b = all.find((x) => x.n === n);
+        const mb = b?.mb;
+        if (!b || !mb || !mb.circleRadius) return;
+        const f = rPx / mb.circleRadius;
+        if (!(f > 1.001)) return;
+        MBody.scale(mb, f, f);
+      };
       setWordList(wordFits.map((f) => ({ lines: f.lines, fs: f.fs })));
       wordBodiesRef.current = bodies;
       wordPopAtRef.current = performance.now();
@@ -13809,6 +13957,49 @@ export default function BreedTree({
                 </text>
               </g>
             ))}
+          </g>
+
+          {/* THE ORPHANS' NAMES (W1 stage 3), one slot per node, in node order so
+              it matches the circles group index for index. Every slot is present
+              and hidden; the frame writer shows the ones whose circle has popped
+              and sizes them. Nothing here reads the view, so this never
+              re-renders as the pit moves.
+
+              THE WORD TAKES THE TAP, as the depth-1 words do: there is no circle
+              behind it any more, and without this the tap reaches the background
+              and offers to leave the game. */}
+          <g ref={owordsGRef} textAnchor="middle">
+            {nodes.map((d, i2) => {
+              const of3 = orphanFits[i2];
+              return (
+                <g
+                  key={i2}
+                  style={{ display: "none", pointerEvents: "auto", userSelect: "none", cursor: "grab" }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => { e.stopPropagation(); liftToLearn(e.currentTarget as Element, d); }}
+                >
+                  <text
+                    x={0}
+                    y={0}
+                    dominantBaseline="central"
+                    style={{
+                      fill: "#ffffff",
+                      stroke: "#0a3a57",
+                      paintOrder: "stroke",
+                      strokeLinejoin: "round",
+                      fontFamily: "var(--font-display), system-ui, sans-serif",
+                      fontSize: "1px",
+                    }}
+                  >
+                    {of3.lines.map((ln, li) => (
+                      // em units, so the line spacing follows the font size the
+                      // frame writer sets and no y value here goes stale
+                      <tspan key={li} x={0} dy={li === 0 ? `${-((of3.lines.length - 1) / 2) * LABEL_LINE_H}em` : `${LABEL_LINE_H}em`}>{ln}</tspan>
+                    ))}
+                  </text>
+                </g>
+              );
+            })}
           </g>
 
           <g ref={btnsGRef} style={{ display: dockAside ? "inline" : "none" }} textAnchor="middle">
