@@ -9,7 +9,7 @@ import BentoBoard from "./BentoBoard";
 import AccessibleMenu from "./AccessibleMenu";
 import PcContrastToolbar from "../PcContrastToolbar/PcContrastToolbar";
 import OutboundLink from "../OutboundLink/OutboundLink";
-import CookieSettingsButton from "../CookieSettings/CookieSettingsButton";
+import CookieIcon from "../CookieSettings/CookieIcon";
 import BasketIcon from "./BasketIcon";
 import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./Nav.module.css";
@@ -327,9 +327,14 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <Link href="/preorder" className={styles.socialIcon} aria-label="Pre-order" onClick={closeForNav}><BasketIcon /></Link>
                 <span className={styles.topNavSep}>|</span>
                 {/* The mark, not the words, and sized by .socialIcon so it matches the
-                    Instagram and TikTok icons beside it. The Footer's copy of this
-                    button keeps its label: see the note on the icon prop. */}
-                <CookieSettingsButton icon className={styles.socialIcon} onActivate={closeForNav} />
+                    Instagram and TikTok icons beside it.
+                    A LINK TO THE POLICY, NOT THE OVERLAY (Steve, 20 September 2026).
+                    It used to open CookieDrop in manage mode. The choices now live in
+                    flow at the top of /cookies, where the explanation is, so this
+                    navigates there instead of floating a panel over whatever page you
+                    happen to be on. The Footer's copy still opens the overlay, which
+                    is the quicker route when you only want to change your mind. */}
+                <Link href="/cookies" className={styles.socialIcon} aria-label="Cookie settings" onClick={closeForNav}><CookieIcon /></Link>
                 <OutboundLink href="https://www.instagram.com/pedigree_chums_game/" className={styles.socialIcon} aria-label="Instagram">
                   {/* The viewBox was 440 0 261 341 and the artwork does not fit
                       inside it: the paths run from x 379.4 to 719.5, so 61 units

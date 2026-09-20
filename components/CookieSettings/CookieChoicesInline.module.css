@@ -1,0 +1,94 @@
+/* The consent panel as it appears IN FLOW at the top of /cookies, rather than as
+   the CookieDrop overlay.
+
+   WHY IT CANNOT JUST REUSE CookieDrop's CARD. That card is
+   `background: transparent` with a backdrop blur and white text, and its own
+   comment says that is "safe site-wide because body carries one blue gradient on
+   every page". The cookie policy page breaks that assumption: its content sits on
+   a white card, so white text on transparent glass landed white-on-white and the
+   panel and the policy text were legible through each other. This panel is
+   opaque navy with its own colours and makes no assumption about what is behind
+   it. */
+
+.panel {
+  background: var(--navy, #0a3a57);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: clamp(20px, 3.5vw, 30px) clamp(18px, 3.5vw, 30px);
+  margin: 0 0 clamp(24px, 4vw, 36px);
+}
+
+/* `.panel .title`, not `.title`, on purpose. This panel is dropped inside the
+   policy page's content card, which styles its headings with `.card h2`
+   (0,1,1). A bare `.title` (0,1,0) loses that and the heading came out in the
+   page's blue instead of the lemon. Two classes (0,2,0) wins without
+   !important, and keeps working wherever else this panel is placed. The same
+   guard is on .text and .state for the paragraph rules. */
+.panel .title {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  color: var(--yellow-header, #ffed00);
+  line-height: 1.1em;
+  margin: 0 0 10px;
+}
+
+.panel .text {
+  font-family: var(--font-body, Montserrat), sans-serif;
+  font-weight: 600;
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  line-height: 1.4em;
+  color: #ffffff;
+  margin: 0 0 14px;
+}
+
+.panel .link {
+  color: var(--yellow-header, #ffed00);
+  text-decoration: underline;
+}
+
+/* The current choice, shown only once one exists. */
+.panel .state {
+  font-family: var(--font-body, Montserrat), sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
+  color: #ffffff;
+  margin: 0 0 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Both buttons carry the same weight on purpose. Under PECR, rejecting has to be
+   as easy as accepting, so neither is styled as the quiet option. Same rule
+   CookieBar records. */
+.btn {
+  flex: 0 1 auto;
+  font-family: var(--font-body, Montserrat), sans-serif;
+  font-weight: 800;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  padding: 14px 34px;
+  border-radius: 999px;
+  border: 3px solid var(--navy, #0a3a57);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.accept {
+  background: var(--cta, #4cb847);
+}
+
+.reject {
+  background: var(--family-emergency, #c2185b);
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+}
+
+.btn:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}

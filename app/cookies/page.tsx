@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import CookieChoicesInline from "../../components/CookieSettings/CookieChoicesInline";
 import styles from "./cookies.module.css";
 
 export const metadata: Metadata = {
@@ -20,6 +21,13 @@ export default function CookiesPage() {
             Cookie <span>Policy</span>
           </h1>
           <p className={styles.updated}>Last updated: August 2026</p>
+
+          {/* The consent choices in flow, at the top of the policy. This used to
+              be the CookieDrop overlay, which is transparent glass with white
+              text and landed on top of this white card, leaving the notice and
+              the policy readable through each other and neither readable at all.
+              CookieDrop now stands down on this route; see its pathname guard. */}
+          <CookieChoicesInline />
 
           <p>
             This policy explains how Pedigree Chums (a trading name of Taylor

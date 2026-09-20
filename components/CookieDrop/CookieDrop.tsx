@@ -108,6 +108,16 @@ export default function CookieDrop() {
     if (visible) cardRef.current?.focus();
   }, [visible]);
 
+  /* STANDS DOWN ON /cookies, 20 September 2026 (Steve). That page renders the
+     same choices in flow through CookieChoicesInline, so opening this as well
+     would be two notices at once. It also could not be read there: this card is
+     transparent glass with white text, and the policy sits on a white content
+     card, so the two were legible through each other and neither was readable.
+     Everything else about this component is unchanged, and the consent events it
+     listens for still work from that page, because the inline panel dispatches
+     exactly the same ones. */
+  if (pathname === "/cookies") return null;
+
   if (!visible) return null;
 
   const choose = (accept: boolean) => {
