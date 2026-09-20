@@ -2236,7 +2236,21 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
 
    ONE CONSTANT TO FLIP. The words group, its positioning loop and the word bodies
    are all left in place and simply not shown. */
-const PIT_DRAWS_WORDS = false;
+/* W1 STAGE 2, 20 September 2026 (owner: the circles that fall from the diagram,
+   as they are single dogs, should be text words). Turned back ON, but it is no
+   longer the whole rule: a depth-1 dog draws as a word only if its breed appears
+   ONCE in this level. A doubled breed keeps its circle.
+
+   WHY THE LEVEL AND NOT THE LIVE PIT. twinNames counts the layout, so the answer
+   is fixed before anything falls and cannot change during a round. That matters
+   here in a way it does not for a fill: the word is a different COLLIDER, a
+   chamfered rectangle from mkWord, and swapping a body mid-round is stage 3. A
+   static answer means the picture and the collider are decided together, once,
+   and can never disagree. That disagreement is the 19 September fault.
+
+   STILL ONE CONSTANT TO FLIP, and it still switches everything off together: the
+   drawing, the group and the body choice all read it. */
+const PIT_DRAWS_WORDS = true;
 const CHIP_R_PX = 12;
 /* THE START SCREEN'S DIAGRAM BADGES ARE TWICE THE PIT'S, 19 September 2026
    (owner). Doubling was tried on CHIP_R_PX itself first, which doubled BOTH,
@@ -3291,6 +3305,16 @@ export default function BreedTree({
     seen.forEach((n, name) => { if (n > 1) out.add(name); });
     return out;
   }, [nodes]);
+  /* THE SAME SET, REACHABLE FROM THE PHYSICS SIDE (W1 stage 2). The frame writer
+     and doFall both hold older closures, so neither may read the memo directly.
+
+     WRITTEN IN AN EFFECT, NOT IN RENDER. The obvious `ref.current = value` beside
+     the memo is what isMobileRef does a few lines below, and it costs one
+     react-hooks/refs error, which this file's baseline may not grow by. The
+     initial value is the first memo, so it is correct before the effect has ever
+     run, and the layout cannot change without a re-render anyway. */
+  const twinNamesRef = useRef<Set<string>>(twinNames);
+  useEffect(() => { twinNamesRef.current = twinNames; }, [twinNames]);
 
   // Rarity band: per-level count of each dog among the CIRCLES that drop (nodes,
   // echo-excluded, root excluded, so it matches what a player sees). The band is
@@ -6067,7 +6091,12 @@ export default function BreedTree({
           // body rather than off React state, because the physics loop holds an
           // older closure and would see a stale learnNode.
           const wn = b.n;
-          const wGone = b.held || (!!wn && removedNodesRef.current.has(wn));
+          /* A TWIN HAS NO WORD. wordList is built from every depth-1 dog so the
+             indices line up with wordBodiesRef, and a doubled breed simply never
+             shows its slot. Same set the body choice used, so a hidden word can
+             never be a word-shaped collider. */
+          const wTwin = !!wn && twinNamesRef.current.has(wn.data.name);
+          const wGone = wTwin || b.held || (!!wn && removedNodesRef.current.has(wn));
           el.setAttribute("display", wGone ? "none" : "inline");
           if (wGone) continue;
           // The pop. `now` is zero on every caller that is not the physics
@@ -6221,7 +6250,7 @@ export default function BreedTree({
       // Once the pit is live a level dog IS its name, drawn in its own group
       // below, so the circle stands down. Keyed off depth alone: no lookup, no
       // way for it to half-apply.
-      const isWordNode = PIT_DRAWS_WORDS && fellRef.current && d.depth === 1;
+      const isWordNode = PIT_DRAWS_WORDS && fellRef.current && d.depth === 1 && !twinNamesRef.current.has(d.data.name);
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       /* A CIRCLE IN THE CHAIN IS INVERTED:
          light blue where it was navy, and navy where its outline was. It wore a
@@ -7386,7 +7415,11 @@ export default function BreedTree({
          BOTH PATHS ARE KEPT, on the one constant, because the word body is not a
          detail of the word: it is a different collider with its own chamfer and
          its own minimum, and rebuilding it later would be real work. */
-      for (const b of bodies) { if (PIT_DRAWS_WORDS) mkWord(b, CIRCLE_OPTS); else mkCircle(b, "circle", CIRCLE_OPTS); }
+      /* ONE TEST, TWO CONSUMERS: this and isWordNode in the frame writer ask the
+         same question of the same set, so what is drawn and what collides are the
+         same decision. Do not let these two drift. */
+      const wordBreed = (b: Body) => PIT_DRAWS_WORDS && !!b.n && !twinNamesRef.current.has(b.n.data.name);
+      for (const b of bodies) { if (wordBreed(b)) mkWord(b, CIRCLE_OPTS); else mkCircle(b, "circle", CIRCLE_OPTS); }
       for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
       // The opening shove: up and out, the first name one way and the next the
       // other, with a spin so they arrive already tumbling rather than dropping
