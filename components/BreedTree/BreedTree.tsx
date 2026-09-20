@@ -2469,6 +2469,16 @@ function fitLabel(name: string, r: number, capFs: number, font: string | null): 
    CACHED BY EXACT KEY, no rounding, so a cached fit is the same number a fresh
    call would produce. Node radii are stable once the layout has run, so the
    cache hits on every later call for the same circle. */
+/* HOW ONE NAME WRAPS, and how wide the widest line is in ems. Pure, no cache, so
+   the render and the physics side can both call it and cannot disagree.
+
+   ONLY THE WRAP IS DECIDED HERE, never the size: the drawn size is computed from
+   the drop-time scale against THESE lines. fitLabel is called at the node's own
+   radius with no view scale, because the line breaking is scale-invariant. */
+function wordWrap(name: string, r: number, font: string | null): { lines: string[]; widthEm: number } {
+  const lines = fitLabel(name.toUpperCase(), r * LABEL_SAFE, 132, font).lines;
+  return { lines, widthEm: Math.max(...lines.map((l) => measureEm(l, font))) || 1 };
+}
 type PitWordFit = { lines: string[]; fs: number; wv: number; hv: number; fits: boolean; capped: boolean };
 const pitWordFitCache = new Map<string, PitWordFit>();
 function pitWordFit(name: string, rView: number, font: string | null, stageW?: number): PitWordFit {
@@ -4123,13 +4133,30 @@ export default function BreedTree({
 
      widthEm IS MEASURED ONCE, here, because the frame writer needs it every frame
      to turn a requested width into a font size, and measureEm is a canvas call. */
-  const orphanFits = useMemo(
-    () => nodes.map((d) => {
-      const lines = fitLabel(d.data.name.toUpperCase(), d.r * LABEL_SAFE, 132, labelFont).lines;
-      return { lines, widthEm: Math.max(...lines.map((l) => measureEm(l, labelFont))) || 1 };
-    }),
-    [nodes, labelFont],
-  );
+  /* THE WORDS ON SCREEN, BY NODE INDEX, and nothing else (owner, 20 September
+     2026: render a word slot only for nodes that are actually words).
+
+     WHAT IT REPLACES. A slot was rendered for EVERY node, hidden until it became
+     a word, and the wrap was measured for every node too. On Old Welsh Land
+     Spaniels that is 97 groups and 97 fitter passes for a handful of visible
+     words, carried for the whole round on top of the heaviest layer in the game.
+     Quick-collecting the chums there took the tab out with Safari's "this page
+     couldn't load", which is a renderer kill.
+
+     THE LATCH IS A REF, so React cannot see it; this list is the published copy.
+     The frame writer appends to it on the frame a circle turns single, which
+     costs one render per word for the whole round.
+
+     ONE FRAME OF LAG IS ACCEPTED AND HANDLED. The writer latches and the state
+     arrives on the next render, so the word draws a frame later. The body is
+     swapped immediately regardless, from wordWrap directly, so the physics never
+     waits on React. */
+  const [wordNodeIds, setWordNodeIds] = useState<number[]>([]);
+  const orphanFits = useMemo(() => {
+    const m = new Map<number, { lines: string[]; widthEm: number }>();
+    for (const i2 of wordNodeIds) { const d = nodes[i2]; if (d) m.set(i2, wordWrap(d.data.name, d.r, labelFont)); }
+    return m;
+  }, [wordNodeIds, nodes, labelFont]);
   const orphanFitsRef = useRef(orphanFits);
   useEffect(() => { orphanFitsRef.current = orphanFits; }, [orphanFits]);
   useEffect(() => {
@@ -6231,7 +6258,18 @@ export default function BreedTree({
       }
     }
     const cg = circlesRef.current;
+    /* THE WORD SLOTS, BY NODE INDEX. The group now holds only the words, so its
+       child order is the order they were latched in, not the node order. One
+       small map a frame beats carrying 97 hidden groups to keep the indices
+       lined up. */
     const owg = owordsGRef.current;
+    const owSlots = owg ? new Map<number, SVGGElement>() : null;
+    if (owg && owSlots) {
+      for (const c2 of Array.from(owg.children)) {
+        const n2 = Number((c2 as SVGGElement).dataset.n);
+        if (Number.isFinite(n2)) owSlots.set(n2, c2 as SVGGElement);
+      }
+    }
     const bb = badgeBodiesRef.current;
     if (bb) {
       const bg = badgesRef.current;
@@ -6549,7 +6587,11 @@ export default function BreedTree({
       if (wantWord && !orphanWord) {
         orphanSetRef.current.add(d);
         orphanPopRef.current.set(d, now || performance.now());
-        const of = orphanFitsRef.current[i];
+        // Publish it so a slot is rendered for it. One render per word, once.
+        setWordNodeIds((l) => (l.includes(i) ? l : [...l, i]));
+        // Measured HERE rather than read from the published list, which does not
+        // exist until React has rendered: the body must swap on this frame.
+        const of = wordWrap(d.data.name, d.r, labelFont);
         const kD = dropKRef.current || k;
         if (of && pxPerViewRef.current) {
           const rv = d.r * kD;
@@ -6812,7 +6854,7 @@ export default function BreedTree({
 
          IT FOLLOWS THE BODY'S ANGLE. A circle is round and never needed one; a
          name has to tumble with the thing it has become. */
-      const ow = owg?.children[i] as SVGGElement | undefined;
+      const ow = owSlots?.get(i);
       if (ow) {
         const ob = pitBodiesRef.current?.find(d);
         /* A WORD FOLLOWS ITS DOG OUT OF THE PIT, the same two tests the drop's
@@ -6821,7 +6863,7 @@ export default function BreedTree({
            never off React state, because this loop holds an older closure. */
         const oShow = orphanWord && !ob?.held && !removedNodesRef.current.has(d);
         if (ow.style.display !== (oShow ? "inline" : "none")) ow.style.display = oShow ? "inline" : "none";
-        const of2 = orphanFitsRef.current[i];
+        const of2 = orphanFitsRef.current.get(i);
         if (oShow && of2) {
           const kD = dropKRef.current || k;
           const want = Math.min(d.r * kD * 2 * PIT_WORD_WIDTH, (stageWvRef.current || Infinity) * PIT_WORD_MAX_STAGE);
@@ -7488,6 +7530,7 @@ export default function BreedTree({
       // a fresh round owns no orphans yet
       orphanSetRef.current = new Set();
       orphanPopRef.current = new Map();
+      setWordNodeIds([]);
       const st = stageRef.current;
       const stageH = st ? Math.max(st.clientHeight, 1) : SIZE;
       const asp = st ? st.clientWidth / stageH : aspect;
@@ -14195,11 +14238,14 @@ export default function BreedTree({
               behind it any more, and without this the tap reaches the background
               and offers to leave the game. */}
           <g ref={owordsGRef} textAnchor="middle">
-            {nodes.map((d, i2) => {
-              const of3 = orphanFits[i2];
+            {wordNodeIds.map((i2) => {
+              const d = nodes[i2];
+              const of3 = orphanFits.get(i2);
+              if (!d || !of3) return null;
               return (
                 <g
                   key={i2}
+                  data-n={i2}
                   style={{ display: "none", pointerEvents: "auto", userSelect: "none", cursor: "grab" }}
                   onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => { e.stopPropagation(); liftToLearn(e.currentTarget as Element, d); }}
