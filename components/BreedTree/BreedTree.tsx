@@ -2366,6 +2366,41 @@ function fitLabel(name: string, r: number, capFs: number, font: string | null): 
   }
   return best;
 }
+/* ONE FITTER FOR EVERY PIT WORD, 20 September 2026 (W1 stage 1).
+
+   WHY IT IS A FUNCTION NOW. A pit word was measured in exactly one place, the
+   d1 pass inside doFall, because words only ever existed at depth 1. W1 draws a
+   word wherever a breed has no other copy left in the pit, which is every depth
+   and at any minute of the round, so the measurement has to be callable rather
+   than a single pass taken before anything falls.
+
+   THE MATHS IS LIFTED UNCHANGED from that pass: the same fitter, the same
+   LABEL_SAFE, the same 132 cap, the same TITLE_BOOST and the same
+   PIT_WORD_SCALE, in the same order. doFall now calls this instead of doing it
+   inline, so the two can never drift apart.
+
+   rView IS THE NODE RADIUS IN VIEW UNITS, n.r * k, at the DROP-TIME k. The word
+   is drawn at a font size in those units and does not rescale with zoom, so
+   measuring against a later k would size a word for a view it is not drawn in.
+   See dropKRef.
+
+   CACHED BY EXACT KEY, no rounding, so a cached fit is the same number the
+   inline version would have produced. Node radii are stable once the layout has
+   run, so the cache hits on every later call for the same circle. */
+type PitWordFit = { lines: string[]; fs: number; wv: number; hv: number; fits: boolean };
+const pitWordFitCache = new Map<string, PitWordFit>();
+function pitWordFit(name: string, rView: number, font: string | null): PitWordFit {
+  const key = `${font ?? ""}|${rView}|${name}`;
+  const hit = pitWordFitCache.get(key);
+  if (hit) return hit;
+  const fit = fitLabel(name.toUpperCase(), rView * LABEL_SAFE, 132, font);
+  const fs = Math.max(10, fit.fs + TITLE_BOOST) * PIT_WORD_SCALE;
+  const wv = Math.max(...fit.lines.map((l) => measureEm(l, font))) * fs;
+  const hv = fit.lines.length * fs * LABEL_LINE_H;
+  const out: PitWordFit = { lines: fit.lines, fs, wv, hv, fits: fit.fits };
+  pitWordFitCache.set(key, out);
+  return out;
+}
 type View = [number, number, number];
 
 // Classic bounce easing for the drop-in entrance: overshoots slightly and
@@ -4182,6 +4217,93 @@ export default function BreedTree({
     } catch {}
     return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
   }, []);
+  /* ---- ?wordfit=1 : W1 STAGE 1, THE WORD MEASUREMENT AT EVERY DEPTH ----------
+     REMOVE BEFORE THE STAGE 5 COMMIT. This is a readout, not a feature: it
+     renders nothing into the pit and changes nothing that falls.
+
+     WHAT IT IS PROVING. Until now a pit word was only ever measured for a
+     depth-1 dog, once, before anything fell. W1 needs a fit for any circle whose
+     breed has no other copy left in the pit, at any depth and at any moment, so
+     the first question is whether the fitter gives a sane answer for circles it
+     has never been asked about. This asks it for every live circle, every half
+     second, and says which answers are unusable.
+
+     THE COLUMNS.
+       live        circles still in the pit, by pitCountable, the same filter
+                   chSingle counts through
+       single      of those, breeds with exactly one copy left: the population
+                   W1 turns into words
+       nofit       fits === false, meaning the name does not sit inside its own
+                   circle at any size the fitter will draw. Those are the ones to
+                   look at: the word is still measured, but it was never drawn
+                   at that size before
+       widest      the widest word as a share of the stage, in the same view
+                   units the word is drawn in. Over 100% cannot fit the pit
+                   however it tumbles, which is the fault PIT_WORD_SCALE's own
+                   note records
+     Then one row per depth, and the eight widest names.
+
+     MEASURED AT THE DROP-TIME k, via dropKRef, because that is the scale the
+     word is drawn at. Nothing is created without the flag. */
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("wordfit") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#6ff;" +
+        "font:11px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "word fit: start a round";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const pb = pitBodiesRef.current;
+        const kD = dropKRef.current;
+        if (!pb || !kD) { el.textContent = "word fit: no pit yet"; return; }
+        const rem = removedNodesRef.current;
+        const live = [...pb.owned].filter((n) => pitCountable(n, rem));
+        // the live count, the same two passes chSingle's own count makes
+        const per = new Map<string, number>();
+        for (const n of live) per.set(n.data.name, (per.get(n.data.name) ?? 0) + 1);
+        // the stage, in the units a word is drawn in
+        const svg = stageRef.current ? stageRef.current.querySelector("svg") : null;
+        const vb = svg ? svg.getAttribute("viewBox") : null;
+        const stageW = vb ? Number(vb.split(/\s+/)[2]) || SIZE : SIZE;
+        type Row = { n: Node; f: PitWordFit; solo: boolean };
+        const rows: Row[] = live.map((n) => ({
+          n,
+          f: pitWordFit(n.data.name, n.r * kD, labelFont),
+          solo: (per.get(n.data.name) ?? 0) === 1,
+        }));
+        const solo = rows.filter((r) => r.solo);
+        const nofit = rows.filter((r) => !r.f.fits);
+        const widest = rows.reduce((a, b) => (b.f.wv > a ? b.f.wv : a), 0);
+        const byDepth = new Map<number, Row[]>();
+        for (const r of rows) byDepth.set(r.n.depth, [...(byDepth.get(r.n.depth) ?? []), r]);
+        const depths = [...byDepth.keys()].sort((a, b) => a - b).map((dp) => {
+          const g = byDepth.get(dp) ?? [];
+          const w = g.reduce((a, b) => (b.f.wv > a ? b.f.wv : a), 0);
+          return `  d${dp}  live ${String(g.length).padStart(3)}  single ${String(g.filter((r) => r.solo).length).padStart(3)}` +
+            `  nofit ${String(g.filter((r) => !r.f.fits).length).padStart(3)}  widest ${((w / stageW) * 100).toFixed(0)}%`;
+        });
+        const worst = [...rows].sort((a, b) => b.f.wv - a.f.wv).slice(0, 8).map((r) => {
+          const pc = ((r.f.wv / stageW) * 100).toFixed(0);
+          return `  d${r.n.depth} ${r.solo ? "SINGLE" : "twin  "} ${r.f.fits ? "    " : "NOFIT"}` +
+            ` w ${pc.padStart(3)}%  fs ${r.f.fs.toFixed(1)}  ${r.f.lines.length}ln  ${r.n.data.name}`;
+        });
+        el.textContent =
+          `word fit  live ${live.length}  single ${solo.length}  nofit ${nofit.length}` +
+          `  widest ${((widest / stageW) * 100).toFixed(0)}% of stage  k ${kD.toFixed(3)}` +
+          (labelFont ? "" : "   <-- NO FONT YET: widths are the flat average, not real glyphs") +
+          "\n" + depths.join("\n") +
+          "\n  widest names:\n" + worst.join("\n");
+      };
+      tick();
+      t = window.setInterval(tick, 500);
+    } catch {}
+    return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
+  }, [labelFont]);
   const spinDiagRef = useRef<string[]>([]);
   /* DIAGNOSTIC, ?fulldiag=1, 19 September 2026. REMOVE ONCE ANSWERED.
      The question: the pit-full countdown starts on a pit that is not full, and
@@ -4933,6 +5055,11 @@ export default function BreedTree({
   const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null; held?: boolean }[]>([]);
   const [wordList, setWordList] = useState<{ lines: string[]; fs: number }[]>([]);
   const wordPopAtRef = useRef<number>(0);
+  /* THE DROP-TIME VIEW SCALE, 20 September 2026 (W1 stage 1). Written once in
+     doFall and read by every later word measurement, so a circle that turns
+     single at minute three is measured in the same units as one that dropped as
+     a word. Zero until the first drop, which is the probe's "no pit yet". */
+  const dropKRef = useRef<number>(0);
   // Whether the last press came from a finger. Touch has no hover, so this flag
   // keeps the tap path and the mouse-hover path apart: browsers fire a synthetic
   // mouseenter on tap, which would set hovered before the click landed and make
@@ -7002,6 +7129,9 @@ export default function BreedTree({
       setDropped(true); // names disappear, physics badges appear
       const v = viewRef.current;
       const k = SIZE / v[2];
+      // The scale every pit word is measured against for the rest of the round.
+      // See dropKRef and pitWordFit.
+      dropKRef.current = k;
       const st = stageRef.current;
       const stageH = st ? Math.max(st.clientHeight, 1) : SIZE;
       const asp = st ? st.clientWidth / stageH : aspect;
@@ -7096,16 +7226,12 @@ export default function BreedTree({
       // it any more. Derived rather than measured off the DOM: the fitter is the
       // thing that decided the size in the first place, so asking it directly
       // cannot disagree with what was drawn.
-      const wordFits = d1.map((n) => {
-        // Owner review: desktop takes the mobile fitter width, so the name
-        // wraps into short lines and sits inside its circle rather than
-        // running wide across the top of the stage.
-        const fit = fitLabel(n.data.name.toUpperCase(), n.r * k * LABEL_SAFE, 132, labelFont);
-        const fs = Math.max(10, fit.fs + TITLE_BOOST) * PIT_WORD_SCALE;
-        const wv = Math.max(...fit.lines.map((l) => measureEm(l, labelFont))) * fs;
-        const hv = fit.lines.length * fs * LABEL_LINE_H;
-        return { lines: fit.lines, fs, wv, hv };
-      });
+      // Owner review: desktop takes the mobile fitter width, so the name wraps
+      // into short lines and sits inside its circle rather than running wide
+      // across the top of the stage. The four lines that did this moved into
+      // pitWordFit unchanged (W1 stage 1), so every depth measures the same way
+      // depth 1 always did.
+      const wordFits = d1.map((n) => pitWordFit(n.data.name, n.r * k, labelFont));
       setWordList(wordFits.map((f) => ({ lines: f.lines, fs: f.fs })));
       wordBodiesRef.current = bodies;
       wordPopAtRef.current = performance.now();
