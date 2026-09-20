@@ -6992,12 +6992,22 @@ export default function BreedTree({
         }
       }
       while (tg.children.length > rings.length) tg.lastChild?.remove();
+      /* THE GLOW TAKES THE CHAINED BREED'S RARITY COLOUR, 20 September 2026
+         (owner). It was the last thing in the chain still on the flat
+         DOG_CHAIN_COLOUR lemon: the PATH moved to the rarity colour on 19
+         September and the halo round the circles did not follow, so a chain drew
+         its line in one colour and lit its dogs in another.
+
+         ONE COLOUR FOR THE WHOLE CHAIN, because a chain is one breed by
+         construction, so this is looked up once a frame rather than per ring.
+
+         IT IS WRITTEN IN THE LOOP, NOT AT CREATION. These elements are pooled and
+         reused by the next chain, so a colour set once when the element was made
+         would be whatever breed happened to be chained first. */
+      const glowCol = glowBreed ? RARITY_BAND[rarityTier(treesContaining(glowBreed))].bg : DOG_CHAIN_COLOUR;
       while (tg.children.length < rings.length) {
         const el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         el.style.fill = "none";
-        // One colour now, the chain's own, so it is set once here rather than
-        // written every frame as it was when the ring had a resting state.
-        el.style.stroke = DOG_CHAIN_COLOUR;
         tg.appendChild(el);
       }
       rings.forEach((rg, ri) => {
@@ -7006,6 +7016,7 @@ export default function BreedTree({
         el.setAttribute("cy", String(rg.y));
         el.setAttribute("r", String(rg.r));
         el.style.strokeWidth = String(Math.max(1, rg.w * 2.2));
+        if (el.style.stroke !== glowCol) el.style.stroke = glowCol;
       });
     }
   }
