@@ -1993,8 +1993,15 @@ const ROD_HITS = 2;
    every rod now lands at exactly 10px long against its 8px thickness, which is a
    small nub rather than a bar. That is what the stated figure gives. If the intent
    was "about the size of a node" rather than "10px", this is the one number to
-   raise and 25 would do it. */
-const ROD_MAX_PX = 10;
+   raise and 25 would do it.
+
+   10 -> 20, 20 September 2026 (owner: the connectors are 50% too short, double
+   the length). The floor at the spawn site stays at 10 and is now the only thing
+   the two do not share, which does not matter in practice: the note above records
+   that the REAL distance between two nodes is always well past the cap, so every
+   rod still lands at exactly the cap, now 20px. Raise the floor too only if the
+   real distance ever comes in short. */
+const ROD_MAX_PX = 20;
 /* HOW THICK A CONNECTOR IS, 19 September 2026 (owner: 10px long is fine, but they
    are too thick, the maximum should be 5px).
 
@@ -2010,8 +2017,19 @@ const ROD_MAX_PX = 10;
 
    IT IS NOW TWICE AS LONG AS IT IS THICK, 10 by 5, which reads as a short bar.
    At the old 8 against the capped 10 it was very nearly square, which is part of
-   why they looked wrong once the length cap went in. */
-const ROD_H_PX = 5;
+   why they looked wrong once the length cap went in.
+
+   5 -> 2, 20 September 2026 (owner: reduce the width by 3px), alongside the
+   length going to 20. The proportion goes from 2:1 to 10:1, so a connector now
+   reads as a thin wire rather than a short bar. The chamfer is still half of
+   this, so the ends stay fully round at 1px.
+
+   TWO THINGS TO KNOW AT 2px. It is the thinnest collider in the pit, so a rod is
+   harder to grab and can be lost against a busy floor; and a rod's blast reach is
+   half its LONGEST side, so doubling the length doubles that reach from 5px to
+   10px. Rods do not conduct a blast onwards, see the note on BOMB_TOUCH, so the
+   reach is the only thing that grows. */
+const ROD_H_PX = 2;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
