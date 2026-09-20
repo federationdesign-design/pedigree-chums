@@ -112,6 +112,9 @@ type Props = {
   /* The clicked history card's viewport rect, so the time tunnel's card dives
      from where it sat. Optional: absent means the tunnel dives from centre. */
   fromRect?: { x: number; y: number; w: number; h: number };
+  // Which object dives down the time tunnel. Passed straight through; see the
+  // note at the top of TimeTunnel.
+  diver?: "card" | "button";
   /* Skip the time tunnel: this level change is navigation between start
      screens, not an entry into the pit. Set by BreedStrip's navTo. */
   quiet?: boolean;
@@ -203,7 +206,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -611,7 +614,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
       aria-label={name}
     >
       {/* The time tunnel covers the pit while it arrives, then removes itself. */}
-      {tunnelActive && <TimeTunnel fromRect={fromRect} onResolve={() => setResolving(true)} onDone={() => setTunnelActive(false)} />}
+      {tunnelActive && <TimeTunnel fromRect={fromRect} diver={diver} onResolve={() => setResolving(true)} onDone={() => setTunnelActive(false)} />}
       {/* Score, top of the pit on the same axis as the level portrait.
 
           SHOWN DURING PLAY AGAIN, 31 August 2026 (Steve), to match the main

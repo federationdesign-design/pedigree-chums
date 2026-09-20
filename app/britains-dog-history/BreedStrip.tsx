@@ -119,6 +119,8 @@ export default function BreedStrip({
     lineage: LineageNode;
     // The clicked card's on-screen rect, so the tunnel's card dives from it.
     fromRect?: { x: number; y: number; w: number; h: number };
+    // And WHAT dives. See the note at the top of TimeTunnel.
+    diver?: "card" | "button";
     /* NO TIME TUNNEL, 9 Sept 2026. LineageModal remounts on every level change,
        and its tunnel state initialises to "play" on mount, so swiping between
        dogs on the start screen replayed the whole arrival sequence each time.
@@ -322,6 +324,10 @@ export default function BreedStrip({
         fact: pack?.fact,
         lineage,
         fromRect: r ? { x: r.x, y: r.y, w: r.width, h: r.height } : undefined,
+        /* A DOG CARD, AT EVERY WIDTH. openFor is the tap handler for BOTH the
+           rail and the era sliders, so this one line covers every card route
+           there is, which is the route the 19 September width rule broke. */
+        diver: "card",
       });
     };
   };
@@ -596,7 +602,7 @@ export default function BreedStrip({
            anything on screen, so this route reached TimeTunnel with none and the
            object dived from the screen centre at a fallback size. The Next Level
            button now reports its own rect and it is carried here. */
-        if (na) setActive({ ...na, fromRect: rect });
+        if (na) setActive({ ...na, fromRect: rect, diver: "button" });
       }}
       onLost={() => {
         /* THE LIFE IS SPENT ON THE LOSS, 19 September 2026 (owner). It used to
@@ -684,6 +690,7 @@ export default function BreedStrip({
       fact={active.fact}
       lineage={active.lineage}
       fromRect={active.fromRect}
+      diver={active.diver}
       quiet={active.quiet}
       navFading={navFading}
       onClose={() => {
