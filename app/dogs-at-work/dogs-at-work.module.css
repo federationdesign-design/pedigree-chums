@@ -551,6 +551,13 @@
   margin: 0;
 }
 
+/* The legacy Sources citation list. It carried a per-site inline fontSize, which
+   cannot take a media query, so reducing it reached desktop as well and shortened
+   the sidebar there. As a class it can be scoped like the component half. */
+.cardSources {
+  font-size: 0.987rem;
+}
+
 .statLabel2 {
   font-family: var(--font-body);
   font-size: 0.66rem;
@@ -866,6 +873,14 @@
     line-height: 1.3em;
   }
 
+  /* Sources down a further 2pt, mobile only, 20 September 2026 (Steve). Declared
+     AFTER .cardBody2 on purpose: both are single classes, so they tie on specificity
+     and source order decides. Placed before it, this rule silently lost and the
+     citation list stayed at the body size. */
+  .cardSources {
+    font-size: calc(0.987rem - 2pt);
+  }
+
   /* Lift the bottom-aligned title, pills and back link off the very bottom so the
      overlaid payslip below has a clear band to sit in (the mobile stand-in for the
      desktop 60%-width title cap). 190 - 140 overlap = 50px nominal clearance,
@@ -889,7 +904,10 @@
     display: flow-root;
     max-width: 1300px;
     margin: 0 auto;
-    padding: 0 24px;
+    /* 48px added at the foot, 20 September 2026 (Steve: the last card sits right on
+       the footer). Measured at 390: the gap between the bottom card and the footer
+       was 0px on all six articles. The side 24px is unchanged. */
+    padding: 0 24px 48px;
     /* Clip the tilted payslip's rotated corners/shadow so they cannot create a
        horizontal scrollbar at full width. */
     overflow-x: clip;

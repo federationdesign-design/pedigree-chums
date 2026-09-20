@@ -168,4 +168,12 @@
     font-size: calc(1.087rem - 2pt);
     line-height: 1.3em;
   }
+
+  /* Sources down a further 2pt, 20 September 2026 (Steve). It is a citation list, so
+     it reads smaller than the card's body copy. Declared after the shared rule above
+     so it wins on source order. The legacy half is the inline 0.987rem override in
+     the medicine and machine articles, which came down by the same 2pt. */
+  .sources {
+    font-size: calc(1.087rem - 4pt);
+  }
 }
