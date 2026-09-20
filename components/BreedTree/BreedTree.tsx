@@ -10242,13 +10242,32 @@ export default function BreedTree({
         // zone, merge their horizontal spans so two circles side by side are not
         // counted twice, and compare against the width between the pit walls.
         const spans: [number, number][] = [];
+        /* THE MOUTH OF THE PIT. A body whose CENTRE is above this is not in the
+           pit at all, and 20 September 2026 it turned out that mattered a great
+           deal: ?fulldiag=1 on Drover's Dog reported 16 bodies in the zone,
+           every one a chum card, covering 100.4% against a 34.3% threshold, with
+           tops of -1184 to -1741 against a zone line of -1109. The chum cards sit
+           ABOVE the stage and never leave, so the pit read as full from the first
+           second and the countdown could not be argued out of it. Clearing the
+           real pit changed nothing, because the figure was never made of dogs.
+
+           WHY CENTRE AND NOT TOP. The zone test below is deliberately a TOP test:
+           a circle stacked high in the pit pokes its top over the line and should
+           count. Using the top here too would throw that away. A body's centre is
+           the honest answer to "is this thing in the pit", and it is what
+           separates a card resting above the mouth from a dog piled up to it.
+
+           CHUM CARDS STILL COUNT when they are genuinely in the pit, which is why
+           they were included in the first place. */
+        const mouthY = zoneY - (PIT_FULL_ZONE_PX * uppW) / k;
         // (the `inZone` counter went with the `>= 5` rule below)
         // ?fulldiag=1 only: what each body did, so a phantom occupier names itself.
         const dLines: string[] = [];
-        let dHeld = 0, dMoving = 0, dBelow = 0;
+        let dHeld = 0, dMoving = 0, dBelow = 0, dAbove = 0;
         const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean, label?: string) => {
           if (held) { dHeld++; return; }
           if (Math.hypot(vx, vy) > worldH * 0.03) { dMoving++; return; }
+          if (y < mouthY) { dAbove++; return; }
           if (y - r < zoneY) {
             spans.push([x - r, x + r]);
             if (fullDiagOn) dLines.push(`  IN ZONE ${label ?? "?"} x${x.toFixed(0)} r${r.toFixed(0)} top${(y - r).toFixed(0)} w${((2 * r) / ((xR - xL) || 1) * 100).toFixed(0)}%`);
@@ -10288,8 +10307,8 @@ export default function BreedTree({
           fullDiagRef.current = [
             `FULL? ${blocked ? "YES" : "no"}   bodies in zone ${spans.length}   cover ${(covered / pitW * 100).toFixed(1)}% of pit   needs ${(PIT_FULL_COVER * 100).toFixed(1)}%`,
             `zone line y ${zoneY.toFixed(0)} (${PIT_FULL_ZONE_PX}px from stage top)   pit ${xL.toFixed(0)} to ${xR.toFixed(0)}   list all=${all.length} chums=${chumBodiesRef.current.length}`,
-            `rejected: held ${dHeld}  moving ${dMoving}  below zone ${dBelow}`,
-            ...dLines.slice(0, 12),
+            `rejected: held ${dHeld}  moving ${dMoving}  below zone ${dBelow}  above the mouth ${dAbove}`,
+            ...dLines.slice(0, 4),
           ];
         }
         /* `|| inZone >= 5` DELETED, 9 Sept 2026 (owner). It was the OLD rule,
