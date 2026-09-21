@@ -111,7 +111,7 @@
   /* Smaller right padding so the bigger one-line title spans toward the toolbar
      (item 1). The title sits below the toolbar's row, so it never runs under it. */
   padding-right: clamp(48px, 5vw, 110px);
-  padding-bottom: 20px;
+  padding-bottom: 0; /* was 20px; the text toggle's row below now holds that space (21 September 2026) */
   padding-left: clamp(18px, 4vw, 48px);
 }
 
@@ -929,12 +929,7 @@
 
    THE COLOUR TOOLBAR WINS: nothing here applies while a data-pc-contrast-scheme is set,
    the same rule the essays use, so the two controls never fight. */
-.textToggleSlot {
-  position: fixed;
-  top: 32px;
-  left: 236px;
-  z-index: 301; /* above the fixed nav (300), whose band this sits in */
-}
+/* .textToggleSlot, the fixed spot beside the logo, removed 21 September 2026: the toggle now sits on the page. See Chums2Client. */
 :global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .introBox,
 :global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .card,
 :global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .framePopover,

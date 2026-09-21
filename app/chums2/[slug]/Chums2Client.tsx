@@ -642,14 +642,6 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       <div ref={introMeasureRef} aria-hidden="true" style={{ position: "absolute", left: -99999, top: 0, visibility: "hidden", padding: "20px 0", boxSizing: "content-box", pointerEvents: "none" }}>
         {tallestFrame && renderAncestorCard(tallestFrame)}
       </div>
-      {/* THE ◐ TOGGLE, 21 September 2026 (owner: the same toggle the articles use;
-          white text goes blue and the info cards go white). The component is the
-          articles' own; it flags the page's <main> and the rules in chums2.module.css
-          under "LIGHT CARDS" decide what that means here. Fixed beside the logo, the
-          spot the owner marked, so it stays with the header like the colour toolbar. */}
-      <div className={styles.textToggleSlot}>
-        <ArticleTextToggle corner labelOn="Switch to white cards with blue text" labelOff="Switch back to the navy cards" />
-      </div>
       {/* Header (brief 5.1). */}
       <header className={styles.header}>
         {/* THE PICTURE PLAYS THIS DOG'S LEVEL, 21 September 2026 (owner). It asks
@@ -679,6 +671,13 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
           {info.subtitle && <p className={styles.subtitle}>{info.subtitle}</p>}
         </div>
       </header>
+      {/* THE ◐ TOGGLE, ON THE PAGE, 21 September 2026 (owner: move it out of the header
+          and set it on the page like every other page). The articles' own toggle, in its
+          usual row on the page's left gutter, between the header and the content it
+          changes, scrolling with the page. It flags the page's <main>; the rules under
+          "LIGHT CARDS" in chums2.module.css decide what that means here. `flush` drops
+          the essay's hero gap, since this page's diagram sits at a fixed height. */}
+      <ArticleTextToggle flush labelOn="Switch to white cards with blue text" labelOff="Switch back to the navy cards" />
 
       {/* Left band: the icon rail with the blue intro description box immediately
           to its right, the box's TOP aligned to the rail's first icon

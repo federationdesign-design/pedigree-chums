@@ -29,7 +29,9 @@ const keyFor = () => "pc-textinvert:" + window.location.pathname;
 // labelOn / labelOff: what the button says it will do. The essays keep the default
 // wording about white and black text; the chum page, where the same attribute swaps
 // the cards to white, passes its own (21 September 2026).
-export default function ArticleTextToggle({ centered = false, corner = false, labelOn, labelOff }: { centered?: boolean; corner?: boolean; labelOn?: string; labelOff?: string }) {
+// `flush` is the in-page row without the essay page's vertical margins, for a page with
+// no hero gap to spend (the chum page, 21 September 2026).
+export default function ArticleTextToggle({ centered = false, corner = false, flush = false, labelOn, labelOff }: { centered?: boolean; corner?: boolean; flush?: boolean; labelOn?: string; labelOff?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [white, setWhite] = useState(false);
 
@@ -58,7 +60,7 @@ export default function ArticleTextToggle({ centered = false, corner = false, la
   };
 
   return (
-    <div ref={ref} className={[styles.wrap, centered && styles.wrapCentered, corner && styles.wrapCorner].filter(Boolean).join(" ")}>
+    <div ref={ref} className={[styles.wrap, centered && styles.wrapCentered, corner && styles.wrapCorner, flush && styles.wrapFlush].filter(Boolean).join(" ")}>
       <button
         type="button"
         className={styles.toggle}

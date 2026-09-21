@@ -96,3 +96,16 @@
 :root[data-pc-contrast-scheme] .wrap {
   visibility: hidden;
 }
+
+/* Flush variant (the chum page, 21 September 2026): the same in-page row, on the same
+   left gutter as every other page, but without the essay's hero gap above or the 12px
+   below and with the button's vertical padding trimmed, because the chum page's
+   diagram and family tree are placed at FIXED heights and the row must not push the
+   content beneath out of line with them. */
+.wrapFlush {
+  margin: 0;
+}
+.wrapFlush .toggle {
+  padding-top: 0;
+  padding-bottom: 0;
+}
