@@ -12,6 +12,7 @@ import { resetToys } from "../../components/BreedTree/BreedTree";
 import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 import styles from "./history.module.css";
 import { sourcesFor } from "../../data/breedSources";
+import { levelCardKind, STRIP_ORDER } from "../../data/levels";
 
 /* Outbound sources are per dog now (data/breedSources.ts), so the era gate has
    gone: a dog with no sources of its own shows no links, wherever it sits. */
@@ -90,19 +91,45 @@ export function stripMatches(rowStrip: string, era: string): boolean {
   return rowStrip === era || (era === "ancient-medieval" && (rowStrip === "ancient" || rowStrip === "medieval"));
 }
 
+/* WHAT OPENING A LEVEL NEEDS, from nothing but the breed's name. Module scope, not
+   inside the component, so the initial state below can call it on the very first
+   render: a deep link has to arrive already open, and setting it from an effect
+   instead costs a second render and trips react-hooks/set-state-in-effect.
+   buildActive inside the component is now a one-line call to this, so the tap
+   path and the deep link build the level identically. */
+function activeFor(name: string) {
+  const pn = resolveLineageName(name);
+  const lin = getLineage(pn);
+  if (!lin) return null;
+  const ub = ukBreeds.find((x) => x.name === name);
+  const pk = packBreeds.find((x) => x.name === pn);
+  return { name, image: pk?.image ?? ub?.image ?? "", character: pk?.character ?? ub?.note, fact: pk?.fact, lineage: lin };
+}
+
+/* Delegates to data/levels.ts, 20 September 2026, so the per-level pages and this
+   strip read one rule. The body moved there unchanged. */
 export function breedCardKind(name: string): BreedCardKind | null {
-  const packName = resolveLineageName(name);
-  if (packBreeds.find((x) => x.name === packName)?.slug) return "learn";
-  const lineage = getLineage(packName);
-  return lineage?.children?.length ? "play" : null;
+  return levelCardKind(name);
 }
 
 export default function BreedStrip({
   era,
   renderLevels,
+  initialLevel,
+  closeHref,
 }: {
   era: string;
   renderLevels?: (open: BreedStripOpen) => React.ReactNode;
+  /* OPEN THIS LEVEL ON ARRIVAL, 20 September 2026, for the per-level pages at
+     /britains-dog-history/dog/[slug]. The breed's NAME, exactly as ukBreeds holds
+     it. Opened quiet, so the visitor lands on the level's start screen rather
+     than sitting through the time tunnel: the owner asked for the start screen. */
+  initialLevel?: string;
+  /* WHERE CLOSING THE LEVEL GOES, and the signal that this is a per-level page
+     showing the GAME ONLY (owner, 20 September 2026: no text underneath, no strip,
+     close goes to that dog's era page). When set, nothing but the level is
+     rendered, and closing it navigates here instead of revealing a strip. */
+  closeHref?: string;
 }) {
   const router = useRouter();
   const { confirmLeave } = useLeaveDialog();
@@ -130,7 +157,14 @@ export default function BreedStrip({
        next one, both still play it. */
     quiet?: boolean;
   };
-  const [active, setActive] = useState<Active | null>(null);
+  /* THE DEEP LINK, 20 September 2026. A per-level page passes initialLevel and the
+     level is open from the first render, quiet, so the visitor lands on its start
+     screen with no tunnel. Read once, in the initialiser, so closing the level or
+     moving on is never undone by a re-render. */
+  const [active, setActive] = useState<Active | null>(() => {
+    const na = initialLevel ? activeFor(initialLevel) : null;
+    return na ? { ...na, quiet: true } : null;
+  });
   // Bumped on a retry so the modal remounts even though the level name has not
   // changed. Without it, Restart on the same level would leave the round exactly
   // as it was lost.
@@ -200,14 +234,9 @@ export default function BreedStrip({
   // The mini pits are levels: every popup-capable breed, in timeline order
   // across all eras. Round Won advances to the next; Game Over restarts at
   // the very first.
-  const STRIP_ORDER = ["ancient", "medieval", "c1500", "c1700", "early1800", "spaniels", "mid1800", "late1800", "c1900", "crosses"];
-  const buildActive = (b: UKBreed): Active | null => {
-    const pn = resolveLineageName(b.name);
-    const lin = getLineage(pn);
-    if (!lin) return null;
-    const pk = packBreeds.find((x) => x.name === pn);
-    return { name: b.name, image: pk?.image ?? b.image ?? "", character: pk?.character ?? b.note, fact: pk?.fact, lineage: lin };
-  };
+  // STRIP_ORDER now comes from data/levels.ts, unchanged, so the level pages share it.
+  // The same builder the deep link uses. See activeFor at module scope.
+  const buildActive = (b: UKBreed): Active | null => activeFor(b.name);
   const levelList = ukBreeds
     .slice()
     .sort((a, b) => (STRIP_ORDER.indexOf(a.strip) - STRIP_ORDER.indexOf(b.strip)) || (a.anchor - b.anchor))
@@ -290,6 +319,7 @@ export default function BreedStrip({
       setNavFading(false);
     }, NAV_FADE_MS);
   };
+
 
   /* What a tap on a dog does. Lifted out of the rail's own map so the slider
      gets the identical rule rather than a second version of it. The three
@@ -698,6 +728,9 @@ export default function BreedStrip({
         // modal does this for its own back-out controls; this is the last way
         // out, and without it the whole rule has a hole in it.
         setCampaignScore(bankedScore);
+        // A per-level page has no strip behind the game to fall back to, so it
+        // leaves for the dog's era page. Everywhere else, closing reveals the strip.
+        if (closeHref) { router.push(closeHref); return; }
         setActive(null);
       }}
     />
@@ -714,6 +747,14 @@ export default function BreedStrip({
         {modal}
       </>
     );
+  }
+
+  /* THE PER-LEVEL PAGE'S BRANCH. The game and nothing else: no era label, no rail,
+     no dogs underneath. The level is open from the first render via initialLevel,
+     so this is never empty in practice; if it ever closed without navigating, the
+     page would simply be blank rather than show a strip nobody asked for. */
+  if (closeHref) {
+    return <>{modal}</>;
   }
 
   return (
