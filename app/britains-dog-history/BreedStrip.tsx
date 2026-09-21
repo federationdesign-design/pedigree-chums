@@ -958,9 +958,16 @@ export default function BreedStrip({
                         }}
                       />
                     </span>
-                    {kind && (
+                    {/* LEARN AND PLAY WHEREVER THE CARD PLAYS, 21 September 2026 (owner:
+                        the chum card plays now, so its flash should match the other
+                        playable levels). On a chum page every card with a tree opens its
+                        level (see openFor), including chums, which used to be learn-only
+                        and so wore LEARN. The same rule gives the foreign progenitors
+                        that play their own branch the flash too; a flip-only card, with
+                        nothing to open, still wears none. The era pages are unchanged. */}
+                    {(kind || (only && open)) && (
                       <span
-                        className={`${styles.deskFlash} ${kind === "play" ? styles.deskFlashPlay : styles.deskFlashLearn}`}
+                        className={`${styles.deskFlash} ${kind === "play" || (only && open) ? styles.deskFlashPlay : styles.deskFlashLearn}`}
                         aria-hidden="true"
                       />
                     )}
