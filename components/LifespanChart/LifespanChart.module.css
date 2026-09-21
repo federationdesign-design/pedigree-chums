@@ -152,3 +152,43 @@
 }
 
 .sourceLink:hover { color: #ffffff; }
+
+/* ---- A TRUE SINGLE-COLOUR CHART IN THE ACCESSIBILITY SCHEMES, 21 September 2026 --------
+   (owner: rework these into true single-colour graphs, like the grey-banded example he
+   sent). The scheme used to grey the whole chart through a filter, which on White on
+   black was a blue duotone, so colour survived. The filter is lifted from the chart alone
+   and the chart is drawn in the scheme's own ink instead:
+     BLACK ON WHITE: a black curve, black text and axes, and the life stages as bands of
+       grey that deepen with age, puppy lightest, aged darkest.
+     WHITE ON BLACK: the inverse, a white curve and text on bands that lighten with age.
+   The shaded area under the curve is dropped in both, so the bands read cleanly. The
+   class is doubled on .svg to outrank the scheme's own filter rule. */
+:global(:root[data-pc-contrast-scheme] #pc-site) .svg.svg { filter: none !important; -webkit-filter: none !important; }
+
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .band[data-stage="Puppy"] { fill: #f4f4f4 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .band[data-stage="Adolescent"] { fill: #e6e6e6 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .band[data-stage="Adult"] { fill: #d9d9d9 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .band[data-stage="Senior"] { fill: #c8c8c8 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .band[data-stage="Aged"] { fill: #b8b8b8 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .curve { stroke: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .curveArea { fill: none !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .gridLine { stroke: #7a7a7a !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .axis { stroke: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .axisLabel, :global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .axisTitle, :global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .stageLabel { fill: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .hoverLine { stroke: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .hoverDot { fill: #000 !important; stroke: #fff !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .hoverLabel { fill: #000 !important; }
+
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .band[data-stage="Puppy"] { fill: #141414 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .band[data-stage="Adolescent"] { fill: #222222 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .band[data-stage="Adult"] { fill: #303030 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .band[data-stage="Senior"] { fill: #404040 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .band[data-stage="Aged"] { fill: #505050 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .curve { stroke: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .curveArea { fill: none !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .gridLine { stroke: #8a8a8a !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .axis { stroke: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .axisLabel, :global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .axisTitle, :global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .stageLabel { fill: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .hoverLine { stroke: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .hoverDot { fill: #fff !important; stroke: #000 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .hoverLabel { fill: #fff !important; }

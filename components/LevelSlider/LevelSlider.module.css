@@ -10,3 +10,14 @@
 .mobile {
   padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px));
 }
+
+/* SEE-THROUGH IN A SCHEME, 21 September 2026 (owner: the accessibility views crop the
+   bottom of the life span chart). The chart is placed at a fixed height near the foot of
+   the chum page, and this section, which comes after the page and sits above it
+   (z-index 1), starts over the chart's lower part. Normally it is transparent; the
+   scheme's sweep paints it solid, cutting the chart off. Only this wrapper and the
+   strip's own wrappers are cleared (history.module.css .stripFlush); the cards keep
+   their scheme colours. */
+:global(:root[data-pc-contrast-scheme] #pc-site) .wrap {
+  background-color: transparent !important;
+}

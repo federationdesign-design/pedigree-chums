@@ -1016,3 +1016,13 @@
   margin-left: 0;
   margin-right: 0;
 }
+
+/* The chum page strip's wrappers stay see-through in a scheme, so they do not cut off the
+   life span chart above them. .stripFlush is the chum page's strip only; the era pages'
+   strips are unchanged. See LevelSlider.module.css. */
+:global(:root[data-pc-contrast-scheme] #pc-site) .stripFlush,
+:global(:root[data-pc-contrast-scheme] #pc-site) .stripFlush .stripWrap,
+:global(:root[data-pc-contrast-scheme] #pc-site) .stripFlush .stripRail,
+:global(:root[data-pc-contrast-scheme] #pc-site) .stripFlush .stripLabel {
+  background-color: transparent !important;
+}

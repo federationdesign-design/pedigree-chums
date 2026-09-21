@@ -101,6 +101,10 @@ export default function LifespanChart({ breedName, fluid = false }: { breedName:
         {ranges.map((r, i) => (
           <rect
             key={r.stage + i}
+            /* The stage, for the accessibility schemes, which redraw the bands in
+               shades of grey rather than colour. See LifespanChart.module.css. */
+            className={styles.band}
+            data-stage={r.stage}
             x={toSvgX(r.startAge, maxAge)}
             y={PAD.top}
             width={toSvgX(r.endAge, maxAge) - toSvgX(r.startAge, maxAge)}
