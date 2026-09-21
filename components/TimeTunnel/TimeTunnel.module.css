@@ -19,3 +19,9 @@
     transition: none;
   }
 }
+
+/* The tunnel's own backing in the accessibility schemes, 21 September 2026 (owner): the
+   scheme's page colour, matching the canvas, which draws in the scheme's two colours
+   (see TimeTunnel.tsx). */
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .tunnel { background: #ffffff; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .tunnel { background: #000000; }

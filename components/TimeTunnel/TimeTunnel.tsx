@@ -190,6 +190,28 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { doneRef.current?.(); return; } // no tunnel: hand straight over
 
+    /* THE ACCESSIBILITY SCHEMES, 21 September 2026 (owner: the time tunnel should follow
+       the accessibility views, black or white). Read once as the tunnel starts. In a
+       scheme every colour below becomes one of two: the scheme's page colour for the
+       background, the card and the button face, and its ink for the rings, the motes,
+       the edges and the details. Black on white is black on white; White on black is the
+       inverse. With no scheme set, the palette is exactly the colours it always had. */
+    const scheme = document.documentElement.getAttribute("data-pc-contrast-scheme");
+    const ink = scheme === "black-on-white" ? "#000000" : scheme === "white-on-black" ? "#ffffff" : null;
+    const paper = scheme === "black-on-white" ? "#ffffff" : scheme === "white-on-black" ? "#000000" : null;
+    const P = ink && paper
+      ? {
+          rings: [ink, ink, ink], motes: [ink, ink, ink],
+          bgFrom: hexToRgb(paper), bgA: hexToRgb(paper), bgB: hexToRgb(paper),
+          cardFill: paper, cardEdge: ink, cardGreen: ink, cardLink: ink,
+          btnFill: paper, btnEdge: ink, btnText: ink,
+        }
+      : {
+          rings: COLORS, motes: MOTE_COLORS,
+          bgFrom: NAVY_RGB, bgA: PIT_A_RGB, bgB: PIT_B_RGB,
+          cardFill: CARD_FILL, cardEdge: CARD_EDGE, cardGreen: CARD_GREEN, cardLink: CARD_LINK,
+          btnFill: BTN_FILL, btnEdge: BTN_EDGE, btnText: BTN_TEXT,
+        };
     const SHAPES = [starPath(), bonePath()]; // bone and star only, the paw dropped
     const dpr = window.devicePixelRatio || 1;
     let W = 0, H = 0, cx = 0, cy = 0, vx = 0;
@@ -203,14 +225,14 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
     resize();
     window.addEventListener("resize", resize);
 
-    const rings = Array.from({ length: RINGS }, (_, i) => ({ z: (i + 1) * SPACING, c: COLORS[i % 3] }));
+    const rings = Array.from({ length: RINGS }, (_, i) => ({ z: (i + 1) * SPACING, c: P.rings[i % 3] }));
     const motes: Mote[] = [];
     const seedMote = (m: Mote, z: number) => {
       m.z = z;
       m.ang = Math.random() * Math.PI * 2;
       m.rad = 20 + Math.random() * 220;
       m.shape = (Math.random() * SHAPES.length) | 0;
-      m.color = MOTE_COLORS[(Math.random() * MOTE_COLORS.length) | 0];
+      m.color = P.motes[(Math.random() * P.motes.length) | 0];
       m.spin0 = Math.random() * Math.PI * 2;
       m.spinRate = (Math.random() - 0.5) * 0.06;
       m.age = 0;
@@ -286,15 +308,15 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
       ctx.save();
       ctx.translate(px, py);
       ctx.rotate(spin);
-      ctx.fillStyle = BTN_FILL;
+      ctx.fillStyle = P.btnFill;
       ctx.beginPath();
       ctx.roundRect(-w / 2, -h / 2, w, h, Math.min(h / 2, Math.min(w, h) / 2));
       ctx.fill();
       ctx.lineWidth = 4 * (1 - p);
-      ctx.strokeStyle = BTN_EDGE;
+      ctx.strokeStyle = P.btnEdge;
       ctx.stroke();
       const tw = w * BTN_TEXT_W, th = h * BTN_TEXT_H;
-      ctx.fillStyle = BTN_TEXT;
+      ctx.fillStyle = P.btnText;
       ctx.beginPath();
       ctx.roundRect(-tw / 2, -th / 2, tw, th, th / 2);
       ctx.fill();
@@ -311,19 +333,19 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
       ctx.save();
       ctx.translate(px, py);
       ctx.rotate(spin);
-      ctx.fillStyle = CARD_FILL;
+      ctx.fillStyle = P.cardFill;
       ctx.beginPath();
       ctx.roundRect(-w / 2, -h / 2, w, h, Math.min(CARD_RADIUS * (1 - p), Math.min(w, h) / 2));
       ctx.fill();
       ctx.lineWidth = 4 * (1 - p);
-      ctx.strokeStyle = CARD_EDGE;
+      ctx.strokeStyle = P.cardEdge;
       ctx.stroke();
       // Match the real card layout, top to bottom: a green button with two white
       // text bars, three navy description lines, then a small blue link icon. Not
       // legible, just recognisable. All rides the card transform, so it tumbles.
       const bw = w * 0.8, bh = h * 0.15;
       const bcy = -h * 0.3; // green button near the TOP
-      ctx.fillStyle = CARD_GREEN;
+      ctx.fillStyle = P.cardGreen;
       ctx.beginPath();
       ctx.roundRect(-bw / 2, bcy - bh / 2, bw, bh, Math.min(bh * 0.3, bh / 2));
       ctx.fill();
@@ -338,7 +360,7 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
       const lineH = h * 0.045;
       const lineW = [w * 0.8, w * 0.8, w * 0.55];
       const lineY = [-h * 0.06, h * 0.04, h * 0.14];
-      ctx.fillStyle = CARD_EDGE;
+      ctx.fillStyle = P.cardEdge;
       for (let li = 0; li < 3; li++) {
         ctx.beginPath();
         ctx.roundRect(-w * 0.4, lineY[li] - lineH / 2, lineW[li], lineH, lineH / 2);
@@ -346,7 +368,7 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
       }
       // small blue link icon below the description
       const iconW = w * 0.16, iconH = h * 0.07;
-      ctx.fillStyle = CARD_LINK;
+      ctx.fillStyle = P.cardLink;
       ctx.beginPath();
       ctx.roundRect(-w * 0.4, h * 0.3 - iconH / 2, iconW, iconH, Math.min(iconH * 0.35, iconH / 2));
       ctx.fill();
@@ -368,8 +390,8 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
       const bgLinear = Math.max(0, Math.min(1, (t - BG_HOLD_MS) / BG_SHIFT_MS)); // 0 until BG_HOLD, ramps over BG_SHIFT
       const bgP = Math.pow(bgLinear, BG_SHIFT_EASE);
       const bg = ctx.createLinearGradient(0, H, W, 0); // bottom-left to top-right = "to top right"
-      bg.addColorStop(0, mix(NAVY_RGB, PIT_A_RGB, bgP));
-      bg.addColorStop(1, mix(NAVY_RGB, PIT_B_RGB, bgP));
+      bg.addColorStop(0, mix(P.bgFrom, P.bgA, bgP));
+      bg.addColorStop(1, mix(P.bgFrom, P.bgB, bgP));
       ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
       if (running) {
         // Travel: rings recede and recycle, motes fly, the card dives in. The ring
