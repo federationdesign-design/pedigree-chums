@@ -2125,15 +2125,22 @@
    SIZE LIVES HERE NOW, so the note on .learnDockBtn about PLAY sharing the row's
    geometry no longer applies to PLAY. What patch 31 was actually for still holds:
    the figures are in the stylesheet once, not duplicated in TypeScript. */
+/* 100.2 -> 75.6 ON DESKTOP, 21 September 2026 (owner: the learn area PLAY is bigger than
+   the start screen PLAY; make it the same). 100.2 was DERIVED, 1.325 times the dock's
+   75.6, as the note above admits, and it came out a third too big. 75.6 is not a guess:
+   it is the start screen PLAY square's own desktop width, recorded at .diff, where
+   --pit-axis 68.4 is that square's centre, left 30.6 plus half of 75.6. The radius is
+   the square's own rule, 0.3 of its size, the figure .learnDockBtn already uses. The
+   phone keeps its measured 55.7 in the media query below. */
 .learnDockBtn.learnPlayBtn {
   position: absolute;
   background: #22c55e;
   border-color: #ffffff;
   box-sizing: border-box;
-  width: 100.2px;
-  height: 100.2px;
+  width: 75.6px;
+  height: 75.6px;
   border-width: 5px;
-  border-radius: 23.5px;
+  border-radius: 22.68px;
   /* NO POP, 16 September 2026 (owner: an animation pop has been added to the play
      icon and needs removing).
 
@@ -2153,7 +2160,7 @@
    of the square, which lets it carry the start screen's own figures unconverted.
    The box therefore laps the 5px rim; flex centring keeps it centred and the
    glyph sits well inside, so nothing is clipped. */
-.learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; width: 100.2px; height: 100.2px; }
+.learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; width: 75.6px; height: 75.6px; }
 .learnDockBtn.learnPlayBtn .learnDockIcon svg { stroke: none; fill: #ffffff; }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
 /* Start-screen SVG captions: "play"/"learn" above the PLAY/LEARN squares and
