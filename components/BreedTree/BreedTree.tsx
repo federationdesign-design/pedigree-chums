@@ -3823,15 +3823,20 @@ export default function BreedTree({
      are set by the site's toolbar as data-pc-contrast-scheme on the root element; a
      MutationObserver keeps this in step if the player switches mid-level. Server
      render and first paint read false. */
-  const schemeOn = useSyncExternalStore(
+  const scheme = useSyncExternalStore(
     (cb) => {
       const mo = new MutationObserver(cb);
       mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-pc-contrast-scheme"] });
       return () => mo.disconnect();
     },
-    () => !!document.documentElement.getAttribute("data-pc-contrast-scheme"),
-    () => false,
+    () => document.documentElement.getAttribute("data-pc-contrast-scheme"),
+    () => null,
   );
+  const schemeOn = !!scheme;
+  /* The view's two colours: INK draws, PAPER is the ground. Null outside a view, so
+     every use below falls back to the game's own colours. */
+  const sInk = scheme === "black-on-white" ? "#000000" : scheme === "white-on-black" ? "#ffffff" : null;
+  const sPaper = scheme === "black-on-white" ? "#ffffff" : scheme === "white-on-black" ? "#000000" : null;
 
 
   // The main pit sizes every toy off BIG = 84 * SCALE, and its menu square off
@@ -14045,7 +14050,11 @@ export default function BreedTree({
                    inert, because it is navy in both states now. Ordinary
                    badges keep the blue inert fill (white on white would
                    disappear). */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? chipBand.bg : CHIP_FILL, stroke: "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                <circle cx={0} cy={0} r={item.r} style={{ /* IN AN ACCESSIBILITY VIEW, 21 September 2026 (owner: the % pills in the
+                     view's colours, inverted on each): an ink disc with an ink ring and a
+                     figure in the page colour; a spent badge the reverse, so it still reads
+                     as a dead token. Outside a view, the colours below as before. */
+                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? chipBand.bg : CHIP_FILL, stroke: sInk ?? "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
                      (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
                      0.09, the weight a first-generation circle wears on the lifted
                      screen, read from the shared RING_FRAC table rather than typed
@@ -14065,7 +14074,7 @@ export default function BreedTree({
                     if (!lab.fits) return null;
                     const top = -((lab.lines.length - 1) * lab.fs * LABEL_LINE_H) / 2;
                     return (
-                      <text x={0} y={0} dominantBaseline="central" style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${lab.fs}px`, pointerEvents: "none", userSelect: "none" }}>
+                      <text x={0} y={0} dominantBaseline="central" style={{ fill: sPaper ?? "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${lab.fs}px`, pointerEvents: "none", userSelect: "none" }}>
                         {lab.lines.map((ln, li) => (
                           <tspan key={li} x={0} y={top + li * lab.fs * LABEL_LINE_H}>{ln}</tspan>
                         ))}
@@ -14073,7 +14082,7 @@ export default function BreedTree({
                     );
                   })()
                 ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: chipBand ? chipBand.fg : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? chipBand.fg : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
                     {`${item.pct}%`}
                   </text>
                 ))}
@@ -14685,8 +14694,11 @@ export default function BreedTree({
                     /* The two menu squares carry their own colour so the choice
                        reads before the glyph does: red leaves, green goes back.
                        Everything else stays the pit's yellow. */
-                    fill:
-                      d.kind === "leave" ? "#ef4444"
+                    /* THE CLOSE SQUARE IN AN ACCESSIBILITY VIEW, 21 September 2026 (owner):
+                       the page colour with an ink edge, its X, back arrow or menu bars in
+                       ink, instead of red with white. Other squares are unchanged. */
+                    fill: sInk && sPaper && d.kind === "close" ? sPaper
+                      : d.kind === "leave" ? "#ef4444"
                         : d.kind === "restart" ? "#22c55e"
                         /* Back-out actions read red: the close square is red both
                            on the START SCREEN (where it closes to the main page)
@@ -14701,7 +14713,8 @@ export default function BreedTree({
                        navy on yellow or white on red. These two are plain yellow
                        tiles with the artwork on them, which is how they read as
                        controls rather than as another way out of the round. */
-                    stroke: d.kind === "slowmo" || d.kind === "shake" ? "none"
+                    stroke: sInk && d.kind === "close" ? sInk
+                      : d.kind === "slowmo" || d.kind === "shake" ? "none"
                       : d.kind === "close" && (learning || !started) ? "#ffffff" : "var(--navy, #0a3a57)",
                     strokeWidth: d.kind === "slowmo" || d.kind === "shake" ? 0 : 5 * upp,
                   }} />
@@ -14751,8 +14764,8 @@ export default function BreedTree({
                     // back rather than closing anything, so an X would be a lie.
                     <path
                       d={`M${half * 0.30},${-half * 0.40} L${-half * 0.34},0 L${half * 0.30},${half * 0.40} Z`}
-                      fill="#ffffff"
-                      stroke="#ffffff"
+                      fill={sInk ?? "#ffffff"}
+                      stroke={sInk ?? "#ffffff"}
                       strokeWidth={iconStroke * 0.8}
                       strokeLinejoin="round"
                     />
@@ -14769,13 +14782,13 @@ export default function BreedTree({
                        `started ?` split and delete the X branch below.
                        Three bars on the same 0.34 half-width as the X's arms, so
                        it reads at the same weight and optical size. */
-                    <g stroke="var(--navy, #0a3a57)" strokeWidth={iconStroke} strokeLinecap="round">
+                    <g stroke={sInk ?? "var(--navy, #0a3a57)"} strokeWidth={iconStroke} strokeLinecap="round">
                       <line x1={-half * 0.34} y1={-half * 0.30} x2={half * 0.34} y2={-half * 0.30} />
                       <line x1={-half * 0.34} y1={0} x2={half * 0.34} y2={0} />
                       <line x1={-half * 0.34} y1={half * 0.30} x2={half * 0.34} y2={half * 0.30} />
                     </g>
                   ) : (
-                    <g stroke="#ffffff" strokeWidth={iconStroke} strokeLinecap="round">
+                    <g stroke={sInk ?? "#ffffff"} strokeWidth={iconStroke} strokeLinecap="round">
                       <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
                       <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
                     </g>
