@@ -777,9 +777,16 @@ export default function BreedStrip({
 
   return (
     <div className={`${styles.strip} ${only ? styles.stripFlush : ""}`.trim()} aria-label={`Breeds: ${label ?? ERA_LABELS[era]}`}>
-      {/* A chum page's strip labels itself in the site lemon; the era pages keep
-          their white era names. See .stripLabelLemon. */}
-      <span className={`${styles.stripLabel} ${only ? styles.stripLabelLemon : ""}`.trim()}>{label ?? ERA_LABELS[era]}</span>
+      {/* A chum page's strip gets a real HEADING, 20 September 2026 (owner: make
+          it an h2, smaller, right aligned). It is a sentence there, "Learn more
+          about the dogs that went into making...", and the page's section heading,
+          so it earns the h2; the era pages keep their decorative era name as a
+          span, since the page itself carries that era's heading. */}
+      {only ? (
+        <h2 className={`${styles.stripLabel} ${styles.stripLabelLemon}`}>{label ?? ERA_LABELS[era]}</h2>
+      ) : (
+        <span className={styles.stripLabel}>{label ?? ERA_LABELS[era]}</span>
+      )}
 
       <div ref={wrapRef} className={styles.stripWrap}>
         <div ref={railRef} className={styles.stripRail} role="list">
