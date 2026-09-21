@@ -856,8 +856,13 @@ export default function BreedStrip({
                 <button
                   type="button"
                   className={`${styles.flipCard} ${open ? styles.flipCardOpen : ""}`}
-                  onClick={open}
-                  aria-label={open ? `View ${b.name} family tree` : undefined}
+                  /* TAP TO TURN, 21 September 2026 (owner). On a chum page a card with
+                     no level to open, the foreign dogs, turns over on a tap and back on
+                     the next, instead of the tap doing nothing. On desktop it also still
+                     turns on hover, as every card does; the tap keeps it turned. The era
+                     pages are unchanged. */
+                  onClick={open ?? (only ? () => setFlipped((f) => (f === b.name ? null : b.name)) : undefined)}
+                  aria-label={open ? `View ${b.name} family tree` : only ? `Turn the ${b.name} card over` : undefined}
                 >
                   <span
                     className={styles.flipInner}

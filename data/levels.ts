@@ -137,9 +137,9 @@ export function ancestorCardsWithin(chumName: string): UKBreed[] {
    Ancient Chinese toy dogs and Eastern Lion dogs. Measured: 58 such names across the 54
    chum trees, and NONE has a family tree of its own as a root. Two rules, the owner's:
 
-     NO DEEPER ANCESTORS in the chum's tree: a FLIP-ONLY card, picture and note.
-     ANCESTORS RECORDED beneath it in the chum's tree: the same card, and a tap opens a
-       play start screen built from THAT subtree, since the dog has no root tree to open.
+     EVERY FOREIGN CARD IS FLIP-ONLY: picture on the front, note on the back, and a tap
+       turns it over (owner, 21 September 2026). An earlier rule the same day let a card
+       with ancestors beneath it open a level built from that branch; it is withdrawn.
 
    "Deeper" ignores a child that merely repeats the dog's own name, the echo rule, or a
    dog whose only child is a copy of itself would count as explorable. */
@@ -193,7 +193,7 @@ export function foreignCardsWithin(chumName: string): StripCard[] {
   walk(root, 0);
   return [...best.values()]
     .sort((a, b) => b.depth - a.depth)
-    .map(({ node, deeper }) => ({
+    .map(({ node }) => ({
       name: node.name,
       strip: "ancient",
       // The researched round date: see data/eraYears.ts. Blank only if one is missing.
@@ -201,6 +201,9 @@ export function foreignCardsWithin(chumName: string): StripCard[] {
       anchor: eraYear(ERA_YEARS[node.name]) ?? -1,
       note: node.note,
       image: node.img,
-      ...(deeper ? { lineage: node } : null),
+      /* NO LEVEL ON A FOREIGN CARD, 21 September 2026 (owner: all foreign dogs just tap
+         to turn rather than go to the level). The branch-to-play rule from earlier the
+         same day is withdrawn, so no subtree is attached and every foreign card is
+         flip-only. `deeper` still decides which copy of a name is kept, above. */
     }));
 }
