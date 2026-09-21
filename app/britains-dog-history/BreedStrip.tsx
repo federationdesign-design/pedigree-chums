@@ -119,6 +119,8 @@ export default function BreedStrip({
   closeHref,
   only,
   label,
+  labelName,
+  playName,
 }: {
   era: string;
   renderLevels?: (open: BreedStripOpen) => React.ReactNode;
@@ -146,6 +148,15 @@ export default function BreedStrip({
      chum page as before. */
   only?: UKBreed[];
   label?: string;
+  /* THE PART OF THE LABEL DRAWN IN WHITE, the chum's own name (owner, 20 September
+     2026: the dog name in the title should be white). Kept separate from `label`
+     so the heading can colour it without the caller passing markup. */
+  labelName?: string;
+  /* THE ONE CARD THAT PLAYS IN PLACE (owner, 20 September 2026: a final playable
+     level on every chum page for the dog the page is about). Every other card in
+     an `only` strip goes to its level page; this dog has no level page, because
+     it is a chum, so tapping its card opens the game right here on the chum page. */
+  playName?: string;
 }) {
   const router = useRouter();
   const { confirmLeave } = useLeaveDialog();
@@ -348,10 +359,16 @@ export default function BreedStrip({
     const packName = resolveLineageName(b.name);
     const lineage = getLineage(packName);
     const pack = packBreeds.find((x) => x.name === packName);
-    if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
-    if (kind !== "play" || !lineage) return undefined;
-    // A chum page's strip: the level has its own page, so go there. See `only`.
-    if (only) return () => router.push(`/britains-dog-history/dog/${levelSlug(b.name)}`);
+    // The chum page's own dog plays here rather than sending the visitor to the
+    // page they are already on. See playName.
+    const playHere = !!only && b.name === playName && !!lineage;
+    if (!playHere) {
+      if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
+      if (kind !== "play" || !lineage) return undefined;
+      // A chum page's strip: the level has its own page, so go there. See `only`.
+      if (only) return () => router.push(`/britains-dog-history/dog/${levelSlug(b.name)}`);
+    }
+    if (!lineage) return undefined;
     return (e) => {
       // opening a level from the page is a fresh run
       setLives(LIVES_START);
@@ -776,14 +793,17 @@ export default function BreedStrip({
   }
 
   return (
-    <div className={`${styles.strip} ${only ? styles.stripFlush : ""}`.trim()} aria-label={`Breeds: ${label ?? ERA_LABELS[era]}`}>
+    <div className={`${styles.strip} ${only ? styles.stripFlush : ""}`.trim()} aria-label={`Breeds: ${label ?? ERA_LABELS[era]}${labelName ? ` ${labelName}` : ""}`}>
       {/* A chum page's strip gets a real HEADING, 20 September 2026 (owner: make
           it an h2, smaller, right aligned). It is a sentence there, "Learn more
           about the dogs that went into making...", and the page's section heading,
           so it earns the h2; the era pages keep their decorative era name as a
           span, since the page itself carries that era's heading. */}
       {only ? (
-        <h2 className={`${styles.stripLabel} ${styles.stripLabelLemon}`}>{label ?? ERA_LABELS[era]}</h2>
+        <h2 className={`${styles.stripLabel} ${styles.stripLabelLemon}`}>
+          {label ?? ERA_LABELS[era]}
+          {labelName ? <> <span className={styles.stripLabelName}>{labelName}</span></> : null}
+        </h2>
       ) : (
         <span className={styles.stripLabel}>{label ?? ERA_LABELS[era]}</span>
       )}
