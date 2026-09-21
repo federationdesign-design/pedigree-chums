@@ -1886,7 +1886,15 @@ export default function LineageMap({
         // clock: the node sits just outside the parent edge (NODE_POKE daylight),
         // so it never tucks under the card. Single child keeps the shoulder tuck;
         // the big pit keeps its own ring (dist).
-        const d2 = clock ? rOf(n) + rOf(k) + NODE_POKE : circular ? ringD : dist;
+        /* THE FIRST CONNECTORS TWICE AS LONG, desktop lift only, 21 September 2026
+           (owner). The visible connector between two circles is exactly NODE_POKE, the
+           daylight d2 leaves between the parent's edge and the child's, so doubling it
+           for depth 0, the lifted circle's own children, doubles those connectors and
+           nothing else: every deeper generation is placed from its PARENT, so the rest
+           of the tree moves out rigidly with its own spacing unchanged. The phone, the
+           main pit and the chum tree keep 18. */
+        const pokeHere = depth === 0 && circular && !isMobile ? NODE_POKE * 2 : NODE_POKE;
+        const d2 = clock ? rOf(n) + rOf(k) + pokeHere : circular ? ringD : dist;
         // Deliberate: every clock node is _tucked = false, so it always draws a
         // connector. Before, a line appeared only once the ring was pushed past
         // the edge; now there is always the NODE_POKE gap to justify one, so a
