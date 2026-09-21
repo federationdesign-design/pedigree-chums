@@ -98,16 +98,16 @@ const pctTitleFor = (id: string) =>
 
 // ── Card placement: IN OPEN ORDER (21 September 2026, reversing D73 #4) ─────────
 // The first card opened takes slot one and each later card opens beside the last one
-// still open, starting OVER famous chums and in line with the intro box, exactly
+// still open, starting OVER the ancestor pack and in line with the intro box, exactly
 // CARD_GAP between cards, at most CARDS_PER_ROW to a row. See placeCard.
 // Coords are canvas-space (DragCard is absolute).
 const SLOT_TOP = 196;      // fallback band top if famous chums cannot be measured
 const SLOT_LEFT = 120;     // left inset of the band
 const SLOT_MARGIN = 24;    // keep off the right edge
 const CARD_GAP = 10;       // exact gap between cards, both axes (D73 #3)
-/* THE BAND SITS ON FAMOUS CHUMS, 21 September 2026 (owner). Superseded the same
-   day's +20 / -100 nudge: the owner wants the cards drawn directly OVER Famous
-   Chums, the first card's left edge in line with the blue intro box above, at most
+/* THE BAND SITS ON THE ANCESTOR PACK, 21 September 2026 (owner). Superseded the same
+   day's +20 / -100 nudge: the owner wants the cards drawn directly OVER the
+   Ancestor Pack, the first card's left edge in line with the blue intro box above, at most
    five to a row, and each new row clear of the tallest card in the row above. Both
    anchors are measured from the page, so there are no pixel nudges left to keep in
    step with it. See placeCard. */
@@ -503,13 +503,14 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     const canvasW = cRect?.width ?? 2244;
     const cTop = cRect?.top ?? 0;
     const cLeft = cRect?.left ?? 0;
-    const famous = typeof document !== "undefined" ? document.querySelector('[data-region="famous-chums"]') : null;
+    const pack = typeof document !== "undefined" ? document.querySelector('[data-region="ancestor-pack"]') : null;
     const intro = typeof document !== "undefined" ? document.querySelector('[data-region="intro-box"]') : null;
-    /* TOP OF FAMOUS CHUMS, so the first row covers it (owner). LEFT EDGE OF THE BLUE
-       INTRO BOX, so slot one lines up with the box above. Both measured in canvas
-       coordinates by subtracting the canvas's own on-screen position, which holds
-       however far the wide canvas is scrolled. */
-    const bandTop = famous ? famous.getBoundingClientRect().top - cTop : SLOT_TOP;
+    /* TOP OF THE ANCESTOR PACK, so the first row covers it (owner, 21 September
+       2026, moved up the same day from the top of Famous Chums). LEFT EDGE OF THE
+       BLUE INTRO BOX, so slot one lines up with the box above. Both measured in
+       canvas coordinates by subtracting the canvas's own on-screen position, which
+       holds however far the wide canvas is scrolled. */
+    const bandTop = pack ? pack.getBoundingClientRect().top - cTop : SLOT_TOP;
     const bandLeft = intro ? intro.getBoundingClientRect().left - cLeft : SLOT_LEFT;
     const width = (cid: string) => cards.find((c) => c.id === cid)?.width ?? 0;
     /* A card's real height once it has drawn; the estimate only until then. The
