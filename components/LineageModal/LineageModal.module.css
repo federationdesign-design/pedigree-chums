@@ -1792,3 +1792,22 @@
   text-shadow: 0 1px 2px rgba(10, 58, 87, 0.55);
 }
 
+
+/* ---- THE GAME WINDOW IN THE ACCESSIBILITY VIEWS, STAGE 1, 21 September 2026 --------
+   (owner: drop the background image from the accessibility views). The game window is
+   drawn outside #pc-site, so the site's scheme rules never reach it; these rules are
+   written for it directly, keyed on the scheme attribute on <html> alone.
+   The blue gradient, and the green one a finished level uses, become the scheme's plain
+   page colour, and the wooden floor is not drawn. Nothing else in the window changes
+   yet; the rest is the next stage. */
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay,
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay.overlayDone {
+  background: #ffffff !important;
+}
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay,
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay.overlayDone {
+  background: #000000 !important;
+}
+:global(:root[data-pc-contrast-scheme]) .floor {
+  display: none !important;
+}
