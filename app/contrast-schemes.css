@@ -511,36 +511,32 @@
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="__cell"] { box-shadow: none !important; }
 
 /* ============================================================================
-   THE CHUM PAGE DIAGRAM IN A SCHEME, 21 September 2026 (owner: the circle diagram
-   disappears when a scheme is on; its lines should turn black or white instead).
+   THE CHUM PAGE DIAGRAM IN A SCHEME, SURGICAL, 21 September 2026 (owner: the first
+   attempt changed the diagram's size and drew a container round it; roll it back and
+   do it surgically). Replaces two earlier patches, reverted in the same commit.
 
-   WHY IT VANISHED. Two scheme rules reach it. The sweep above paints a solid
-   background-color on every element that is not media, so the transparent layers the
-   diagram draws on turn into opaque white or black sheets over its lines. And the
-   diagram is a large SVG carrying colour, so SchemeCrushSvg marks it data-pc-crush and
-   the whole thing is greyed and darkened, which takes white rings to grey or dim blue.
-   Built from reading the stylesheet, not from a device: these rules answer BOTH, so the
-   diagram shows whichever of the two was doing the hiding.
+   WHAT WENT WRONG THE FIRST TIME. It stroked every rect, line and path in the diagram
+   and cleared the background of every element in it. The diagram has more than rings:
+   a stroked rect drew the "container", and a stroke widens the drawing's bounds, which
+   the diagram measures to fit itself, so it re-fitted at a new size.
 
-   THE FIX, scoped to [data-region="diagram"], the chum page's own diagram stage, so no
-   other page and no other SVG changes:
-     its layers stay see-through; the crush is lifted off the diagram as a whole; every
-     line takes the scheme's ink, black on white, white on black; and its pictures are
-     greyed ONE BY ONE instead, the same crush every other image in a scheme gets, so a
-     scheme page never shows a colour photograph. */
-:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] *:not(img):not(image) {
-  background-color: transparent !important;
-}
-:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] [data-pc-crush] {
-  filter: none !important;
-  -webkit-filter: none !important;
-}
-:root[data-pc-contrast-scheme="black-on-white"] #pc-site [data-region="diagram"] :is(circle, ellipse, line, path, polyline, rect) {
+   NOW, THREE RULES, EACH ON ONE THING:
+   1. THE RINGS ONLY. The diagram's circles carry BreedTree's btCircle class; only they
+      take the scheme ink, black on white, white on black. Nothing else in the svg is
+      stroked, so its bounds, and therefore its size, do not change.
+   2. THE THREE WRAPPERS THAT COVER IT stay see-through: .upperBand, .leftBand and
+      .introStack, each documented in chums2.module.css as lying over the diagram,
+      which sits at z-index -1 behind them. See the rule there.
+   3. THE GREY CRUSH, if the scheme marks the diagram's svg for it, is lifted from that
+      svg alone, so a white ring is not dimmed to grey on the black scheme. */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site [data-region="diagram"] [class*="btCircle"] {
   stroke: #000 !important;
 }
-:root[data-pc-contrast-scheme="white-on-black"] #pc-site [data-region="diagram"] :is(circle, ellipse, line, path, polyline, rect) {
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [data-region="diagram"] [class*="btCircle"] {
   stroke: #fff !important;
 }
-:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] image {
-  filter: grayscale(1) contrast(1.1) brightness(0.55);
+:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] > svg[data-pc-crush],
+:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] svg[data-pc-crush] {
+  filter: none !important;
+  -webkit-filter: none !important;
 }

@@ -950,28 +950,14 @@
   color: var(--navy, #0a3a57);
 }
 
-/* ---- THE DIAGRAM IN A SCHEME, THE REAL CAUSE, 21 September 2026 (owner) --------------
-   Measured on the owner's devtools, not guessed: with a scheme on, the diagram's rings
-   WERE black (or white), the stroke rule in contrast-schemes.css applied, and still they
-   could not be seen. The reason is here in this file. .diagramStage sits at z-index -1,
-   BEHIND everything, and several full-width wrappers lie over it with nothing painted
-   in their empty middle; this file says so at .leftBand and .introStack. Normally they
-   are transparent. The scheme's sweep paints a solid background on every element, so
-   each became an opaque white or black sheet laid over the diagram.
-
-   So in a scheme these WRAPPERS stay see-through, the wrappers only and not what is in
-   them: the intro box, the cards, the tiles and the icons keep their scheme colours and
-   borders. The body behind them is already the scheme colour, so nothing changes where
-   there is no diagram. The #pc-site in the selector is what lets it outrank the sweep,
-   which carries that id too. */
-:global(:root[data-pc-contrast-scheme] #pc-site) .header,
-:global(:root[data-pc-contrast-scheme] #pc-site) .leftBand,
-:global(:root[data-pc-contrast-scheme] #pc-site) .introStack,
+/* THE THREE WRAPPERS OVER THE DIAGRAM, IN A SCHEME, 21 September 2026 (owner). The
+   scheme's sweep paints a solid background on every element; .upperBand, .leftBand and
+   .introStack are full-width and lie over .diagramStage (z-index -1), so they became
+   opaque sheets hiding it. Only these three stay see-through; everything inside them
+   keeps its scheme colours. #pc-site in the selector outranks the sweep. See also
+   "THE CHUM PAGE DIAGRAM IN A SCHEME, SURGICAL" in contrast-schemes.css. */
 :global(:root[data-pc-contrast-scheme] #pc-site) .upperBand,
-:global(:root[data-pc-contrast-scheme] #pc-site) .lowerBand,
-:global(:root[data-pc-contrast-scheme] #pc-site) .ancestorPack,
-:global(:root[data-pc-contrast-scheme] #pc-site) .famousWrap,
-:global(:root[data-pc-contrast-scheme] #pc-site) .packGrid,
-:global(:root[data-pc-contrast-scheme] #pc-site) .railWrap {
+:global(:root[data-pc-contrast-scheme] #pc-site) .leftBand,
+:global(:root[data-pc-contrast-scheme] #pc-site) .introStack {
   background-color: transparent !important;
 }
