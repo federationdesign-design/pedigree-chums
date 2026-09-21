@@ -2543,14 +2543,18 @@
 
 /* ---- THE LEARN AREA IN THE ACCESSIBILITY VIEWS, 21 September 2026 (owner) -------------
    The game window sits outside the site's scheme scope, so these are written for it.
-     1. THE PAW PATTERN behind the learn area is not drawn.
+     1. THE PAW PATTERN behind the learn area is not drawn (.learnPattern).
      2. THE INFO BOX that holds the dog's write-up: the view's page colour with an ink
         edge and ink text throughout (its blue is set inline by the game; !important
         outranks that). The edge is drawn inside the box, so its size does not change.
      3. THE GREEN PLAY: the page colour with an ink edge and an ink triangle.
      4. THE CHUM RAIL, and any picture in the info box, take the site's own image
         filter: a darkened grey on Black on white, the blue duotone on White on black. */
-:global(:root[data-pc-contrast-scheme]) .levelPaws { display: none !important; }
+/* CORRECTED, same evening: the first version of item 1 hid .levelPaws, which is NOT the
+   learn background. It is the pit-full wash, the paws the countdown fades in as a warning,
+   so it is restored. The learn area's paw background is .learnPattern, hidden here; the
+   finished-level paws on the game window are hidden in LineageModal.module.css. */
+:global(:root[data-pc-contrast-scheme]) .learnPattern { display: none !important; }
 :global(:root[data-pc-contrast-scheme="black-on-white"]) .caption { background: #ffffff !important; box-shadow: inset 0 0 0 2px #000000 !important; color: #000000 !important; }
 :global(:root[data-pc-contrast-scheme="black-on-white"]) .caption * { color: #000000 !important; text-shadow: none !important; }
 :global(:root[data-pc-contrast-scheme="black-on-white"]) .caption img, :global(:root[data-pc-contrast-scheme="black-on-white"]) .relRail img { filter: grayscale(1) contrast(1.1) brightness(0.55) !important; }

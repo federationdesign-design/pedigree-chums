@@ -1875,3 +1875,7 @@
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay .titlePortrait { box-shadow: 0 0 0 3px #ffffff !important; }
 :global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay .title { color: #000000 !important; text-shadow: none !important; }
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay .title { color: #ffffff !important; text-shadow: none !important; }
+
+/* The finished level's paw pattern is not drawn in the views either, 21 September 2026
+   (owner: remove the paw pattern from the accessibility views). */
+:global(:root[data-pc-contrast-scheme]) .overlayDone::before { display: none !important; }
