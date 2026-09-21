@@ -385,3 +385,20 @@
 .railGlyph svg { width: 100%; height: 100%; stroke: currentColor; }
 .railIconOpen .railGlyph { color: var(--navy, #0a3a57); }
 .railIconOpen .railGlyph svg { stroke: currentColor; }
+
+/* THE ANCESTOR "i" BUTTON IN A SCHEME, 21 September 2026 (owner: on the accessibility
+   views the i needs a fill so it can be seen, and the inverse on the other scheme). It
+   sat see-through over the dark picture, so a black i on Black on white vanished. It now
+   has a solid fill: white with a black i and ring on Black on white, black with a white i
+   and ring on White on black. The class is doubled on purpose, to outrank any scheme rule
+   that would clear its background, whichever stylesheet loads last. */
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .frameInfoBtn.frameInfoBtn {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .frameInfoBtn.frameInfoBtn {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
