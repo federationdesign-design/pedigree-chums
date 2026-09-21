@@ -399,6 +399,29 @@ export default function BreedStrip({
     };
   };
 
+  /* THE HEADER PICTURE PLAYS THE CHUM'S LEVEL, 21 September 2026 (owner: a direct
+     link to the chum level from the dog image). The picture lives in another
+     component, so it announces "pc:play-chum" with itself as the element, and this
+     strip, which owns the game, answers it by tapping the chum's own card through
+     the SAME openFor the card uses. One path, so the run resets, the tunnel and
+     the start screen are identical to tapping the card; and the tunnel dives from
+     the picture the player actually pressed.
+
+     Re-subscribed each render so it always holds the current openFor, whose play
+     branch reads the banked score; a listener captured once would bank a stale
+     one. Cheap: it is one listener. */
+  useEffect(() => {
+    if (!playName || !only) return;
+    const onPlay = (ev: Event) => {
+      const el = (ev as CustomEvent<{ el?: Element }>).detail?.el ?? null;
+      const b = only.find((x) => x.name === playName);
+      const h = b ? openFor(b) : undefined;
+      h?.({ currentTarget: el });
+    };
+    window.addEventListener("pc:play-chum", onPlay);
+    return () => window.removeEventListener("pc:play-chum", onPlay);
+  });
+
   const breeds: UKBreed[] = only ?? ukBreeds
     .filter((b) => stripMatches(b.strip, era))
     .sort((a, b) => a.anchor - b.anchor);
@@ -802,7 +825,8 @@ export default function BreedStrip({
           so it earns the h2; the era pages keep their decorative era name as a
           span, since the page itself carries that era's heading. */}
       {only ? (
-        <h2 className={`${styles.stripLabel} ${styles.stripLabelLemon}`}>
+        // The anchor the chum page's title links down to. See Chums2Client.
+        <h2 id="dogs-that-made" className={`${styles.stripLabel} ${styles.stripLabelLemon}`}>
           {label ?? ERA_LABELS[era]}
           {labelName ? <> <span className={styles.stripLabelName}>{labelName}</span></> : null}
         </h2>

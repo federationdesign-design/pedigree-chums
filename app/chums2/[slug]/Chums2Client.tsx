@@ -585,12 +585,29 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       </div>
       {/* Header (brief 5.1). */}
       <header className={styles.header}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className={styles.headerImg} src={image} alt={name} />
+        {/* THE PICTURE PLAYS THIS DOG'S LEVEL, 21 September 2026 (owner). It asks
+            the ancestor strip at the foot of the page to open the chum's own
+            level, so the tunnel dives from this picture. See BreedStrip's
+            "pc:play-chum". A button, because it performs an action here rather
+            than going to another page. */}
+        <button
+          type="button"
+          className={styles.headerImgBtn}
+          aria-label={`Play the ${name} level`}
+          onClick={(e) => window.dispatchEvent(new CustomEvent("pc:play-chum", { detail: { el: e.currentTarget } }))}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={styles.headerImg} src={image} alt={name} />
+        </button>
         <div className={styles.headerText}>
+          {/* THE TITLE JUMPS TO THE ANCESTOR STRIP, 21 September 2026 (owner). A
+              real anchor, so it works without script and a search engine sees the
+              relationship. The link carries no look of its own. */}
           <h1 className={styles.title}>
-            <span className={styles.titleLead}>Learn about the</span>{" "}
-            <span className={styles.titleName}>{name}</span>
+            <a href="#dogs-that-made" className={styles.titleLink}>
+              <span className={styles.titleLead}>Learn about the</span>{" "}
+              <span className={styles.titleName}>{name}</span>
+            </a>
           </h1>
           {info.subtitle && <p className={styles.subtitle}>{info.subtitle}</p>}
         </div>

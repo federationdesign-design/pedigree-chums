@@ -885,3 +885,28 @@
 }
 
 .backBtn:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* The header picture as a button that plays the chum's level, and the title as a
+   link down to the ancestor strip, 21 September 2026. Neither changes the look: the
+   button only resets the browser's button chrome, and the link inherits its colours
+   and drops the underline. Both keep a visible focus ring for the keyboard. */
+.headerImgBtn {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 22px;
+  transition: transform 0.15s ease;
+}
+.headerImgBtn:hover { transform: translateY(-2px); }
+.headerImgBtn:focus-visible { outline: 3px solid var(--yellow, #fff200); outline-offset: 4px; }
+.titleLink {
+  color: inherit;
+  text-decoration: none;
+}
+.titleLink:focus-visible { outline: 3px solid var(--yellow, #fff200); outline-offset: 4px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  .headerImgBtn { transition: none; }
+  .headerImgBtn:hover { transform: none; }
+}

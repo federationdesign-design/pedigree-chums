@@ -970,9 +970,21 @@
 
      margin-top and font-weight undo the browser's defaults for an h2: the display
      face has one weight, and a faux bold of it looks smeared. */
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  font-weight: 400;
+  /* MONTSERRAT, NOT LUCKIEST GUY, 21 September 2026 (owner: style it like the
+     Ancestor Pack and Likely life span titles). Those are .packTitle on the chum
+     page: the body face at 800, tracked 0.06em, upper case, at the same clamp.
+     Taken figure for figure so the three read as one family of headings. The
+     colours stay lemon and white, which the owner set separately; .packTitle
+     itself is navy. */
+  font-family: var(--font-body, "Montserrat"), system-ui, sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   line-height: 1.1;
+  /* The chum page's title links here, and the site's nav is fixed over the top of
+     the window, so an anchor jump stops this far down rather than underneath it. */
+  scroll-margin-top: 120px;
   /* LEFT, 20 September 2026 (owner reversed the right alignment the same day).
      The window-width box that right alignment needed is gone with it: a left
      aligned heading starts at the page's left edge whatever the canvas width. */
