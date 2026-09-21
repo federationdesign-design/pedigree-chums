@@ -278,7 +278,11 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       });
     }
     if (runningCosts[slug]) {
-      list.push({ id: "cost", label: "Cost to care", icon: ICONS.runningCost, width: 380, body: <RunningCostCard config={runningCosts[slug]} /> });
+      list.push({ id: "cost", label: "Cost to care", icon: (
+          /* 20% SMALLER, 21 September 2026 (owner). The rail draws every glyph at 100% of
+             its tile, so this one is wrapped in an 80% box and fills that instead. */
+          <span style={{ display: "flex", width: "80%", height: "80%" }}>{ICONS.runningCost}</span>
+        ), width: 380, body: <RunningCostCard config={runningCosts[slug]} /> });
     }
     if (suitabilityScores[slug]) {
       list.push({ id: "suitability", label: "Suitability", icon: ICONS.suitability, width: 380, body: <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} /> });

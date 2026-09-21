@@ -381,6 +381,7 @@
   color: var(--yellow, #fff200);
   line-height: 1;
 }
-.railGlyph svg { width: 100%; height: 100%; stroke: var(--yellow, #fff200); }
+/* currentColor, 21 September 2026 (owner: in the accessibility modes some icons stayed yellow). The stroke was a hard yellow on the svg itself, so the scheme, which recolours text through `color`, could not reach it: stroke icons (health, family tree) and the outline on the fill icons stayed yellow on black. Following currentColor, the stroke now takes whatever colour the glyph has: yellow normally, navy when hovered or open, and the scheme's white or black. */
+.railGlyph svg { width: 100%; height: 100%; stroke: currentColor; }
 .railIconOpen .railGlyph { color: var(--navy, #0a3a57); }
-.railIconOpen .railGlyph svg { stroke: var(--navy, #0a3a57); }
+.railIconOpen .railGlyph svg { stroke: currentColor; }

@@ -249,7 +249,11 @@ export default function Chums2Mobile({ name, slug, image, info, lineage }: Props
         ),
       });
     }
-    if (runningCosts[slug]) list.push({ id: "cost", label: "Cost to care", icon: ICONS.runningCost, body: <RunningCostCard config={runningCosts[slug]} /> });
+    if (runningCosts[slug]) list.push({ id: "cost", label: "Cost to care", icon: (
+          /* 20% SMALLER, 21 September 2026 (owner). The rail draws every glyph at 100% of
+             its tile, so this one is wrapped in an 80% box and fills that instead. */
+          <span style={{ display: "flex", width: "80%", height: "80%" }}>{ICONS.runningCost}</span>
+        ), body: <RunningCostCard config={runningCosts[slug]} /> });
     if (suitabilityScores[slug]) list.push({ id: "suitability", label: "Suitability", icon: ICONS.suitability, body: <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} /> });
     if (exerciseNeeds[slug]) list.push({ id: "exercise", label: "Exercise", icon: ICONS.exercise, body: <ExerciseCard data={exerciseNeeds[slug]} /> });
     if (groomingNeeds[slug]) list.push({ id: "grooming", label: "Grooming", icon: ICONS.grooming, body: <GroomingCard data={groomingNeeds[slug]} /> });

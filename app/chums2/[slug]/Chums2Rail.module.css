@@ -34,13 +34,13 @@
 }
 
 .icon:hover .glyph { color: var(--navy, #0a3a57); }
-.icon:hover .glyph svg { stroke: var(--navy, #0a3a57); }
+.icon:hover .glyph svg { stroke: currentColor; }
 
 /* D73 #1: OPEN state - the inverted active look (yellow tile, navy glyph), the same
    treatment as :hover, held while the card is open. Clicking again toggles it closed. */
 .iconOpen { background: var(--yellow, #ffd23e); }
 .iconOpen .glyph { color: var(--navy, #0a3a57); }
-.iconOpen .glyph svg { stroke: var(--navy, #0a3a57); }
+.iconOpen .glyph svg { stroke: currentColor; }
 
 .icon:hover .label {
   opacity: 1;
@@ -58,10 +58,11 @@
   line-height: 1;
 }
 
+/* currentColor, 21 September 2026 (owner: in the accessibility modes some icons stayed yellow). The stroke was a hard yellow on the svg itself, so the scheme, which recolours text through `color`, could not reach it: stroke icons (health, family tree) and the outline on the fill icons stayed yellow on black. Following currentColor, the stroke now takes whatever colour the glyph has: yellow normally, navy when hovered or open, and the scheme's white or black. */
 .glyph svg {
   width: 100%;
   height: 100%;
-  stroke: var(--yellow, #ffd23e);
+  stroke: currentColor;
 }
 
 /* Tooltip label, to the RIGHT of the tile (rail sits on the left edge). */
