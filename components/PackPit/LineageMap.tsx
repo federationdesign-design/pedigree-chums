@@ -1893,7 +1893,12 @@ export default function LineageMap({
            nothing else: every deeper generation is placed from its PARENT, so the rest
            of the tree moves out rigidly with its own spacing unchanged. The phone, the
            main pit and the chum tree keep 18. */
-        const pokeHere = depth === 0 && circular && !isMobile ? NODE_POKE * 2 : NODE_POKE;
+        /* AND EVERY CONNECTOR 10px LONGER, desktop lift only, the same evening (owner:
+           all the connectors, the first ones from the lifted circle included). Written
+           in screen pixels and divided out of the lift's 0.8 overlay by liftK, so it
+           lands as 10 on screen. The first ring is therefore 36 + 12.5 layout units. */
+        const liftExtra = circular && !isMobile ? 10 * liftK : 0;
+        const pokeHere = (depth === 0 && circular && !isMobile ? NODE_POKE * 2 : NODE_POKE) + liftExtra;
         const d2 = clock ? rOf(n) + rOf(k) + pokeHere : circular ? ringD : dist;
         // Deliberate: every clock node is _tucked = false, so it always draws a
         // connector. Before, a line appeared only once the ring was pushed past
