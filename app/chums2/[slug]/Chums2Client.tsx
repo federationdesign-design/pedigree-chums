@@ -297,8 +297,8 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       // other cards, so cap the card at 560 and let it scroll internally.
       // (Decision D10.)
       list.push({
-        // 560 -> 700, 25% wider (owner, 21 September 2026).
-        id: "health", label: "Health", icon: HEALTH_GLYPH, width: 700,
+        // 560 -> 700, 25% wider, then 700 -> 770, 10% wider (owner, 21 September 2026).
+        id: "health", label: "Health", icon: HEALTH_GLYPH, width: 770,
         body: <div className={styles.scrollBody}><HealthSection profile={healthConditions[slug]} /></div>,
       });
     }

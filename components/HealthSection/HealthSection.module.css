@@ -29,7 +29,11 @@
 /* Table header */
 .tableHead {
   display: grid;
-  grid-template-columns: 320px 80px 80px 28px;
+  /* THE CONDITION COLUMN TAKES WHAT IS LEFT, 21 September 2026 (owner: it always has
+     the most content so it should be the dominant column). It was a fixed 320px, so in
+     a wider box the spare width pooled on the right and long names wrapped early. Now
+     the three small columns keep their size and the name column fills the rest. */
+  grid-template-columns: minmax(0, 1fr) 80px 80px 36px;
   gap: 0;
   padding: 0 16px 8px;
   border-bottom: 1px solid rgba(255,255,255,0.12);
@@ -45,11 +49,11 @@
 }
 
 /* Column widths -- shared between header and rows */
-.colCondition  { width: 320px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.colCondition  { min-width: 0; display: flex; align-items: center; gap: 10px; }
 .colSeverity   { width: 80px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .colLikelihood { width: 80px; display: flex; align-items: center; flex-shrink: 0; }
 
-.colToggle     { width: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.colToggle     { width: 36px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 /* Rows */
 .rows {
@@ -59,7 +63,9 @@
 }
 
 .row {
-  background: var(--blue-deep, #0b78bd);
+  /* DARK BLUE, 21 September 2026 (owner: change the lighter blue to dark blue). A step
+     lighter than the card's own navy, so each row still reads as a row. */
+  background: #134a75;
   border: 1.5px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   overflow: hidden;
@@ -77,7 +83,11 @@
 .rowHeader {
   width: 100%;
   display: grid;
-  grid-template-columns: 320px 80px 80px 28px;
+  /* THE CONDITION COLUMN TAKES WHAT IS LEFT, 21 September 2026 (owner: it always has
+     the most content so it should be the dominant column). It was a fixed 320px, so in
+     a wider box the spare width pooled on the right and long names wrapped early. Now
+     the three small columns keep their size and the name column fills the rest. */
+  grid-template-columns: minmax(0, 1fr) 80px 80px 36px;
   align-items: center;
   padding: 14px 16px;
   background: none;
@@ -143,7 +153,11 @@
 
 /* Chevron */
 .chevron {
-  font-size: 1rem;
+  /* BIGGER AND BOLDER, 21 September 2026 (owner). The arrow is a text glyph, and most
+     fonts draw it at one weight, so the stroke is what thickens it. */
+  font-size: 1.6rem;
+  font-weight: 900;
+  -webkit-text-stroke: 1.5px #ffffff;
   color: #ffffff;
   display: inline-block;
   transition: transform 0.2s ease;
