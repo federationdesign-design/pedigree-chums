@@ -30,7 +30,15 @@ export default function LevelSlider({ chum, mobile = false }: { chum: string; mo
   /* Foreign progenitors first, deepest first, then the levels and chum ancestors in
      era order, then the page's own dog last. See foreignCardsWithin. */
   const self = stripCardFor(chum);
-  const levels = [...foreignCardsWithin(chum), ...ancestorCardsWithin(chum), self];
+  /* ONE TIMELINE, BY YEAR, 21 September 2026. Every card now carries a real year: the
+     strip's own dogs in their anchor, the rest from data/eraYears.ts. So the row is
+     sorted by that year alone, oldest first, and a dog dated c. 600 BC can no longer
+     sit after one dated 1850 just because it came from a different list. The page's
+     own dog stays LAST whatever its date, because the row leads up to it. */
+  const ancestors = [...foreignCardsWithin(chum), ...ancestorCardsWithin(chum)]
+    .filter((b) => b.name !== chum)
+    .sort((a, b) => a.anchor - b.anchor);
+  const levels = [...ancestors, self];
   const era = levels[0].strip;
   return (
     <section className={`${styles.wrap} ${mobile ? styles.mobile : ""}`.trim()} aria-label={`The dogs that went into making the ${chum}`}>

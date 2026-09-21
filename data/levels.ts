@@ -14,6 +14,7 @@ import { ukBreeds, type UKBreed } from "./uk-breeds";
 import { breeds as packBreeds } from "./breeds";
 import { getLineage, type LineageNode } from "./lineage";
 import { isEchoName } from "./lineageShape";
+import { ERA_YEARS, eraYear } from "./eraYears";
 import { resolveLineageName } from "./lineageNames";
 
 export type BreedCardKind = "learn" | "play";
@@ -98,7 +99,10 @@ export function stripCardFor(name: string): UKBreed {
   const uk = ukBreeds.find((u) => u.name === name);
   if (uk) return uk;
   const pack = packBreeds.find((b) => b.name === name);
-  return { name, strip: "c1900", era: "Today", anchor: 9999, note: pack?.character ?? "", image: pack?.image };
+  /* The researched round date, not "Today", 21 September 2026: see data/eraYears.ts.
+     Its year is the anchor too, so the card sorts into the timeline where it belongs. */
+  const label = ERA_YEARS[name];
+  return { name, strip: "c1900", era: label ?? "", anchor: eraYear(label) ?? 9999, note: pack?.character ?? "", image: pack?.image };
 }
 
 /* EVERY DOG IN A CHUM'S TREE THAT CAN BE PLAYED, 21 September 2026 (owner: the Bulldog
@@ -192,8 +196,9 @@ export function foreignCardsWithin(chumName: string): StripCard[] {
     .map(({ node, deeper }) => ({
       name: node.name,
       strip: "ancient",
-      era: "",
-      anchor: -1,
+      // The researched round date: see data/eraYears.ts. Blank only if one is missing.
+      era: ERA_YEARS[node.name] ?? "",
+      anchor: eraYear(ERA_YEARS[node.name]) ?? -1,
       note: node.note,
       image: node.img,
       ...(deeper ? { lineage: node } : null),
