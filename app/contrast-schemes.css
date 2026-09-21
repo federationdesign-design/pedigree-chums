@@ -509,3 +509,38 @@
    dividers and the box outline do the separating; keyboard focus still shows via
    the focus-ring rule above (an outline, not this box-shadow). */
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="__cell"] { box-shadow: none !important; }
+
+/* ============================================================================
+   THE CHUM PAGE DIAGRAM IN A SCHEME, 21 September 2026 (owner: the circle diagram
+   disappears when a scheme is on; its lines should turn black or white instead).
+
+   WHY IT VANISHED. Two scheme rules reach it. The sweep above paints a solid
+   background-color on every element that is not media, so the transparent layers the
+   diagram draws on turn into opaque white or black sheets over its lines. And the
+   diagram is a large SVG carrying colour, so SchemeCrushSvg marks it data-pc-crush and
+   the whole thing is greyed and darkened, which takes white rings to grey or dim blue.
+   Built from reading the stylesheet, not from a device: these rules answer BOTH, so the
+   diagram shows whichever of the two was doing the hiding.
+
+   THE FIX, scoped to [data-region="diagram"], the chum page's own diagram stage, so no
+   other page and no other SVG changes:
+     its layers stay see-through; the crush is lifted off the diagram as a whole; every
+     line takes the scheme's ink, black on white, white on black; and its pictures are
+     greyed ONE BY ONE instead, the same crush every other image in a scheme gets, so a
+     scheme page never shows a colour photograph. */
+:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] *:not(img):not(image) {
+  background-color: transparent !important;
+}
+:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] [data-pc-crush] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site [data-region="diagram"] :is(circle, ellipse, line, path, polyline, rect) {
+  stroke: #000 !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [data-region="diagram"] :is(circle, ellipse, line, path, polyline, rect) {
+  stroke: #fff !important;
+}
+:root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] image {
+  filter: grayscale(1) contrast(1.1) brightness(0.55);
+}
