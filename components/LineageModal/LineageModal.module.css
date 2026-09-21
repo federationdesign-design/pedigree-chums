@@ -1839,7 +1839,7 @@
 :global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(:is(line, circle, path)[stroke="#ffffff"][stroke-dasharray]) { stroke: #000000 !important; }
 :global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(polygon[fill="#ffffff"]) { fill: #000000 !important; }
 :global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(circle[class*="btCircle"][stroke]:not([stroke="none"]):not([stroke="transparent"])) { stroke: #000000 !important; }
-:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(circle[fill^="url(#bt-img"]) { filter: grayscale(1) contrast(1.1); }
+
 
 /* white-on-black */
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global([class*="diffTrack"]) { background: #000000 !important; border-color: #ffffff !important; box-shadow: none !important; }
@@ -1851,4 +1851,27 @@
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(:is(line, circle, path)[stroke="#ffffff"][stroke-dasharray]) { stroke: #ffffff !important; }
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(polygon[fill="#ffffff"]) { fill: #ffffff !important; }
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(circle[class*="btCircle"][stroke]:not([stroke="none"]):not([stroke="transparent"])) { stroke: #ffffff !important; }
-:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(circle[fill^="url(#bt-img"]) { filter: grayscale(1) contrast(1.1); }
+
+
+/* ---- THE GAME'S PICTURES, PORTRAIT AND NAME IN THE VIEWS, 21 September 2026 (owner) ---
+   PICTURES TAKE THE SITE'S OWN IMAGE FILTER, the exact figures contrast-schemes.css gives
+   every picture on the site: a darkened grey on Black on white, the blue duotone on White
+   on black. This covers the level portrait top left and every picture in the circle pack,
+   and replaces the plain grey the circle pictures had in stage 2, so the game and the site
+   treat pictures the same way.
+   THE PORTRAIT GETS A RING in the view's ink, drawn as a shadow ring so the portrait keeps
+   its exact size and position.
+   THE DOG'S NAME is black on the white view; on the black view it stays white. Its soft
+   shadow is dropped in both. */
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay .titlePortrait,
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(circle[fill^="url(#bt-img"]) {
+  filter: grayscale(1) contrast(1.1) brightness(0.55);
+}
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay .titlePortrait,
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(circle[fill^="url(#bt-img"]) {
+  filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55);
+}
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay .titlePortrait { box-shadow: 0 0 0 3px #000000 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay .titlePortrait { box-shadow: 0 0 0 3px #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay .title { color: #000000 !important; text-shadow: none !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay .title { color: #ffffff !important; text-shadow: none !important; }
