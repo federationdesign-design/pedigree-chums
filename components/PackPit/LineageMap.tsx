@@ -4572,7 +4572,10 @@ export default function LineageMap({
                          there the pill stays clear ABOVE the node, so this is `circular`,
                          the lift, only. */
                       const pcy = circular
-                        ? -r + (nmH / 2) * PIT_PILL_SCALE
+                        /* UP 10px, the same evening (owner). Written in screen pixels and
+                           divided out of the lift's 0.8 overlay by liftK, so it lands as 10
+                           on screen rather than 8. */
+                        ? -r + (nmH / 2) * PIT_PILL_SCALE - 10 * liftK
                         : -(r * CARD_COVER + PILL_CARD_GAP + (nmH / 2) * PIT_PILL_SCALE);
                       return (
                         /* 10% SMALLER, 2 September 2026 (owner).
