@@ -118,9 +118,14 @@ const EST_H = 260;         // card height estimate (row pitch + canvas-growth re
 // The rail's icon order. It USED to double as the fixed slot order for the pop-out
 // cards; since 21 September 2026 cards take slots in the order they are opened instead,
 // so this now only orders the icons. See placeCard.
+/* 21 September 2026 (owner): HEALTH moves up to sit directly under temperament, and
+   the LIFESPAN hourglass is gone. The rail only draws what is listed here, so leaving
+   lifespanExplain out removes the icon; its card definition stays in the file, unused,
+   because the owner is still choosing where the lifespan explanation should live. The
+   life span chart itself is a page section, not a rail card, and is unaffected. */
 const RAIL_ORDER = [
-  "temperament", "tree", "lifespanExplain", "cost", "suitability",
-  "exercise", "grooming", "training", "influence", "health", "diagram",
+  "temperament", "health", "tree", "cost", "suitability",
+  "exercise", "grooming", "training", "influence", "diagram",
 ];
 
 // ── Intro box: FIXED height, width steps up on overflow (D75) ────────────────
@@ -292,7 +297,8 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       // other cards, so cap the card at 560 and let it scroll internally.
       // (Decision D10.)
       list.push({
-        id: "health", label: "Health", icon: HEALTH_GLYPH, width: 560,
+        // 560 -> 700, 25% wider (owner, 21 September 2026).
+        id: "health", label: "Health", icon: HEALTH_GLYPH, width: 700,
         body: <div className={styles.scrollBody}><HealthSection profile={healthConditions[slug]} /></div>,
       });
     }
