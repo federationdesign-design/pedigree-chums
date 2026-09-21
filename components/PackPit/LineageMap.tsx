@@ -203,7 +203,13 @@ export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common
      glow use when there is no breed to read; chaining a common dog therefore
      draws in the same colour as that fallback. If either starts to read as a
      fault, those are the two constants to move, not this one. */
-  common:        { bg: "#ffed00", fg: "#000000", label: "COMMON" },         // site lemon
+  /* REVERSED THE SAME DAY, 20 September 2026 (owner: swap the yellow common
+     colour back to the orange). Back to #f47421. The note above is left standing
+     because it records what was tried and the two clashes that came with it; on
+     the device the two neighbouring yellows were the problem the swap was warned
+     about, and the owner has ruled the orange back. Do not reapply the lemon
+     without a plan for very common, which is #ffd23e. */
+  common:        { bg: "#f47421", fg: "#000000", label: "COMMON" },         // orange
   /* #fcee23 -> #ffd23e, 18 September 2026 (owner). The lemon becomes the site's
      own --yellow, so the top tier sits in the palette rather than beside it.
      ALL FIVE READERS MOVE TOGETHER and that is intended, audited before the
