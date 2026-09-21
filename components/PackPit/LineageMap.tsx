@@ -1510,6 +1510,36 @@ export default function LineageMap({
     return { chum, alive: rest.filter((s) => isAlive(s.status)), extinct: rest.filter((s) => !isAlive(s.status)) };
   }, [root, bounded]);
 
+  /* FRAMES SIZED BY SHARE, STAGE 1, 21 September 2026 (owner: on desktop the frames in
+     the lifted layer should reflect the size of the images, so a 100% node gets a bigger
+     frame; the diagram's own curve, capped at 1.5 times the small frame).
+
+     BEHIND A TEST SWITCH until all three stages land: ?framesize=1 on the page URL. With
+     it off, every frame is CW exactly as before, so the live game is untouched.
+
+     STAGE 1 IS: each frame's size, the rows laid out for mixed sizes, the frame outlines
+     at their own size, and the drop test reading each frame's own size. NOT YET: the
+     placed picture and the dragged card still draw at CW, so a big frame shows a CW
+     picture inside it until stage 2.
+
+     A FRAME IS ONE PER PICTURE, so it takes the LARGEST share of any circle carrying that
+     picture: a dog met at 50% and at 10% gets the 50% frame. The share is the one the
+     diagram itself draws with, the circle's leaves over its parent's drawn leaves. */
+  const frameSizeTest = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("framesize");
+  const frameShareByImg = useMemo(() => {
+    const m = new Map<string, number>();
+    const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
+      if (k.img) {
+        const img = packArt(k.name) ?? k.img;
+        const share = Math.round((k._leaves / drawnLeaves(n)) * 100);
+        m.set(img, Math.max(m.get(img) ?? 0, share));
+      }
+      walk(k);
+    });
+    if (root) walk(root);
+    return m;
+  }, [root]);
+
   // how many times each image appears across the whole tree; >1 means the breed is a
   // duplicate, so its frame becomes a stack the extra copies can be dropped onto
   const dupTotal = useMemo(() => {
@@ -2192,7 +2222,15 @@ export default function LineageMap({
      derived from it, at 171 instead of 124. The row rises with the counter,
      because one number governs both and that is what keeps them from arguing. */
   const chumTop = fiveUp ? unscaleY(91) : circular ? unscaleY(isMobile ? 118 : 168) : isMobile ? 170 : unscaleY(240); // 96, down 15 to clear the top-right button
-  const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
+  /* A frame's width. radius() is the diagram's curve and floors at 21, so the smallest
+     frame is exactly CW and the ratio grows with the share, stopping at FRAME_SCALE_CAP.
+     Measured: the cap is reached at about 40%, and anything at or under 17.6% is CW. */
+  const FRAME_SCALE_CAP = 1.5;
+  const frameSizeOn = frameSizeTest && circular && !isMobile && !bounded;
+  const frameW = (img: string) => frameSizeOn
+    ? Math.round(CW * Math.min(FRAME_SCALE_CAP, radius(frameShareByImg.get(img) ?? 0) / 21))
+    : CW;
+  const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number; fw: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
     // chum, then alive, then extinct, flowing as one continuous bunch with no separators
@@ -2201,13 +2239,48 @@ export default function LineageMap({
       ...frameSlots.alive.map((s, i) => ({ id: `fa${i}`, cat: "alive" as const, img: s.img })),
       ...frameSlots.extinct.map((s, i) => ({ id: `fe${i}`, cat: "extinct" as const, img: s.img })),
     ];
-    all.forEach((f, g) => frames.push({ ...f, sx: F_LEFT + (g % MCOLS) * F_COL + gridX, sy: chumTop + Math.floor(g / MCOLS) * F_ROW }));
+    all.forEach((f, g) => frames.push({ ...f, sx: F_LEFT + (g % MCOLS) * F_COL + gridX, sy: chumTop + Math.floor(g / MCOLS) * F_ROW, fw: CW }));
+  } else if (frameSizeOn) {
+    /* MIXED SIZES FLOW, stage 1. Each section is split into rows that fit the same right
+       edge the even grid used, then each row's frames share one centre line, set by the
+       tallest frame in that row, so a row of mixed sizes still reads as a row. A section's
+       first row keeps the even grid's top edge, and the next section starts 72 below the
+       last row, the even grid's own gap. */
+    const GUT = F_COL - CW;
+    const left = F_LEFT - CW / 2;
+    const right = F_LEFT + (fCols - 1) * F_COL + CW / 2;
+    const flow = (slots: { img: string }[], prefix: string, cat: "chum" | "alive" | "extinct", firstCentre: number) => {
+      const rows: { img: string; i: number; w: number }[][] = [];
+      let x = left;
+      slots.forEach((s, i) => {
+        const w = frameW(s.img);
+        if (!rows.length || (x + w > right && x > left)) { rows.push([]); x = left; }
+        rows[rows.length - 1].push({ img: s.img, i, w });
+        x += w + GUT;
+      });
+      let top = firstCentre - CW / 2;
+      for (const row of rows) {
+        const h = Math.max(...row.map((r) => r.w));
+        let rx = left;
+        for (const r of row) {
+          frames.push({ id: `${prefix}${r.i}`, cat, img: r.img, sx: rx + r.w / 2, sy: top + h / 2, fw: r.w });
+          rx += r.w + GUT;
+        }
+        top += h + GUT;
+      }
+      return rows.length ? top - GUT : firstCentre - CW / 2; // bottom edge of the last row
+    };
+    const chumBottom = flow(frameSlots.chum, "fc", "chum", chumTop);
+    aliveTop = frameSlots.chum.length ? chumBottom + GUT + 72 + CW / 2 : chumTop;
+    const aliveBottom = flow(frameSlots.alive, "fa", "alive", aliveTop);
+    extinctTop = frameSlots.alive.length ? aliveBottom + GUT + 72 + CW / 2 : aliveTop;
+    flow(frameSlots.extinct, "fe", "extinct", extinctTop);
   } else {
-    frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: chumTop + Math.floor(i / fCols) * F_ROW }));
+    frameSlots.chum.forEach((s, i) => frames.push({ id: `fc${i}`, cat: "chum", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: chumTop + Math.floor(i / fCols) * F_ROW, fw: CW }));
     aliveTop = chumTop + (frameSlots.chum.length ? Math.ceil(frameSlots.chum.length / fCols) * F_ROW + 72 : 0);
-    frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: aliveTop + Math.floor(i / fCols) * F_ROW }));
+    frameSlots.alive.forEach((s, i) => frames.push({ id: `fa${i}`, cat: "alive", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: aliveTop + Math.floor(i / fCols) * F_ROW, fw: CW }));
     extinctTop = aliveTop + (frameSlots.alive.length ? Math.ceil(frameSlots.alive.length / fCols) * F_ROW + 72 : 0);
-    frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: extinctTop + Math.floor(i / fCols) * F_ROW }));
+    frameSlots.extinct.forEach((s, i) => frames.push({ id: `fe${i}`, cat: "extinct", img: s.img, sx: F_LEFT + (i % fCols) * F_COL, sy: extinctTop + Math.floor(i / fCols) * F_ROW, fw: CW }));
   }
   // horizontal nudge only if the 4-wide grid overflows a narrow phone (otherwise it sits still)
   const gridRight = F_LEFT + (MCOLS - 1) * F_COL + CW / 2;
@@ -4585,11 +4658,13 @@ export default function LineageMap({
                        untouched: there the card's ring is yellow too and the
                        two sit on top of each other as one. */
                     style={circular && filledHere ? { ...glow, opacity: 0 } : glow}
-                    x={f.sx - pan.x - CW / 2}
-                    y={f.sy - pan.y - CW / 2}
-                    width={CW}
-                    height={CW}
-                    rx={circular ? CW / 2 : 15}
+                    /* The frame's OWN width, stage 1 of the share sizing. Equals CW when
+                       the ?framesize test switch is off, so nothing moves. */
+                    x={f.sx - pan.x - f.fw / 2}
+                    y={f.sy - pan.y - f.fw / 2}
+                    width={f.fw}
+                    height={f.fw}
+                    rx={circular ? f.fw / 2 : 15}
                   />
                   {(lit && dragName || wrongDog?.frameId === f.id) && ( /* pickup-name: label inside frame, clipped */
                     <>
@@ -4805,8 +4880,8 @@ export default function LineageMap({
                       const cdd = cardDrag.current;
                       const ccx = (cdd ? cdd.ox + (e.clientX - cdd.sx) : c.cardX) + pan.x;
                       const ccy = (cdd ? cdd.oy + (e.clientY - cdd.sy) : c.cardY) + pan.y;
-                      const ptrHit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CW / 2 && Math.abs(e.clientY - f.sy) <= CW / 2);
-                      const cardHit = frames.find((f) => Math.abs(ccx - f.sx) <= CW / 2 && Math.abs(ccy - f.sy) <= CW / 2);
+                      const ptrHit = frames.find((f) => Math.abs(e.clientX - f.sx) <= f.fw / 2 && Math.abs(e.clientY - f.sy) <= f.fw / 2);
+                      const cardHit = frames.find((f) => Math.abs(ccx - f.sx) <= f.fw / 2 && Math.abs(ccy - f.sy) <= f.fw / 2); // each frame's own size (share sizing, stage 1)
                       const mine = frames
                         .filter((f) => f.img === c.img)
                         .map((f) => `${f.id}${filled.has(f.id) ? "[full]" : "[open]"} ptr ${Math.round(e.clientX - f.sx)},${Math.round(e.clientY - f.sy)} card ${Math.round(ccx - f.sx)},${Math.round(ccy - f.sy)}`)
@@ -4834,7 +4909,7 @@ export default function LineageMap({
                            and what they can see. Do not put the pointer test back. */
                         const cardCx = cd.ox + (e.clientX - cd.sx) + pan.x;
                         const cardCy = cd.oy + (e.clientY - cd.sy) + pan.y;
-                        const hit = frames.find((f) => Math.abs(cardCx - f.sx) <= CW / 2 && Math.abs(cardCy - f.sy) <= CW / 2);
+                        const hit = frames.find((f) => Math.abs(cardCx - f.sx) <= f.fw / 2 && Math.abs(cardCy - f.sy) <= f.fw / 2);
                         if (hit && hit.img === c.img && !filled.has(hit.id)) {
                           // first copy of this breed: it fills the frame (+100)
                           setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
