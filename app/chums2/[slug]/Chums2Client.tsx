@@ -9,6 +9,7 @@ import LineageMap from "../../../components/PackPit/LineageMap";
 import Chums2Rail, { type RailItem } from "./Chums2Rail";
 import DragCard, { type Rect } from "./DragCard";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
+import SchemeDiag from "./SchemeDiag";
 import { ICONS } from "../../../components/CardDock/CardDock";
 import { INFLUENCE_GLYPH, DIAGRAM_GLYPH, HEALTH_GLYPH } from "./chums2Icons";
 import { breedInfo } from "../../../data/breedInfo";
@@ -325,6 +326,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // Which tile popout is open, and which kind. Only one is open at a time, so
   // opening any one replaces the others. The enlarged image (kind "image") also
   // carries the tile's screen rect, captured at click, as the TileZoom anchor.
+  const [schemeDiagOn, setSchemeDiagOn] = useState(false);
+  useEffect(() => {
+    // After mount, so the server render and the first client render agree.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSchemeDiagOn(new URLSearchParams(window.location.search).has("schemediag"));
+  }, []);
   const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" | "image"; anchor?: { x: number; y: number; size: number } } | null>(null);
   // The hovered ancestor NAME (from a pack tile OR a diagram circle). Drives BOTH the
   // diagram-circle yellow OUTLINE (passed to BreedTree as highlightName) and the INTRO
@@ -646,6 +653,8 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       <div ref={introMeasureRef} aria-hidden="true" style={{ position: "absolute", left: -99999, top: 0, visibility: "hidden", padding: "20px 0", boxSizing: "content-box", pointerEvents: "none" }}>
         {tallestFrame && renderAncestorCard(tallestFrame)}
       </div>
+      {/* TEST HOOK: ?schemediag=1 prints the diagram's measurements. See SchemeDiag. */}
+      {schemeDiagOn && <SchemeDiag />}
       {/* Header (brief 5.1). */}
       <header className={styles.header}>
         {/* THE PICTURE PLAYS THIS DOG'S LEVEL, 21 September 2026 (owner). It asks
