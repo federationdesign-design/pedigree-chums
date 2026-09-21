@@ -98,19 +98,20 @@ const pctTitleFor = (id: string) =>
 
 // ── Card placement: IN OPEN ORDER (21 September 2026, reversing D73 #4) ─────────
 // The first card opened takes slot one and each later card opens beside the last one
-// still open, flowing left-to-right from DIRECTLY below famous chums, exactly CARD_GAP
-// between cards, wrapping down at the canvas edge. See placeCard for the detail.
+// still open, starting OVER famous chums and in line with the intro box, exactly
+// CARD_GAP between cards, at most CARDS_PER_ROW to a row. See placeCard.
 // Coords are canvas-space (DragCard is absolute).
 const SLOT_TOP = 196;      // fallback band top if famous chums cannot be measured
 const SLOT_LEFT = 120;     // left inset of the band
 const SLOT_MARGIN = 24;    // keep off the right edge
 const CARD_GAP = 10;       // exact gap between cards, both axes (D73 #3)
-/* THE WHOLE BAND NUDGED, 21 September 2026 (owner: move all the information cards up
-   100px and right 20px). Applied to where the band STARTS, slot one and the left edge
-   a wrapped row returns to, so every later card, which is placed beside the one before
-   it, moves with it and the row keeps its even gaps. */
-const CARD_NUDGE_X = 20;
-const CARD_NUDGE_Y = -100;
+/* THE BAND SITS ON FAMOUS CHUMS, 21 September 2026 (owner). Superseded the same
+   day's +20 / -100 nudge: the owner wants the cards drawn directly OVER Famous
+   Chums, the first card's left edge in line with the blue intro box above, at most
+   five to a row, and each new row clear of the tallest card in the row above. Both
+   anchors are measured from the page, so there are no pixel nudges left to keep in
+   step with it. See placeCard. */
+const CARDS_PER_ROW = 5;
 const EST_H = 260;         // card height estimate (row pitch + canvas-growth reserve)
 
 // The rail's icon order. It USED to double as the fixed slot order for the pop-out
@@ -406,12 +407,21 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     return Math.max(...openCards.map((c) => (positions[c.id]?.y ?? 0) + EST_H)) + 40;
   }, [cards, closed, positions]);
 
-  // Grid shape (item 12): ALWAYS at least 2 rows, never 1 long row, max 3.
-  // Columns grow with the pack (grid-auto-flow: column), so a big pack adds
-  // width, not a 4th row. maxPerRow = 15 (52px tiles) sets the 2->3 row step.
-  // (Decision D12, revised.)
-  const MAX_PER_ROW = 15;
-  const packRows = frames.length > 2 * MAX_PER_ROW ? 3 : 2;
+  /* GRID SHAPE: AT MOST 11 ACROSS, AS MANY ROWS AS THAT NEEDS, 21 September 2026
+     (owner: on some chums the ancestor grid runs over the life span chart; limit the
+     rows to 11).
+
+     REVERSES D12, which capped the grid at 3 ROWS and let the COLUMNS grow, so a big
+     pack got wider rather than taller. At 76px tiles and an 18px gap, 15 per row was
+     about 1,400px, and a 32-ancestor dog like the Labrador ran the grid straight into
+     the life span chart to its right. Capping the width instead and letting the pack
+     grow downward is what keeps it clear of the chart.
+
+     11 across is 11 x 76 + 10 x 18 = 1,016px. The rows are then as few as fit that:
+     22 ancestors make 2 rows of 11, 32 make 3, and so on. The old floor of 2 rows is
+     kept, so a small pack still never sits as one long line. */
+  const MAX_PER_ROW = 11;
+  const packRows = Math.max(2, Math.ceil(frames.length / MAX_PER_ROW));
   const packCols = Math.max(1, Math.ceil(frames.length / packRows));
 
   const frameBorder = (status?: FrameNode["status"]) =>
@@ -487,21 +497,39 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
        rather than squeezing in, because a card of a different width would not fit
        the gap and would overlap its neighbour.
 
-       The band still starts directly below famous chums, 10px gaps throughout. */
+       Where the band starts and when a row wraps: see CARDS_PER_ROW. 10px gaps. */
     const canvasEl = typeof document !== "undefined" ? (document.querySelector('[data-canvas="true"]') as HTMLElement | null) : null;
     const cRect = canvasEl?.getBoundingClientRect();
     const canvasW = cRect?.width ?? 2244;
     const cTop = cRect?.top ?? 0;
+    const cLeft = cRect?.left ?? 0;
     const famous = typeof document !== "undefined" ? document.querySelector('[data-region="famous-chums"]') : null;
-    const bandTop = (famous ? famous.getBoundingClientRect().bottom - cTop + CARD_GAP : SLOT_TOP) + CARD_NUDGE_Y;
-    const bandLeft = SLOT_LEFT + CARD_NUDGE_X;
+    const intro = typeof document !== "undefined" ? document.querySelector('[data-region="intro-box"]') : null;
+    /* TOP OF FAMOUS CHUMS, so the first row covers it (owner). LEFT EDGE OF THE BLUE
+       INTRO BOX, so slot one lines up with the box above. Both measured in canvas
+       coordinates by subtracting the canvas's own on-screen position, which holds
+       however far the wide canvas is scrolled. */
+    const bandTop = famous ? famous.getBoundingClientRect().top - cTop : SLOT_TOP;
+    const bandLeft = intro ? intro.getBoundingClientRect().left - cLeft : SLOT_LEFT;
     const width = (cid: string) => cards.find((c) => c.id === cid)?.width ?? 0;
-    const prev = [...openOrder.current].reverse().find((o) => o !== id && !closed.has(o) && positions[o]);
+    /* A card's real height once it has drawn; the estimate only until then. The
+       estimate was the whole row height before, which is why a tall card like
+       Suitability ran down over the row beneath it. */
+    const height = (cid: string) => openRects.current.get(cid)?.h ?? EST_H;
+    const live = openOrder.current.filter((o) => o !== id && !closed.has(o) && positions[o]);
+    const prev = live[live.length - 1];
     if (!prev) return { x: bandLeft, y: bandTop };
     const p = positions[prev];
+    // The row the last card is on, in the order its cards were opened.
+    const row = live.filter((o) => positions[o].y === p.y);
     let x = p.x + width(prev) + CARD_GAP;
     let y = p.y;
-    if (x + width(id) > canvasW - SLOT_MARGIN) { x = bandLeft; y = p.y + EST_H + CARD_GAP; } // wrap
+    const full = row.length >= CARDS_PER_ROW || x + width(id) > canvasW - SLOT_MARGIN;
+    if (full) {
+      // A NEW ROW, below the TALLEST card on this one, so the rows never overlap.
+      x = bandLeft;
+      y = Math.max(...row.map((o) => positions[o].y + height(o))) + CARD_GAP;
+    }
     return { x, y };
   }, [cards, closed, positions]);
 
