@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { fireConfetti } from "../../lib/confetti";
 import ReadingProgress from "../ReadingProgress/ReadingProgress";
@@ -631,6 +631,23 @@ export default function LineageMap({
   // In bounded mode `vp` is the container size (measured below); seed with a
   // reasonable box until the layout effect measures. Otherwise the window.
   const overlayRef = useRef<HTMLDivElement>(null);
+  /* ONE ID PER INSTANCE, 21 September 2026 (owner: in the chum levels the lifted
+     picture sits in a small rounded square and the rarity band is missing, where
+     the history levels fill the circle).
+
+     THE CAUSE. The root card's clip path was the fixed id "lm-clip-root". An SVG
+     url(#id) resolves to the FIRST element with that id in the whole document, and
+     a chum page mounts TWO LineageMaps: its own display tree (bounded, square
+     corners, rx 20) and, once a level is opened on that page, the pit's lift
+     (circular, rx R). The lift's picture and its rarity band were both being
+     clipped by the display tree's small rounded square, somewhere else on the
+     page. A history page mounts only one, which is why it never showed there.
+
+     Every id this component writes into the document now carries this prefix, so
+     two instances can never answer for each other. The punctuation React puts in
+     a useId value is stripped, because url(#...) inside an SVG attribute is not a
+     place to trust colons. */
+  const inst = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const [vp, setVp] = useState(() =>
     bounded
       ? { w: 900, h: 520 }
@@ -2003,7 +2020,7 @@ export default function LineageMap({
   const LIFT_K = (circular || strongBg) && !bounded ? 0.8 : 1;
   const unscaleX = (x: number) => vp.w / 2 + (x - vp.w / 2) / LIFT_K;
   const unscaleY = (y: number) => vp.h / 2 + (y - vp.h / 2) / LIFT_K;
-  const clip = "lm-clip-root";
+  const clip = `lm-clip-root-${inst}`;
   // Mini pit, a dog with a tree: the root card and the Complete button inside it
   // are drawn in a second svg on top of the placed cards. Lifting the cards down
   // instead would have hidden the very pictures the player just placed.
@@ -3329,7 +3346,7 @@ export default function LineageMap({
             const cr = (nHex >> 16) & 255, cg = (nHex >> 8) & 255, cb = nHex & 255;
             const toHex = (r: number, g: number, b: number) => `#${((1 << 24) + (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b)).toString(16).slice(1)}`;
             const lighten = (t: number) => toHex(cr + (255 - cr) * t, cg + (255 - cg) * t, cb + (255 - cb) * t);
-            const blurId = "lm-glow-blur";
+            const blurId = `lm-glow-blur-${inst}`;
             return (
               <>
                 <defs>
@@ -4565,7 +4582,7 @@ export default function LineageMap({
                           fit a 60px square. The name now sits BELOW the frame and is
                           not clipped, so it can be read. WRONG DOG still belongs
                           inside the frame, so it keeps the clip. */}
-                      <clipPath id={`lbl-clip-${f.id}`}>
+                      <clipPath id={`lbl-clip-${inst}-${f.id}`}>
                         <rect x={f.sx - pan.x - CW / 2 + 4} y={f.sy - pan.y - CW / 2 + 4} width={CW - 8} height={CW - 8} />
                       </clipPath>
                       <text
@@ -4584,7 +4601,7 @@ export default function LineageMap({
                         y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : CW / 2 + 27)}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        {...(wrongDog?.frameId === f.id ? { clipPath: `url(#lbl-clip-${f.id})` } : null)}
+                        {...(wrongDog?.frameId === f.id ? { clipPath: `url(#lbl-clip-${inst}-${f.id})` } : null)}
                         /* SIZED DOWN TWICE, 9 Sept 2026 (owner), item 7. The
                            breed name went 14 to 12 to 10 to 8, WRONG DOG 18 to 16 to 13 to 10,
                            both on the owner reading them on the device. The line height
@@ -4643,7 +4660,7 @@ export default function LineageMap({
               if (packed && packHidden.has(c.id)) return null; // folded-out duplicate
               if (stackedIds.has(c.id)) return null; // absorbed into a frame's stack
               if (cardFrame.has(c.id) && !collectRef.current) return null; // placed cards rendered as fixed HTML outside SVG
-              const clipId = `lm-pick-${c.id}`;
+              const clipId = `lm-pick-${inst}-${c.id}`;
               const packScale = 1; // the zoom is now a draggable overlay, not an in-place scale /* zoom-overlay */
               const ci = collecting && collectRef.current ? collectRef.current.cards.get(c.id) : null;
               const cxf = ci ? collectXf(c.cardX, c.cardY, ci.spin, cardDeg) : null; // tumble to the corner with the main card
