@@ -57,6 +57,10 @@ export default async function BreedPage({ params }: Props) {
   return (
     <>
       <Nav showLogo />
+      {/* A <main>, 21 September 2026: the ◐ text toggle sets its attribute on the
+          nearest main, and this page had none, so it had nothing to switch. It is
+          also the right landmark for the page's content, which sits here. */}
+      <main>
       {mobile ? (
         <Chums2Mobile
           name={breed.name}
@@ -79,6 +83,7 @@ export default async function BreedPage({ params }: Props) {
       {/* The levels that went into making this dog, as links to their own pages.
           Renders nothing for a chum with no British ancestry recorded. */}
       <LevelSlider chum={breed.name} mobile={mobile} />
+      </main>
     </>
   );
 }

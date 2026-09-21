@@ -910,3 +910,47 @@
   .headerImgBtn { transition: none; }
   .headerImgBtn:hover { transform: none; }
 }
+
+/* ---- LIGHT CARDS: THE ◐ TOGGLE ON THE CHUM PAGE, 21 September 2026 (owner) -------
+   The articles' toggle sets data-pc-textinvert="on" on <main>. On this page that means
+   the owner's two rules: every white text turns blue, and every info card turns white.
+
+   THE BLUE IS THE SITE NAVY, #0a3a57, the colour of the Ancestor Pack and Likely life
+   span titles on this same page, so the page reads as one set of headings.
+
+   CARDS, BY WHAT THEY ARE: the intro box, the rail's pop-out cards, the ancestor pack's
+   two popovers, and the Famous Chums cards. The last belong to FamousDogsSection, whose
+   class names are hashed in its own module, so they are matched by the "__card" part of
+   the generated name. If that component renames its .card class, this line stops working.
+
+   INSIDE A CARD EVERYTHING GOES NAVY, not only what was white, because on a white card the
+   yellow headings and the pale grey notes would not read either. Inline colours, such as a
+   rarity colour, still win, since an inline style beats any class.
+
+   THE COLOUR TOOLBAR WINS: nothing here applies while a data-pc-contrast-scheme is set,
+   the same rule the essays use, so the two controls never fight. */
+.textToggleSlot {
+  position: fixed;
+  top: 32px;
+  left: 236px;
+  z-index: 301; /* above the fixed nav (300), whose band this sits in */
+}
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .introBox,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .card,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .framePopover,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .framePctCard,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .famousWrap [class*="__card"] {
+  background: #ffffff;
+}
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .introBox *,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .card *,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .framePopover *,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .framePctCard *,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .famousWrap [class*="__card"] * {
+  color: var(--navy, #0a3a57);
+}
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .title,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .titleLead,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .subtitle {
+  color: var(--navy, #0a3a57);
+}

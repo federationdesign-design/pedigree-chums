@@ -8,6 +8,7 @@ import BreedTree from "../../../components/BreedTree/BreedTree";
 import LineageMap from "../../../components/PackPit/LineageMap";
 import Chums2Rail, { type RailItem } from "./Chums2Rail";
 import DragCard, { type Rect } from "./DragCard";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import { ICONS } from "../../../components/CardDock/CardDock";
 import { INFLUENCE_GLYPH, DIAGRAM_GLYPH, HEALTH_GLYPH } from "./chums2Icons";
 import { breedInfo } from "../../../data/breedInfo";
@@ -634,6 +635,14 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
           intro box can fix its width. Off-screen, never paints, no pointer. */}
       <div ref={introMeasureRef} aria-hidden="true" style={{ position: "absolute", left: -99999, top: 0, visibility: "hidden", padding: "20px 0", boxSizing: "content-box", pointerEvents: "none" }}>
         {tallestFrame && renderAncestorCard(tallestFrame)}
+      </div>
+      {/* THE ◐ TOGGLE, 21 September 2026 (owner: the same toggle the articles use;
+          white text goes blue and the info cards go white). The component is the
+          articles' own; it flags the page's <main> and the rules in chums2.module.css
+          under "LIGHT CARDS" decide what that means here. Fixed beside the logo, the
+          spot the owner marked, so it stays with the header like the colour toolbar. */}
+      <div className={styles.textToggleSlot}>
+        <ArticleTextToggle corner labelOn="Switch to white cards with blue text" labelOff="Switch back to the navy cards" />
       </div>
       {/* Header (brief 5.1). */}
       <header className={styles.header}>

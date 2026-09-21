@@ -26,7 +26,10 @@ const keyFor = () => "pc-textinvert:" + window.location.pathname;
 // shared left essay axis. The essays render it prop-less (left-aligned on that
 // axis); /home opts in because it has no essay axis to line up with. `corner`
 // pins it to the top-left of a positioned parent (used inside the /about panel).
-export default function ArticleTextToggle({ centered = false, corner = false }: { centered?: boolean; corner?: boolean }) {
+// labelOn / labelOff: what the button says it will do. The essays keep the default
+// wording about white and black text; the chum page, where the same attribute swaps
+// the cards to white, passes its own (21 September 2026).
+export default function ArticleTextToggle({ centered = false, corner = false, labelOn, labelOff }: { centered?: boolean; corner?: boolean; labelOn?: string; labelOff?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [white, setWhite] = useState(false);
 
@@ -60,7 +63,7 @@ export default function ArticleTextToggle({ centered = false, corner = false }: 
         type="button"
         className={styles.toggle}
         aria-pressed={white}
-        aria-label={white ? "Switch to black text" : "Switch to white text"}
+        aria-label={white ? (labelOff ?? "Switch to black text") : (labelOn ?? "Switch to white text")}
         onClick={toggle}
       >
         <span className={styles.icon} aria-hidden="true">◐</span>
