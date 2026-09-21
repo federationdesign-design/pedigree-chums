@@ -21,8 +21,8 @@ export default function LevelSlider({ chum, mobile = false }: { chum: string; mo
   if (!levels.length) return null;
   const era = levels[0].strip;
   return (
-    <section className={`${styles.wrap} ${mobile ? styles.mobile : ""}`.trim()} aria-label={`The dogs that made the ${chum}`}>
-      <BreedStrip era={era} only={levels} label={`The dogs that made the ${chum}`} />
+    <section className={`${styles.wrap} ${mobile ? styles.mobile : ""}`.trim()} aria-label={`The dogs that went into making the ${chum}`}>
+      <BreedStrip era={era} only={levels} label={`Learn more about the dogs that went into making the ${chum}`} />
     </section>
   );
 }

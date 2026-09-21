@@ -777,7 +777,9 @@ export default function BreedStrip({
 
   return (
     <div className={styles.strip} aria-label={`Breeds: ${label ?? ERA_LABELS[era]}`}>
-      <span className={styles.stripLabel}>{label ?? ERA_LABELS[era]}</span>
+      {/* A chum page's strip labels itself in the site lemon; the era pages keep
+          their white era names. See .stripLabelLemon. */}
+      <span className={`${styles.stripLabel} ${only ? styles.stripLabelLemon : ""}`.trim()}>{label ?? ERA_LABELS[era]}</span>
 
       <div ref={wrapRef} className={styles.stripWrap}>
         <div ref={railRef} className={styles.stripRail} role="list">

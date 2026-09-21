@@ -58,8 +58,14 @@ export function levelBySlug(slug: string): UKBreed | undefined {
    the bottom of every chum page holding only the dogs that went into making it).
 
    A level counts if its name appears anywhere below the chum in the chum's own
-   lineage. Nearest first, so the direct parents lead and the deep ancestors trail;
-   ties keep campaign order, so two dogs at the same depth sit in timeline order.
+   lineage.
+
+   OLDEST ERA FIRST, 20 September 2026 (owner: the dogs from the older eras come
+   first, moving in order to the modern eras). This was nearest-ancestor first,
+   which put a Victorian parent ahead of the Roman mastiff behind it. It is now the
+   campaign's own order, era by STRIP_ORDER then the dog's anchor within its era,
+   which is exactly the order levelBreeds() already returns, so the strip reads as
+   a timeline and matches the order the game plays the levels in.
 
    MEASURED on the 54 chums: median 6 levels, most 23, and 13 chums have NONE, the
    breeds that arrived from outside Britain with no British ancestry recorded, Pug,
@@ -79,7 +85,6 @@ export function levelsWithin(chumName: string): UKBreed[] {
     for (const c of (n.children ?? []) as { name: string; children?: { name: string }[] }[]) walk(c, d + 1);
   };
   walk(root, 0);
-  return order
-    .filter((b) => depth.has(b.name))
-    .sort((a, b) => (depth.get(a.name) as number) - (depth.get(b.name) as number));
+  // levelBreeds() is already in campaign order, oldest era first; keep it.
+  return order.filter((b) => depth.has(b.name));
 }

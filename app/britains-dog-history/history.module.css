@@ -947,3 +947,11 @@
 ) {
   color: var(--navy, #0a3a57);
 }
+
+/* THE CHUM PAGE'S ANCESTOR STRIP LABEL, 20 September 2026 (owner: the correct lemon
+   yellow). --yellow-header is the site's lemon, #ffed00, the same one the name
+   generator and the How It Plays headings use. Only the chum page's strip takes
+   this class, so the era pages' labels stay white. */
+.stripLabelLemon {
+  color: var(--yellow-header, #ffed00);
+}
