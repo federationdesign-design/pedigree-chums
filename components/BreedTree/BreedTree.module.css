@@ -2533,3 +2533,26 @@
   pointer-events: none;
   box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
 }
+
+/* ---- THE LEARN AREA IN THE ACCESSIBILITY VIEWS, 21 September 2026 (owner) -------------
+   The game window sits outside the site's scheme scope, so these are written for it.
+     1. THE PAW PATTERN behind the learn area is not drawn.
+     2. THE INFO BOX that holds the dog's write-up: the view's page colour with an ink
+        edge and ink text throughout (its blue is set inline by the game; !important
+        outranks that). The edge is drawn inside the box, so its size does not change.
+     3. THE GREEN PLAY: the page colour with an ink edge and an ink triangle.
+     4. THE CHUM RAIL, and any picture in the info box, take the site's own image
+        filter: a darkened grey on Black on white, the blue duotone on White on black. */
+:global(:root[data-pc-contrast-scheme]) .levelPaws { display: none !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .caption { background: #ffffff !important; box-shadow: inset 0 0 0 2px #000000 !important; color: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .caption * { color: #000000 !important; text-shadow: none !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .caption img, :global(:root[data-pc-contrast-scheme="black-on-white"]) .relRail img { filter: grayscale(1) contrast(1.1) brightness(0.55) !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .learnPlayBtn { background: #ffffff !important; border-color: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .learnPlayBtn .learnDockIcon { color: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .learnPlayBtn path { fill: #000000 !important; stroke: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .caption { background: #000000 !important; box-shadow: inset 0 0 0 2px #ffffff !important; color: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .caption * { color: #ffffff !important; text-shadow: none !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .caption img, :global(:root[data-pc-contrast-scheme="white-on-black"]) .relRail img { filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .learnPlayBtn { background: #000000 !important; border-color: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .learnPlayBtn .learnDockIcon { color: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .learnPlayBtn path { fill: #ffffff !important; stroke: #ffffff !important; }
