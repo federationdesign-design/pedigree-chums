@@ -464,6 +464,10 @@ const PILL_CARD_GAP = 6;
    <g> that draws it on the tree, and scatterPills, which has to send the pit the
    drawn width rather than the raw one. */
 const PIT_PILL_SCALE = 0.683;
+/* WHAT A LIFTED PILL MEASURES ON SCREEN, per unit of nodePillWidth: drawn at
+   PIT_PILL_SCALE inside a layer drawn at LIFT_OVERLAY_SCALE. Exported so the pit can
+   draw the pill that drops into it at exactly this size (owner, 21 September 2026). */
+export const LIFT_PILL_SCREEN_K = PIT_PILL_SCALE * 0.8;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -480,7 +484,7 @@ export function radius(share: number) {
    THIS IS NOT THE PLACE TO CHANGE THE PILL'S SIZE. The scale on the <g> does that,
    and it multiplies this; the two are separate on purpose, so padding can be tuned
    without moving every sibling apart. */
-function nodePillWidth(lines: string[]): number {
+export function nodePillWidth(lines: string[]): number {
   return Math.max(58, Math.max(...lines.map((l) => l.length)) * 7.4 + 28 + (lines.length > 1 ? 10 : 0));
 }
 
@@ -2040,6 +2044,9 @@ export default function LineageMap({
      wears its name at rest, which is the owner's call of 19 September 2026 and
      brings pill-on-pill overlap with it. False restores the on-demand pill. */
   const LIFT_STANDING_PILLS = true;
+  /* Where a lift pill sits on its node: its top edge on the node's top edge, then up 10
+     screen px (owner, 21 September 2026). One formula for both places that draw it. */
+  const liftPillY = (r: number, nmH: number) => -r + (nmH / 2) * PIT_PILL_SCALE - 10 * liftK;
   const tagLines = circular ? splitName(breed.name) : [breed.name];
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;
@@ -4480,7 +4487,14 @@ export default function LineageMap({
                          Falls back to the old blue when no tier is supplied,
                          which is every caller outside the pit lift. */
                       const seenFill = rarityTier ? RARITY_BAND[rarityTier].bg : "#0c5b92";
-                      const fill = placedHere ? "#ffed00" : seen.has(n._id) ? seenFill : undefined;
+                      /* A PLACED NODE KEEPS THE RARITY COLOUR TOO, 21 September 2026
+                         (owner: the nodes turn the rarity colour as layers open, then go
+                         back to yellow once their pictures are placed). On the lift, where
+                         rarityTier is supplied, placed now wears seenFill like a seen node;
+                         the scatter chips that leave this layer already wear the same
+                         colour, so node and chip still match. Everywhere else, with no
+                         tier, a placed node keeps the lemon it had. */
+                      const fill = placedHere ? (rarityTier ? seenFill : "#ffed00") : seen.has(n._id) ? seenFill : undefined;
                       const st: React.CSSProperties = {
                         ...(fill ? { fill } : null),
                         // clamped so a nested ring can never out-thicken its parent
@@ -4519,7 +4533,7 @@ export default function LineageMap({
                       /* White only on the blue SEEN fill now. A placed node is
                          yellow (item 9 above), and white on yellow cannot be read,
                          so it keeps the default navy. */
-                      style={(!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id)) ? {fill:(rarityTier ? RARITY_BAND[rarityTier].fg : "#ffffff"),...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
+                      style={((rarityTier && n.img && (placedImgs.has(n.img as string) || packed)) || (!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id))) ? {fill:(rarityTier ? RARITY_BAND[rarityTier].fg : "#ffffff"),...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {/* STANDING PILLS ARE BACK ON THE LIFT, 19 September 2026 (owner),
@@ -4546,7 +4560,9 @@ export default function LineageMap({
                         LIFT_STANDING_PILLS IS THE ONE FLIP. Setting it false restores
                         the on-demand behaviour exactly, and namedNode still feeds the
                         gate, so nothing else has to be put back. */}
-                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) && (!circular || LIFT_STANDING_PILLS || namedNode === n._id) ? (() => {
+                    {/* On the lift the pill is drawn in its own pass ABOVE the cards;
+                        see "PILLS ON TOP" after the card layer. Other modes draw it here. */}
+                    {!circular && (hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) && (!circular || LIFT_STANDING_PILLS || namedNode === n._id) ? (() => {
                       // The pill is drawn at nodePillWidth, the SAME width the
                       // placement spaces siblings on, so the picture and the spacing
                       // can never drift. It matches the pit pill exactly. (The root
@@ -4588,7 +4604,7 @@ export default function LineageMap({
                         /* UP 10px, the same evening (owner). Written in screen pixels and
                            divided out of the lift's 0.8 overlay by liftK, so it lands as 10
                            on screen rather than 8. */
-                        ? -r + (nmH / 2) * PIT_PILL_SCALE - 10 * liftK
+                        ? liftPillY(r, nmH)
                         : -(r * CARD_COVER + PILL_CARD_GAP + (nmH / 2) * PIT_PILL_SCALE);
                       return (
                         /* 10% SMALLER, 2 September 2026 (owner).
@@ -5271,6 +5287,38 @@ className={[
                 </g>
               );
             })}
+            {/* PILLS ON TOP, 21 September 2026 (owner: when the pictures appear on the
+                nodes, the blue name pills should still be seen, on top of them). The
+                pictures are the loose cards drawn AFTER the nodes in this same svg, so a
+                pill drawn with its node sat underneath its own picture. On the lift the
+                pills are now a separate pass drawn here, after the cards, with the same
+                gate and the same position as before. pointer-events none, so a pill can
+                never catch the drag meant for the card beneath it. Lift only; every
+                other mode still draws its pill with the node. */}
+            {circular && shown
+              .filter((n) => n._parent && !soloLeaf && !hiddenIds.has(n._id))
+              .map((n) => {
+                const hasKids = !!(n.children && n.children.length);
+                if (!((hasKids || !autoExposed.has(n._id)) && n.name !== breed.name && (LIFT_STANDING_PILLS || namedNode === n._id))) return null;
+                const share = Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100);
+                const r = nodeR(share);
+                const nmLines = splitName(n.name);
+                const nmW = nodePillWidth(nmLines);
+                const nmH = nmLines.length > 1 ? 40 : 22;
+                return (
+                  <g key={`pill-${n._id}`} transform={`translate(${n._x},${n._y})`} style={{ pointerEvents: "none" }}>
+                    <g transform={`translate(0,${liftPillY(r, nmH)}) scale(${PIT_PILL_SCALE})`}>
+                      <rect className={styles.nmPill} x={-nmW / 2} y={-nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
+                      {nmLines.map((ln, li) => (
+                        <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
+                          x={0} y={nmLines.length > 1 ? (li === 0 ? -8 : 8) : 0}>
+                          {ln}
+                        </text>
+                      ))}
+                    </g>
+                  </g>
+                );
+              })}
 {/* stacked duplicate cards rendered as fixed HTML below */}
             {/* In the mini pit this is drawn in its own layer above the cards
                 instead, see liftRoot below. The placed cards are HTML with a

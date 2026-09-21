@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
-import { ringFrac, RARITY_BAND } from "../PackPit/LineageMap";
+import { ringFrac, RARITY_BAND, nodePillWidth, LIFT_PILL_SCREEN_K } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
 import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
@@ -9195,8 +9195,18 @@ export default function BreedTree({
 
            `unit` reads PILL_K too, so the text comes down with the pill and
            cannot overflow it. */
-        const PILL_K = 0.612;
-        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0)) * PILL_K;
+        /* EXACT PARITY WITH THE LIFTED PILL, 21 September 2026 (owner: the pills and
+           circles are clearly different sizes in the pit and on the lift; make them
+           exactly the same). The note above explains why PILL_K could never do it: the
+           pit used its OWN width formula (+14, floor 44) where the lift uses
+           nodePillWidth (+28, floor 58), so one multiplier matched only one name
+           length, and the height sat 12% proud. Both now use the lift's formula and
+           the lift's on-screen scale, LIFT_PILL_SCREEN_K (0.683 x 0.8 = 0.5464),
+           imported rather than copied, so a pill is the same width AND height, at
+           every name length, on both screens. `unit` follows, so the text comes
+           down with it. The note above is kept for the history; PILL_K is replaced. */
+        const PILL_K = LIFT_PILL_SCREEN_K;
+        const pw = nodePillWidth(lines) * PILL_K;
         const ph = (lines.length > 1 ? 40 : 22) * PILL_K;
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: PILL_HITS, mb: null as any };
         const mb = Bodies.rectangle(sx, sy, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
