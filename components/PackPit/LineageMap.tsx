@@ -4564,7 +4564,16 @@ export default function LineageMap({
                          clearance and never scaled. Measured against the card's
                          footprint plus the pill's own half-height, so the gap is
                          PILL_CARD_GAP at every node size and at one line or two. */
-                      const pcy = -(r * CARD_COVER + PILL_CARD_GAP + (nmH / 2) * PIT_PILL_SCALE);
+                      /* ON THE LIFT, THE PILL SITS ON THE NODE, 21 September 2026 (owner:
+                         nudge the pills down so they fit on top of the node). Its TOP edge
+                         now meets the node's top edge, so the pill overlaps the upper part
+                         of the circle, which is where the owner's arrows put it. The 14
+                         August note above still stands for the main pit and the chum tree:
+                         there the pill stays clear ABOVE the node, so this is `circular`,
+                         the lift, only. */
+                      const pcy = circular
+                        ? -r + (nmH / 2) * PIT_PILL_SCALE
+                        : -(r * CARD_COVER + PILL_CARD_GAP + (nmH / 2) * PIT_PILL_SCALE);
                       return (
                         /* 10% SMALLER, 2 September 2026 (owner).
 
