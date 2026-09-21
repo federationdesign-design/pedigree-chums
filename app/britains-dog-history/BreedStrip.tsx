@@ -12,7 +12,7 @@ import { resetToys } from "../../components/BreedTree/BreedTree";
 import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 import styles from "./history.module.css";
 import { sourcesFor } from "../../data/breedSources";
-import { levelCardKind, STRIP_ORDER } from "../../data/levels";
+import { levelCardKind, levelSlug, STRIP_ORDER } from "../../data/levels";
 
 /* Outbound sources are per dog now (data/breedSources.ts), so the era gate has
    gone: a dog with no sources of its own shows no links, wherever it sits. */
@@ -117,6 +117,8 @@ export default function BreedStrip({
   renderLevels,
   initialLevel,
   closeHref,
+  only,
+  label,
 }: {
   era: string;
   renderLevels?: (open: BreedStripOpen) => React.ReactNode;
@@ -130,6 +132,20 @@ export default function BreedStrip({
      close goes to that dog's era page). When set, nothing but the level is
      rendered, and closing it navigates here instead of revealing a strip. */
   closeHref?: string;
+  /* A CHUM PAGE'S ANCESTOR STRIP, 20 September 2026 (owner: the slider at the foot
+     of a chum page should look like the era page's, same corners, and flip).
+
+     THE SAME CARDS, NOT A COPY OF THEM. Passing `only` swaps the era's dogs for this
+     list and `label` replaces the era name, and everything else, the corners, the
+     flip, the wheel-to-sideways scroll, is this component's own, so the two rows
+     cannot drift apart in look or behaviour.
+
+     A TAP GOES TO THE LEVEL'S OWN PAGE. On a chum page there is no campaign to
+     play inside, so a play card navigates to /britains-dog-history/dog/[slug]
+     rather than opening the game over the chum page. Learn cards still go to their
+     chum page as before. */
+  only?: UKBreed[];
+  label?: string;
 }) {
   const router = useRouter();
   const { confirmLeave } = useLeaveDialog();
@@ -334,6 +350,8 @@ export default function BreedStrip({
     const pack = packBreeds.find((x) => x.name === packName);
     if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
     if (kind !== "play" || !lineage) return undefined;
+    // A chum page's strip: the level has its own page, so go there. See `only`.
+    if (only) return () => router.push(`/britains-dog-history/dog/${levelSlug(b.name)}`);
     return (e) => {
       // opening a level from the page is a fresh run
       setLives(LIVES_START);
@@ -362,7 +380,7 @@ export default function BreedStrip({
     };
   };
 
-  const breeds: UKBreed[] = ukBreeds
+  const breeds: UKBreed[] = only ?? ukBreeds
     .filter((b) => stripMatches(b.strip, era))
     .sort((a, b) => a.anchor - b.anchor);
 
@@ -758,8 +776,8 @@ export default function BreedStrip({
   }
 
   return (
-    <div className={styles.strip} aria-label={`Breeds: ${ERA_LABELS[era]}`}>
-      <span className={styles.stripLabel}>{ERA_LABELS[era]}</span>
+    <div className={styles.strip} aria-label={`Breeds: ${label ?? ERA_LABELS[era]}`}>
+      <span className={styles.stripLabel}>{label ?? ERA_LABELS[era]}</span>
 
       <div ref={wrapRef} className={styles.stripWrap}>
         <div ref={railRef} className={styles.stripRail} role="list">

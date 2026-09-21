@@ -1,69 +1,12 @@
-/* The level slider at the foot of a chum page. See LevelSlider.tsx. */
+/* The wrapper round a chum page's ancestor strip. The strip draws itself with the
+   era page's own styles; this only spaces it from the page above and, on a phone,
+   clears the fixed icon rail. See LevelSlider.tsx. */
 .wrap {
   position: relative;
   z-index: 1;
   padding: 28px 0 40px;
 }
-/* Clears the phone page's fixed icon rail, which is about 128px tall with the
-   safe area. Without this the last row of the page sits underneath it. */
+/* The phone page's fixed icon rail is about 128px tall with the safe area. */
 .mobile {
   padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px));
-}
-.heading {
-  margin: 0 0 14px;
-  padding: 0 clamp(14px, 4vw, 48px);
-  font-family: var(--font-display, "Luckiest Guy"), system-ui, sans-serif;
-  font-weight: 400;
-  font-size: clamp(1.4rem, 4.5vw, 2.2rem);
-  line-height: 1.05;
-  color: var(--yellow, #ffd23e);
-}
-.row {
-  list-style: none;
-  margin: 0;
-  padding: 4px clamp(14px, 4vw, 48px) 12px;
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scroll-padding-left: clamp(14px, 4vw, 48px);
-  -webkit-overflow-scrolling: touch;
-}
-.item {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  width: clamp(120px, 34vw, 170px);
-  text-decoration: none;
-  background: var(--navy, #0a3a57);
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  transition: transform 0.15s ease;
-}
-.card:hover,
-.card:focus-visible { transform: translateY(-3px); }
-.card:focus-visible { outline: 3px solid var(--yellow, #ffd23e); outline-offset: 2px; }
-.img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-}
-.name {
-  padding: 8px 10px 10px;
-  font-family: var(--font-body, "Montserrat"), system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 0.85rem;
-  line-height: 1.2;
-  color: #ffffff;
-}
-@media (prefers-reduced-motion: reduce) {
-  .card { transition: none; }
-  .card:hover { transform: none; }
 }
