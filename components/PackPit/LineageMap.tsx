@@ -277,6 +277,19 @@ const CARD = 74; // card + frame + image size (reduced 10% further)
 
    One number to nudge. */
 const LIFT_CARD_SCALE = 0.75;
+/* THE DESKTOP LIFT GOES THE OTHER WAY, 21 September 2026 (owner: make the circle
+   frames larger so they match the size of the circles that pop up from the nodes).
+   A separate figure, because LIFT_CARD_SCALE also sets the PHONE grid's floor and the
+   phone's type measure, and the phone is not part of this. Desktop only.
+
+   1.2, measured on the owner's two desktop screenshots: the diagram's image circles
+   draw about 70 css px across and the frames about 44, a ratio of about 1.6, and
+   0.75 x 1.6 is 1.2. The cards the player drags grow with the frames, since both are
+   CW and a card has to fit the frame it drops into. The type does not grow: CW_TYPE
+   divides this back out, as it did the quarter. */
+const LIFT_CARD_SCALE_DESKTOP = 1.2;
+// The gutter between frames on the desktop lift, both ways. See F_COL.
+const LIFT_FRAME_GUT = 16;
 /* THE OVERLAY'S OWN SCALE, AND ITS INVERSE (owner, 19 September 2026: the small info
    card on the lifted layer is too small).
 
@@ -1025,7 +1038,7 @@ export default function LineageMap({
     // Desktop: the card IS this figure, so the lifted layer's quarter is taken
     // here and nowhere else. See LIFT_CARD_SCALE. The phone branches above are
     // untouched, along with the column count they choose.
-    : Math.round(CARD * (circular ? LIFT_CARD_SCALE : 1));
+    : Math.round(CARD * (circular ? LIFT_CARD_SCALE_DESKTOP : 1));
   /* THE CARD'S TYPE DOES NOT COME DOWN WITH THE CARD (owner, 18 September 2026).
      The lifted layer's card is a quarter smaller, and anything sized from CW
      would have shrunk with it. Type and labels are read, not drawn to scale, so
@@ -1041,7 +1054,8 @@ export default function LineageMap({
      today and only the card has moved. */
   const CW_TYPE = isMobile && (circular || strongBg) && gridType
     ? Math.round(gridType.cw / (circular ? LIFT_CARD_SCALE : 1))
-    : Math.round(CW / (circular ? LIFT_CARD_SCALE : 1));
+    // The phone keeps its own quarter here in the rare case gridType is not ready.
+    : Math.round(CW / (circular ? (isMobile ? LIFT_CARD_SCALE : LIFT_CARD_SCALE_DESKTOP) : 1));
   /* ONE SOURCE, 18 September 2026 (owner). This used to repeat the whole ladder
      with a comment warning that the two derivations must agree exactly. It now
      reads the very same object CW was built from, so they cannot disagree at
@@ -2124,7 +2138,13 @@ export default function LineageMap({
        stops the tablet case spreading. Whatever is still over after that is centred
        by F_LEFT below rather than left on one side. */
     ? CW + Math.max(F_GUT_MIN, Math.min(F_GUT_MAX, Math.floor(((vp.w - 2 * F_EDGE) / LIFT_K - MCOLS * CW) / Math.max(1, MCOLS - 1))))
-    : circular ? CW + 3 : isMobile ? 92 : 112;
+    /* MORE GUTTER ON THE DESKTOP LIFT, 21 September 2026 (owner: more gutter
+       between these frames). 3 was a phone-era pitch; the circular frames draw a
+       dashed ring a touch outside CW, so at 3 their rings met and read as one
+       chain. 16 is the gutter the phone grid is allowed to grow into at most, and
+       there is room for it on a wide screen. F_ROW takes the same figure below so
+       the gap is even both ways. The phone takes the fiveUp branch above, untouched. */
+    : circular ? CW + LIFT_FRAME_GUT : isMobile ? 92 : 112;
   /* CENTRED WHEN THE ROW CANNOT FILL, 16 September 2026 (owner). Once the gutter has
      taken what it can, up to F_GUT_MAX, any remaining slack is split evenly instead
      of sitting on the right. On a phone that is a pixel or none; on a tablet holding
@@ -2135,7 +2155,7 @@ export default function LineageMap({
     ? Math.max(0, ((vp.w - 2 * F_EDGE) / LIFT_K - (MCOLS * CW + (MCOLS - 1) * (F_COL - CW))) / 2)
     : 0;
   const F_LEFT = F_LEFT_BASE + F_SLACK;
-  const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
+  const F_ROW = fiveUp ? F_COL : circular ? CW + LIFT_FRAME_GUT : isMobile ? 92 : 112;
   /* MORE COLUMNS ON A WIDE SCREEN, 20 September 2026 (owner: add more columns to
      the frames so they do not run off the bottom of the page).
 
