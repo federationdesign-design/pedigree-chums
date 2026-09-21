@@ -52,21 +52,21 @@
 .axisLabel {
   fill: #ffffff;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 12px;
+  font-size: 24px; /* 12 -> 24, doubled (owner, 21 September 2026) */
   font-weight: 700;
 }
 
 .axisTitle {
   fill: #ffffff;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 12px;
+  font-size: 24px; /* 12 -> 24, doubled (owner, 21 September 2026) */
   font-weight: 700;
 }
 
 .stageLabel {
   fill: #ffffff;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 10px;
+  font-size: 20px; /* 10 -> 20, doubled (owner, 21 September 2026) */
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;

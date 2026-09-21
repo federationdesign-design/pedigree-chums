@@ -5,8 +5,14 @@ import { lifespanCurves, EXPLANATION, METHOD, type CurvePoint } from "../../data
 import styles from "./LifespanChart.module.css";
 
 const W = 1008;
-const H = 576;
-const PAD = { top: 44, right: 32, bottom: 60, left: 52 };
+/* LABELS DOUBLED, 21 September 2026 (owner: all label text twice the size, the axis
+   titles included). Room was made for them rather than letting them clip: the left
+   padding holds the three-digit tick labels AND the vertical title, the bottom holds the
+   tick labels and the "Age (years)" title, the top holds a stage name turned 45 degrees
+   on a narrow band, and H grows by the extra top and bottom so the plot itself keeps
+   its height. */
+const H = 624;
+const PAD = { top: 72, right: 32, bottom: 84, left: 88 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
@@ -133,7 +139,9 @@ export default function LifespanChart({ breedName, fluid = false }: { breedName:
               transform={narrow ? `rotate(-45, ${midX}, ${PAD.top - 6})` : undefined}
               className={styles.stageLabel}
             >
-              {r.stage}
+              {/* "Teen" on screen for the Adolescent stage (owner, 21 September 2026);
+                  the stage's key, and the colour it drives, are unchanged. */}
+              {r.stage === "Adolescent" ? "Teen" : r.stage}
             </text>
           );
         })}
@@ -152,20 +160,20 @@ export default function LifespanChart({ breedName, fluid = false }: { breedName:
 
         {/* Y axis labels */}
         {scoreTicks.map((s) => (
-          <text key={`y-${s}`} x={PAD.left - 6} y={toSvgY(s) + 4} textAnchor="end" className={styles.axisLabel}>
+          <text key={`y-${s}`} x={PAD.left - 8} y={toSvgY(s) + 8} textAnchor="end" className={styles.axisLabel}>
             {s}
           </text>
         ))}
 
         {/* X axis labels */}
         {ageTicks.filter((a) => a % 2 === 0).map((a) => (
-          <text key={`x-${a}`} x={toSvgX(a, maxAge)} y={PAD.top + PLOT_H + 18} textAnchor="middle" className={styles.axisLabel}>
+          <text key={`x-${a}`} x={toSvgX(a, maxAge)} y={PAD.top + PLOT_H + 30} textAnchor="middle" className={styles.axisLabel}>
             {a}
           </text>
         ))}
 
         {/* X axis title */}
-        <text x={PAD.left + PLOT_W / 2} y={H - 4} textAnchor="middle" className={styles.axisTitle} style={{ fontSize: 15 }}>Age (years)</text>
+        <text x={PAD.left + PLOT_W / 2} y={H - 8} textAnchor="middle" className={styles.axisTitle} style={{ fontSize: 30 }}>Age (years)</text>
 
         {/* Curve */}
         <path d={path} className={styles.curve} />
@@ -207,11 +215,11 @@ export default function LifespanChart({ breedName, fluid = false }: { breedName:
         <line x1={PAD.left} x2={PAD.left + PLOT_W} y1={PAD.top + PLOT_H} y2={PAD.top + PLOT_H} className={styles.axis} />
         {/* Vertical axis label */}
         <text
-          x={14}
+          x={24}
           y={PAD.top + PLOT_H / 2}
           textAnchor="middle"
           className={styles.axisTitle}
-          transform={`rotate(-90, 14, ${PAD.top + PLOT_H / 2})`}
+          transform={`rotate(-90, 24, ${PAD.top + PLOT_H / 2})`}
         >Function &amp; Health</text>
       </svg>
 
