@@ -12,7 +12,8 @@
    or where they sit. */
 import { ukBreeds, type UKBreed } from "./uk-breeds";
 import { breeds as packBreeds } from "./breeds";
-import { getLineage } from "./lineage";
+import { getLineage, type LineageNode } from "./lineage";
+import { isEchoName } from "./lineageShape";
 import { resolveLineageName } from "./lineageNames";
 
 export type BreedCardKind = "learn" | "play";
@@ -125,4 +126,76 @@ export function ancestorCardsWithin(chumName: string): UKBreed[] {
   return all
     .filter((b) => (seen.has(b.name) ? false : (seen.add(b.name), true)))
     .sort((a, b) => (STRIP_ORDER.indexOf(a.strip) - STRIP_ORDER.indexOf(b.strip)) || (a.anchor - b.anchor));
+}
+
+/* ---- FOREIGN PROGENITORS IN A CHUM'S SLIDER, 21 September 2026 (owner) -----------------
+   Ancestors that are neither a level nor a chum, and are not British, such as the Pug's
+   Ancient Chinese toy dogs and Eastern Lion dogs. Measured: 58 such names across the 54
+   chum trees, and NONE has a family tree of its own as a root. Two rules, the owner's:
+
+     NO DEEPER ANCESTORS in the chum's tree: a FLIP-ONLY card, picture and note.
+     ANCESTORS RECORDED beneath it in the chum's tree: the same card, and a tap opens a
+       play start screen built from THAT subtree, since the dog has no root tree to open.
+
+   "Deeper" ignores a child that merely repeats the dog's own name, the echo rule, or a
+   dog whose only child is a copy of itself would count as explorable. */
+
+/* THE BRITISH DOGS WITH NO ERA, so they are not treated as foreign. The owner chose this
+   shape, a short British list with everything else era-less counted as foreign, on 21
+   September 2026. These are the ten sent to him as confident. Nine more were put to him
+   as unclear and are NOT on this list yet, so they count as foreign until he rules:
+   Early Badger hunting dogs, Early Boar hunting dogs, Old hunting dogs of the Celts, Norse
+   settlers dogs, Dalmatian, Carriage guard dogs, Fishermen's water dogs, Rough water dogs,
+   Shaggy upland herders. Adding a name here is the whole change. */
+export const BRITISH_NO_ERA = new Set<string>([
+  "Ancient Celtic earth dogs",
+  "Anglo-Saxon herding dogs",
+  "English Mastiff",
+  "Labrador",
+  "Medieval British Mastiff",
+  "Old Border Terriers",
+  "Old Scottish working Terriers",
+  "Old earth Terriers",
+  "Working hunt Terriers",
+  "Wavy-Coated Retriever",
+]);
+
+const ukNames = new Set(ukBreeds.map((u) => u.name));
+
+// Neither a level nor a chum, not on an era strip, and not on the British list.
+export function isForeignAncestor(name: string): boolean {
+  return !levelCardKind(name) && !ukNames.has(name) && !BRITISH_NO_ERA.has(name);
+}
+
+// A strip card that may carry its own subtree to play. See BreedStrip's `only`.
+export type StripCard = UKBreed & { lineage?: LineageNode };
+
+/* THE FOREIGN CARDS FOR ONE CHUM. Deepest first, since further back in the tree is
+   further back in time and these have no era to sort by; LevelSlider puts them ahead of
+   the era-sorted levels. A name met more than once keeps its deepest, and an explorable
+   copy wins over a leaf. The era is left BLANK, not "Today": none of them is modern. */
+export function foreignCardsWithin(chumName: string): StripCard[] {
+  const root = getLineage(resolveLineageName(chumName));
+  if (!root) return [];
+  const best = new Map<string, { node: LineageNode; depth: number; deeper: boolean }>();
+  const walk = (n: LineageNode, d: number) => {
+    if (d > 0 && n.name !== chumName && isForeignAncestor(n.name)) {
+      const deeper = (n.children ?? []).some((c) => !isEchoName(c.name, n.name));
+      const had = best.get(n.name);
+      if (!had || (deeper && !had.deeper) || (deeper === had.deeper && d > had.depth)) best.set(n.name, { node: n, depth: d, deeper });
+    }
+    for (const c of n.children ?? []) walk(c, d + 1);
+  };
+  walk(root, 0);
+  return [...best.values()]
+    .sort((a, b) => b.depth - a.depth)
+    .map(({ node, deeper }) => ({
+      name: node.name,
+      strip: "ancient",
+      era: "",
+      anchor: -1,
+      note: node.note,
+      image: node.img,
+      ...(deeper ? { lineage: node } : null),
+    }));
 }

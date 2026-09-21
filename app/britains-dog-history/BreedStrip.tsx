@@ -12,7 +12,7 @@ import { resetToys } from "../../components/BreedTree/BreedTree";
 import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 import styles from "./history.module.css";
 import { sourcesFor } from "../../data/breedSources";
-import { levelCardKind, STRIP_ORDER } from "../../data/levels";
+import { levelCardKind, STRIP_ORDER, type StripCard } from "../../data/levels";
 
 /* Outbound sources are per dog now (data/breedSources.ts), so the era gate has
    gone: a dog with no sources of its own shows no links, wherever it sits. */
@@ -150,7 +150,7 @@ export default function BreedStrip({
      tunnel dives from the card's own rect into that level's start screen, over
      the chum page. The level pages are unchanged and are still the shareable URLs.
      Learn cards still go to their chum page as before. */
-  only?: UKBreed[];
+  only?: StripCard[];
   label?: string;
   /* THE PART OF THE LABEL DRAWN IN WHITE, the chum's own name (owner, 20 September
      2026: the dog name in the title should be white). Kept separate from `label`
@@ -360,7 +360,11 @@ export default function BreedStrip({
   const openFor: BreedStripOpen = (b) => {
     const kind = breedCardKind(b.name);
     const packName = resolveLineageName(b.name);
-    const lineage = getLineage(packName);
+    /* A FOREIGN PROGENITOR CARRIES ITS OWN SUBTREE, 21 September 2026. It has no root
+       tree to look up, so a card that has ancestors recorded beneath it in the chum's
+       tree brings that subtree with it, and it plays from that. A leaf brings none and
+       stays flip-only, since both lookups then come back empty. See foreignCardsWithin. */
+    const lineage = (b as StripCard).lineage ?? getLineage(packName);
     const pack = packBreeds.find((x) => x.name === packName);
     // The chum page's own dog plays here rather than sending the visitor to the
     // page they are already on. See playName.

@@ -1,5 +1,5 @@
 import BreedStrip from "../../app/britains-dog-history/BreedStrip";
-import { ancestorCardsWithin, stripCardFor } from "../../data/levels";
+import { ancestorCardsWithin, foreignCardsWithin, stripCardFor } from "../../data/levels";
 import styles from "./LevelSlider.module.css";
 
 /* THE LEVELS THAT MADE THIS DOG, at the foot of a chum page, 20 September 2026.
@@ -27,9 +27,10 @@ import styles from "./LevelSlider.module.css";
    `mobile` only adds room at the foot, because the phone page pins its icon rail
    over the bottom of the screen and the strip would sit under it. */
 export default function LevelSlider({ chum, mobile = false }: { chum: string; mobile?: boolean }) {
-  // Levels AND chum ancestors, oldest first, then the page's own dog last.
+  /* Foreign progenitors first, deepest first, then the levels and chum ancestors in
+     era order, then the page's own dog last. See foreignCardsWithin. */
   const self = stripCardFor(chum);
-  const levels = [...ancestorCardsWithin(chum), self];
+  const levels = [...foreignCardsWithin(chum), ...ancestorCardsWithin(chum), self];
   const era = levels[0].strip;
   return (
     <section className={`${styles.wrap} ${mobile ? styles.mobile : ""}`.trim()} aria-label={`The dogs that went into making the ${chum}`}>
