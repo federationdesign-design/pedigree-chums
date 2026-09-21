@@ -12,7 +12,7 @@ import { resetToys } from "../../components/BreedTree/BreedTree";
 import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 import styles from "./history.module.css";
 import { sourcesFor } from "../../data/breedSources";
-import { levelCardKind, levelSlug, STRIP_ORDER } from "../../data/levels";
+import { levelCardKind, STRIP_ORDER } from "../../data/levels";
 
 /* Outbound sources are per dog now (data/breedSources.ts), so the era gate has
    gone: a dog with no sources of its own shows no links, wherever it sits. */
@@ -142,10 +142,14 @@ export default function BreedStrip({
      flip, the wheel-to-sideways scroll, is this component's own, so the two rows
      cannot drift apart in look or behaviour.
 
-     A TAP GOES TO THE LEVEL'S OWN PAGE. On a chum page there is no campaign to
-     play inside, so a play card navigates to /britains-dog-history/dog/[slug]
-     rather than opening the game over the chum page. Learn cards still go to their
-     chum page as before. */
+     A TAP OPENS THE LEVEL HERE, WITH THE TIME TUNNEL, 20 September 2026 (owner:
+     the time tunnel on the card click and into the start screen). It navigated to
+     /britains-dog-history/dog/[slug] instead, which arrives quiet by design, the
+     owner having asked for shared links to land straight on the start screen. A
+     tap from the strip now does exactly what a tap on the era page does: the
+     tunnel dives from the card's own rect into that level's start screen, over
+     the chum page. The level pages are unchanged and are still the shareable URLs.
+     Learn cards still go to their chum page as before. */
   only?: UKBreed[];
   label?: string;
   /* THE PART OF THE LABEL DRAWN IN WHITE, the chum's own name (owner, 20 September
@@ -365,8 +369,6 @@ export default function BreedStrip({
     if (!playHere) {
       if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
       if (kind !== "play" || !lineage) return undefined;
-      // A chum page's strip: the level has its own page, so go there. See `only`.
-      if (only) return () => router.push(`/britains-dog-history/dog/${levelSlug(b.name)}`);
     }
     if (!lineage) return undefined;
     return (e) => {

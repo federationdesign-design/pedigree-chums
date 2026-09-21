@@ -13,8 +13,10 @@ import styles from "./LevelSlider.module.css";
 
    OLDEST ERA FIRST, then THE CHUM ITSELF LAST (owner: a final playable level for
    the dog the page is about). Its ancestors lead to it, so it closes the row.
-   Every ancestor card goes to its level page; the chum's own card opens the game
-   here, because a chum has no level page. See BreedStrip's playName.
+   Every card, the ancestors and the chum itself, opens its level HERE, through
+   the time tunnel from the card, exactly as the era page does (owner, 20
+   September 2026). The chum's own card needs playName because it is a chum, a
+   "learn" card that would otherwise send the visitor to the page they are on.
 
    EVERY CHUM PAGE GETS A STRIP NOW. Before this, 13 chums with no British ancestry
    recorded showed nothing; they now show a single card, their own, which plays.
