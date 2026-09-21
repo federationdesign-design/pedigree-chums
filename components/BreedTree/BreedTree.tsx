@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
-import { ringFrac, RARITY_BAND, nodePillWidth, LIFT_PILL_SCREEN_K } from "../PackPit/LineageMap";
+import { ringFrac, RARITY_BAND, nodePillWidth, LIFT_PILL_SCREEN_K, liftNodeScreenR } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
 import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
@@ -2309,7 +2309,30 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    STILL ONE CONSTANT TO FLIP, and it still switches everything off together: the
    drawing, the group and the body choice all read it. */
 const PIT_DRAWS_WORDS = true;
-const CHIP_R_PX = 12;
+/* CHIP_R_PX, the flat 12, is GONE with the 20 September ruling below. Its two
+   readers now ask chipRadiusPx per chip. The DIAGRAM badges keep their own
+   constant, DIAGRAM_CHIP_R_PX, which was never this one. */
+/* CHIPS THE SIZE OF THE LIFTED CIRCLES, EXACTLY, 21 September 2026 (owner, option 1:
+   chips match the lifted circles exactly, bombs keep today's blast).
+
+   HISTORY. A share-sized chip was tried on 20 September and rolled back the same day,
+   because the bombs grew with it and their explosions became too powerful. The flat
+   CHIP_R_PX 12 it restored is what this replaces.
+
+   THE SIZE is liftNodeScreenR, imported from LineageMap: the node's on-screen radius on
+   the lifted layer, the phone's shrink and the 0.8 overlay included. So a 50% circle
+   that reads about 57px across on the lift drops a 57px chip, and a 100% one an 80px
+   chip. 18% and under sit on the curve's floor, about 34px.
+
+   THE BLAST DOES NOT GROW, which is what made this acceptable the second time. A bomb is
+   still a chip and is drawn at this size, but its explosion reads BOMB_BLAST_R_PX, the
+   old flat 12, wherever it used the bomb's own radius. See BOMB_BLAST_R_PX.
+
+   EXPECT THE PIT TO FILL FASTER: chips are two to three times the old width. */
+const chipRadiusPx = (share: number, mobile: boolean) => liftNodeScreenR(share, mobile);
+/* THE RADIUS A BOMB'S EXPLOSION IS BUILT FROM, fixed at the old chip size so a bigger
+   bomb looks bigger but blasts exactly as it did (owner, 21 September 2026). */
+const BOMB_BLAST_R_PX = 12;
 /* THE START SCREEN'S DIAGRAM BADGES ARE TWICE THE PIT'S, 19 September 2026
    (owner). Doubling was tried on CHIP_R_PX itself first, which doubled BOTH,
    and the owner's ruling on seeing it was: only the ones on the start screen,
@@ -7586,8 +7609,11 @@ export default function BreedTree({
       const svgEl = st ? st.querySelector("svg") : null;
       const ctm0 = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
       const fxScale = ctm0 && ctm0.a ? 1 / ctm0.a : vbHf / stageH;
-      // Every chip in the pit is this radius, in viewBox units: see CHIP_R_PX.
-      const chipR = CHIP_R_PX * fxScale;
+      /* A CHIP'S RADIUS FROM ITS OWN SHARE, in viewBox units: see chipRadiusPx.
+         It was `CHIP_R_PX * fxScale`, one figure for every chip, read by the drop
+         and the pop below. Both now ask per chip, because the share is what
+         decides the size. */
+      const chipRof = (share: number) => chipRadiusPx(share, isMobileRef.current) * fxScale;
       // ---- frozen drop-time transform: Matter bodies live in CLIENT PX ----
       // (the pit's native space, so every pit constant copies verbatim). World
       // coords stay the render currency: sync after each Engine.update, so
@@ -7734,7 +7760,7 @@ export default function BreedTree({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: chipR / k, rDraw: chipR, pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false,
+        r: chipRof(pctOf(n)) / k, rDraw: chipRof(pctOf(n)), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false,
       }));
       badgeBodiesRef.current = badges;
 
@@ -8291,9 +8317,10 @@ export default function BreedTree({
           const bl = badgeBodiesRef.current;
           if (bl) {
             const kidBomb = rollBomb();
+            const kidR = chipRof(pctOf(ch));
             const kb: Body = {
               n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0,
-              r: chipR / k, rDraw: chipR,
+              r: kidR / k, rDraw: kidR,
               pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true,
               a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: kidBomb,
             };
@@ -8304,7 +8331,7 @@ export default function BreedTree({
             newMbs.push(mbb);
             // Both homes, same order. See badgeSrcRef.
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: kb.pct, r: chipR, bomb: kidBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: kb.pct, r: kidR, bomb: kidBomb, src: ch }]);
           }
         });
         // resolve the deliberate word/circle overlap without an explosion
@@ -8359,14 +8386,15 @@ export default function BreedTree({
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
             const popBomb = rollBomb();
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: chipR / k, rDraw: chipR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
+            const popR = chipRof(pctOf(ch));
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: popR / k, rDraw: popR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: chipR, bomb: popBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: popR, bomb: popBomb, src: ch }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -8907,10 +8935,12 @@ export default function BreedTree({
            face still belongs to the child; only the colour is the parent's. */
         const kids = (n.children ?? []).filter((ch) => !isHiddenCopy(ch));
         if (kids.length) {
-          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(ch), { name: n.data.name }); }
+          // the radius argument is ignored for a percentage chip, which sizes
+          // itself from its share; passed for the signature only. See chipRadiusPx.
+          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, chipRof(pctOf(ch)), pctOf(ch), { name: n.data.name }); }
         } else {
           const q = at();
-          spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(n), { name: n.data.name });
+          spawnBadgeRef.current?.(q.x, q.y, chipRof(pctOf(n)), pctOf(n), { name: n.data.name });
         }
         /* IT TAKES THE BODY OUT ITSELF (owner, 18 September 2026), rather than
            setting a flag and waiting for a tick that may not come.
@@ -9307,7 +9337,7 @@ export default function BreedTree({
            through the last of those and had its carefully computed radius discarded.
            All of them are now the one constant. Only opts.label is untouched: that
            is a solo DOG CIRCLE arriving with its full radius, not a chip. */
-        const rDraw = opts?.label ? (opts?.r ?? 0) : CHIP_R_PX * fxScale;
+        const rDraw = opts?.label ? (opts?.r ?? 0) : chipRadiusPx(pctVal, isMobileRef.current) * fxScale;
         /* TWO CHIPS STAND OUTSIDE THE BOMB ROLL. A labelled circle, because it is
            a whole breed rather than a chip, and any caller that asks for noBomb.
            The solo leaf uses the second: it now drops an ordinary percentage
@@ -9882,7 +9912,19 @@ export default function BreedTree({
         const bombMb = b.mb as MB;
         if (!bombMb) return;
         const bx = bombMb.position.x, by = bombMb.position.y;
-        const bsz = radOf(bombMb) * (1 + (b.pct || 0) / 25); // a bigger figure, a bigger boom
+        /* THE BLAST IS BUILT FROM THE OLD CHIP SIZE, 21 September 2026 (owner: chips match
+           the lifted circles exactly, bombs keep today's blast). A bomb is drawn at its
+           share's size now, up to about 40px radius, but its explosion is still built from
+           a 12px chip, BOMB_BLAST_R_PX. The body's radius is scaled back by the ratio of 12
+           to the bomb's own drawn radius, which cancels the units, so the shockwave radius
+           and the pct boost below are exactly what they were for every bomb.
+
+           WHAT STILL FOLLOWS THE REAL SIZE: the chain's seed, touch(), reads the bomb's
+           actual body, because a chip resting against a bigger bomb IS touching it and the
+           chain would otherwise fail to start. Chips are bigger too, so a touching cluster
+           covers more of the pit than before. */
+        const blastBase = (b.rDraw ?? 0) > 0 ? radOf(bombMb) * (BOMB_BLAST_R_PX * fxScale) / (b.rDraw as number) : radOf(bombMb);
+        const bsz = blastBase * (1 + (b.pct || 0) / 25); // a bigger figure, a bigger boom
         wake();
         toyTimers.push(window.setTimeout(() => {
           const now2 = performance.now();

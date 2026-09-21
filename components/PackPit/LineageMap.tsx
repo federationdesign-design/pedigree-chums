@@ -468,6 +468,13 @@ const PIT_PILL_SCALE = 0.683;
    PIT_PILL_SCALE inside a layer drawn at LIFT_OVERLAY_SCALE. Exported so the pit can
    draw the pill that drops into it at exactly this size (owner, 21 September 2026). */
 export const LIFT_PILL_SCREEN_K = PIT_PILL_SCALE * 0.8;
+/* WHAT A LIFTED NODE MEASURES ON SCREEN, in client px, for a share. The node is
+   radius(share), shrunk by PIT_NODE_SCALE on a phone (nodeScaleK), inside a layer drawn at
+   LIFT_OVERLAY_SCALE. Exported so the pit can drop a chip EXACTLY this size (owner, 21
+   September 2026). One definition, so the two can never drift. */
+export function liftNodeScreenR(share: number, mobile: boolean): number {
+  return radius(Math.max(0, share)) * (mobile ? PIT_NODE_SCALE : 1) * LIFT_OVERLAY_SCALE;
+}
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
