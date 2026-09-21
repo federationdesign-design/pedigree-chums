@@ -105,6 +105,12 @@ const SLOT_TOP = 196;      // fallback band top if famous chums cannot be measur
 const SLOT_LEFT = 120;     // left inset of the band
 const SLOT_MARGIN = 24;    // keep off the right edge
 const CARD_GAP = 10;       // exact gap between cards, both axes (D73 #3)
+/* THE WHOLE BAND NUDGED, 21 September 2026 (owner: move all the information cards up
+   100px and right 20px). Applied to where the band STARTS, slot one and the left edge
+   a wrapped row returns to, so every later card, which is placed beside the one before
+   it, moves with it and the row keeps its even gaps. */
+const CARD_NUDGE_X = 20;
+const CARD_NUDGE_Y = -100;
 const EST_H = 260;         // card height estimate (row pitch + canvas-growth reserve)
 
 // The rail's icon order. It USED to double as the fixed slot order for the pop-out
@@ -487,14 +493,15 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     const canvasW = cRect?.width ?? 2244;
     const cTop = cRect?.top ?? 0;
     const famous = typeof document !== "undefined" ? document.querySelector('[data-region="famous-chums"]') : null;
-    const bandTop = famous ? famous.getBoundingClientRect().bottom - cTop + CARD_GAP : SLOT_TOP;
+    const bandTop = (famous ? famous.getBoundingClientRect().bottom - cTop + CARD_GAP : SLOT_TOP) + CARD_NUDGE_Y;
+    const bandLeft = SLOT_LEFT + CARD_NUDGE_X;
     const width = (cid: string) => cards.find((c) => c.id === cid)?.width ?? 0;
     const prev = [...openOrder.current].reverse().find((o) => o !== id && !closed.has(o) && positions[o]);
-    if (!prev) return { x: SLOT_LEFT, y: bandTop };
+    if (!prev) return { x: bandLeft, y: bandTop };
     const p = positions[prev];
     let x = p.x + width(prev) + CARD_GAP;
     let y = p.y;
-    if (x + width(id) > canvasW - SLOT_MARGIN) { x = SLOT_LEFT; y = p.y + EST_H + CARD_GAP; } // wrap
+    if (x + width(id) > canvasW - SLOT_MARGIN) { x = bandLeft; y = p.y + EST_H + CARD_GAP; } // wrap
     return { x, y };
   }, [cards, closed, positions]);
 
