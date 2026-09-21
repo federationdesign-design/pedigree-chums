@@ -15,6 +15,7 @@ import { breeds as packBreeds } from "./breeds";
 import { getLineage, type LineageNode } from "./lineage";
 import { isEchoName } from "./lineageShape";
 import { ERA_YEARS, eraYear } from "./eraYears";
+import { FOREIGN_CARD_NOTES, statusFromNote } from "./foreignCardNotes";
 import { resolveLineageName } from "./lineageNames";
 
 export type BreedCardKind = "learn" | "play";
@@ -199,7 +200,10 @@ export function foreignCardsWithin(chumName: string): StripCard[] {
       // The researched round date: see data/eraYears.ts. Blank only if one is missing.
       era: ERA_YEARS[node.name] ?? "",
       anchor: eraYear(ERA_YEARS[node.name]) ?? -1,
-      note: node.note,
+      // The short card-back version, and the status moved to the front band: see
+      // data/foreignCardNotes.ts. The full note is untouched everywhere else.
+      note: FOREIGN_CARD_NOTES[node.name] ?? node.note,
+      tag: statusFromNote(node.note),
       image: node.img,
       /* NO LEVEL ON A FOREIGN CARD, 21 September 2026 (owner: all foreign dogs just tap
          to turn rather than go to the level). The branch-to-play rule from earlier the
