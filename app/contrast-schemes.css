@@ -529,11 +529,16 @@
       which sits at z-index -1 behind them. See the rule there.
    3. THE GREY CRUSH, if the scheme marks the diagram's svg for it, is lifted from that
       svg alone, so a white ring is not dimmed to grey on the black scheme. */
-:root[data-pc-contrast-scheme="black-on-white"] #pc-site [data-region="diagram"] [class*="btCircle"] {
+/* ONLY THE RINGS THAT ARE ALREADY DRAWN WHITE, 21 September 2026 (owner's devtools: the
+   scheme showed "an extra circle" and a crop, even in white on black, which should have
+   changed nothing). The diagram carries btCircle rings that are NOT drawn at all in the
+   default view: the outer one round the whole tree has no white stroke. Forcing every
+   btCircle to the scheme ink painted that invisible ring, and at that size it runs past
+   the svg's edge, which is the crop. So the ink now goes only on rings whose own stroke
+   is white, which are exactly the rings the default view shows, and white on black gets
+   no rule at all: its rings are already white, as the owner asked. */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site [data-region="diagram"] [class*="btCircle"]:is([stroke="#ffffff"], [stroke="#fff"], [stroke="white"], [stroke="#FFFFFF"]) {
   stroke: #000 !important;
-}
-:root[data-pc-contrast-scheme="white-on-black"] #pc-site [data-region="diagram"] [class*="btCircle"] {
-  stroke: #fff !important;
 }
 :root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] > svg[data-pc-crush],
 :root[data-pc-contrast-scheme] #pc-site [data-region="diagram"] svg[data-pc-crush] {
