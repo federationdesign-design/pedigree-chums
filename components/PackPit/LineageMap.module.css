@@ -1238,3 +1238,13 @@
   background: none;
   transition: background 0.12s ease-out;
 }
+
+/* THE CHUM PAGE'S FAMILY TREE STAYS SEE-THROUGH IN A SCHEME, 21 September 2026 (owner).
+   In bounded mode (the chum page's tree only) this overlay fills .treeRegion, which lies
+   over the right-hand part of the circle diagram. The scheme's sweep paints every element
+   solid, so this became a white or black sheet cropping the diagram. Only the overlay
+   itself is cleared; what is drawn inside it keeps its scheme colours. #pc-site
+   outranks the sweep. */
+:global(:root[data-pc-contrast-scheme] #pc-site) .overlayBounded {
+  background-color: transparent !important;
+}

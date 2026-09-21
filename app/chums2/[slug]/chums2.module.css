@@ -958,6 +958,11 @@
    "THE CHUM PAGE DIAGRAM IN A SCHEME, SURGICAL" in contrast-schemes.css. */
 :global(:root[data-pc-contrast-scheme] #pc-site) .upperBand,
 :global(:root[data-pc-contrast-scheme] #pc-site) .leftBand,
-:global(:root[data-pc-contrast-scheme] #pc-site) .introStack {
+:global(:root[data-pc-contrast-scheme] #pc-site) .introStack,
+/* AND THE FAMILY TREE COLUMN, 21 September 2026 (owner: the diagram is still cropped
+   on the right). .treeRegion is absolutely placed over the right-hand part of the
+   diagram's zone; its left edge is exactly where the owner's screenshot cuts the
+   diagram off. Painted solid by the sweep, it covered that side. */
+:global(:root[data-pc-contrast-scheme] #pc-site) .treeRegion {
   background-color: transparent !important;
 }
