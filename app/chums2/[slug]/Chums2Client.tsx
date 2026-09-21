@@ -96,19 +96,20 @@ const pctTxt = (v: number) => `${v.toFixed(1)}%`;
 const pctTitleFor = (id: string) =>
   PCT_TITLES[Math.abs([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % PCT_TITLES.length];
 
-// ── Card placement: FIXED, deterministic slots (D73 #4) ──────────────────────
-// Each card owns a slot by its position in the RAIL ORDER, independent of open order,
-// so opening health first still lands it in health's own slot (not slot 1). Slots flow
-// left-to-right from DIRECTLY below famous chums, exactly CARD_GAP between cards on both
-// axes, wrapping down at the canvas edge. Coords are canvas-space (DragCard is absolute).
+// ── Card placement: IN OPEN ORDER (21 September 2026, reversing D73 #4) ─────────
+// The first card opened takes slot one and each later card opens beside the last one
+// still open, flowing left-to-right from DIRECTLY below famous chums, exactly CARD_GAP
+// between cards, wrapping down at the canvas edge. See placeCard for the detail.
+// Coords are canvas-space (DragCard is absolute).
 const SLOT_TOP = 196;      // fallback band top if famous chums cannot be measured
 const SLOT_LEFT = 120;     // left inset of the band
 const SLOT_MARGIN = 24;    // keep off the right edge
 const CARD_GAP = 10;       // exact gap between cards, both axes (D73 #3)
 const EST_H = 260;         // card height estimate (row pitch + canvas-growth reserve)
 
-// The rail order doubles as the fixed slot order. tree/diagram are panels, not placed
-// cards, so they are skipped when the slot walk hits them.
+// The rail's icon order. It USED to double as the fixed slot order for the pop-out
+// cards; since 21 September 2026 cards take slots in the order they are opened instead,
+// so this now only orders the icons. See placeCard.
 const RAIL_ORDER = [
   "temperament", "tree", "lifespanExplain", "cost", "suitability",
   "exercise", "grooming", "training", "influence", "health", "diagram",
@@ -461,28 +462,41 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     openRects.current.set(id, rect);
   }, []);
 
+  /* THE ORDER THE CARDS WERE OPENED IN, oldest first. See placeCard. */
+  const openOrder = useRef<string[]>([]);
+
   const placeCard = useCallback((id: string) => {
-    // FIXED slot (D73 #4): walk the cards in rail order, accumulating x by each card's
-    // width + CARD_GAP and wrapping down at the canvas edge, and return THIS card's slot.
-    // The result depends only on the card ORDER (not which are open), so a card always
-    // lands in its own slot. The band starts DIRECTLY below famous chums (measured in
-    // canvas coords by subtracting the canvas top); 10px gaps throughout.
+    /* OPEN ORDER, NOT RAIL ORDER, 21 September 2026 (owner: the first card to open
+       should always open in the same place, and the next one beside it, and on).
+
+       REVERSES D73 #4, which gave every card its OWN fixed slot by its position in
+       the rail, so opening health first sent it to health's slot far along the row
+       and the first card could land anywhere. Now the first card to open, whichever
+       it is, takes slot one, and each card after it opens directly beside the last
+       card still open, wrapping down at the canvas edge.
+
+       BESIDE THE LAST ONE'S SLOT, not its current place. A card the player dragged
+       away still counts as occupying the slot it opened in, so the row stays a row.
+       Closing a card from the middle leaves its gap; the next opens at the end
+       rather than squeezing in, because a card of a different width would not fit
+       the gap and would overlap its neighbour.
+
+       The band still starts directly below famous chums, 10px gaps throughout. */
     const canvasEl = typeof document !== "undefined" ? (document.querySelector('[data-canvas="true"]') as HTMLElement | null) : null;
     const cRect = canvasEl?.getBoundingClientRect();
     const canvasW = cRect?.width ?? 2244;
     const cTop = cRect?.top ?? 0;
     const famous = typeof document !== "undefined" ? document.querySelector('[data-region="famous-chums"]') : null;
     const bandTop = famous ? famous.getBoundingClientRect().bottom - cTop + CARD_GAP : SLOT_TOP;
-    const ordered = RAIL_ORDER.map((rid) => cards.find((c) => c.id === rid)).filter((c): c is CardDef => !!c);
-    let x = SLOT_LEFT, y = bandTop, rowH = 0;
-    for (const c of ordered) {
-      if (x + c.width > canvasW - SLOT_MARGIN && x > SLOT_LEFT) { x = SLOT_LEFT; y += rowH + CARD_GAP; rowH = 0; } // wrap
-      if (c.id === id) return { x, y };
-      x += c.width + CARD_GAP;
-      rowH = Math.max(rowH, EST_H);
-    }
-    return { x: SLOT_LEFT, y: bandTop };
-  }, [cards]);
+    const width = (cid: string) => cards.find((c) => c.id === cid)?.width ?? 0;
+    const prev = [...openOrder.current].reverse().find((o) => o !== id && !closed.has(o) && positions[o]);
+    if (!prev) return { x: SLOT_LEFT, y: bandTop };
+    const p = positions[prev];
+    let x = p.x + width(prev) + CARD_GAP;
+    let y = p.y;
+    if (x + width(id) > canvasW - SLOT_MARGIN) { x = SLOT_LEFT; y = p.y + EST_H + CARD_GAP; } // wrap
+    return { x, y };
+  }, [cards, closed, positions]);
 
   const openCard = useCallback((id: string) => {
     // Pop-outs are gated by SHOW_SECTIONS: while a section is off, its rail icon
@@ -496,6 +510,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       return;
     }
     const pos = placeCard(id);
+    openOrder.current = [...openOrder.current.filter((o) => o !== id), id];
     setPositions((prev) => ({ ...prev, [id]: pos }));
     setClosed((prev) => { const next = new Set(prev); next.delete(id); return next; });
     bringToFront(id);
@@ -514,6 +529,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
 
   const closeCard = useCallback((id: string) => {
     openRects.current.delete(id);
+    openOrder.current = openOrder.current.filter((o) => o !== id);
     setClosed((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
   }, []);
 
