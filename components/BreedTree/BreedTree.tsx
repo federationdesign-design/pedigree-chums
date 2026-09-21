@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { ringFrac, RARITY_BAND, nodePillWidth, LIFT_PILL_SCREEN_K, liftNodeScreenR } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
@@ -3819,6 +3819,19 @@ export default function BreedTree({
   }, [holdEntrance, resolve, dropArmed]);
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
+  /* IS AN ACCESSIBILITY VIEW ON, read live from <html>, 21 September 2026. The views
+     are set by the site's toolbar as data-pc-contrast-scheme on the root element; a
+     MutationObserver keeps this in step if the player switches mid-level. Server
+     render and first paint read false. */
+  const schemeOn = useSyncExternalStore(
+    (cb) => {
+      const mo = new MutationObserver(cb);
+      mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-pc-contrast-scheme"] });
+      return () => mo.disconnect();
+    },
+    () => !!document.documentElement.getAttribute("data-pc-contrast-scheme"),
+    () => false,
+  );
 
 
   // The main pit sizes every toy off BIG = 84 * SCALE, and its menu square off
@@ -11495,7 +11508,17 @@ export default function BreedTree({
   // not the root) AND the pointer is within that subtree (hovered in imgZoomSet), the
   // focused circle and its visible descendants show their photos. Leaving the circle
   // (hovered null / outside) or zooming out reverts to stroke-only. displayOnly only.
-  const imgZoomSet = displayOnly && focus !== nodes[0] ? new Set(focus.descendants()) : null;
+  /* PICTURES HIDDEN UNTIL A CIRCLE IS OPENED, IN THE ACCESSIBILITY VIEWS, 21 September
+     2026 (owner, option 1 of three: accessibility views only). The chum page's diagram
+     (displayOnly) has always shown rings only, and a circle's pictures only once you
+     have clicked into it and while the pointer is over it. The game's own diagram now
+     does the same while a view is on, from the start screen through the learn area,
+     until the round begins and the circles drop into the pit, where the pictures are
+     needed and come back. The normal colours are unchanged.
+     On the start screen the circles do not take clicks by design, so there it is rings
+     only; clicking into a circle to see its pictures works once LEARN is pressed. */
+  const schemeHidesImgs = schemeOn && !displayOnly && !falling && !dropped;
+  const imgZoomSet = (displayOnly || schemeHidesImgs) && focus !== nodes[0] ? new Set(focus.descendants()) : null;
   const imgZoomOn = !!imgZoomSet && !!hovered && imgZoomSet.has(hovered);
   // Hovering shows the short write-up; clicking into a circle shows the extended
   // one. hovered is non-null only while the pointer is over a circle, so a null
@@ -13487,7 +13510,7 @@ export default function BreedTree({
                      out onto the learn layer. Anyone proposing it again should
                      know it is a redesign of the chain's colour system, not a flag
                      in nodeImg. */
-                  fill={hidden ? "none" : displayOnly ? (imgZoomOn && imgZoomSet?.has(d) && hasImg ? `url(#bt-img-${i})` : "transparent") : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
+                  fill={hidden ? "none" : (displayOnly || schemeHidesImgs) ? (imgZoomOn && imgZoomSet?.has(d) && hasImg ? `url(#bt-img-${i})` : "transparent") : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
                   // the node circle stroke here; hidden circles keep "none". Gated on
