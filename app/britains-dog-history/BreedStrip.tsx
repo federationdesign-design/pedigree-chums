@@ -156,10 +156,9 @@ export default function BreedStrip({
      2026: the dog name in the title should be white). Kept separate from `label`
      so the heading can colour it without the caller passing markup. */
   labelName?: string;
-  /* THE ONE CARD THAT PLAYS IN PLACE (owner, 20 September 2026: a final playable
-     level on every chum page for the dog the page is about). Every other card in
-     an `only` strip goes to its level page; this dog has no level page, because
-     it is a chum, so tapping its card opens the game right here on the chum page. */
+  /* THE PAGE'S OWN DOG. Every card in an `only` strip plays in place now (see
+     openFor), so this no longer decides what a tap does; it tells the header picture's
+     "pc:play-chum" which card to open. */
   playName?: string;
 }) {
   const router = useRouter();
@@ -365,7 +364,12 @@ export default function BreedStrip({
     const pack = packBreeds.find((x) => x.name === packName);
     // The chum page's own dog plays here rather than sending the visitor to the
     // page they are already on. See playName.
-    const playHere = !!only && b.name === playName && !!lineage;
+    /* ON A CHUM PAGE EVERY CARD PLAYS HERE, 21 September 2026 (owner: chum ancestors
+       such as the Bulldog on the French Bulldog page open their play level's start
+       screen). An ancestor that is itself a chum would otherwise go to its own chum
+       page, the "learn" route below; in an `only` strip it plays in place through the
+       tunnel instead, like every level card beside it. The era pages are unchanged. */
+    const playHere = !!only && !!lineage;
     if (!playHere) {
       if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
       if (kind !== "play" || !lineage) return undefined;

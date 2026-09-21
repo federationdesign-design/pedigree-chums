@@ -88,3 +88,41 @@ export function levelsWithin(chumName: string): UKBreed[] {
   // levelBreeds() is already in campaign order, oldest era first; keep it.
   return order.filter((b) => depth.has(b.name));
 }
+
+/* A STRIP CARD FOR ANY NAMED DOG. The strip's own entry when the dog has one, so it
+   looks like its neighbours; otherwise one built from the chum record, with the card
+   art and "Today" as its era, parked at the end of the timeline. Moved here from
+   LevelSlider, 21 September 2026, so chum ancestors and the page's own dog share it. */
+export function stripCardFor(name: string): UKBreed {
+  const uk = ukBreeds.find((u) => u.name === name);
+  if (uk) return uk;
+  const pack = packBreeds.find((b) => b.name === name);
+  return { name, strip: "c1900", era: "Today", anchor: 9999, note: pack?.character ?? "", image: pack?.image };
+}
+
+/* EVERY DOG IN A CHUM'S TREE THAT CAN BE PLAYED, 21 September 2026 (owner: the Bulldog
+   is missing from the French Bulldog page). levelsWithin returns LEVELS only, and a
+   level is by definition not one of the 54 chums, so a chum ancestor such as the
+   Bulldog never appeared. This adds them.
+
+   MEASURED: 27 of the 54 chum pages have chum ancestors, 71 cards in all; the Bull
+   Terrier alone has five. 24 of those have no strip entry and take the built card.
+
+   The page's own dog is left out, including the self-named copies of it inside its
+   tree; LevelSlider appends it last. Oldest era first, then each dog's anchor, the
+   campaign's order, so the chums slot into the timeline beside the levels. */
+export function ancestorCardsWithin(chumName: string): UKBreed[] {
+  const root = getLineage(resolveLineageName(chumName));
+  if (!root) return [];
+  const chums = new Set<string>();
+  const walk = (n: { name: string; children?: { name: string }[] }, d: number) => {
+    if (d > 0 && n.name !== chumName && levelCardKind(n.name) === "learn") chums.add(n.name);
+    for (const c of (n.children ?? []) as { name: string; children?: { name: string }[] }[]) walk(c, d + 1);
+  };
+  walk(root, 0);
+  const all = [...levelsWithin(chumName), ...[...chums].map(stripCardFor)];
+  const seen = new Set<string>();
+  return all
+    .filter((b) => (seen.has(b.name) ? false : (seen.add(b.name), true)))
+    .sort((a, b) => (STRIP_ORDER.indexOf(a.strip) - STRIP_ORDER.indexOf(b.strip)) || (a.anchor - b.anchor));
+}

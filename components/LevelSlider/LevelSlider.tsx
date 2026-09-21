@@ -1,7 +1,5 @@
 import BreedStrip from "../../app/britains-dog-history/BreedStrip";
-import { levelsWithin } from "../../data/levels";
-import { ukBreeds, type UKBreed } from "../../data/uk-breeds";
-import { breeds } from "../../data/breeds";
+import { ancestorCardsWithin, stripCardFor } from "../../data/levels";
 import styles from "./LevelSlider.module.css";
 
 /* THE LEVELS THAT MADE THIS DOG, at the foot of a chum page, 20 September 2026.
@@ -28,23 +26,10 @@ import styles from "./LevelSlider.module.css";
 
    `mobile` only adds room at the foot, because the phone page pins its icon rail
    over the bottom of the screen and the strip would sit under it. */
-function selfCard(chum: string): UKBreed {
-  const uk = ukBreeds.find((u) => u.name === chum);
-  if (uk) return uk;
-  const pack = breeds.find((b) => b.name === chum);
-  return {
-    name: chum,
-    strip: "c1900",
-    era: "Today",
-    anchor: 9999,
-    note: pack?.character ?? "",
-    image: pack?.image,
-  };
-}
-
 export default function LevelSlider({ chum, mobile = false }: { chum: string; mobile?: boolean }) {
-  const self = selfCard(chum);
-  const levels = [...levelsWithin(chum).filter((b) => b.name !== chum), self];
+  // Levels AND chum ancestors, oldest first, then the page's own dog last.
+  const self = stripCardFor(chum);
+  const levels = [...ancestorCardsWithin(chum), self];
   const era = levels[0].strip;
   return (
     <section className={`${styles.wrap} ${mobile ? styles.mobile : ""}`.trim()} aria-label={`The dogs that went into making the ${chum}`}>
