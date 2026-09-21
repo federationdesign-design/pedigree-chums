@@ -8,6 +8,7 @@ import Nav from "../../../components/Nav/Nav";
 // /chums keeps its own indexable title below.
 import Chums2Client from "../../chums2/[slug]/Chums2Client";
 import Chums2Mobile from "../../chums2/[slug]/Chums2Mobile";
+import LevelSlider from "../../../components/LevelSlider/LevelSlider";
 import { breeds } from "../../../data/breeds";
 import { getLineage } from "../../../data/lineage";
 import { resolveLineageName } from "../../../data/lineageNames";
@@ -75,6 +76,9 @@ export default async function BreedPage({ params }: Props) {
           character={breed.character}
         />
       )}
+      {/* The levels that went into making this dog, as links to their own pages.
+          Renders nothing for a chum with no British ancestry recorded. */}
+      <LevelSlider chum={breed.name} mobile={mobile} />
     </>
   );
 }

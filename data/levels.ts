@@ -53,3 +53,33 @@ export function levelSlug(name: string): string {
 export function levelBySlug(slug: string): UKBreed | undefined {
   return levelBreeds().find((b) => levelSlug(b.name) === slug);
 }
+
+/* THE LEVELS INSIDE ONE CHUM'S FAMILY TREE, 20 September 2026 (owner: a slider at
+   the bottom of every chum page holding only the dogs that went into making it).
+
+   A level counts if its name appears anywhere below the chum in the chum's own
+   lineage. Nearest first, so the direct parents lead and the deep ancestors trail;
+   ties keep campaign order, so two dogs at the same depth sit in timeline order.
+
+   MEASURED on the 54 chums: median 6 levels, most 23, and 13 chums have NONE, the
+   breeds that arrived from outside Britain with no British ancestry recorded, Pug,
+   Chihuahua, German Shepherd and so on. The caller shows nothing for those. */
+export function levelsWithin(chumName: string): UKBreed[] {
+  const root = getLineage(resolveLineageName(chumName));
+  if (!root) return [];
+  const order = levelBreeds();
+  const byLineageName = new Map(order.map((b) => [resolveLineageName(b.name), b]));
+  const depth = new Map<string, number>();
+  const walk = (n: { name: string; children?: { name: string }[] }, d: number) => {
+    if (d > 0) {
+      const lv = byLineageName.get(n.name);
+      if (lv && !depth.has(lv.name)) depth.set(lv.name, d);
+      else if (lv) depth.set(lv.name, Math.min(depth.get(lv.name) as number, d));
+    }
+    for (const c of (n.children ?? []) as { name: string; children?: { name: string }[] }[]) walk(c, d + 1);
+  };
+  walk(root, 0);
+  return order
+    .filter((b) => depth.has(b.name))
+    .sort((a, b) => (depth.get(a.name) as number) - (depth.get(b.name) as number));
+}
