@@ -1811,3 +1811,44 @@
 :global(:root[data-pc-contrast-scheme]) .floor {
   display: none !important;
 }
+
+/* ---- THE START SCREEN IN THE ACCESSIBILITY VIEWS, STAGE 2, 21 September 2026 --------
+   (owner: the slider, the PLAY and LEARN buttons and the circle pack must follow the
+   accessibility style; icons black and white, inverted on the black view). Written for
+   the game window directly, since the site's scheme rules never reach it, and scoped to
+   .overlay so nothing outside the game changes. The game's own classes are hashed in
+   BreedTree's module, so they are matched by name with [class*=...].
+
+   INK AND PAGE: black on white draws in black on white, white on black the inverse.
+     The zoom slider: page-coloured track and knob, ink edge and ink fill.
+     PLAY and LEARN: page-coloured face, ink edge, ink icon, ink label.
+     The dashed guide circle and arrow: ink.
+     The circle pack: every ring that is drawn takes the ink; a ring the game leaves
+       undrawn, stroke none or transparent, stays undrawn, the lesson from the chum page.
+     Pictures in the circles: greyed, one by one.
+   NOT YET: the percentage badges (30%, 60% and so on). Their colours are set inline by
+   the game, which a stylesheet cannot match reliably; they need a change in the game's
+   own code, the next stage. */
+/* black-on-white */
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global([class*="diffTrack"]) { background: #ffffff !important; border-color: #000000 !important; box-shadow: none !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global([class*="diffFill"]) { background: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global([class*="diffThumb"]) { background: #ffffff !important; border-color: #000000 !important; box-shadow: none !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global([class*="startBtn"] rect:not([fill="transparent"])) { fill: #ffffff !important; stroke: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global([class*="startBtn"] path) { fill: #000000 !important; stroke: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global([class*="startBtn"] text) { fill: #000000 !important; stroke: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(:is(line, circle, path)[stroke="#ffffff"][stroke-dasharray]) { stroke: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(polygon[fill="#ffffff"]) { fill: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(circle[class*="btCircle"][stroke]:not([stroke="none"]):not([stroke="transparent"])) { stroke: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .overlay :global(circle[fill^="url(#bt-img"]) { filter: grayscale(1) contrast(1.1); }
+
+/* white-on-black */
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global([class*="diffTrack"]) { background: #000000 !important; border-color: #ffffff !important; box-shadow: none !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global([class*="diffFill"]) { background: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global([class*="diffThumb"]) { background: #000000 !important; border-color: #ffffff !important; box-shadow: none !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global([class*="startBtn"] rect:not([fill="transparent"])) { fill: #000000 !important; stroke: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global([class*="startBtn"] path) { fill: #ffffff !important; stroke: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global([class*="startBtn"] text) { fill: #ffffff !important; stroke: #000000 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(:is(line, circle, path)[stroke="#ffffff"][stroke-dasharray]) { stroke: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(polygon[fill="#ffffff"]) { fill: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(circle[class*="btCircle"][stroke]:not([stroke="none"]):not([stroke="transparent"])) { stroke: #ffffff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .overlay :global(circle[fill^="url(#bt-img"]) { filter: grayscale(1) contrast(1.1); }
