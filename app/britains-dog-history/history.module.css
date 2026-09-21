@@ -955,3 +955,22 @@
 .stripLabelLemon {
   color: var(--yellow-header, #ffed00);
 }
+
+/* THE CHUM PAGE'S STRIP, EDGE TO EDGE, 20 September 2026 (owner: the slider should
+   go full width, it is constrained within a frame).
+
+   WHY IT WAS BOXED IN. .strip reaches the window edges with
+   margin: calc(50% - 50vw), which assumes its parent is about as wide as the
+   window. On the desktop chum page it is not: body[data-pc-chums2] carries
+   min-width: 2244px for the page's sideways canvas, so on a 1440 window 50% is
+   1122 and 50vw is 720, and the margins come out at PLUS 402px each side. The
+   strip was pushed in, not out, which is the frame the owner saw.
+
+   ZERO IS RIGHT HERE. The strip's parent on a chum page already spans the whole
+   page, so it only needs to fill it. On a phone the parent is the window and zero
+   is what the break-out came to anyway, so nothing changes there. The era pages
+   do not take this class and keep their break-out. */
+.stripFlush {
+  margin-left: 0;
+  margin-right: 0;
+}
