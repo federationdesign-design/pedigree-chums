@@ -725,7 +725,11 @@
      and this line is unchanged. The phone is a different story: PLAY moved to
      left 18 earlier today and is 42 across, so its centre is 39, not the axis's
      51.8. The media query below carries that. */
-  left: calc(var(--pit-axis, 51.8px) - 10px);
+  /* 5px further left, 21 September 2026 (owner: the slider is not centred over the PLAY
+     button it sits above; nudge it 5px left). The note above reasons that the axis IS
+     the button's centre, but on the device the track sat 5px right of it, so the owner's
+     eye wins. Desktop only; the phone has its own left in the media query below. */
+  left: calc(var(--pit-axis, 51.8px) - 15px);
   /* top and height are set inline: the track runs to the cap of the S in START,
      which is computed from the same numbers the word uses */
   z-index: 16;
