@@ -545,3 +545,16 @@
   filter: none !important;
   -webkit-filter: none !important;
 }
+
+/* THE CHUM PAGE'S FAMILY TREE: NO GREY FILTER, 21 September 2026 (owner: rather than a
+   filter on the family tree, change the node and connector colours to black and white).
+   The tree is drawn in the scheme's own colours instead; see "THE CHUM PAGE'S FAMILY TREE
+   IN A SCHEME" in LineageMap.module.css. Lifted from this tree's svg alone; any picture
+   inside it is still greyed one by one, as every picture in a scheme is. */
+:root[data-pc-contrast-scheme] #pc-site [data-region="tree"] svg[data-pc-crush] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+:root[data-pc-contrast-scheme] #pc-site [data-region="tree"] image {
+  filter: grayscale(1) contrast(1.1) brightness(0.55);
+}

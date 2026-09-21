@@ -1248,3 +1248,38 @@
 :global(:root[data-pc-contrast-scheme] #pc-site) .overlayBounded {
   background-color: transparent !important;
 }
+
+/* ---- THE CHUM PAGE'S FAMILY TREE IN A SCHEME, 21 September 2026 (owner) --------------
+   Rather than the scheme's grey filter over the whole tree, the tree is drawn in the
+   scheme's own two colours: on Black on white the nodes and connectors are black with
+   white figures; on White on black, the inverse. The central dog's picture is replaced
+   by its name in Luckiest Guy, centred in the card (see schemeRootName in the tsx).
+   The filter itself is lifted in contrast-schemes.css, from this tree's svg alone.
+   Every rule is under .overlayBounded, which only the chum page's tree carries, so the
+   pit, the learn area and the lifted layer are untouched. */
+.schemeRootName {
+  display: none;
+  font-family: "Luckiest Guy", system-ui, sans-serif;
+  font-weight: 400;
+  pointer-events: none;
+}
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .schemeRootName, :global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .schemeRootName { display: inline; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .schemeRootImg, :global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .schemeRootImg { display: none; }
+
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .disc { fill: #000 !important; stroke: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .pct { fill: #fff !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .edge, :global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .edge.lit { stroke: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .plus { fill: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .nmPill { fill: #000 !important; filter: none !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .nm { fill: #fff !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .rootCard { fill: #fff !important; stroke: #000 !important; }
+:global(:root[data-pc-contrast-scheme="black-on-white"] #pc-site) .overlayBounded .schemeRootName { fill: #000; }
+
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .disc { fill: #fff !important; stroke: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .pct { fill: #000 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .edge, :global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .edge.lit { stroke: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .plus { fill: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .nmPill { fill: #fff !important; filter: none !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .nm { fill: #000 !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .rootCard { fill: #000 !important; stroke: #fff !important; }
+:global(:root[data-pc-contrast-scheme="white-on-black"] #pc-site) .overlayBounded .schemeRootName { fill: #fff; }

@@ -3417,7 +3417,26 @@ export default function LineageMap({
                picture, so leaving it yellow would draw a yellow halo inside a green
                rim. */
             style={circular && ringColor ? { fill: doneRing ? "#22c55e" : ringColor, stroke: doneRing ? "#22c55e" : ringColor } : undefined} />
-          {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
+          {breed.image ? <image className={bounded ? styles.schemeRootImg : undefined} href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
+          {/* THE DOG'S NAME IN PLACE OF ITS PICTURE, IN A SCHEME, 21 September 2026 (owner:
+              on the accessibility views the central dog becomes its name in Luckiest Guy,
+              centred in the card). The chum page's family tree only (bounded). Hidden in
+              the normal colours by .schemeRootName; the scheme rules in
+              LineageMap.module.css show it and hide the picture. Sized to fit the card's
+              width on its longest line, one or two lines. */}
+          {bounded && (() => {
+            const ln = splitName(breed.name);
+            const longest = Math.max(1, ...ln.map((l) => l.length));
+            const fs = Math.min(R * 0.42, (R * 1.7) / (0.62 * longest));
+            const lh = fs * 0.95;
+            return (
+              <text className={styles.schemeRootName} textAnchor="middle" dominantBaseline="central" style={{ fontSize: `${fs}px` }}>
+                {ln.map((l, i) => (
+                  <tspan key={i} x={0} y={(i - (ln.length - 1) / 2) * lh}>{l}</tspan>
+                ))}
+              </text>
+            );
+          })()}
           {/* Rarity ring + OUTWARD glow. The crisp ring is drawn LAST, on top, in the
               tier colour. Behind it sit three blurred bands OFFSET OUTWARD so each one's
               inner edge meets the ring's outer edge and it blooms only outward; the
