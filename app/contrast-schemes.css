@@ -558,3 +558,15 @@
 :root[data-pc-contrast-scheme] #pc-site [data-region="tree"] image {
   filter: grayscale(1) contrast(1.1) brightness(0.55);
 }
+
+/* THE DIAGRAM'S YELLOW HOVER BAND IN A SCHEME, 21 September 2026 (owner: the yellow
+   needs to change to black on the white scheme and to white on the black one). The
+   band is BreedTree's hover punch-out, a single path filled with the site yellow by
+   attribute; it is matched by that attribute, so no other shape in the diagram changes.
+   Its holes still punch through to the page, so the child circles read as before. */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site [data-region="diagram"] path[fill^="var(--yellow"] {
+  fill: #000 !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [data-region="diagram"] path[fill^="var(--yellow"] {
+  fill: #fff !important;
+}
