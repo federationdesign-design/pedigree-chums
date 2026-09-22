@@ -106,7 +106,11 @@ export const ukBreeds: UKBreed[] = [
   { name: "Skye Terrier", strip: "c1500", era: "1500s", anchor: 1560, note: "Long-bodied, long-coated terrier from Scotland's Isle of Skye.", image: "/history/breeds/skye-terrier-photo.webp", tag: "endangered" },
   { name: "English Foxhound", strip: "c1500", era: "1500s", anchor: 1570, note: "Pack hound bred on great estates for the fox hunt.", image: "/history/breeds/english-foxhound.jpg", tag: "endangered" },
   { name: "Otterhound", strip: "c1500", era: "1500s", anchor: 1575, note: "Web-footed otter-hunting hound, now the rarest native breed.", image: "/history/breeds/otterhound-photo.jpg", tag: "endangered" },
-  { name: "Turnspit Dog", strip: "c1500", era: "1500s", anchor: 1576, note: "Short-legged dog bred to run in a wheel and turn the spit.", image: "/history/breeds/Turnspitdog-drawing-remake.jpg", tag: "extinct" },
+  /* 22 September 2026 (owner): moved to the front of the Tudor strip, just after
+     Old Welsh Land Spaniels (anchor 1511), so anchor 1512. The era band stays
+     "1500s": the first written record is Caius in 1570, and the job passed from
+     kitchen boys to dogs during the 1500s. */
+  { name: "Turnspit Dog", strip: "c1500", era: "1500s", anchor: 1512, note: "Short-legged dog bred to run in a wheel and turn the spit. Before dogs, the spit was turned by a kitchen boy.", image: "/history/breeds/Turnspitdog-drawing-remake.jpg", tag: "extinct" },
   { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", image: "/history/breeds/staghound.jpg", tag: "extinct" },
 
   // The 1700s
