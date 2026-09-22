@@ -53,6 +53,18 @@ const W = 620;
 const H = 300;
 const PAD = { l: 44, r: 14, t: 16, b: 34 };
 
+/* The debt in any year, read off the line between the two nearest figures, so a
+   war's start and end can be marked on the line itself (owner, 22 Sept 2026). */
+const debtAt = (year: number) => {
+  if (year <= DEBT[0][0]) return DEBT[0][1];
+  for (let i = 0; i < DEBT.length - 1; i++) {
+    const [ya, va] = DEBT[i];
+    const [yb, vb] = DEBT[i + 1];
+    if (year <= yb) return va + ((vb - va) * (year - ya)) / (yb - ya);
+  }
+  return DEBT[DEBT.length - 1][1];
+};
+
 const px = (year: number) => PAD.l + ((year - X0) / (X1 - X0)) * (W - PAD.l - PAD.r);
 const py = (m: number) => H - PAD.b - (m / YMAX) * (H - PAD.t - PAD.b);
 
@@ -87,6 +99,12 @@ export default function MoneyForShips() {
                     the fill read as a bar chart (owner, 22 Sept 2026). */}
                 <line x1={x0} x2={x0} y1={PAD.t} y2={H - PAD.b} className={styles.warEdge} />
                 <line x1={x1} x2={x1} y1={PAD.t} y2={H - PAD.b} className={styles.warEdge} />
+                <circle cx={x0} cy={py(debtAt(w.from))} r={4.5} className={styles.warStart}>
+                  <title>{`${w.name} begins, ${w.from}`}</title>
+                </circle>
+                <circle cx={x1} cy={py(debtAt(w.to))} r={4.5} className={styles.warEnd}>
+                  <title>{`${w.name} ends, ${w.to}`}</title>
+                </circle>
                 <text x={(x0 + x1) / 2} y={PAD.t} textAnchor="middle" className={styles.warLabel}>
                   {lines.map((l, i) => (
                     <tspan key={l} x={(x0 + x1) / 2} dy={i === 0 ? 0 : 10}>
@@ -131,7 +149,7 @@ export default function MoneyForShips() {
         </p>
       </div>
 
-      <p className={styles.note}>Shaded bands are wars. Figures are the published national debt for the years shown, rounded.</p>
+      <p className={styles.note}>Dashed lines mark wars: a green dot where one starts, a red dot where it ends. Figures are the published national debt for the years shown, rounded.</p>
     </section>
   );
 }

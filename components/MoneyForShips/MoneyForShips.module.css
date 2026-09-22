@@ -77,6 +77,18 @@
   stroke: var(--yellow-header);
   stroke-width: 1.5;
 }
+/* War start and end, on the debt line. The palette has no plain red, so the red
+   is set here (owner, 22 Sept 2026). */
+.warStart {
+  fill: var(--cta);
+  stroke: var(--white);
+  stroke-width: 1.5;
+}
+.warEnd {
+  fill: #e2402f;
+  stroke: var(--white);
+  stroke-width: 1.5;
+}
 
 .facts {
   list-style: none;
