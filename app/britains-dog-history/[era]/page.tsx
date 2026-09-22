@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BreedStrip from "../BreedStrip";
+import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
 import { SECTIONS } from "../../../data/historySections";
@@ -76,6 +77,12 @@ export default async function EraPage({ params }: Props) {
             {section && (
               <div className={styles.sectionHolder}>
                 <HistorySection section={section} />
+              </div>
+            )}
+            {/* Ancient era only: sea level map in its own blue panel (22 Sept 2026). */}
+            {strip === "ancient" && (
+              <div className={styles.sectionHolder}>
+                <SeaLevelMap />
               </div>
             )}
           </div>
