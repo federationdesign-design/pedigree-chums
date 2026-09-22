@@ -315,15 +315,16 @@
     position: static;
     width: 100%;
     margin: 0 0 10px;
-    font-size: 0.9rem;
+    /* 2pt smaller, one row per town (owner, 22 Sept 2026). */
+    font-size: calc(0.9rem - 2pt);
   }
   .townsTitle {
     font-size: 1.25rem;
     white-space: nowrap;
   }
   .townList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2px 14px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
   }
   .caption {
     position: relative;
