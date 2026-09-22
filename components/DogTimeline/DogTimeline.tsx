@@ -39,6 +39,15 @@ const ENTRIES: Entry[] = [
     uk: true,
     text: "DNA from dogs at Neolithic sites in Orkney and Caithness shows that about a quarter of their ancestry came from dogs brought by incoming farmers. The rest came from Britain's older hunter-gatherer dogs.",
   },
+  /* Final entry, owner request 22 Sept 2026: Stonehenge, built from about
+     3000 BC to about 1520 BC (owner's dates). 1,480 years at roughly 25 years
+     a generation is about 60 generations. */
+  {
+    when: "About 5,000 to 3,500 years ago",
+    title: "Stonehenge, Wiltshire",
+    uk: true,
+    text: "Work on Stonehenge began around 3000 BC and carried on until around 1520 BC. That is nearly 1,500 years of building, so the people who finished it lived about 60 generations after the people who started it.",
+  },
 ];
 
 const SOURCES: { label: string; href: string }[] = [
