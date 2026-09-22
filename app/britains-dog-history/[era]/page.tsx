@@ -8,6 +8,7 @@ import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleText
 import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
 import AncientFacts from "../../../components/AncientFacts/AncientFacts";
+import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
 import { SECTIONS } from "../../../data/historySections";
@@ -105,6 +106,13 @@ export default async function EraPage({ params }: Props) {
             {section && (
               <div className={styles.sectionHolder}>
                 <HistorySection section={section} />
+              </div>
+            )}
+            {/* 1800s page only, after the late-1800s strip: dog show boom chart and
+                milestones (22 Sept 2026). */}
+            {strip === "late1800" && (
+              <div className={styles.sectionHolder}>
+                <PedigreeBoom />
               </div>
             )}
           </div>
