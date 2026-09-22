@@ -9,7 +9,8 @@
    the same bargain TimelineRun makes.
 
    FIRST ERA replaced the old DOG HISTORY scroll button on 22 September 2026
-   (owner): it is a plain link to the Medieval era page. The nextPanel prop is
+   (owner): it is a plain link to the first era page, Ancient
+   (Medieval until 22 September 2026, corrected same day). The nextPanel prop is
    gone with it, so the caller no longer passes one.
 
    Under the two buttons sits the rolling breed picker, a scrolling column of
@@ -53,7 +54,7 @@ export default function IntroButtonsV() {
           );
         }}
       />
-      <Link href="/britains-dog-history/medieval" className={`${styles.introBtn} ${styles.introBtnAlt}`}>
+      <Link href="/britains-dog-history/ancient" className={`${styles.introBtn} ${styles.introBtnAlt}`}>
         First era
       </Link>
     </div>
