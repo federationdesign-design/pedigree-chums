@@ -29,7 +29,7 @@ export const ERA_INTRO: Record<string, EraIntro> = {
     note: "At the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
   },
   c1500: {
-    words: ["Tudor", "Times", "Dogs"],
+    words: ["Tudor 'n'", "Stuart", "Dogs"], // renamed 22 Sept 2026 (was Tudor / Times / Dogs); kept to three lines
     note: "The Tudors kept dogs for work and for show, and started writing down which was which",
   },
   c1700: {

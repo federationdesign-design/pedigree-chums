@@ -40,7 +40,9 @@ export const ERA_PAGES: EraPage[] = [
     intro:
       "In 1066 William, Duke of Normandy, sailed to England, saying the old king had promised him the crown. He won the Battle of Hastings, took the throne and became known as William the Conqueror. He also turned huge areas into royal forests for his own hunting, so families who had always gathered firewood, found food and grazed their animals there were suddenly breaking the law.",
   },
-  { slug: "tudor", title: "Tudor Times", strips: ["c1500"] },
+  /* Renamed from "Tudor Times" (owner, 22 Sept 2026): the strip covers the 1500s
+     AND 1600s. Slug kept as "tudor" so shared links still work. */
+  { slug: "tudor", title: "Tudor 'n' Stuart Times", strips: ["c1500"] },
   { slug: "1700s", title: "The 1700s", strips: ["c1700"] },
   {
     slug: "1800s",

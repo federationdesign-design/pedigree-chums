@@ -83,7 +83,7 @@ export const SECTIONS: Section[] = [
     imageAlt: "Medieval working dogs at their jobs, from pack hounds to herders",
   },
   {
-    title: "Tudor Britain",
+    title: "Tudor 'n' Stuart Britain", // renamed 22 Sept 2026 (was "Tudor Britain")
     accent: "Britain",
     anchor: "tudor-britain",
     era: "c1500",
