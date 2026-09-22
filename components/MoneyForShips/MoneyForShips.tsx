@@ -119,9 +119,9 @@ export default function MoneyForShips() {
       </div>
 
       <ul className={styles.facts}>
-        <li><span className={styles.big}>£0.7m</span> owed in 1688, the year William landed</li>
+        <li><span className={styles.big}>£0.7m</span> government debt in 1688</li>
         <li><span className={styles.big}>£132m</span> by 1763, after winning the Seven Years War</li>
-        <li><span className={styles.big}>£523m</span> by 1802, and the biggest navy in the world</li>
+        <li><span className={styles.big}>£523m</span> owed in 1802, and now the most powerful country</li>
       </ul>
       {/* Explainer on bonds (owner request, 22 Sept 2026). Copy flagged for review.
           The last paragraph is deliberately careful: the money was not conjured from
@@ -132,7 +132,7 @@ export default function MoneyForShips() {
           It is not the same as money. A coin is worth what it says right now. A bond is a promise about the future. But because everyone believed Parliament would pay, people bought and sold bonds happily, so a bond worked almost as well as cash.
         </p>
         <p className={styles.explainText}>
-          That belief is what let the government spend sums it did not have. It borrowed from thousands of people at once, paid the interest out of taxes, and the Bank of England printed paper notes backed by the loan. It looked like money out of thin air. Really it was a promise that future taxpayers would pick up the bill, and they did, for two hundred years.
+          That belief is what let the government spend sums it did not have. It borrowed from thousands of rich and wealthy people at once, making what is now known as the 1%, paid the interest out of taxes, and the Bank of England printed paper notes backed by the loan. It looked like money out of thin air. Really it was a promise that future taxpayers would pick up the bill, and they did, for two hundred years.
         </p>
       </div>
 

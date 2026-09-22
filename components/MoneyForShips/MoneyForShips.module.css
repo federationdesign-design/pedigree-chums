@@ -100,7 +100,8 @@
 }
 .big {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 1.5rem;
+  font-size: 3rem; /* twice the size (owner, 22 Sept 2026) */
+  line-height: 1.05;
   color: var(--yellow-header);
   margin-right: 8px;
 }
