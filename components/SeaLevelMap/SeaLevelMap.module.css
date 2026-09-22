@@ -324,3 +324,51 @@
     display: none;
   }
 }
+
+/* Mobile: the slider floats at the bottom of the screen, like the other era maps
+   (owner, 22 Sept 2026). The overlay and its left column become display:contents
+   so the readouts, the map and the controls are all children of .mapWrap; that
+   makes .mapWrap the sticky element's containing block, so the slider stays with
+   the map while the panel is on screen. */
+@media (max-width: 768px) {
+  .mapWrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .overlay,
+  .overlayLeft {
+    display: contents;
+  }
+  .title {
+    order: 0;
+  }
+  .overlayRight {
+    order: 1;
+  }
+  .stats {
+    order: 2;
+  }
+  .caption {
+    order: 3;
+  }
+  .map {
+    order: 4;
+    margin-top: 0;
+  }
+  .controls {
+    order: 5;
+    position: sticky;
+    bottom: 8px;
+    z-index: 5;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(0, 110, 200, 0.85);
+    backdrop-filter: blur(4px);
+  }
+  .overlayBottom {
+    order: 6;
+  }
+}
+
