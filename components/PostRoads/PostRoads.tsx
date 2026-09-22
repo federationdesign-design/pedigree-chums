@@ -74,6 +74,17 @@ const TOWNS: Town[] = [
   { name: "Exeter", at: [-3.53, 50.72], pop: [[1680, 10300]] },
   { name: "Ipswich", at: [1.16, 52.06], pop: [[1680, 9800]] },
   { name: "Great Yarmouth", at: [1.73, 52.61], pop: [[1680, 9200]] },
+  /* More towns on the post roads (owner request, 22 Sept 2026), all Langton (2000)
+     c.1680 figures: Canterbury (Dover road), Salisbury (Plymouth road), Colchester
+     (Yarmouth road), Hull (bye-post), Coventry and Chester (Ireland road), and
+     Plymouth (Langton's table 2). */
+  { name: "Canterbury", at: [1.08, 51.28], pop: [[1680, 7700]] },
+  { name: "Salisbury", at: [-1.79, 51.07], pop: [[1680, 6800]] },
+  { name: "Colchester", at: [0.9, 51.89], pop: [[1680, 6600]] },
+  { name: "Hull", at: [-0.34, 53.74], pop: [[1680, 6600]] },
+  { name: "Coventry", at: [-1.51, 52.41], pop: [[1680, 6400]] },
+  { name: "Chester", at: [-2.89, 53.19], pop: [[1680, 5800]] },
+  { name: "Plymouth", at: [-4.14, 50.37], pop: [[1680, 4000]] },
 ];
 
 const popAt = (pts: [number, number][], y: number) => {
@@ -190,7 +201,12 @@ export default function PostRoads() {
           <polygon points={GB.map(px).join(" ")} className={styles.land} />
           {TOWNS.map((tw) => {
             const [cx, cy] = pt(tw.at);
-            return <circle key={tw.name} cx={cx} cy={cy} r={radius(popAt(tw.pop, year))} className={styles.city} />;
+            const people = popAt(tw.pop, year);
+            return (
+              <circle key={tw.name} cx={cx} cy={cy} r={radius(people)} className={styles.city}>
+                <title>{`${tw.name}: about ${roundPop(people).toLocaleString("en-GB")} people`}</title>
+              </circle>
+            );
           })}
           {ROADS.map((r) => {
             const p = Math.min(1, Math.max(0, (year - r.year) / GROW));
