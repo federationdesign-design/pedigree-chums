@@ -49,8 +49,12 @@
   font-weight: 700;
   fill: var(--white);
 }
-.war {
-  fill: rgba(10, 58, 87, 0.28);
+/* War start and end lines (owner, 22 Sept 2026: the old filled band looked like
+   a bar chart). */
+.warEdge {
+  stroke: var(--white);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
 }
 .warLabel {
   font-family: var(--font-body), system-ui, sans-serif;

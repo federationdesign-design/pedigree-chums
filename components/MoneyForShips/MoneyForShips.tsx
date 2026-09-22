@@ -83,8 +83,11 @@ export default function MoneyForShips() {
             const lines = wrapLabel(w.name, x1 - x0);
             return (
               <g key={w.name}>
-                <rect x={x0} y={PAD.t} width={x1 - x0} height={H - PAD.t - PAD.b} className={styles.war} />
-                <text x={(x0 + x1) / 2} y={PAD.t + 10} textAnchor="middle" className={styles.warLabel}>
+                {/* Dashed lines at the start and end of each war, not a filled band:
+                    the fill read as a bar chart (owner, 22 Sept 2026). */}
+                <line x1={x0} x2={x0} y1={PAD.t} y2={H - PAD.b} className={styles.warEdge} />
+                <line x1={x1} x2={x1} y1={PAD.t} y2={H - PAD.b} className={styles.warEdge} />
+                <text x={(x0 + x1) / 2} y={PAD.t} textAnchor="middle" className={styles.warLabel}>
                   {lines.map((l, i) => (
                     <tspan key={l} x={(x0 + x1) / 2} dy={i === 0 ? 0 : 10}>
                       {l}
