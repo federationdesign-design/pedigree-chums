@@ -84,21 +84,28 @@ export default async function EraPage({ params }: Props) {
           visual match. */}
       <h1 className={styles.srOnly}>{page.title}</h1>
 
+      {/* Ancient page only: map and timeline side by side on desktop, stacked
+          below 1024px, at the top of the page above the strip (owner request,
+          22 Sept 2026). */}
+      {page.slug === "ancient" && (
+        <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+          <div className={styles.pair}>
+            <SeaLevelMap />
+            <DogTimeline />
+          </div>
+        </div>
+      )}
+
       {page.strips.map((strip) => {
         const section = sectionForStrip(strip);
         return (
           <div key={strip}>
             <BreedStrip era={strip} />
-            {/* Ancient era only: sea level map, timeline and fact boxes, placed above
-                the Ancient Dogs write-up panel (owner request, 22 Sept 2026). */}
+            {/* Ancient era only: the three fact boxes, above the Ancient Dogs write-up
+                panel (owner request, 22 Sept 2026). The map and timeline moved to
+                the top of the page, see above. */}
             {strip === "ancient" && (
               <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
-                {/* Map and timeline side by side on desktop, stacked below
-                    1024px (owner request, 22 Sept 2026). */}
-                <div className={styles.pair}>
-                  <SeaLevelMap />
-                  <DogTimeline />
-                </div>
                 {/* Three boxed facts from the social slides (22 Sept 2026). */}
                 <AncientFacts />
               </div>
