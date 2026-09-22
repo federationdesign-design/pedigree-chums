@@ -19,6 +19,28 @@ export default function BreedRoller() {
   const listRef = useRef<HTMLUListElement | null>(null);
   const [centre, setCentre] = useState(0);
 
+  /* Coming back from a dog page should land where the user left off, so the
+     scroll position is kept for the session (owner, 22 Sept 2026). */
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    try {
+      const saved = window.sessionStorage.getItem("pc-breed-roller");
+      if (saved) list.scrollTop = Number(saved);
+    } catch {
+      /* private mode: not worth breaking the picker over */
+    }
+    const save = () => {
+      try {
+        window.sessionStorage.setItem("pc-breed-roller", String(list.scrollTop));
+      } catch {
+        /* as above */
+      }
+    };
+    list.addEventListener("scroll", save, { passive: true });
+    return () => list.removeEventListener("scroll", save);
+  }, []);
+
   /* Highlight whichever dog is nearest the middle of the window. */
   useEffect(() => {
     const list = listRef.current;

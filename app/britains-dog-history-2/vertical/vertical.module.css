@@ -212,6 +212,13 @@
 .introBtn {
   flex: 1 1 0;
   min-width: 0;
+  /* The blue one is a link now, not a button, so the centring a button gives for
+     free has to be said out loud (owner, 22 Sept 2026). */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
   /* 21 top against 16 bottom. Luckiest Guy sits high in its em box, so an even
      padding reads as text pushed toward the top of the button. The extra 5px
      puts it back on the optical middle. */
