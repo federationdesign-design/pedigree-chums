@@ -84,9 +84,11 @@
 .pickedTitle {
   display: block;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 1.6rem;
-  color: var(--yellow-header);
-  margin: 0 0 6px;
+  /* Three times the size and white, not yellow (owner, 22 Sept 2026). */
+  font-size: 4.8rem;
+  line-height: 1.05;
+  color: var(--white);
+  margin: 0 0 10px;
 }
 .tagWall {
   list-style: none;
@@ -136,6 +138,7 @@
 /* Text colour toggle: white text flips to navy; yellow stays. */
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .pickedTitle,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
   color: var(--navy, #0a3a57);
 }
