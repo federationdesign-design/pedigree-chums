@@ -58,17 +58,6 @@ export default function BreedExplosion() {
 
       <div className={styles.chartWrap}>
         <svg viewBox={`0 0 ${W} ${H}`} className={styles.chart} role="img" aria-label="Bar chart of how many British breeds appear in each decade of the 1800s, peaking in the 1870s">
-          {MARKS.map((m) => {
-            const x = PAD.l + ((m.year - FROM) / (TO - FROM)) * (W - PAD.l - PAD.r);
-            return (
-              <g key={m.year}>
-                <line x1={x} x2={x} y1={PAD.t - 12} y2={H - PAD.b} className={styles.markLine} />
-                <text x={x} y={PAD.t - 16} textAnchor="middle" className={styles.markText}>
-                  {m.text} {m.year}
-                </text>
-              </g>
-            );
-          })}
           {decades.map((d, i) => {
             const n = d.dogs.length;
             const on = d.decade === open;
@@ -86,6 +75,18 @@ export default function BreedExplosion() {
               </g>
             );
           })}
+          {/* After the bars, so the dashed line sits on top (owner, 22 Sept 2026). */}
+          {MARKS.map((m) => {
+            const x = PAD.l + ((m.year - FROM) / (TO - FROM)) * (W - PAD.l - PAD.r);
+            return (
+              <g key={m.year}>
+                <line x1={x} x2={x} y1={PAD.t - 12} y2={H - PAD.b} className={styles.markLine} />
+                <text x={x} y={PAD.t - 16} textAnchor="middle" className={styles.markText}>
+                  {m.text} {m.year}
+                </text>
+              </g>
+            );
+          })}
           <line x1={PAD.l} x2={W - PAD.r} y1={H - PAD.b} y2={H - PAD.b} className={styles.axisLine} />
         </svg>
       </div>
@@ -93,7 +94,15 @@ export default function BreedExplosion() {
       {/* Tag wall of the decade's dogs, each with its round portrait where the
           catalogue has one (owner, 22 Sept 2026). */}
       <div className={styles.picked} aria-live="polite">
-        <span className={styles.pickedTitle}>{chosen ? `${chosen.decade}s: ${chosen.dogs.length} dogs` : "Tap a bar"}</span>
+        <span className={styles.pickedTitle}>
+          {chosen ? (
+            <>
+              <span className={styles.pickedYears}>{`${chosen.decade}s:`}</span> {`${chosen.dogs.length} dogs`}
+            </>
+          ) : (
+            "Tap a bar"
+          )}
+        </span>
         <ul className={styles.tagWall}>
           {chosen?.dogs.map((dog) => (
             <li key={dog.name} className={styles.tag}>

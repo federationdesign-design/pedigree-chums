@@ -84,8 +84,11 @@
 }
 .chartTitle {
   display: block;
-  font-weight: 700;
-  margin: 0 0 4px;
+  /* Display font, yellow and bigger (owner, 22 Sept 2026). */
+  font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+  line-height: 1.1;
+  color: var(--yellow-header);
+  margin: 0 0 8px;
 }
 .chart {
   display: block;

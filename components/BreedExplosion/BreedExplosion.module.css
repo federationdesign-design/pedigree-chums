@@ -90,6 +90,10 @@
   color: var(--white);
   margin: 0 0 10px;
 }
+/* The decade stays yellow, the count is white (owner, 22 Sept 2026). */
+.pickedYears {
+  color: var(--yellow-header);
+}
 .tagWall {
   list-style: none;
   display: flex;

@@ -185,14 +185,15 @@ export default function DogCartBan() {
           <text x={mx} y={my - ry - 5} textAnchor="middle" className={styles.ringLabel}>
             15 miles from Charing Cross
           </text>
-          <text x={VIEW.x + VIEW.w / 2} y={VIEW.y + VIEW.h - 8} textAnchor="middle" className={styles.mapNote}>
+          {/* At the top of the map (owner, 22 Sept 2026: it was at the foot). */}
+          <text x={VIEW.x + VIEW.w / 2} y={VIEW.y + 16} textAnchor="middle" className={styles.mapNote}>
             {year < 1840 ? "Dog carts still legal everywhere" : year < 1854 ? "Banned inside the circle" : "Banned across England and Wales"}
           </text>
         </svg>
       </div>
 
       <div className={styles.chartWrap}>
-        <span className={styles.chartTitle}>How many dogs were there?</span>
+        <span className={`display ${styles.chartTitle}`}>How many dogs were there?</span>
         <svg viewBox={`0 0 ${CW} ${CH}`} className={styles.chart} role="img" aria-label="Chart of the estimated number of dogs in England and Wales through the 1800s">
           {[0, 1_000_000, 2_000_000].map((v) => (
             <g key={v}>
