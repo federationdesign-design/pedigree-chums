@@ -41,6 +41,38 @@ const PACK_ALIAS: Record<string, string> = {
   Labrador: "Labrador Retriever",
   Corgi: "Pembroke Welsh Corgi",
 };
+/* HAND-AUTHORED ORIGIN ERAS (owner choice A, 22 Sept 2026). `established` is the
+   year a kennel club recognised a breed, not when the dog first existed, so every
+   ancient breed from abroad was reading "1900s". These are editorial calls on when
+   the TYPE appears, written to the site's own era words, and they are the first
+   thing the lookup tries for a pack chum. Correct any of them here. */
+const PACK_ERA: Record<string, string> = {
+  "Afghan Hound": "Ancient",
+  Maltese: "Ancient",
+  Pug: "Ancient",
+  Chihuahua: "Ancient",
+  "Shih Tzu": "Ancient",
+  "Siberian Husky": "Ancient",
+  "Italian Greyhound": "Ancient",
+  Rottweiler: "Ancient",
+  "Great Dane": "Medieval",
+  Corgi: "Medieval",
+  "Bichon Frise": "Medieval",
+  Poodle: "1500s",
+  Papillon: "1500s",
+  "Saint Bernard": "1600s",
+  Dachshund: "1600s",
+  Dalmatian: "1600s",
+  Pomeranian: "1700s",
+  Weimaraner: "early 1800s",
+  "Boston Terrier": "late 1800s",
+  "Doberman Pinscher": "late 1800s",
+  "German Shepherd": "late 1800s",
+  Boxer: "late 1800s",
+  "Miniature Schnauzer": "late 1800s",
+  "French Bulldog": "late 1800s",
+};
+
 const bandFor = (established: string) => {
   const year = Number(established.match(/[0-9]{4}/)?.[0]);
   if (!year) return "1800s";
@@ -52,7 +84,7 @@ const bandFor = (established: string) => {
   return "1900s";
 };
 const packEra = (name: string, established: string) =>
-  ERA_BY_NAME.get(name) ?? ERA_BY_NAME.get(PACK_ALIAS[name] ?? "") ?? bandFor(established);
+  PACK_ERA[name] ?? ERA_BY_NAME.get(name) ?? ERA_BY_NAME.get(PACK_ALIAS[name] ?? "") ?? bandFor(established);
 
 const PACK_ROWS: Row[] = breeds
   .filter((p) => !LEVEL_ROWS.some((r) => r.name === p.name))

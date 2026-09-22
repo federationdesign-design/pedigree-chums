@@ -86,6 +86,10 @@ const EVENTS: [number, string][] = [
 /* Timeline runs from 14,300 years ago, the Gough's Cave dog (owner request,
    22 Sept 2026; was 13,300, originally 20,000). */
 const START = 14300;
+/* The run stops 2,000 years ago (owner, 22 Sept 2026): everything after that
+   belongs to the other era pages, so this map is not walked into modern times. */
+const STOP = 2000;
+const SPAN = START - STOP;
 /* Site palette from app/globals.css (owner request, 22 Sept 2026). No sea fill:
    the blue panel shows through as the sea. */
 const LAND = "var(--cta)";
@@ -174,8 +178,8 @@ export default function SeaLevelMap() {
     if (!playing) return;
     timer.current = setInterval(() => {
       setT((v) => {
-        const n = Math.min(START, v + 100);
-        if (n >= START) setPlaying(false);
+        const n = Math.min(SPAN, v + 100);
+        if (n >= SPAN) setPlaying(false);
         return n;
       });
     }, 60);
@@ -197,7 +201,7 @@ export default function SeaLevelMap() {
   const iceOpacity = Math.min(0.95, Math.max(0, (yearsAgo - 14500) / 4500));
 
   const togglePlay = () => {
-    if (!playing && t >= START) setT(0);
+    if (!playing && t >= SPAN) setT(0);
     setPlaying((p) => !p);
   };
 
@@ -224,7 +228,7 @@ export default function SeaLevelMap() {
               <input
                 type="range"
                 min={0}
-                max={START}
+                max={SPAN}
                 step={50}
                 value={t}
                 onChange={(e) => {
@@ -248,9 +252,11 @@ export default function SeaLevelMap() {
               </div>
               <div className={`${styles.stat} ${styles.tempStat}`}>
                 <svg viewBox="0 0 20 60" className={styles.thermo} aria-hidden="true">
-                  <rect x={6} y={4} width={8} height={42} rx={4} fill="rgba(255,255,255,0.25)" stroke="#ffffff" strokeWidth={1.5} />
-                  <rect x={8} y={44 - Number(mercury)} width={4} height={Number(mercury) + 4} rx={2} style={{ fill: "var(--family-emergency)" }} />
-                  <circle cx={10} cy={51} r={7} stroke="#ffffff" strokeWidth={1.5} style={{ fill: "var(--family-emergency)" }} />
+                  {/* In a scheme the glass and the mercury are the scheme colour,
+                      so nothing stays pink (owner, 22 Sept 2026). */}
+                  <rect x={6} y={4} width={8} height={42} rx={4} fill={scheme ? "none" : "rgba(255,255,255,0.25)"} stroke={scheme ? fg : "#ffffff"} strokeWidth={1.5} />
+                  <rect x={8} y={44 - Number(mercury)} width={4} height={Number(mercury) + 4} rx={2} style={{ fill: scheme ? fg : "var(--family-emergency)" }} />
+                  <circle cx={10} cy={51} r={7} stroke={scheme ? fg : "#ffffff"} strokeWidth={1.5} style={{ fill: scheme ? fg : "var(--family-emergency)" }} />
                 </svg>
                 <span className={styles.tempText}>
                   <span className={styles.statLabel}>Summer temp</span>

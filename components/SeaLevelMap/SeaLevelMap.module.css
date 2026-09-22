@@ -25,6 +25,8 @@
 }
 
 .title {
+  /* Space above the heading inside the panel (owner, 22 Sept 2026). */
+  padding-top: 30px;
   grid-column: 1 / -1;
   text-align: center;
   font-size: clamp(40px, 6.5vw, 84px);
@@ -393,5 +395,14 @@
   .stats {
     padding: 0 6px;
   }
+}
+
+/* Accessibility schemes: the slider's yellow fill becomes the scheme colour
+   (owner, 22 Sept 2026). */
+:root[data-pc-contrast-scheme="black-on-white"] .slider {
+  accent-color: #000000;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .slider {
+  accent-color: #ffffff;
 }
 
