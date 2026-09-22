@@ -77,7 +77,11 @@ export default function DogCartBan() {
       <div className={styles.mapWrap}>
         <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} className={styles.map} role="img" aria-label="Map of south east England showing the 15 mile circle around Charing Cross where dog carts were banned">
           <polygon points={GB.map((p) => px(p).join(",")).join(" ")} className={styles.land} />
-          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} className={styles.ring} />
+          {/* The map has to move with the story (owner, 22 Sept 2026): the circle
+              fills red once the ban bites in 1840, and the whole country turns red
+              in 1854 when the ban spreads. */}
+          {step >= 2 && <polygon points={GB.map((p) => px(p).join(",")).join(" ")} className={styles.banned} />}
+          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} className={step >= 1 ? styles.ringOn : styles.ring} />
           {TOWNS.map((t) => {
             const [tx, ty] = px(t.at);
             return (
@@ -91,6 +95,9 @@ export default function DogCartBan() {
           })}
           <text x={cx} y={cy - ry - 5} textAnchor="middle" className={styles.ringLabel}>
             15 miles from Charing Cross
+          </text>
+          <text x={VIEW.x + VIEW.w / 2} y={VIEW.y + VIEW.h - 8} textAnchor="middle" className={styles.mapNote}>
+            {step === 0 ? "Dog carts still legal everywhere" : step === 1 ? "Banned inside the circle" : "Banned across England and Wales"}
           </text>
         </svg>
       </div>

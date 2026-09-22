@@ -82,6 +82,21 @@
   stroke-width: 2.5;
   stroke-dasharray: 7 5;
 }
+/* Banned: the palette has no plain red, so it is set here (22 Sept 2026). */
+.ringOn {
+  fill: rgba(226, 64, 47, 0.55);
+  stroke: #e2402f;
+  stroke-width: 2.5;
+}
+.banned {
+  fill: rgba(226, 64, 47, 0.45);
+}
+.mapNote {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  fill: var(--white);
+}
 .town {
   fill: var(--navy);
 }
