@@ -189,7 +189,7 @@ export default function CaiusDogs() {
           word lurcher, from "lurch" (to lurk or steal), is first used for a dog in
           1668 (Wikipedia, Lurcher). */}
       <div className={styles.why}>
-        <h3 className={styles.whyTitle}>Why don&apos;t all these dogs have a level?</h3>
+        <h3 className={styles.whyTitle}>Why don&apos;t all these dogs appear in our timeline?</h3>
         <p className={styles.whyText}>
           Caius named dogs by the job they did, not by breed, and most of those jobs never became breeds of their own. The Gazehound hunted by sight, much like our Rough northern sighthounds. The Wappe and the Dancer were mongrels, like our Cur. The Leviner was an in-between hound that has simply been lost. And the Tumbler and the Stealer were crafty poachers&apos; dogs whose job lives on in today&apos;s Lurcher.
         </p>

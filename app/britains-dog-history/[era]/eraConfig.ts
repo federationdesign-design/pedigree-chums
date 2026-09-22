@@ -42,7 +42,18 @@ export const ERA_PAGES: EraPage[] = [
   },
   /* Renamed from "Tudor Times" (owner, 22 Sept 2026): the strip covers the 1500s
      AND 1600s. Slug kept as "tudor" so shared links still work. */
-  { slug: "tudor", title: "Tudor 'n' Stuart Times", strips: ["c1500"] },
+  {
+    slug: "tudor",
+    title: "Tudor 'n' Stuart Times",
+    strips: ["c1500"],
+    /* Owner request, 22 Sept 2026. Sources: a signpost's "post" is the wooden
+       pole, while the letter post comes from horses "posted" in relays; a 1697
+       Act let magistrates put direction posts where highways crossed, and the
+       oldest surviving fingerpost, near Chipping Campden, is dated 1669
+       (Wikipedia, Fingerpost; Country Life). */
+    intro:
+      "Signposts and the post sound related, but they are not: a signpost is named after a wooden pole, while the letter post comes from horses \"posted\" in relays along the road. Britain got its first direction posts in the late 1600s, and the oldest still standing, from 1669, is near Chipping Campden. Dogs, of course, treated every new post as a message board of their own.",
+  },
   { slug: "1700s", title: "The 1700s", strips: ["c1700"] },
   {
     slug: "1800s",
