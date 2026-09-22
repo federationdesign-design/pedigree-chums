@@ -1,0 +1,50 @@
+/* Era page buttons, the same face as the history intro's FIRST DOG and FIRST ERA
+   (app/britains-dog-history-2/vertical/vertical.module.css .introBtn): green and
+   blue, Luckiest Guy, a solid colour base instead of a shadow. 22 September 2026. */
+
+.row {
+  display: flex;
+  gap: 12px;
+  margin: clamp(16px, 2.4vw, 26px) 0 0;
+  padding: 0 clamp(20px, 6vw, 90px);
+}
+
+.btn {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  /* 21 top against 16 bottom: Luckiest Guy sits high in its em box. */
+  padding: 21px 10px 16px;
+  border: none;
+  border-radius: 14px;
+  background: #22c55e;
+  color: #ffffff;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(0.85rem, 4.2vw, 1.3rem);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  box-shadow: 0 4px 0 #16a34a;
+}
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #16a34a;
+}
+
+.btnAlt {
+  background: #1497d6;
+  box-shadow: 0 4px 0 #0c6a9c;
+}
+.btnAlt:active {
+  box-shadow: 0 2px 0 #0c6a9c;
+}
+
+/* Desktop keeps the plain text link above, so the buttons are a phone thing. */
+@media (min-width: 769px) {
+  .row {
+    display: none;
+  }
+}
