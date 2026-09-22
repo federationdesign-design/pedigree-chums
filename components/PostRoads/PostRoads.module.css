@@ -316,7 +316,9 @@
   .towns {
     position: static;
     width: 100%;
-    margin: 0 0 10px;
+    /* Nudged down, clear of the slider above and the map below (owner,
+       22 Sept 2026). */
+    margin: 10px 0 20px;
     /* 2pt smaller, one row per town (owner, 22 Sept 2026). */
     font-size: calc(0.9rem - 2pt);
   }
