@@ -54,7 +54,18 @@ export const ERA_PAGES: EraPage[] = [
     intro:
       "Signposts and the post sound related, but they are not: a signpost is named after a wooden pole, while the letter post comes from horses \"posted\" in relays along the road. Britain got its first direction posts in the late 1600s, and the oldest still standing, from 1669, is near Chipping Campden. Dogs, of course, treated every new post as a message board of their own.",
   },
-  { slug: "1700s", title: "The 1700s", strips: ["c1700"] },
+  {
+    slug: "1700s",
+    title: "The 1700s",
+    strips: ["c1700"],
+    /* Owner request, 22 Sept 2026: the William of Orange story, saved for this
+       page. Sources: The National Archives (the Immortal Seven's letter of 30
+       June 1688, Edward Russell coded as "35"); UK Parliament (landing at Brixham,
+       5 November 1688, James II fled to France); Wikipedia, Pug (a pug travelled
+       with William and Mary in 1688). */
+    intro:
+      "In 1688, seven powerful English lords secretly wrote to William of Orange, the leader of the Dutch Republic, asking him to come and replace King James II. Their letter even used code numbers instead of names. William landed at Brixham with a Dutch army, James fled to France, and William and his wife Mary became king and queen. They brought their pugs with them, and Britain has loved the pug ever since.",
+  },
   {
     slug: "1800s",
     title: "The 1800s",

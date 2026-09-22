@@ -96,6 +96,38 @@ export const TUDOR_FACTS: Fact[] = [
   },
 ];
 
+/* 1700s page boxes (owner request, 22 Sept 2026): how the Dutch grew powerful,
+   how Britain copied their model, and how the money built an empire. Sources:
+   Wikipedia, Financial Revolution (reforms modelled on Dutch practice, first
+   government bonds 1693, Bank of England 1694); Tontine Coffee-House (the loan
+   that founded the Bank was to rebuild the navy after a crushing defeat);
+   predictivehistory.com and UK Parliament (parliament-backed borrowing let
+   Britain outspend France and fund the empire). The Dutch East India Company
+   (1602) and the Raid on the Medway (1667) are standard history. */
+export const EIGHTEENTH_FACTS: Fact[] = [
+  {
+    heading: "The Dutch ruled the waves",
+    paras: [
+      "In the 1600s the small Dutch Republic had some of the biggest trading fleets in the world, and its East India Company, set up in 1602, sold shares to ordinary investors.",
+      "In 1667 the Dutch navy even sailed up the River Medway in Kent, burned English warships and towed away the fleet's flagship, the Royal Charles.",
+    ],
+  },
+  {
+    heading: "Copying the Dutch",
+    paras: [
+      "Rich English merchants admired how the Dutch raised money. When William arrived, England copied their ideas: the first government bonds in 1693, then the Bank of England in 1694.",
+      "The Bank's very first job was lending money to the government to rebuild the navy.",
+    ],
+  },
+  {
+    heading: "From island to empire",
+    paras: [
+      "Because Parliament promised to pay back what it borrowed, Britain could borrow more cheaply than its rivals. That money paid for a huge navy.",
+      "Through the 1700s a small island nation fought old enemies like France and Spain, and new rivals, on the other side of the world, laying the foundations of the British Empire.",
+    ],
+  },
+];
+
 /* `facts` lets other era pages reuse the same heading, boxes and styling
    (22 Sept 2026); Ancient passes nothing and gets its own boxes as before. */
 export default function AncientFacts({ facts = FACTS }: { facts?: Fact[] }) {
