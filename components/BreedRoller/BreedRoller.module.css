@@ -3,10 +3,11 @@
 
 .picker {
   width: 100%;
-  /* auto pushes the picker to the foot of the intro slide when that slide is a
-     flex column, and reads as 0 elsewhere (owner, 22 Sept 2026). */
-  margin: auto 0 0;
-  padding-top: 6px;
+  /* No auto margin (owner, 22 Sept 2026): the intro body is already a flex column
+     with justify-content: flex-end, so an auto top margin only pushed the picker
+     away from the buttons and left a hole. As a plain last child, the whole stack
+     sits at the foot of the screen together. */
+  margin: 0;
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
 }

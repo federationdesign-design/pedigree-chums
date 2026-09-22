@@ -24,13 +24,21 @@ export default function BreedRoller() {
   const [centre, setCentre] = useState(0);
 
   /* Coming back from a dog page should land where the user left off, so the
-     scroll position is kept for the session (owner, 22 Sept 2026). */
+     scroll position is kept for the session (owner, 22 Sept 2026).
+
+     On a first visit the list is scrolled so the FIRST dog is already under the
+     marker. The list has to carry half its own height as top padding for any
+     item to reach the centre, and at scrollTop 0 that padding showed as a blank
+     band under the heading. Scrolling it away is the fix; do not delete the
+     padding, or nothing can be centred. */
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
+    const first = list.firstElementChild as HTMLElement | null;
+    const centreFirst = first ? first.offsetTop + first.offsetHeight / 2 - list.clientHeight / 2 : 0;
     try {
       const saved = window.sessionStorage.getItem("pc-breed-roller");
-      if (saved) list.scrollTop = Number(saved);
+      list.scrollTop = saved ? Number(saved) : centreFirst;
     } catch {
       /* private mode: not worth breaking the picker over */
     }
