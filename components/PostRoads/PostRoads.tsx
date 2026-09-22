@@ -62,18 +62,21 @@ const ROADS: Road[] = [
    8,000 to 9,000 c.1520 (eHRAF); all 1680 figures from Langton (2000), as tabled
    in Bogart's historic urban dataset. Towns with only a 1680 figure are shown at
    that size throughout. All are estimates. */
-type Town = { name: string; at: LL; pop: [number, number][]; label?: boolean };
+/* `left`: label on the left, for towns near the right edge. Every town except
+   London (which has its own label) is named on the map (owner request, 22 Sept
+   2026; previously only four were). */
+type Town = { name: string; at: LL; pop: [number, number][]; left?: boolean };
 const TOWNS: Town[] = [
   { name: "London", at: LONDON, pop: [[1520, 55000], [1600, 200000], [1700, 600000]] },
-  { name: "Norwich", at: [1.3, 52.63], pop: [[1520, 12000], [1700, 30000]], label: true },
+  { name: "Norwich", at: [1.3, 52.63], pop: [[1520, 12000], [1700, 30000]] },
   { name: "Bristol", at: [-2.59, 51.45], pop: [[1520, 8500], [1680, 13500]] },
-  { name: "York", at: [-1.08, 53.96], pop: [[1520, 8500], [1680, 14200]], label: true },
-  { name: "Newcastle", at: [-1.61, 54.97], pop: [[1680, 11600]], label: true },
+  { name: "York", at: [-1.08, 53.96], pop: [[1520, 8500], [1680, 14200]] },
+  { name: "Newcastle", at: [-1.61, 54.97], pop: [[1680, 11600]] },
   { name: "Oxford", at: [-1.26, 51.75], pop: [[1680, 11100]] },
-  { name: "Cambridge", at: [0.12, 52.2], pop: [[1680, 10600]], label: true },
+  { name: "Cambridge", at: [0.12, 52.2], pop: [[1680, 10600]] },
   { name: "Exeter", at: [-3.53, 50.72], pop: [[1680, 10300]] },
   { name: "Ipswich", at: [1.16, 52.06], pop: [[1680, 9800]] },
-  { name: "Great Yarmouth", at: [1.73, 52.61], pop: [[1680, 9200]] },
+  { name: "Great Yarmouth", at: [1.73, 52.61], pop: [[1680, 9200]], left: true },
   /* More towns on the post roads (owner request, 22 Sept 2026), all Langton (2000)
      c.1680 figures: Canterbury (Dover road), Salisbury (Plymouth road), Colchester
      (Yarmouth road), Hull (bye-post), Coventry and Chester (Ireland road), and
@@ -86,6 +89,9 @@ const TOWNS: Town[] = [
   { name: "Chester", at: [-2.89, 53.19], pop: [[1680, 5800]] },
   { name: "Plymouth", at: [-4.14, 50.37], pop: [[1680, 4000]] },
 ];
+
+/* Road ends that are also towns are named by the town label, not twice. */
+const TOWN_NAMES = new Set([...TOWNS.map((tw) => tw.name), "Yarmouth"]);
 
 const popAt = (pts: [number, number][], y: number) => {
   if (y <= pts[0][0]) return pts[0][1];
@@ -244,17 +250,24 @@ export default function PostRoads() {
                 {p >= 1 && (
                   <>
                     <circle cx={ex} cy={ey} r={1.8} className={styles.town} />
-                    <text x={r.left ? ex - 2.6 : ex + 2.6} y={ey + 1.8} textAnchor={r.left ? "end" : "start"} className={styles.townLabel}>{r.end}</text>
+                    {!TOWN_NAMES.has(r.end) && (
+                    <text x={r.left ? ex - 2.6 : ex + 2.6} y={ey + 1.8} textAnchor={r.left ? "end" : "start"} className={styles.townLabel}>{r.end}</text>)}
                   </>
                 )}
               </g>
             );
           })}
-          {TOWNS.filter((tw) => tw.label).map((tw) => {
+          {TOWNS.filter((tw) => tw.name !== "London").map((tw) => {
             const [cx, cy] = pt(tw.at);
             const r = radius(popAt(tw.pop, year));
             return (
-              <text key={tw.name} x={cx + r + 1.2} y={cy - r - 0.6} className={styles.cityLabel}>
+              <text
+                key={tw.name}
+                x={tw.left ? cx - r - 1.2 : cx + r + 1.2}
+                y={cy - r - 0.6}
+                textAnchor={tw.left ? "end" : "start"}
+                className={styles.cityLabel}
+              >
                 {tw.name}
               </text>
             );
