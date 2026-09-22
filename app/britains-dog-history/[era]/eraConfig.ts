@@ -36,9 +36,15 @@ export const ERA_PAGES: EraPage[] = [
     /* Owner request, 22 Sept 2026 (option A: the accurate 1066 story; the 1688
        "invitation" story belongs to William III, not the Conqueror). Sources:
        English Heritage and History.com on 1066; forest-law restrictions per
-       History Hit and encyclopedia.com "forest laws". */
+       History Hit and encyclopedia.com "forest laws".
+
+       REWRITTEN 22 Sept 2026 to the owner's words, with two corrections kept:
+       1066 is the START of the medieval period in England, not the end, and the
+       king who disbelieved William was Harold Godwinson, Edward the Confessor's
+       brother-in-law, not his son (Edward had no children). The forest sentence
+       moved to the King's Forests panel, where the map shows it. */
     intro:
-      "In 1066 William, Duke of Normandy, sailed to England, saying the old king had promised him the crown. He won the Battle of Hastings, took the throne and became known as William the Conqueror. He also turned huge areas into royal forests for his own hunting, so families who had always gathered firewood, found food and grazed their animals there were suddenly breaking the law.",
+      "In 1066, at the start of the medieval period, William, a duke from Normandy in France, sailed to England proclaiming that the old English king had promised him the crown when he died. He had to fight for it, because the new English king, Harold, did not believe him. He won the Battle of Hastings, took the throne and became known as William the Conqueror.",
   },
   /* Renamed from "Tudor Times" (owner, 22 Sept 2026): the strip covers the 1500s
      AND 1600s. Slug kept as "tudor" so shared links still work. */

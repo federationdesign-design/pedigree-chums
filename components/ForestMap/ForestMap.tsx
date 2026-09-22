@@ -133,7 +133,7 @@ export default function ForestMap() {
         The King&apos;s <span className="display-yellow">Forests</span>
       </h2>
       <p className={styles.intro}>
-        After 1066, Norman kings turned huge areas of England into royal forests, where only the king could hunt. Press play to watch them grow, then shrink.
+        He also turned huge areas into royal forests for his own hunting, so families who had always gathered firewood, found food and grazed their animals there were suddenly breaking the law. Press play to watch them grow, then shrink.
       </p>
 
       <div className={styles.controls}>
