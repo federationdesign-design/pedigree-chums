@@ -5327,7 +5327,15 @@ className={[
                 gate and the same position as before. pointer-events none, so a pill can
                 never catch the drag meant for the card beneath it. Lift only; every
                 other mode still draws its pill with the node. */}
-            {circular && shown
+            {/* THE PILLS FADE WITH THE TREE, 21 September 2026 (owner: the blue pills should
+                fade out at the same point as the nodes and connectors, once every circle is
+                placed in the frames). Being their own pass, they no longer sat inside the
+                tree's group, so its fade never reached them. This group carries the tree
+                group's exact rule: the same opacity test, the same 0.7s ease on completion,
+                the same drag fade and hidden when scattered. */}
+            {circular && (
+            <g style={{ opacity: removing || scattered || dragFocus || treeDone ? 0 : 1, display: scattered ? "none" : undefined, transition: treeDone && !dragFocus && !removing && !scattered ? "opacity 0.7s ease" : DRAG_FADE, pointerEvents: "none" }}>
+            {shown
               .filter((n) => n._parent && !soloLeaf && !hiddenIds.has(n._id))
               .map((n) => {
                 const hasKids = !!(n.children && n.children.length);
@@ -5351,6 +5359,8 @@ className={[
                   </g>
                 );
               })}
+            </g>
+            )}
 {/* stacked duplicate cards rendered as fixed HTML below */}
             {/* In the mini pit this is drawn in its own layer above the cards
                 instead, see liftRoot below. The placed cards are HTML with a
