@@ -302,3 +302,32 @@
 .swatchNl {
   width: 18px;
 }
+
+/* Mobile layout fix (owner, 22 Sept 2026): the overlaid towns box covered the
+   caption and its title wrapped, so on small screens the box drops out of the
+   map and becomes a plain two-column list above it, and the map is not pulled
+   up under the controls. */
+@media (max-width: 768px) {
+  .mapWrap {
+    margin-top: 0;
+  }
+  .towns {
+    position: static;
+    width: 100%;
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+  }
+  .townsTitle {
+    font-size: 1.25rem;
+    white-space: nowrap;
+  }
+  .townList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 14px;
+  }
+  .caption {
+    position: relative;
+    z-index: 2;
+  }
+}
+
