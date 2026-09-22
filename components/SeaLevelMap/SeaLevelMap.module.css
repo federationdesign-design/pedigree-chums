@@ -48,7 +48,8 @@
 
 .overlayLeft {
   justify-self: start;
-  width: min(88%, 440px);
+  /* Widened from 440px for the third (temperature) card, 22 Sept 2026. */
+  width: min(88%, 540px);
 }
 
 .overlayRight {
@@ -100,7 +101,7 @@
 
 .stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
   margin: 0 0 12px;
 }
@@ -109,6 +110,22 @@
   background: rgba(255, 255, 255, 0.16);
   border-radius: 18px;
   padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Third indicator: vertical thermometer beside the value (22 Sept 2026). */
+.tempStat {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.thermo {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 54px;
+}
+.tempText {
   display: flex;
   flex-direction: column;
 }

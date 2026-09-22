@@ -42,6 +42,22 @@ const ICE: LL[] = [[-10.5,51.8],[-8,51.3],[-6.3,50],[-5,51.3],[-4,51.9],[-3,52.3
 /* Approximate relative sea level, [years ago, metres against today]. */
 const CURVE: [number, number][] = [[20000,-120],[16000,-100],[14500,-80],[12000,-60],[11000,-50],[10000,-40],[9000,-28],[8500,-24],[8000,-18],[7500,-12],[7000,-8],[6000,-4],[5000,-2],[0,0]];
 
+/* Approximate average July temperature in southern Britain, [years ago, degrees C].
+   Rounded from fossil beetle studies: warm at the start, a sharp cold snap (the
+   Younger Dryas, about 12,900 to 11,700 years ago), then fast warming. Added
+   22 Sept 2026 at owner request. Flagged for owner review. */
+const TEMP: [number, number][] = [[13300,14],[12900,13],[12700,10],[11800,10],[11500,16],[9000,17.5],[6000,17],[3000,16],[0,16.5]];
+const T_MIN = 8;
+const T_MAX = 20;
+
+const tempAt = (y: number) => {
+  for (let i = 0; i < TEMP.length - 1; i++) {
+    const [a, b] = [TEMP[i], TEMP[i + 1]];
+    if (y <= a[0] && y >= b[0]) return a[1] + ((b[1] - a[1]) * (a[0] - y)) / (a[0] - b[0]);
+  }
+  return TEMP[TEMP.length - 1][1];
+};
+
 const seaAt = (y: number) => {
   for (let i = 0; i < CURVE.length - 1; i++) {
     const [a, b] = [CURVE[i], CURVE[i + 1]];
@@ -90,6 +106,10 @@ export default function SeaLevelMap() {
 
   const yearsAgo = START - t;
   const sea = seaAt(yearsAgo);
+  const temp = tempAt(yearsAgo);
+  const tempShown = Math.round(temp);
+  /* Thermometer tube interior runs y 6 to 44 in its 20 x 60 viewBox. */
+  const mercury = (38 * Math.min(1, Math.max(0, (temp - T_MIN) / (T_MAX - T_MIN)))).toFixed(1);
   const seaShown = Math.round(sea);
   const caption = EVENTS.find((e) => yearsAgo >= e[0])?.[1] ?? "";
   const iceOpacity = Math.min(0.95, Math.max(0, (yearsAgo - 13500) / 4500));
@@ -143,6 +163,17 @@ export default function SeaLevelMap() {
               <div className={styles.stat}>
                 <span className={styles.statLabel}>Sea level</span>
                 <span className={styles.statValue}>{seaShown === 0 ? "0" : seaShown} m</span>
+              </div>
+              <div className={`${styles.stat} ${styles.tempStat}`}>
+                <svg viewBox="0 0 20 60" className={styles.thermo} aria-hidden="true">
+                  <rect x={6} y={4} width={8} height={42} rx={4} fill="rgba(255,255,255,0.25)" stroke="#ffffff" strokeWidth={1.5} />
+                  <rect x={8} y={44 - Number(mercury)} width={4} height={Number(mercury) + 4} rx={2} style={{ fill: "var(--family-emergency)" }} />
+                  <circle cx={10} cy={51} r={7} stroke="#ffffff" strokeWidth={1.5} style={{ fill: "var(--family-emergency)" }} />
+                </svg>
+                <span className={styles.tempText}>
+                  <span className={styles.statLabel}>Summer temp</span>
+                  <span className={styles.statValue}>{tempShown}&deg;C</span>
+                </span>
               </div>
             </div>
 
