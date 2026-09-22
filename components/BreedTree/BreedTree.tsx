@@ -430,6 +430,14 @@ const TOY_BONE_GAP = 900;
    The 80 degree drop angle is the main pit's too. It arrives tipped almost onto
    its rim rather than flat, so it topples as it settles. */
 const TOY_BOWL_SRC = "/dog-bowl-2.svg";
+/* THE ACCESSIBILITY VIEWS' TOYS, 21 September 2026 (owner: in the play area the tennis
+   balls go yellow to white and pink to light grey, and the bowl to white). Separate
+   artwork rather than a filter, so each is an exact colour: the same drawings with the
+   ball's panels white or light grey (#cccccc) and the black seam kept, and the bowl's
+   tones mapped to white and light greys by their brightness, so its shape still reads. */
+const TOY_BALL_WHITE_SRC = "/tennis-ball-white.svg";
+const TOY_BALL_GREY_SRC = "/tennis-ball-grey.svg";
+const TOY_BOWL_WHITE_SRC = "/dog-bowl-2-white.svg";
 const BOWL_ASPECT = 3.22;
 const BOWL_VB_W = 1031.7;
 const BOWL_VB_H = 316.8;
@@ -14173,8 +14181,9 @@ export default function BreedTree({
                     <>
                       <clipPath id={`bt-toy-${i2}`}><circle cx={0} cy={0} r={half} /></clipPath>
                       <image href={ty.src} x={-half} y={-half} width={ty.size} height={ty.size}
-                        clipPath={`url(#bt-toy-${i2})`} preserveAspectRatio="xMidYMid slice" />
-                      <circle cx={0} cy={0} r={half} style={{ fill: "none", stroke: "#ffffff", strokeWidth: ty.size * 0.06 }} />
+                        clipPath={`url(#bt-toy-${i2})`} preserveAspectRatio="xMidYMid slice"
+                        style={scheme ? { filter: "grayscale(1)" } : undefined} />
+                      <circle cx={0} cy={0} r={half} style={{ fill: "none", stroke: sInk ?? "#ffffff", strokeWidth: ty.size * 0.06 }} />
                     </>
                   ) : (
                     /* THE FUSED BONE. Two nodes rather than one swapped href,
@@ -14185,8 +14194,19 @@ export default function BreedTree({
                        without needing a canvas. Outside the fuse the second
                        node is simply not rendered. */
                     <>
-                      <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
-                        style={ty.filter ? { filter: ty.filter } : undefined} />
+                      {/* In an accessibility view: the balls and the bowl swap to their
+                          black-and-white artwork (see TOY_BALL_WHITE_SRC), the pink
+                          ball's draining filter is dropped since its grey is exact, and
+                          every other toy is greyed. Outside a view, as before. */}
+                      <image href={!scheme ? ty.src
+                          : ty.kind === "ball" ? TOY_BALL_WHITE_SRC
+                          : ty.kind === "ballPink" ? TOY_BALL_GREY_SRC
+                          : ty.kind === "bowl" ? TOY_BOWL_WHITE_SRC
+                          : ty.src}
+                        x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
+                        style={scheme
+                          ? (ty.kind === "ball" || ty.kind === "ballPink" || ty.kind === "bowl" ? undefined : { filter: "grayscale(1)" })
+                          : ty.filter ? { filter: ty.filter } : undefined} />
                       {(boneFuse?.idx === i2 || boneNear === i2) && (
                         <image href={TOY_BONE_OHYEA_SRC} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
                           style={boneFuse?.idx === i2 ? {
