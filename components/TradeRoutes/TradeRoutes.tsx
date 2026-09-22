@@ -1,0 +1,182 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import styles from "./TradeRoutes.module.css";
+import { WORLD_PATHS, lonX, latY } from "../../data/worldOutline";
+
+/* Ships, Spices and Pugs: the English and Dutch sea routes east, 1600 to 1800.
+   The 1700s era page, added 22 September 2026 at the owner's request. Copy
+   flagged for owner review.
+
+   SIMPLIFIED: each route is drawn through a handful of waypoints on its general
+   line, not a real sailing track. Dates are the founding or first-trading dates
+   of the places named. Sources: the East India Company's 1600 charter and the
+   Dutch East India Company's 1602 charter; Batavia 1619; Madras 1639; the Dutch
+   Cape supply station 1652; Bombay handed to the company 1668; Calcutta 1690;
+   English trade at Canton from 1699; and a pug travelling with William III and
+   Mary II in 1688 (Wikipedia, Pug). */
+
+const VIEW = { x: 0, y: 60, w: 1080, h: 345 };
+const START = 1600;
+const END = 1800;
+
+type LL = [number, number];
+const pts = (a: LL[]) => a.map(([lo, la]) => `${lonX(lo).toFixed(1)},${latY(la).toFixed(1)}`).join(" ");
+
+/* Route waypoints, London or Amsterdam out to the east. */
+const EN_INDIA: LL[] = [[0, 51.5], [-10, 44], [-25, 18], [-30, -5], [-10, -30], [18, -34.4], [50, -30], [72, 5], [80.3, 13.1]];
+const EN_BENGAL: LL[] = [[80.3, 13.1], [84, 18], [88.4, 22.6]];
+const EN_CHINA: LL[] = [[80.3, 13.1], [95, 6], [105, 3], [110, 14], [113.3, 23.1]];
+const NL_EAST: LL[] = [[4.9, 52.4], [-6, 46], [-22, 14], [-28, -8], [-8, -32], [18, -34.4], [55, -28], [85, -12], [106.8, -6.2]];
+
+type Port = { year: number; name: string; at: LL; dog?: boolean; left?: boolean };
+const PORTS: Port[] = [
+  { year: 1600, name: "London", at: [0, 51.5], left: true },
+  { year: 1602, name: "Amsterdam", at: [4.9, 52.4] },
+  { year: 1619, name: "Batavia", at: [106.8, -6.2] },
+  { year: 1639, name: "Madras", at: [80.3, 13.1], left: true },
+  { year: 1652, name: "Cape Town", at: [18, -34.4] },
+  { year: 1668, name: "Bombay", at: [72.8, 19], left: true },
+  { year: 1688, name: "Pugs reach England", at: [-2, 54], dog: true, left: true },
+  { year: 1690, name: "Calcutta", at: [88.4, 22.6] },
+  { year: 1699, name: "Canton", at: [113.3, 23.1] },
+];
+
+/* What came back, drawn as small labels once the route reaches them. */
+const GOODS: { year: number; text: string; at: LL }[] = [
+  { year: 1619, text: "Nutmeg, cloves, pepper", at: [122, -12] },
+  { year: 1639, text: "Cotton, silk, pepper", at: [74, 5] },
+  { year: 1699, text: "Tea, porcelain, and pugs", at: [118, 32] },
+];
+
+const EVENTS: [number, string][] = [
+  [1699, "English ships begin trading at Canton in China. Tea, silk and porcelain sail home, and so do small flat-faced dogs from the east."],
+  [1690, "Calcutta is founded. English trading posts now ring the Indian coast."],
+  [1688, "William and Mary sail from the Netherlands to take the English throne, and their pugs come too. The pug had reached Europe on Dutch trading ships from China."],
+  [1668, "Bombay is handed to the East India Company, giving it a harbour of its own."],
+  [1652, "The Dutch set up a supply station at the Cape of Good Hope, halfway to the east."],
+  [1639, "The English build a fort at Madras, their first real foothold in India."],
+  [1619, "The Dutch make Batavia, today's Jakarta, the capital of their eastern trade. The Spice Islands are the richest prize of all."],
+  [1602, "The Dutch East India Company is founded, and sells shares to ordinary people to pay for its ships."],
+  [1600, "Queen Elizabeth I grants a charter to the East India Company. Its ships have to sail right around Africa to reach the east."],
+];
+
+export default function TradeRoutes() {
+  const [t, setT] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const span = END - START;
+
+  useEffect(() => {
+    if (!playing) return;
+    timer.current = setInterval(() => {
+      setT((v) => {
+        const n = Math.min(span, v + 1);
+        if (n >= span) setPlaying(false);
+        return n;
+      });
+    }, 50);
+    return () => {
+      if (timer.current) clearInterval(timer.current);
+    };
+  }, [playing, span]);
+
+  const year = START + t;
+  const caption = EVENTS.find((e) => year >= e[0])?.[1] ?? "";
+  const grow = (from: number) => Math.min(1, Math.max(0, (year - from) / 10));
+
+  const togglePlay = () => {
+    if (!playing && t >= span) setT(0);
+    setPlaying((p) => !p);
+  };
+
+  const route = (d: LL[], from: number, cls: string) => {
+    const p = grow(from);
+    if (p <= 0) return null;
+    return <polyline points={pts(d)} pathLength={1} className={cls} strokeDasharray={cls === styles.routeNl ? undefined : "1"} strokeDashoffset={cls === styles.routeNl ? undefined : 1 - p} opacity={cls === styles.routeNl ? p : 1} />;
+  };
+
+  return (
+    <section className={styles.panel} aria-labelledby="trade-routes-title">
+      <h2 id="trade-routes-title" className={`display ${styles.title}`}>
+        Ships, Spices and <span className="display-yellow">Pugs</span>
+      </h2>
+      <p className={styles.intro}>
+        Dutch and English ships sailed halfway round the world for spices, cotton, tea and silk. Dogs came home with them. Press play to watch the trade routes open up.
+      </p>
+
+      <div className={styles.controls}>
+        <button type="button" className={styles.play} onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
+          {playing ? (
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" /><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+          )}
+        </button>
+        <input
+          type="range"
+          min={0}
+          max={span}
+          step={1}
+          value={t}
+          onChange={(ev) => {
+            setPlaying(false);
+            setT(Number(ev.target.value));
+          }}
+          className={styles.slider}
+          aria-label="Year"
+          aria-valuetext={`${year}`}
+        />
+      </div>
+
+      <div className={styles.stats}>
+        <div className={styles.stat}>
+          <span className={styles.statValue}>Year</span>
+          <span className={styles.statLabel}>{year}</span>
+        </div>
+        <div className={styles.stat}>
+          <span className={styles.statValue}>Trading posts</span>
+          <span className={styles.statLabel}>{PORTS.filter((p) => !p.dog && year >= p.year).length}</span>
+        </div>
+      </div>
+
+      <p className={styles.caption} aria-live="polite">{caption}</p>
+
+      <div className={styles.mapWrap}>
+        <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} className={styles.map} role="img" aria-label={`World map of Dutch and English trade routes in ${year}`}>
+          {WORLD_PATHS.map((d, i) => (
+            <path key={i} d={d} className={styles.land} />
+          ))}
+          {route(NL_EAST, 1602, styles.routeNl)}
+          {route(EN_INDIA, 1600, styles.routeEn)}
+          {route(EN_BENGAL, 1690, styles.routeEn)}
+          {route(EN_CHINA, 1699, styles.routeEn)}
+          {GOODS.filter((g) => year >= g.year).map((g) => (
+            <text key={g.text} x={lonX(g.at[0])} y={latY(g.at[1])} className={styles.portLabel} opacity={grow(g.year)}>
+              {g.text}
+            </text>
+          ))}
+          {PORTS.filter((p) => year >= p.year).map((p) => {
+            const cx = lonX(p.at[0]);
+            const cy = latY(p.at[1]);
+            return (
+              <g key={p.name} opacity={grow(p.year)}>
+                <circle cx={cx} cy={cy} r={p.dog ? 6 : 5} className={p.dog ? styles.dogPort : styles.port} />
+                <text x={p.left ? cx - 8 : cx + 8} y={cy + 3.5} textAnchor={p.left ? "end" : "start"} className={styles.portLabel}>
+                  {p.name}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      <ul className={styles.legend}>
+        <li><span className={`${styles.swatch} ${styles.swatchEn}`} aria-hidden="true" /> English route</li>
+        <li><span className={styles.swatchNl} aria-hidden="true" /> Dutch route</li>
+        <li><span className={`${styles.swatch} ${styles.swatchLand}`} aria-hidden="true" /> Land</li>
+      </ul>
+      <p className={styles.note}>Simplified map. Routes are drawn through a few points on their general line, not real sailing tracks.</p>
+    </section>
+  );
+}

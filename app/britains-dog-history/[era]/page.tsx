@@ -10,6 +10,8 @@ import DomesdayMap from "../../../components/DomesdayMap/DomesdayMap";
 import ForestMap from "../../../components/ForestMap/ForestMap";
 import PostRoads from "../../../components/PostRoads/PostRoads";
 import CaiusDogs from "../../../components/CaiusDogs/CaiusDogs";
+import TradeRoutes from "../../../components/TradeRoutes/TradeRoutes";
+import MoneyForShips from "../../../components/MoneyForShips/MoneyForShips";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
 import AncientFacts, { MEDIEVAL_FACTS, TUDOR_FACTS, EIGHTEENTH_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
@@ -130,6 +132,17 @@ export default async function EraPage({ params }: Props) {
           <div className={styles.pair}>
             <PostRoads />
             <CaiusDogs />
+          </div>
+        </div>
+      )}
+
+      {/* 1700s page only: the trade map and the money chart, side by side on
+          desktop (22 Sept 2026). */}
+      {page.slug === "1700s" && (
+        <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+          <div className={styles.pair}>
+            <TradeRoutes />
+            <MoneyForShips />
           </div>
         </div>
       )}
