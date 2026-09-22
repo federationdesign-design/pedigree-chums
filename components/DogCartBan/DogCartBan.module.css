@@ -142,14 +142,14 @@
 }
 /* Banned: the palette has no plain red, so it is set here (22 Sept 2026). */
 .ringOn {
-  fill: rgba(226, 64, 47, 0.55);
+  fill: #e2402f;
   stroke: #e2402f;
   stroke-width: 2.5;
 }
 .banned {
-  /* Same alpha as the circle, so the whole country turns exactly the circle's
-     red rather than an olive (owner, 22 Sept 2026). */
-  fill: rgba(226, 64, 47, 0.55);
+  /* Solid red, not a wash over the green: a 55% red over green read as olive
+     (owner, 22 Sept 2026). */
+  fill: #e2402f;
 }
 .mapNote {
   font-family: var(--font-body), system-ui, sans-serif;
