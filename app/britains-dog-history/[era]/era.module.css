@@ -79,11 +79,11 @@
 
 /* Visually hidden, still read by screen readers and search. The visible era
    heading is BreedStrip's stripLabel span, kept identical to the history page. */
-/* Visible page h1 (22 Sept 2026): takes .stripLabel's look; this only resets the
-   h1 defaults. Luckiest Guy has one weight, so no faux bold. */
+/* Visible page h1 (22 Sept 2026): look comes from global .display and the history
+   page's .title; this only centres it and spaces it from the toggle. */
 .pageTitle {
-  margin-top: 0;
-  font-weight: 400;
+  text-align: center;
+  margin: 0 0 clamp(20px, 3vw, 34px);
 }
 
 .srOnly {

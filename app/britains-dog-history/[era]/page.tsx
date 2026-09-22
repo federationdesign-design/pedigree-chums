@@ -15,6 +15,7 @@ import { SECTIONS } from "../../../data/historySections";
 import { ERA_PAGES, eraPageBySlug } from "./eraConfig";
 import styles from "./era.module.css";
 import hist from "../history.module.css";
+import PopHeading from "../../../components/PopHeading/PopHeading";
 
 /* The write-up panel for a strip: the same section that sits above this strip on
    the history page, matched by era. "Dogs in the armed forces" shares era c1500
@@ -69,6 +70,10 @@ export default async function EraPage({ params }: Props) {
      docs/social-pages/DECISIONS.md. The toggle sets data-pc-textinvert on this
      <main>, which the history page's text-toggle rules (history.module.css) use
      to flip the strip headings, breed names and write-up text to navy. */
+  const cut = page.title.lastIndexOf(" ");
+  const titleHead = cut > 0 ? page.title.slice(0, cut) : "";
+  const titleTail = cut > 0 ? page.title.slice(cut + 1) : page.title;
+
   return (
     <>
       <Nav showLogo />
@@ -77,11 +82,17 @@ export default async function EraPage({ params }: Props) {
         Back to Britain&apos;s dog history
       </Link>
 
-      {/* Visible h1 at the top, in the strip label's own style (history.module.css
-          .stripLabel, so the text toggle flips it too). Replaces the visually hidden
-          h1; on single-strip pages the matching label above the rail is hidden
-          (owner request, 22 Sept 2026). The 1800s page keeps its four sub-labels. */}
-      <h1 className={`${hist.stripLabel} ${styles.pageTitle}`}>{page.title}</h1>
+      {/* Visible h1 at the top. Replaces the visually hidden h1; on single-strip
+          pages the matching label above the rail is hidden (owner request,
+          22 Sept 2026). The 1800s page keeps its four sub-labels. */}
+      {/* Matches the history index h1 (22 Sept 2026, owner request): same
+          PopHeading, global .display (Luckiest Guy, drop shadow) and history
+          .title size, with the last word in the lemon yellow as "history" is. */}
+      <PopHeading as="h1" className={`display ${hist.title} ${styles.pageTitle}`}>
+        {titleHead}
+        {titleHead ? " " : ""}
+        <span className="display-yellow">{titleTail}</span>
+      </PopHeading>
 
       <ArticleTextToggle centered />
 
