@@ -32,6 +32,9 @@
   color: var(--navy);
   text-decoration: none;
 }
+.backRow {
+  margin-top: clamp(16px, 2.4vw, 26px);
+}
 .back::before {
   content: "\2039"; /* single left angle quote, a lightweight back chevron */
   font-size: 1.4em;

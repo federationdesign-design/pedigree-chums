@@ -78,10 +78,6 @@ export default async function EraPage({ params }: Props) {
     <>
       <Nav showLogo />
       <main className={styles.page}>
-      <Link href="/britains-dog-history" className={styles.back}>
-        Back to Britain&apos;s dog history
-      </Link>
-
       {/* Visible h1 at the top. Replaces the visually hidden h1; on single-strip
           pages the matching label above the rail is hidden (owner request,
           22 Sept 2026). The 1800s page keeps its four sub-labels. */}
@@ -99,6 +95,14 @@ export default async function EraPage({ params }: Props) {
       {page.intro && <p className={`${hist.lead} ${styles.pageLead}`}>{page.intro}</p>}
 
       <ArticleTextToggle centered />
+
+      {/* Back link moved below the toggle so it no longer crowds the h1 (owner
+          request, 22 Sept 2026; was the first item on the page). */}
+      <div className={styles.backRow}>
+        <Link href="/britains-dog-history" className={styles.back}>
+          Back to Britain&apos;s dog history
+        </Link>
+      </div>
 
       {/* Ancient page only: map and timeline side by side on desktop, stacked
           below 1024px, at the top of the page above the strip (owner request,
