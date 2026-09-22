@@ -83,3 +83,8 @@
   margin: 0;
   text-align: center;
 }
+
+/* Tight, the chum page only: the gaps either side of the chart close from 12 to 4. The
+   empty band inside the chart itself is cropped in the tsx. */
+.wrapTight { gap: 12px; }
+.wrapTight .svg { margin: -8px 0; }

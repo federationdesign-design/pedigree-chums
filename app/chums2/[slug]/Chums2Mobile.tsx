@@ -254,7 +254,7 @@ export default function Chums2Mobile({ name, slug, image, info, lineage }: Props
              its tile, so this one is wrapped in an 80% box and fills that instead. */
           <span style={{ display: "flex", width: "80%", height: "80%" }}>{ICONS.runningCost}</span>
         ), body: <RunningCostCard config={runningCosts[slug]} /> });
-    if (suitabilityScores[slug]) list.push({ id: "suitability", label: "Suitability", icon: ICONS.suitability, body: <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} /> });
+    if (suitabilityScores[slug]) list.push({ id: "suitability", label: "Suitability", icon: ICONS.suitability, body: <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} tight /> });
     if (exerciseNeeds[slug]) list.push({ id: "exercise", label: "Exercise", icon: ICONS.exercise, body: <ExerciseCard data={exerciseNeeds[slug]} /> });
     if (groomingNeeds[slug]) list.push({ id: "grooming", label: "Grooming", icon: ICONS.grooming, body: <GroomingCard data={groomingNeeds[slug]} /> });
     if (trainingDifficulty[slug]) list.push({ id: "training", label: "Training", icon: ICONS.training, body: <TrainingCard data={trainingDifficulty[slug]} /> });

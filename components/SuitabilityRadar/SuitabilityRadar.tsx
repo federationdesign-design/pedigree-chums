@@ -6,6 +6,12 @@ import styles from "./SuitabilityRadar.module.css";
 interface Props {
   score: SuitabilityScore;
   breedName: string;
+  /* TIGHT, the chum page only, 21 September 2026 (owner: close up the space between the
+     title and the diagram, and between the diagram and the scores below). The chart is
+     drawn in a 320 square with about 29 units of nothing above the top label and below
+     the bottom one; tight crops that away and closes the gaps either side of it. Every
+     other page that shows this card keeps it as it was. */
+  tight?: boolean;
 }
 
 const AXES = [
@@ -22,6 +28,10 @@ const MAX = 5;
 const CX = 160;
 const CY = 160;
 const R = 100;
+// The empty band above the top label and below the bottom one, cut in tight mode.
+// The top and bottom labels sit at CY -/+ (R + 26) = 34 and 286, 5 units tall either
+// side, so 25 leaves them a 4-unit margin.
+const TIGHT_TRIM = 25;
 
 function angleOf(i: number): number {
   return (Math.PI * 2 * i) / N - Math.PI / 2;
@@ -41,17 +51,17 @@ function polygonPoints(values: number[]): string {
     .join(" ");
 }
 
-export default function SuitabilityRadar({ score, breedName }: Props) {
+export default function SuitabilityRadar({ score, breedName, tight = false }: Props) {
   const values = AXES.map((a) => score[a.key] as number);
   const rings = [1, 2, 3, 4, 5];
 
   return (
-    <div className={styles.wrap}>
+    <div className={`${styles.wrap}${tight ? " " + styles.wrapTight : ""}`}>
       <p className={styles.heading}>Suitability</p>
       <svg
-        viewBox={`0 0 ${CX * 2} ${CY * 2}`}
+        viewBox={tight ? `0 ${TIGHT_TRIM} ${CX * 2} ${CY * 2 - TIGHT_TRIM * 2}` : `0 0 ${CX * 2} ${CY * 2}`}
         width={CX * 2}
-        height={CY * 2}
+        height={tight ? CY * 2 - TIGHT_TRIM * 2 : CY * 2}
         aria-label={`Suitability radar chart for ${breedName}`}
         className={styles.svg}
       >

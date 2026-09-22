@@ -286,7 +286,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
         ), width: 380, body: <RunningCostCard config={runningCosts[slug]} /> });
     }
     if (suitabilityScores[slug]) {
-      list.push({ id: "suitability", label: "Suitability", icon: ICONS.suitability, width: 380, body: <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} /> });
+      list.push({ id: "suitability", label: "Suitability", icon: ICONS.suitability, width: 380, body: <SuitabilityRadar score={suitabilityScores[slug]} breedName={name} tight /> });
     }
     if (exerciseNeeds[slug]) {
       list.push({ id: "exercise", label: "Exercise", icon: ICONS.exercise, width: 400, body: <ExerciseCard data={exerciseNeeds[slug]} /> });
@@ -295,7 +295,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       list.push({ id: "grooming", label: "Grooming", icon: ICONS.grooming, width: 380, body: <GroomingCard data={groomingNeeds[slug]} /> });
     }
     if (trainingDifficulty[slug]) {
-      list.push({ id: "training", label: "Training", icon: ICONS.training, width: 380, body: <TrainingCard data={trainingDifficulty[slug]} /> });
+      list.push({ id: "training", label: "Training", icon: ICONS.training, width: 418 /* 380 + 10%, owner 21 Sept 2026 */, body: <TrainingCard data={trainingDifficulty[slug]} /> });
     }
     if (healthConditions[slug]) {
       // Brief 5.5: HealthSection unchanged inside a card. It is wider than the
