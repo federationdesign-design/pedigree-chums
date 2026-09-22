@@ -81,11 +81,11 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
 }
 
 .chip {
-  padding: 12px 24px; /* twice the size (owner, 22 Sept 2026) */
+  padding: 6px 12px; /* back to the original size (owner, 22 Sept 2026; briefly doubled) */
   border-radius: 999px;
   /* Navy pills with white text (owner request, 22 Sept 2026). */
   border: 2px solid var(--navy);
@@ -93,7 +93,7 @@
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 1.8rem;
+  font-size: 0.9rem;
   line-height: 1.1;
   cursor: pointer;
 }
