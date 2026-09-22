@@ -16,7 +16,10 @@ import { WORLD_PATHS, lonX, latY } from "../../data/worldOutline";
    English trade at Canton from 1699; and a pug travelling with William III and
    Mary II in 1688 (Wikipedia, Pug). */
 
-const VIEW = { x: 0, y: 60, w: 1080, h: 345 };
+/* The Americas are cropped out (owner, 22 Sept 2026): nothing on this map
+   happens there, and the window from about 32W to 145E and 60N to 15S lets
+   Europe, Africa and Asia be drawn much bigger. */
+const VIEW = { x: 444, y: 90, w: 531, h: 315 };
 const START = 1600;
 const END = 1800;
 
@@ -26,7 +29,8 @@ const pts = (a: LL[]) => a.map(([lo, la]) => `${lonX(lo).toFixed(1)},${latY(la).
 /* Route waypoints, London or Amsterdam out to the east. */
 const EN_INDIA: LL[] = [[0, 51.5], [-10, 44], [-25, 18], [-30, -5], [-10, -30], [18, -34.4], [50, -30], [72, 5], [80.3, 13.1]];
 const EN_BENGAL: LL[] = [[80.3, 13.1], [84, 18], [88.4, 22.6]];
-const EN_CHINA: LL[] = [[80.3, 13.1], [95, 6], [105, 3], [110, 14], [113.3, 23.1]];
+/* Round the Malay peninsula and up the South China Sea, so the line stays at sea. */
+const EN_CHINA: LL[] = [[80.3, 13.1], [92, 6], [98, 3.5], [103, 1.2], [107, 6], [111, 14], [113.3, 23.1]];
 const NL_EAST: LL[] = [[4.9, 52.4], [-6, 46], [-22, 14], [-28, -8], [-8, -32], [18, -34.4], [55, -28], [85, -12], [106.8, -6.2]];
 
 type Port = { year: number; name: string; at: LL; dog?: boolean; left?: boolean };
