@@ -103,13 +103,16 @@ export const TUDOR_FACTS: Fact[] = [
    that founded the Bank was to rebuild the navy after a crushing defeat);
    predictivehistory.com and UK Parliament (parliament-backed borrowing let
    Britain outspend France and fund the empire). The Dutch East India Company
-   (1602) and the Raid on the Medway (1667) are standard history. */
+   (1602) and the Raid on the Medway (1667) are standard history. The 1784 ban on
+   publicly displaying orange in Holland, carrots included, is from contemporary
+   accounts of 16 June 1784 (The Retrospectors; christiandevotionals substack). */
 export const EIGHTEENTH_FACTS: Fact[] = [
   {
     heading: "The Dutch ruled the waves",
     paras: [
       "In the 1600s the small Dutch Republic had some of the biggest trading fleets in the world, and its East India Company, set up in 1602, sold shares to ordinary investors.",
       "In 1667 the Dutch navy even sailed up the River Medway in Kent, burned English warships and towed away the fleet's flagship, the Royal Charles.",
+      "Orange was the colour of William's family, and it stayed political for a long time. In 1784 Holland banned showing orange in public, and market sellers had to keep the green tops over their carrots so nobody took offence.",
     ],
   },
   {
