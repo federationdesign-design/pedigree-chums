@@ -38,6 +38,8 @@ export default function HistorySection({ section: s, eraLink }: { section: Secti
         </div>
         <p className={styles.sectionIntro}>{s.intro}</p>
         <p className={styles.detail}>{s.detail}</p>
+        {/* Optional second paragraph (22 Sept 2026): lines re-homed from other eras. */}
+        {s.more && <p className={`${styles.detail} ${styles.detailMore}`}>{s.more}</p>}
         {eraLink && (
           <Link href={eraLink.href} className={styles.eraLink}>
             {eraLink.label}

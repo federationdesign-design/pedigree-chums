@@ -267,6 +267,11 @@
   margin: 0;
 }
 
+/* Second write-up paragraph (Section.more), spaced from the first (22 Sept 2026). */
+.detailMore {
+  margin-top: 0.8em;
+}
+
 /* Era page button under the left-column text (history index only, 22 Sept 2026).
    The site green button: #22c55e pill, white Luckiest Guy, as OfferCta/home. */
 .eraLink {

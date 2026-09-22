@@ -16,6 +16,7 @@ export type Section = {
   intro: string;
   bullets: string[];
   detail: string;
+  more?: string; // optional second paragraph under detail (added 22 Sept 2026)
   facts: { text: string; image?: string; imageAlt?: string; imagePos?: string }[]; // imagePos: object-position for the round fact image, so the dog's face shows
   image: string; // /history/<name>.jpg image path; drop art in later
   imageAlt: string;
@@ -66,6 +67,12 @@ export const SECTIONS: Section[] = [
     ],
     detail:
       "By the Middle Ages Britain's dogs had settled into recognisable working kinds. Hunting treatises described each type and its task, household records listed hounds by the work they did, and forest law regulated which dogs could live near the royal deer. These were still types rather than breeds: a talbot or a rache was a job and a look, not a pedigree, and the same name could cover different dogs in different counties.",
+    /* Re-homed from the Tudor panel, 22 Sept 2026 (owner: medieval lines out of
+       the Tudor era, kept here as prose rather than extra facts). The "lawed"
+       dogs line was dropped as a repeat of this panel's own claws fact, and the
+       Master of Game fact as a repeat of this panel's fact about it. */
+    more:
+      "Norman kings set aside up to a third of England as royal forest, where only the king could hunt, and the forest laws became some of the most resented in medieval England: even a harmless guard dog could be lamed simply for living near royal land. The law valued dogs by their work, too, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.",
     facts: [
       { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/breeds/medieval-earth-dog.jpg", imageAlt: "A small wiry brown terrier standing by a burrow below a ruined castle.", imagePos: "50% 40%" },
       { text: "The Master of Game, an English hunting book from the early 1400s, describes running hounds, greyhounds, alaunts, spaniels and mastiffs, each with its own work.", image: "/history/breeds/talbot-hound.jpg", imageAlt: "A white pack hound with tan ears standing in the rain on rough ground.", imagePos: "82% 32%" },
@@ -81,20 +88,22 @@ export const SECTIONS: Section[] = [
     anchor: "tudor-britain",
     era: "c1500",
     intro:
-      "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
+      /* Rewritten 22 Sept 2026: the old first sentence was medieval. The strip
+         covers the 1500s and 1600s, so the copy does too. Flagged for owner review. */
+      "In the 1500s and 1600s, dogs moved into the heart of the household. At the royal court they were pampered companions, while in towns and villages they turned kitchen spits, guarded yards and even followed their owners to church.",
     bullets: [
-      "Norman kings set aside up to a third of England as royal forest, where only the king could hunt.",
-      "Commoners living near a forest had to have their dogs 'lawed', having three toes chopped off, to stop them chasing the king's game.",
+      "In 1576 John Caius's Of Englishe Dogges became the first book about dogs in the English language, sorting them into noble, rustic and degenerate kinds.",
+      "Short-legged turnspit dogs ran inside wooden wheels in kitchens to turn the roasting meat, a job Caius recorded by name.",
       "By Tudor times, Henry VIII kept spaniels, beagles and greyhounds, and owned sixty-five dog leashes.",
       "Ladies of the court adored their little lapdogs, which they fondly called 'comforters'.",
     ],
     detail:
-      "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
+      "At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. A century later the Stuart kings were just as devoted: Charles II was rarely seen without his little spaniels, which still carry his name as the King Charles Spaniel. The dog as a treasured companion, not just a working animal, was taking shape.",
     facts: [
       { text: "So many dogs followed their owners to church that Tudor parishes paid a 'dog whipper' to keep order, armed with a three-foot whip and a pair of wooden tongs.", image: "/history/breeds/Farm-and-kitchen-curs.jpg", imageAlt: "A rough-coated brown and black village dog standing by a stone doorway.", imagePos: "50% 40%" },
-      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/breeds/low-slung-soldiers-dogs.jpg", imageAlt: "A short-legged brindle working dog standing on a rocky moor.", imagePos: "72% 34%" },
+      { text: "John Caius first wrote his dog book in Latin for his Swiss friend, the naturalist Conrad Gesner. It was translated into English in 1576.", image: "/history/breeds/low-slung-soldiers-dogs.jpg", imageAlt: "A short-legged brindle working dog standing on a rocky moor.", imagePos: "72% 34%" },
       { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/breeds/Old-English-Bulldog.jpg", imageAlt: "A stocky brindle and white bulldog standing in a field by a stone wall.", imagePos: "74% 28%" },
-      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/breeds/staghound.jpg", imageAlt: "A tricolour pack hound standing on a hillside under a cloudy sky.", imagePos: "74% 30%" },
+      { text: "Tudor London's bear gardens set mastiffs against bears for sport, a cruel entertainment that was not banned until 1835.", image: "/history/breeds/staghound.jpg", imageAlt: "A tricolour pack hound standing on a hillside under a cloudy sky.", imagePos: "74% 30%" },
     ],
     image: "/history/Tudor-era.jpg",
     imageAlt: "Tudor dogs at the royal court",
