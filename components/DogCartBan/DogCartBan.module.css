@@ -89,7 +89,9 @@
   stroke-width: 2.5;
 }
 .banned {
-  fill: rgba(226, 64, 47, 0.45);
+  /* Same alpha as the circle, so the whole country turns exactly the circle's
+     red rather than an olive (owner, 22 Sept 2026). */
+  fill: rgba(226, 64, 47, 0.55);
 }
 .mapNote {
   font-family: var(--font-body), system-ui, sans-serif;
