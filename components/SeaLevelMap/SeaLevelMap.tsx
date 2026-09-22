@@ -62,12 +62,15 @@ const EVENTS: [number, string][] = [
   [-1, "Today, Doggerland lies under the North Sea. Trawlers still net its bones and tools."],
 ];
 
-const START = 20000;
-const LAND = "#97C459";
-const COAST = "#27500A";
+/* Timeline runs from 13,300 years ago (owner request, 22 Sept 2026; was 20,000). */
+const START = 13300;
+/* Site palette from app/globals.css (owner request, 22 Sept 2026). */
+const LAND = "var(--cta)";
+const SEA = "var(--blue-deep)";
+const COAST = "var(--navy)";
 
 export default function SeaLevelMap() {
-  /* Slider runs left to right through time: 0 = 20,000 years ago, 20,000 = today. */
+  /* Slider runs left to right through time: 0 = START years ago, START = today. */
   const [t, setT] = useState(0);
   const [playing, setPlaying] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -145,16 +148,16 @@ export default function SeaLevelMap() {
 
       <div className={styles.mapWrap}>
         <svg viewBox={`0 0 ${W} ${H}`} className={styles.map} role="img" aria-label="Map of Britain and Doggerland as the sea rises">
-          <rect x={0} y={0} width={W} height={H} fill="#0b78bd" />
+          <rect x={0} y={0} width={W} height={H} style={{ fill: SEA }} />
           {SHELF.map(({ d, a }) => (
-            <polygon key={d} points={pts(a)} fill={LAND} opacity={Math.min(1, Math.max(0, (-d + 3 - sea) / 6))} />
+            <polygon key={d} points={pts(a)} style={{ fill: LAND }} opacity={Math.min(1, Math.max(0, (-d + 3 - sea) / 6))} />
           ))}
           {[GB, IE, EU, NO, ...SMALL].map((a, i) => (
-            <polygon key={`l${i}`} points={pts(a)} fill={LAND} />
+            <polygon key={`l${i}`} points={pts(a)} style={{ fill: LAND }} />
           ))}
           <polygon points={pts(ICE)} fill="#ffffff" stroke="#b4b2a9" strokeWidth={0.8} opacity={iceOpacity} />
           {[GB, IE, NO, ...SMALL, EU.slice(0, 25)].map((a, i) => (
-            <polygon key={`c${i}`} points={pts(a)} fill="none" stroke={COAST} strokeWidth={1} strokeDasharray="3 2" />
+            <polygon key={`c${i}`} points={pts(a)} fill="none" style={{ stroke: COAST }} strokeWidth={1} strokeDasharray="3 2" />
           ))}
           <text x={250} y={190} fontSize={13} fill="#ffffff" opacity={sea < -14 ? 1 : 0} className={styles.mapLabel}>
             Doggerland
@@ -164,7 +167,6 @@ export default function SeaLevelMap() {
 
       <ul className={styles.legend}>
         <li><span className={styles.swatch} style={{ background: LAND }} /> Dry land</li>
-        <li><span className={styles.swatch} style={{ background: "#ffffff" }} /> Ice sheet</li>
         <li><span className={styles.dash} /> Today&apos;s coastline</li>
       </ul>
       <p className={styles.note}>Simplified map. Coastlines and sea levels are approximate.</p>
