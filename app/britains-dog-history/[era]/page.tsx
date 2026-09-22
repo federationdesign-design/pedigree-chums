@@ -7,7 +7,7 @@ import Footer from "../../../components/Footer/Footer";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
-import AncientFacts from "../../../components/AncientFacts/AncientFacts";
+import AncientFacts, { MEDIEVAL_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
@@ -128,6 +128,13 @@ export default async function EraPage({ params }: Props) {
               <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
                 {/* Three boxed facts from the social slides (22 Sept 2026). */}
                 <AncientFacts />
+              </div>
+            )}
+            {/* Medieval page: the same "Did you know?" boxes, medieval facts, above
+                the write-up panel (owner request, 22 Sept 2026). */}
+            {strip === "medieval" && (
+              <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+                <AncientFacts facts={MEDIEVAL_FACTS} />
               </div>
             )}
             {section && (
