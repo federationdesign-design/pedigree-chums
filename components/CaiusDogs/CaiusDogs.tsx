@@ -90,7 +90,7 @@ export default function CaiusDogs() {
   return (
     <section className={styles.panel} aria-labelledby="caius-title">
       <h2 id="caius-title" className={`display ${styles.title}`}>
-        The First Book of <span className="display-yellow">English Dogs</span>
+        1st Book of <span className="display-yellow">Dogs</span>
       </h2>
       <p className={styles.intro}>
         In 1576 Doctor John Caius sorted England&apos;s dogs into three kinds. Tap a dog to see what job it did, and what it became.

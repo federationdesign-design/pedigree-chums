@@ -11,7 +11,7 @@ import ForestMap from "../../../components/ForestMap/ForestMap";
 import PostRoads from "../../../components/PostRoads/PostRoads";
 import CaiusDogs from "../../../components/CaiusDogs/CaiusDogs";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
-import AncientFacts, { MEDIEVAL_FACTS } from "../../../components/AncientFacts/AncientFacts";
+import AncientFacts, { MEDIEVAL_FACTS, TUDOR_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
@@ -162,6 +162,12 @@ export default async function EraPage({ params }: Props) {
             {strip === "medieval" && (
               <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
                 <AncientFacts facts={MEDIEVAL_FACTS} />
+              </div>
+            )}
+            {/* Tudor 'n' Stuart page: "Did you know?" boxes (22 Sept 2026). */}
+            {strip === "c1500" && (
+              <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+                <AncientFacts facts={TUDOR_FACTS} />
               </div>
             )}
             {section && (

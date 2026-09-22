@@ -66,6 +66,36 @@ export const MEDIEVAL_FACTS: Fact[] = [
   },
 ];
 
+/* Tudor 'n' Stuart page boxes (owner request, 22 Sept 2026: non-royal facts, the
+   fork and the shoe with a dog-chewing joke, and a cultural event). Sources:
+   Thomas Coryat and the fork, Coryat's Crudities (1611), Wikipedia; heels from
+   Persian riders and the 1599 Persian mission to Europe, Elizabeth Semmelhack,
+   Bata Shoe Museum, via BBC News; Crab as the only dog Shakespeare wrote into a
+   play, AKC Family Dog (2024). The Globe opening in 1599 is common knowledge. */
+export const TUDOR_FACTS: Fact[] = [
+  {
+    heading: "Forks? How rude!",
+    paras: [
+      "In 1608 a traveller from Somerset called Thomas Coryat saw Italians eating with forks and brought the habit home. Most people still ate with a knife and their fingers, and his friends teased him with the nickname 'Furcifer', the fork-carrier.",
+      "The family dog, meanwhile, decided a fork was just a very small, very pointy bone.",
+    ],
+  },
+  {
+    heading: "Heels were for horse riders",
+    paras: [
+      "High heels began as riding boots for Persian horsemen, to keep their feet firmly in the stirrups. After Persian visitors toured Europe in 1599, rich European men went wild for heeled shoes.",
+      "Then, as now, dogs had their own view of fancy new shoes: an expensive chew toy.",
+    ],
+  },
+  {
+    heading: "A dog steals the show",
+    paras: [
+      "In 1599 the Globe Theatre opened on London's Bankside, where ordinary Londoners could stand and watch a play for a penny.",
+      "Shakespeare only ever wrote one dog into his plays: Crab, in The Two Gentlemen of Verona. Crab never says a word, and still steals every scene.",
+    ],
+  },
+];
+
 /* `facts` lets other era pages reuse the same heading, boxes and styling
    (22 Sept 2026); Ancient passes nothing and gets its own boxes as before. */
 export default function AncientFacts({ facts = FACTS }: { facts?: Fact[] }) {

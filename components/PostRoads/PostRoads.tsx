@@ -19,7 +19,7 @@ import { GB, type LL } from "../SeaLevelMap/SeaLevelMap";
    (four days a year of parish road work). Same projection as the other maps:
    x = (lon + 11) * 20, y = (61 - lat) * 33. */
 
-const VIEW = { x: 100, y: 155, w: 170, h: 218 };
+const VIEW = { x: 100, y: 140, w: 170, h: 233 };
 const START = 1500;
 const END = 1700;
 
@@ -153,10 +153,10 @@ export default function PostRoads() {
   return (
     <section className={styles.panel} aria-labelledby="post-roads-title">
       <h2 id="post-roads-title" className={`display ${styles.title}`}>
-        The King&apos;s <span className="display-yellow">Post</span>
+        Connected <span className="display-yellow">Britain</span>
       </h2>
       <p className={styles.intro}>
-        Before post boxes, the king&apos;s letters raced along special post roads, with fresh horses waiting every 20 miles or so. Press play to watch the network grow.
+        Before the national post, Britain had special roads called &lsquo;post roads&rsquo;, with fresh horses waiting every 20 miles or so, and these were exclusively for the king. Press play to watch the network grow.
       </p>
 
       <div className={styles.controls}>
@@ -197,6 +197,24 @@ export default function PostRoads() {
       <p className={styles.caption} aria-live="polite">{caption}</p>
 
       <div className={styles.mapWrap}>
+        {/* Overlaid top left of the map, narrower (owner request, 22 Sept 2026). The
+            view starts a little higher so the box sits over open sea, clear of
+            Edinburgh and Berwick. */}
+        <div className={styles.towns}>
+          <span className={styles.townsTitle}>Biggest towns in {year}</span>
+          <ol className={styles.townList}>
+            {[...TOWNS]
+              .map((tw) => ({ name: tw.name, people: popAt(tw.pop, year) }))
+              .sort((a, b) => b.people - a.people)
+              .slice(0, 5)
+              .map((tw) => (
+                <li key={tw.name}>
+                  <span className={styles.townName}>{tw.name}</span>
+                  <span className={styles.townPop}>about {roundPop(tw.people).toLocaleString("en-GB")}</span>
+                </li>
+              ))}
+          </ol>
+        </div>
         <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} className={styles.map} role="img" aria-label={`Simplified map of England's post roads in ${year}`}>
           <polygon points={GB.map(px).join(" ")} className={styles.land} />
           {TOWNS.map((tw) => {
@@ -244,22 +262,6 @@ export default function PostRoads() {
           <circle cx={lx} cy={ly} r={2.6} className={styles.london} />
           <text x={lx + 3.2} y={ly + 5.5} className={styles.townLabel}>London</text>
         </svg>
-      </div>
-
-      <div className={styles.towns}>
-        <span className={styles.townsTitle}>Biggest towns in {year}</span>
-        <ol className={styles.townList}>
-          {[...TOWNS]
-            .map((tw) => ({ name: tw.name, people: popAt(tw.pop, year) }))
-            .sort((a, b) => b.people - a.people)
-            .slice(0, 5)
-            .map((tw) => (
-              <li key={tw.name}>
-                <span className={styles.townName}>{tw.name}</span>
-                <span className={styles.townPop}>about {roundPop(tw.people).toLocaleString("en-GB")}</span>
-              </li>
-            ))}
-        </ol>
       </div>
 
       <ul className={styles.legend}>

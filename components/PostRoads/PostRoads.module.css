@@ -71,10 +71,10 @@
   margin: 0 0 12px;
 }
 
+/* Inner box fills removed (owner request, 22 Sept 2026). */
 .stat {
-  background: rgba(255, 255, 255, 0.16);
   border-radius: 18px;
-  padding: 10px 16px;
+  padding: 10px 0;
   display: flex;
   flex-direction: column;
 }
@@ -100,6 +100,7 @@
 }
 
 .mapWrap {
+  position: relative;
   margin-top: auto;
 }
 
@@ -148,9 +149,6 @@
   font-weight: 700;
   font-size: 4.4px;
   fill: var(--white);
-  paint-order: stroke;
-  stroke: var(--navy);
-  stroke-width: 1.2px;
 }
 
 .town {
@@ -168,9 +166,6 @@
   font-weight: 700;
   font-size: 5.2px;
   fill: var(--white);
-  paint-order: stroke;
-  stroke: var(--navy);
-  stroke-width: 1.4px;
 }
 
 .legend {
@@ -243,10 +238,14 @@
   border: 1.5px solid var(--navy);
 }
 .towns {
-  margin: 12px 0 0;
-  background: rgba(255, 255, 255, 0.14);
-  border-radius: 18px;
-  padding: 10px 16px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: min(32%, 200px);
+  padding: 2px 0;
+  font-size: 0.8rem;
+  line-height: 1.25;
 }
 .townsTitle {
   display: block;

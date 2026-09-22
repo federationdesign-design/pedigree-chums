@@ -42,10 +42,9 @@
   }
 }
 
+/* Inner box fills removed (owner request, 22 Sept 2026). */
 .kind {
-  background: rgba(255, 255, 255, 0.14);
-  border-radius: 20px;
-  padding: 14px 16px;
+  padding: 4px 0;
 }
 
 .kindTitle {
@@ -87,8 +86,9 @@
 .chip {
   padding: 6px 12px;
   border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.12);
+  /* Navy pills with white text (owner request, 22 Sept 2026). */
+  border: 2px solid var(--navy);
+  background: var(--navy);
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
@@ -106,9 +106,8 @@
 }
 
 .card {
-  background: rgba(10, 58, 87, 0.28);
-  border-radius: 20px;
-  padding: 16px 18px;
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+  padding: 14px 0 0;
   min-height: 11em;
 }
 
@@ -166,11 +165,18 @@
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .kindQuote,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .groupLabel,
-:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .chip:not([aria-pressed="true"]),
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardKind,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardOld,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardJob,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardToday,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
+  color: var(--navy, #0a3a57);
+}
+
+/* Text colour toggle: the navy pills invert to white with navy text. The
+   accessibility schemes' own sweep turns them black and white. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .chip:not([aria-pressed="true"]) {
+  background: var(--white);
+  border-color: var(--white);
   color: var(--navy, #0a3a57);
 }
