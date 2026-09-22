@@ -12,6 +12,10 @@ type LL = [number, number];
 
 const W = 400;
 const H = 429;
+/* Visible window crops 10% off the top and 10% off the bottom of the drawing,
+   making the panel 20% shorter (owner request, 22 Sept 2026). */
+const CROP_Y = H * 0.1;
+const CROP_H = H * 0.8;
 const proj = ([lo, la]: LL) => `${((lo + 11) * 20).toFixed(1)},${((61 - la) * 33).toFixed(1)}`;
 const pts = (a: LL[]) => a.map(proj).join(" ");
 
@@ -189,7 +193,7 @@ export default function SeaLevelMap() {
             <p className={styles.note}>Simplified map. Coastlines and sea levels are approximate.</p>
           </div>
         </div>
-        <svg viewBox={`0 0 ${W} ${H}`} className={styles.map} role="img" aria-label="Map of Britain and Doggerland as the sea rises">
+        <svg viewBox={`0 ${CROP_Y} ${W} ${CROP_H}`} className={styles.map} role="img" aria-label="Map of Britain and Doggerland as the sea rises">
           {SHELF.map(({ d, a }) => (
             <polygon key={d} points={pts(a)} style={{ fill: LAND }} opacity={Math.min(1, Math.max(0, (-d + 3 - sea) / 6))} />
           ))}
