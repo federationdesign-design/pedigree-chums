@@ -165,7 +165,9 @@
   height: 100%;
   /* Tighter foot (owner, 22 Sept 2026) so the whole stack, picker included, sits
      lower on the screen. */
-  padding: 60px 28px 18px;
+  /* Zero at the foot (owner, 22 Sept 2026): the breed roller sits flush with the
+     bottom of the screen, so its last row reads as running off it. */
+  padding: 60px 28px 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;

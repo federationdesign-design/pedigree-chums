@@ -3,6 +3,10 @@
 
 .picker {
   width: 100%;
+  /* Flush to the foot of the screen (owner, 22 Sept 2026): nothing under the
+     list, and the intro panel's own bottom padding is zero, so the last row
+     fades off the bottom edge. */
+  margin-bottom: 0;
   /* No auto margin (owner, 22 Sept 2026): the intro body is already a flex column
      with justify-content: flex-end, so an auto top margin only pushed the picker
      away from the buttons and left a hole. As a plain last child, the whole stack
@@ -25,9 +29,9 @@
      22 Sept 2026). */
   --text-size: 1rem;
   --line-height: 1.7;
-  /* Half the old height: three dogs on screen, not six (owner, 22 Sept 2026).
-     A row is --text-size times --line-height, so three rows is about 82px. */
-  --roller-height: 11vh;
+  /* Two rows on screen (owner, 22 Sept 2026): a row is --text-size times
+     --line-height, about 27px. */
+  --roller-height: 8vh;
   list-style: none;
   margin: 0;
   /* No padding at either end (owner, 22 Sept 2026): the half-slot of space top
@@ -35,8 +39,8 @@
      starts flush under the heading and ends flush at the foot. */
   padding: 0;
   height: var(--roller-height);
-  min-height: 84px;
-  max-height: 96px;
+  min-height: 56px;
+  max-height: 68px;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scroll-snap-type: y proximity;
@@ -52,20 +56,6 @@
 }
 .list::-webkit-scrollbar {
   display: none;
-}
-
-/* A band behind the top row, so it reads as the selector rather than as a dog
-   that happens to be yellow (owner, 22 Sept 2026). */
-.list::before {
-  content: "";
-  position: sticky;
-  top: 0;
-  display: block;
-  height: calc(var(--text-size) * var(--line-height));
-  margin-bottom: calc(var(--text-size) * var(--line-height) * -1);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.14);
-  pointer-events: none;
 }
 
 .item {
@@ -88,9 +78,8 @@
 .name {
   font-weight: 700;
 }
-.on .name {
-  color: var(--yellow-header);
-}
+/* No colour change on the marked row (owner, 22 Sept 2026); it is simply the
+   one at full strength. */
 .era {
   font-size: 0.75rem;
   font-weight: 600;

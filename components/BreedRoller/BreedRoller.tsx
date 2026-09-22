@@ -5,6 +5,7 @@ import Link from "next/link";
 import styles from "./BreedRoller.module.css";
 import { levelBreeds, levelSlug } from "../../data/levels";
 import { breeds } from "../../data/breeds";
+import { ukBreeds } from "../../data/uk-breeds";
 
 /* A rolling picker of every dog in every era slider, for the mobile intro
    (owner request, 22 September 2026, modelled on the date-picker pattern they
@@ -25,9 +26,13 @@ const LEVEL_ROWS: Row[] = levelBreeds().map((b) => ({
   era: b.era,
   href: `/britains-dog-history/dog/${levelSlug(b.name)}`,
 }));
+/* Pack chums show their era too (owner, 22 Sept 2026). Half of them are in the
+   timeline catalogue and take its era; the rest are breeds from elsewhere that
+   the catalogue does not date, so they read "Today". */
+const ERA_BY_NAME = new Map(ukBreeds.map((b) => [b.name, b.era]));
 const PACK_ROWS: Row[] = breeds
   .filter((p) => !LEVEL_ROWS.some((r) => r.name === p.name))
-  .map((p) => ({ name: p.name, era: "Pack chum", href: `/chums/${p.slug}` }));
+  .map((p) => ({ name: p.name, era: ERA_BY_NAME.get(p.name) ?? "Today", href: `/chums/${p.slug}` }));
 const DOGS: Row[] = [...LEVEL_ROWS, ...PACK_ROWS].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function BreedRoller() {
