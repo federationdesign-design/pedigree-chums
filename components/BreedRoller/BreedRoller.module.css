@@ -25,7 +25,9 @@
      22 Sept 2026). */
   --text-size: 1rem;
   --line-height: 1.7;
-  --roller-height: 20vh;
+  /* Half the old height: three dogs on screen, not six (owner, 22 Sept 2026).
+     A row is --text-size times --line-height, so three rows is about 82px. */
+  --roller-height: 11vh;
   list-style: none;
   margin: 0;
   /* No padding at either end (owner, 22 Sept 2026): the half-slot of space top
@@ -33,8 +35,8 @@
      starts flush under the heading and ends flush at the foot. */
   padding: 0;
   height: var(--roller-height);
-  min-height: 108px;
-  max-height: 170px;
+  min-height: 84px;
+  max-height: 96px;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scroll-snap-type: y proximity;
@@ -50,6 +52,20 @@
 }
 .list::-webkit-scrollbar {
   display: none;
+}
+
+/* A band behind the top row, so it reads as the selector rather than as a dog
+   that happens to be yellow (owner, 22 Sept 2026). */
+.list::before {
+  content: "";
+  position: sticky;
+  top: 0;
+  display: block;
+  height: calc(var(--text-size) * var(--line-height));
+  margin-bottom: calc(var(--text-size) * var(--line-height) * -1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  pointer-events: none;
 }
 
 .item {

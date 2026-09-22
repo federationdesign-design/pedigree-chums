@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "./BreedRoller.module.css";
 import { levelBreeds, levelSlug } from "../../data/levels";
+import { breeds } from "../../data/breeds";
 
 /* A rolling picker of every dog in every era slider, for the mobile intro
    (owner request, 22 September 2026, modelled on the date-picker pattern they
@@ -15,9 +16,19 @@ import { levelBreeds, levelSlug } from "../../data/levels";
 
 /* A to Z, not timeline order (owner, 22 Sept 2026): this is a find-a-dog list,
    so the alphabet is the useful order. */
-const DOGS = levelBreeds()
-  .map((b) => ({ name: b.name, era: b.era, slug: levelSlug(b.name) }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+/* TWO SOURCES, because the 54 pack dogs are not in the level list at all (owner,
+   22 Sept 2026): every timeline level goes to its history page, and every pack
+   chum goes to its chum page. Anything named in both keeps the history page. */
+type Row = { name: string; era: string; href: string };
+const LEVEL_ROWS: Row[] = levelBreeds().map((b) => ({
+  name: b.name,
+  era: b.era,
+  href: `/britains-dog-history/dog/${levelSlug(b.name)}`,
+}));
+const PACK_ROWS: Row[] = breeds
+  .filter((p) => !LEVEL_ROWS.some((r) => r.name === p.name))
+  .map((p) => ({ name: p.name, era: "Pack chum", href: `/chums/${p.slug}` }));
+const DOGS: Row[] = [...LEVEL_ROWS, ...PACK_ROWS].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function BreedRoller() {
   const listRef = useRef<HTMLUListElement | null>(null);
@@ -84,8 +95,8 @@ export default function BreedRoller() {
       <span className={styles.label}>Britain&rsquo;s dogs a-z</span>
       <ul className={styles.list} ref={listRef} aria-label="Every dog in the timeline">
         {DOGS.map((d, i) => (
-          <li key={d.slug} className={`${styles.item} ${i === centre ? styles.on : ""}`}>
-            <Link href={`/britains-dog-history/dog/${d.slug}`} className={styles.link}>
+          <li key={d.href} className={`${styles.item} ${i === centre ? styles.on : ""}`}>
+            <Link href={d.href} className={styles.link}>
               <span className={styles.name}>{d.name}</span>
               <span className={styles.era}>{d.era}</span>
             </Link>
