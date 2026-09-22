@@ -121,8 +121,10 @@ export default function DomesdayMap() {
           </p>
 
           <div className={styles.buttons} role="group" aria-label="Show land held by">
+            {/* "All three", not "Everyone": ordinary people held no land in their own
+                right, so "Everyone" misled (owner, 22 Sept 2026). */}
             <button type="button" className={styles.btn} aria-pressed={filter === "all"} onClick={() => setFilter("all")}>
-              Everyone
+              All three
             </button>
             {HOLDERS.map((h) => (
               <button key={h.id} type="button" className={styles.btn} aria-pressed={filter === h.id} onClick={() => setFilter(h.id)}>
