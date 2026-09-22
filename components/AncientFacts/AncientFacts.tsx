@@ -5,7 +5,9 @@ import styles from "./AncientFacts.module.css";
    2026, with light copy fixes: "there" to "their", "A Roman writer Arrian" to
    "The Roman writer Arrian", and the guard dogs sentence given a verb. The image
    caption on slide 2 ("no doubt a very good boy") is left out, as the image is
-   not used here. */
+   not used here. The Star Carr height sentence was added 22 Sept 2026 to balance
+   the middle box: Harcourt (1974), as cited in Journal of Archaeological Science
+   (2010), https://www.sciencedirect.com/science/article/abs/pii/S0305440310001974 */
 
 type Fact = { heading: string; paras: string[] };
 
@@ -21,6 +23,7 @@ const FACTS: Fact[] = [
     heading: "A 14,000-year-old dog jawbone",
     paras: [
       "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.",
+      "The dogs at Star Carr in North Yorkshire, around 11,000 years ago, stood between 52 and 61 cm at the shoulder, about the height of a modern Labrador.",
     ],
   },
   {

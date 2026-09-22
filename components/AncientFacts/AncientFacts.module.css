@@ -39,7 +39,7 @@
 .text {
   margin: 0 0 12px;
   font-size: 1.05rem;
-  line-height: 1.5;
+  line-height: 1.3em; /* owner request, 22 Sept 2026 (was 1.5) */
   font-weight: 600;
 }
 .text:last-child {
