@@ -49,7 +49,8 @@
   grid-template-columns: 1fr 1fr;
   align-items: start;
   gap: 0 24px;
-  padding: var(--pad);
+  /* Extra room above the heading (owner, 22 Sept 2026: it read as zero). */
+  padding: calc(var(--pad) + 18px) var(--pad) var(--pad);
   text-shadow: 0 1px 3px rgba(10, 58, 87, 0.6);
   pointer-events: none;
 }
@@ -74,7 +75,9 @@
   right: 0;
   bottom: 0;
   z-index: 1;
-  width: min(60%, 460px);
+  /* Wide enough for "Lost land, depth under today's sea" on one line (owner,
+     22 Sept 2026). */
+  width: min(78%, 520px);
   padding: var(--pad);
   text-align: right;
   text-shadow: 0 1px 3px rgba(10, 58, 87, 0.6);
@@ -131,10 +134,10 @@
   margin: 0 0 12px;
 }
 
+/* No tinted box behind the readouts (owner, 22 Sept 2026): they are thin enough
+   to sit as plain text, and the box left them touching the panel edge. */
 .stat {
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 18px;
-  padding: 10px 16px;
+  padding: 4px 10px;
   display: flex;
   flex-direction: column;
 }
@@ -209,6 +212,7 @@
 .legendTitle {
   width: 100%;
   justify-content: flex-end;
+  white-space: nowrap;
 }
 .legend .scale {
   gap: 4px;
@@ -240,9 +244,12 @@
   }
 }
 
+/* Three across at every width (owner, 22 Sept 2026): stacked, they took a third
+   of a phone screen for three short numbers. */
 @container (max-width: 480px) {
   .stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
 }
 
@@ -369,6 +376,22 @@
   }
   .overlayBottom {
     order: 6;
+  }
+}
+
+/* Mobile tidy-up (owner, 22 Sept 2026): the caption was left aligned against the
+   panel edge, and the slider bar ran edge to edge. */
+@media (max-width: 768px) {
+  .caption {
+    text-align: center;
+    padding: 0 14px;
+    line-height: 1.3em;
+  }
+  .controls {
+    margin: 0 10px 12px;
+  }
+  .stats {
+    padding: 0 6px;
   }
 }
 

@@ -13,7 +13,8 @@
   box-sizing: border-box;
   /* Top padding clears the fixed site Nav (menu button 100px plus 18px bar
      padding on desktop, smaller under 769px). 22 Sept 2026. */
-  padding: 140px 0 clamp(48px, 8vw, 96px);
+  /* 50px lower than the nav needs (owner, 22 Sept 2026). */
+  padding: 190px 0 clamp(48px, 8vw, 96px);
   /* The strips break full-bleed on their own (margin: calc(50% - 50vw)), so the
      page keeps horizontal overflow contained. */
   overflow-x: hidden;
@@ -112,7 +113,7 @@ p.pageLead {
 /* Nav clearance on narrow screens, where the menu button shrinks (22 Sept 2026). */
 @media (max-width: 768px) {
   .page {
-    padding-top: 100px;
+    padding-top: 150px;
   }
 }
 
