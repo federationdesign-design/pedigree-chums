@@ -44,6 +44,21 @@
   padding: 0 calc(clamp(18px, 4vw, 40px) + 30px);
 }
 
+/* Ancient page: the sea level map and the first-dogs timeline. Stacked on small
+   screens; two equal columns from 1024px (22 Sept 2026). Each panel keeps its
+   own 50px top margin, so only the column gap is set here. */
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 clamp(24px, 3vw, 40px);
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .pair {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
 /* Below 480 the outer inset shrinks so the panel copy gets more line width. This
    file is loaded by the era pages only; the history page never sees it. */
 @media (max-width: 480px) {

@@ -3,6 +3,10 @@
 
 .panel {
   --pad: clamp(24px, 3.5vw, 48px);
+  /* Layout below responds to the panel's own width, not the screen, so it still
+     stacks correctly when the panel sits in a half-width column on desktop
+     (22 Sept 2026). */
+  container-type: inline-size;
   position: relative;
   overflow: hidden;
   margin: 50px 0 0;
@@ -223,13 +227,18 @@
   .panel {
     border-radius: 28px;
   }
+}
+
+@container (max-width: 480px) {
   .stats {
     grid-template-columns: 1fr;
   }
 }
 
-/* Small screens: the overlay would cover most of the map, so it stacks above. */
-@media (max-width: 720px) {
+/* Narrow panel: the overlay would cover most of the map, so it stacks above.
+   Container query (was a 720px screen query) so the half-width desktop column
+   gets the stacked layout too. */
+@container (max-width: 720px) {
   .overlay {
     position: static;
     grid-template-columns: 1fr;

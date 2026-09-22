@@ -83,9 +83,12 @@ export default async function EraPage({ params }: Props) {
             {/* Ancient era only: sea level map in its own blue panel (22 Sept 2026). */}
             {strip === "ancient" && (
               <div className={styles.sectionHolder}>
-                <SeaLevelMap />
-                {/* Archaeology timeline below the map (22 Sept 2026). */}
-                <DogTimeline />
+                {/* Map and timeline side by side on desktop, stacked below
+                    1024px (owner request, 22 Sept 2026). */}
+                <div className={styles.pair}>
+                  <SeaLevelMap />
+                  <DogTimeline />
+                </div>
               </div>
             )}
           </div>
