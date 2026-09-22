@@ -72,13 +72,14 @@ const BATTLES: Battle[] = [
   { year: 1797, name: "Cape St Vincent", at: [-9.5, 36.9], size: 4, left: true, foe: "Spain" },
   { year: 1797, name: "Camperdown", at: [4.6, 52.8], size: 3, foe: "The Dutch" },
   { year: 1798, name: "The Nile", at: [30.1, 31.3], size: 5, foe: "France" },
+  { year: 1805, name: "Trafalgar", at: [-6, 36.2], size: 5, foe: "France and Spain", left: true },
 ];
 
 /* A battle shows for six years: two growing, two full, two fading. */
 const battleScale = (b: Battle, year: number) => {
   const d = year - b.year;
   if (d < 0 || d > 6) return 0;
-  if (d < 2) return d / 2;
+  if (d < 2) return (d + 1) / 2; /* visible from its own year, so 1805 still shows */
   if (d > 4) return (6 - d) / 2;
   return 1;
 };
@@ -219,7 +220,9 @@ export default function TradeRoutes() {
                   cx={cx}
                   cy={cy}
                   r={p.dog ? 6 : 5}
-                  className={p.dog ? styles.dogPort : p.name === "Amsterdam" ? styles.portNl : styles.port}
+                  className={
+                    p.dog ? styles.dogPort : p.name === "Amsterdam" ? styles.portNl : p.name === "London" ? styles.portEn : styles.port
+                  }
                 />
                 {!p.noLabel && (
                   <text
@@ -240,6 +243,7 @@ export default function TradeRoutes() {
       <ul className={styles.legend}>
         <li><span className={`${styles.swatch} ${styles.swatchEn}`} aria-hidden="true" /> English route</li>
         <li><span className={styles.swatchNl} aria-hidden="true" /> Dutch route</li>
+        <li><span className={styles.swatchBattle} aria-hidden="true" /> Sea battle, bigger means bigger fight</li>
       </ul>
       <p className={styles.note}>Simplified map. Routes are drawn through a few points on their general line, not real sailing tracks, and battle markers are sized by how big the fight was, not measured.</p>
     </section>

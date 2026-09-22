@@ -137,6 +137,10 @@
 .portNl {
   fill: #ff7a1a;
 }
+/* London in white, to match the English route (owner, 22 Sept 2026). */
+.portEn {
+  fill: var(--white);
+}
 .dogPort {
   fill: var(--yellow-header);
 }
