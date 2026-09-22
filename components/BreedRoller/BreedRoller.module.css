@@ -28,21 +28,22 @@
   --roller-height: 20vh;
   list-style: none;
   margin: 0;
-  /* The old padding was a percentage, which resolves against WIDTH, so it left a
-     huge gap under the heading. Half the list height minus half a row centres the
-     first item properly (owner, 22 Sept 2026). */
+  /* No padding at either end (owner, 22 Sept 2026): the half-slot of space top
+     and bottom was what centring needed, and it read as a blank row. The list now
+     starts flush under the heading and ends flush at the foot. */
+  padding: 0;
   height: var(--roller-height);
   min-height: 108px;
-  max-height: 160px;
-  padding: calc((var(--roller-height) - var(--text-size) * var(--line-height)) / 2) 0;
+  max-height: 170px;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scroll-snap-type: y proximity;
   font-size: var(--text-size);
   line-height: var(--line-height);
-  text-align: center;
-  mask-image: linear-gradient(to bottom, transparent 0, red 38% 62%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, red 38% 62%, transparent 100%);
+  text-align: left;
+  /* Only the foot fades now, since the top row is the marker. */
+  mask-image: linear-gradient(to bottom, red 0 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, red 0 45%, transparent 100%);
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -51,19 +52,18 @@
 }
 
 .item {
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   opacity: 0.55;
   transition: opacity 0.2s, transform 0.2s;
 }
 .on {
   opacity: 1;
-  transform: scale(1.06);
 }
 
 .link {
   display: flex;
   align-items: baseline;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   color: inherit;
   text-decoration: none;

@@ -24,21 +24,13 @@ export default function BreedRoller() {
   const [centre, setCentre] = useState(0);
 
   /* Coming back from a dog page should land where the user left off, so the
-     scroll position is kept for the session (owner, 22 Sept 2026).
-
-     On a first visit the list is scrolled so the FIRST dog is already under the
-     marker. The list has to carry half its own height as top padding for any
-     item to reach the centre, and at scrollTop 0 that padding showed as a blank
-     band under the heading. Scrolling it away is the fix; do not delete the
-     padding, or nothing can be centred. */
+     scroll position is kept for the session (owner, 22 Sept 2026). */
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
-    const first = list.firstElementChild as HTMLElement | null;
-    const centreFirst = first ? first.offsetTop + first.offsetHeight / 2 - list.clientHeight / 2 : 0;
     try {
       const saved = window.sessionStorage.getItem("pc-breed-roller");
-      list.scrollTop = saved ? Number(saved) : centreFirst;
+      if (saved) list.scrollTop = Number(saved);
     } catch {
       /* private mode: not worth breaking the picker over */
     }
@@ -53,7 +45,10 @@ export default function BreedRoller() {
     return () => list.removeEventListener("scroll", save);
   }, []);
 
-  /* Highlight whichever dog is nearest the middle of the window. */
+  /* Highlight the row at the TOP of the window, not the middle (owner, 22 Sept
+     2026). Centring needed half the list's height as padding at each end, and
+     those empty half-slots were the gap under the heading and the gap at the
+     foot. With the top row as the marker the list runs flush, first dog to last. */
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
@@ -62,12 +57,12 @@ export default function BreedRoller() {
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
         frame = 0;
-        const mid = list.scrollTop + list.clientHeight / 2;
+        const top = list.scrollTop + 4;
         const items = Array.from(list.children) as HTMLElement[];
         let best = 0;
         let bestGap = Infinity;
         items.forEach((el, i) => {
-          const gap = Math.abs(el.offsetTop + el.offsetHeight / 2 - mid);
+          const gap = Math.abs(el.offsetTop - top);
           if (gap < bestGap) {
             bestGap = gap;
             best = i;
