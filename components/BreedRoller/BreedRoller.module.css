@@ -29,9 +29,9 @@
      22 Sept 2026). */
   --text-size: 1rem;
   --line-height: 1.7;
-  /* Two rows on screen (owner, 22 Sept 2026): a row is --text-size times
+  /* Three rows on screen (owner, 22 Sept 2026): a row is --text-size times
      --line-height, about 27px. */
-  --roller-height: 8vh;
+  --roller-height: 11vh;
   list-style: none;
   margin: 0;
   /* No padding at either end (owner, 22 Sept 2026): the half-slot of space top
@@ -39,18 +39,21 @@
      starts flush under the heading and ends flush at the foot. */
   padding: 0;
   height: var(--roller-height);
-  min-height: 56px;
-  max-height: 68px;
+  min-height: 84px;
+  max-height: 96px;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scroll-snap-type: y proximity;
   font-size: var(--text-size);
   line-height: var(--line-height);
   text-align: center;
-  /* Only the foot fades, and only the last sliver of it, so the list does not
-     read as empty space at the bottom (owner, 22 Sept 2026). */
-  mask-image: linear-gradient(to bottom, red 0 78%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, red 0 78%, transparent 100%);
+  /* Both ends fade, as in the picker pattern the owner sent, so dogs roll in at
+     the top and out at the bottom (owner, 22 Sept 2026). The top fade is kept
+     short, 10 per cent, because the marked dog sits on the top line: a full
+     half-row fade there would need padding back, and that padding was the gap we
+     spent the evening removing. */
+  mask-image: linear-gradient(to bottom, transparent 0, red 10% 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, red 10% 55%, transparent 100%);
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
