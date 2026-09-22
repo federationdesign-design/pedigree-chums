@@ -9,6 +9,12 @@ import styles from "./EraNav.module.css";
    BACK button and a NEXT ERA button in the history page's own button style, plus
    a left swipe that moves to the next era.
 
+   BACK goes back one page in the browser's own history, so a reader who came
+   Ancient to Medieval to Tudor lands on Tudor, not at the top of the index
+   (owner, 22 Sept 2026). It stays a real link to the index, which is what a
+   direct arrival, a new tab or a crawler gets, and only intercepts the click
+   when there is somewhere of ours to go back to.
+
    The swipe listens on the document rather than a wrapper so it works wherever
    the reader is on a long page. It only fires on a clear horizontal drag, at
    least 70px across and more across than down, so scrolling the page and
@@ -19,6 +25,17 @@ type Props = { nextHref: string | null; nextLabel: string | null };
 
 export default function EraNav({ nextHref, nextLabel }: Props) {
   const router = useRouter();
+
+  /* Only step back when this page was reached from our own site in this tab;
+     otherwise the link's own href takes over and opens the index. */
+  const goBack = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    const from = typeof document !== "undefined" ? document.referrer : "";
+    const sameSite = !!from && from.startsWith(window.location.origin);
+    if (!sameSite || window.history.length <= 1) return;
+    e.preventDefault();
+    router.back();
+  };
 
   useEffect(() => {
     if (!nextHref) return;
@@ -49,7 +66,7 @@ export default function EraNav({ nextHref, nextLabel }: Props) {
 
   return (
     <div className={styles.row}>
-      <Link href="/britains-dog-history" className={styles.btn}>
+      <Link href="/britains-dog-history" className={styles.btn} onClick={goBack}>
         Back
       </Link>
       {nextHref && (

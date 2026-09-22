@@ -95,10 +95,9 @@ export default function PetPanic() {
 
       <p className={styles.caption} aria-live="polite">{STEPS[step].text}</p>
 
-      <div className={styles.counter}>
-        <span className={styles.big}>{gone === 0 ? "0" : `${(gone * 10000).toLocaleString("en-GB")}`}</span>
-        <span className={styles.counterText}>pets, each dot 10,000</span>
-      </div>
+      {/* The running count and its "each dot 10,000" line were removed on 22 Sept
+          2026 (owner): the dots say it already. The figures are still in the step
+          captions. */}
       {/* Dots empty from the right, so the yellow that is left reads as what
           remains (owner, 22 Sept 2026). */}
       <div className={styles.grid} aria-hidden="true">

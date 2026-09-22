@@ -64,7 +64,9 @@
 
 
 .mapWrap {
-  margin: 0 0 12px;
+  /* Edge to edge: the negative margins cancel the panel padding (owner,
+     22 Sept 2026). */
+  margin: 0 calc(-1 * var(--pad)) 12px;
 }
 .map {
   display: block;
