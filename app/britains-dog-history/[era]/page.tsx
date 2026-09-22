@@ -8,6 +8,8 @@ import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleText
 import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
 import DomesdayMap from "../../../components/DomesdayMap/DomesdayMap";
 import ForestMap from "../../../components/ForestMap/ForestMap";
+import PostRoads from "../../../components/PostRoads/PostRoads";
+import CaiusDogs from "../../../components/CaiusDogs/CaiusDogs";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
 import AncientFacts, { MEDIEVAL_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
@@ -117,6 +119,17 @@ export default async function EraPage({ params }: Props) {
           <div className={styles.pair}>
             <ForestMap />
             <DomesdayMap />
+          </div>
+        </div>
+      )}
+
+      {/* Tudor 'n' Stuart page only: the King's Post map and Caius's dog family
+          tree, side by side on desktop (22 Sept 2026). */}
+      {page.slug === "tudor" && (
+        <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+          <div className={styles.pair}>
+            <PostRoads />
+            <CaiusDogs />
           </div>
         </div>
       )}

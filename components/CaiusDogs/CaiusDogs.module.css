@@ -1,0 +1,176 @@
+/* Caius's dog family tree, Tudor 'n' Stuart page (22 Sept 2026). Blue panel
+   matching the map beside it. Three kind columns when the panel is wide,
+   stacked when narrow (container query, so it works in the half-width pair). */
+
+.panel {
+  --pad: clamp(24px, 3.5vw, 48px);
+  container-type: inline-size;
+  position: relative;
+  margin: 50px 0 0;
+  padding: var(--pad);
+  border-radius: 40px;
+  box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
+  background: linear-gradient(to top right, #00e2ff, #008eff);
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.title {
+  text-align: center;
+  font-size: clamp(40px, 6.5vw, 84px);
+  line-height: 1.05;
+  margin: 0 0 clamp(10px, 1.6vw, 18px);
+}
+
+.intro {
+  margin: 0 0 20px;
+  text-align: center;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  line-height: 1.3;
+}
+
+.tree {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin: 0 0 18px;
+}
+@container (min-width: 760px) {
+  .tree {
+    grid-template-columns: 1.6fr 1fr 1fr;
+  }
+}
+
+.kind {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  padding: 14px 16px;
+}
+
+.kindTitle {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  line-height: 1;
+  color: var(--yellow-header);
+}
+
+.kindQuote {
+  margin: 4px 0 10px;
+  font-size: 0.85rem;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.group {
+  margin: 0 0 10px;
+}
+.group:last-child {
+  margin-bottom: 0;
+}
+
+.groupLabel {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 6px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  background: var(--yellow-header);
+  border-color: var(--yellow-header);
+  color: var(--navy);
+}
+.chip:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.card {
+  background: rgba(10, 58, 87, 0.28);
+  border-radius: 20px;
+  padding: 16px 18px;
+  min-height: 11em;
+}
+
+.cardKind {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cardName {
+  margin: 2px 0 4px;
+  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+  line-height: 1;
+  color: var(--yellow-header);
+}
+
+.cardOld {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+.cardJob {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.cardToday {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.todayLabel {
+  color: var(--yellow-header);
+  font-weight: 800;
+}
+
+.note {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .panel {
+    border-radius: 28px;
+  }
+}
+
+/* Text colour toggle: white text flips to navy; yellow stays. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .kindQuote,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .groupLabel,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .chip:not([aria-pressed="true"]),
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardKind,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardOld,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardJob,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardToday,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
+  color: var(--navy, #0a3a57);
+}
