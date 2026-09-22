@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import BreedStrip from "../BreedStrip";
 import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
+import AncientFacts from "../../../components/AncientFacts/AncientFacts";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
 import { SECTIONS } from "../../../data/historySections";
@@ -89,6 +90,8 @@ export default async function EraPage({ params }: Props) {
                   <SeaLevelMap />
                   <DogTimeline />
                 </div>
+                {/* Three boxed facts from the social slides (22 Sept 2026). */}
+                <AncientFacts />
               </div>
             )}
           </div>
