@@ -118,21 +118,32 @@ export default function MoneyForShips() {
         </svg>
       </div>
 
-      <ul className={styles.facts}>
-        <li><span className={styles.big}>£0.7m</span> government debt in 1688</li>
-        <li><span className={styles.big}>£132m</span> by 1763, after winning the Seven Years War</li>
-        <li><span className={styles.big}>£523m</span> owed in 1802, and now the most powerful country</li>
-      </ul>
+      {/* Three-stop timeline (owner, 22 Sept 2026): was a plain bullet list. */}
+      <ol className={styles.timeline}>
+        {[
+          { figure: "£0.7m", text: "government debt in 1688" },
+          { figure: "£132m", text: "by 1763, after winning the Seven Years War" },
+          { figure: "£523m", text: "owed in 1802, and now the most powerful country" },
+        ].map((s) => (
+          <li key={s.figure} className={styles.stop}>
+            <span className={styles.stopDot} aria-hidden="true" />
+            <span className={styles.big}>{s.figure}</span>
+            <span className={styles.stopText}>{s.text}</span>
+          </li>
+        ))}
+      </ol>
       {/* Explainer on bonds (owner request, 22 Sept 2026). Copy flagged for review.
           The last paragraph is deliberately careful: the money was not conjured from
-          nothing, it was a promise that future taxes would pay for it. */}
+          nothing, it was a promise that future taxes would pay for it. The present-day
+          figure is the ONS public sector finances release for August 2026, which puts
+          debt just below £3 trillion; check it before any reprint. */}
       <div className={styles.explain}>
         <h3 className={styles.explainTitle}>So what is a bond?</h3>
         <p className={styles.explainText}>
           It is not the same as money. A coin is worth what it says right now. A bond is a promise about the future. But because everyone believed Parliament would pay, people bought and sold bonds happily, so a bond worked almost as well as cash.
         </p>
         <p className={styles.explainText}>
-          That belief is what let the government spend sums it did not have. It borrowed from thousands of rich and wealthy people at once, making what is now known as the 1%, paid the interest out of taxes, and the Bank of England printed paper notes backed by the loan. It looked like money out of thin air. Really it was a promise that future taxpayers would pick up the bill, and they did, for two hundred years.
+          That understanding was what let the government spend sums of money it did not have. It borrowed from thousands of rich and wealthy people at once (making them even richer, and what is now known as the 1%). The government paid them back with interest from raising taxes, and ordered the Bank of England to print paper &lsquo;money&rsquo;, which is why they are called &lsquo;notes&rsquo;, backed by that loan. It was like money out of thin air, only backed by a promise. Future taxpayers are still paying for it now: the UK&rsquo;s debt today is just under £3 trillion.
         </p>
       </div>
 

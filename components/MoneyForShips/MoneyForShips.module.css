@@ -90,13 +90,56 @@
   stroke-width: 1.5;
 }
 
-.facts {
+/* Three-stop timeline under the chart (22 Sept 2026). */
+.timeline {
   list-style: none;
+  position: relative;
   display: grid;
-  gap: 8px;
-  padding: 0;
-  margin: 0 0 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 6px 0 0;
+  margin: 0 0 16px;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 16%;
+  right: 16%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.65);
+}
+.stop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   font-weight: 600;
+}
+.stopDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--yellow-header);
+  border: 3px solid var(--white);
+  margin: 6px 0 10px;
+  position: relative;
+  z-index: 1;
+}
+.stopText {
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+@media (max-width: 520px) {
+  .timeline {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .timeline::before {
+    display: none;
+  }
 }
 .big {
   font-family: var(--font-display), system-ui, sans-serif;
@@ -122,7 +165,7 @@
   margin: 0 0 10px;
   font-size: 1rem;
   line-height: 1.45;
-  font-weight: 500;
+  font-weight: 600;
 }
 .explainText:last-child {
   margin-bottom: 0;
@@ -143,7 +186,7 @@
 /* Text colour toggle: white text flips to navy; yellow stays. */
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
-:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .facts,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .timeline,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .explainText,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
   color: var(--navy, #0a3a57);
