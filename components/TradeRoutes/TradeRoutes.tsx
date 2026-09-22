@@ -55,21 +55,23 @@ const PORTS: Port[] = [
    was, not a measured figure: 5 is a fleet-destroying victory (Quiberon Bay, the
    Nile), 2 a smaller action (Dogger Bank). Battles fought in the Americas, such
    as the Saintes in 1782, are outside this map. */
-type Battle = { year: number; name: string; at: LL; size: number; left?: boolean };
+/* `foe` is who the Royal Navy was fighting; it is what the map shows, with the
+   battle name kept as the marker's tooltip (owner, 22 Sept 2026). */
+type Battle = { year: number; name: string; at: LL; size: number; left?: boolean; foe: string };
 const BATTLES: Battle[] = [
-  { year: 1667, name: "Raid on the Medway", at: [0.6, 51.4], size: 4, left: true },
-  { year: 1690, name: "Beachy Head", at: [0.3, 50.5], size: 4 },
-  { year: 1692, name: "Barfleur and La Hougue", at: [-1.3, 49.6], size: 4, left: true },
-  { year: 1704, name: "Gibraltar taken", at: [-5.35, 36.1], size: 3, left: true },
-  { year: 1718, name: "Cape Passaro", at: [15.1, 36.6], size: 3 },
-  { year: 1747, name: "Cape Finisterre", at: [-9.3, 43], size: 3, left: true },
-  { year: 1759, name: "Lagos", at: [-8.7, 37.1], size: 3, left: true },
-  { year: 1759, name: "Quiberon Bay", at: [-3.1, 47.4], size: 5, left: true },
-  { year: 1781, name: "Dogger Bank", at: [3.3, 54.8], size: 2 },
-  { year: 1794, name: "The Glorious First of June", at: [-13, 47.5], size: 4, left: true },
-  { year: 1797, name: "Cape St Vincent", at: [-9.5, 36.9], size: 4, left: true },
-  { year: 1797, name: "Camperdown", at: [4.6, 52.8], size: 3 },
-  { year: 1798, name: "The Nile", at: [30.1, 31.3], size: 5 },
+  { year: 1667, name: "Raid on the Medway", at: [0.6, 51.4], size: 4, left: true, foe: "The Dutch" },
+  { year: 1690, name: "Beachy Head", at: [0.3, 50.5], size: 4, foe: "France" },
+  { year: 1692, name: "Barfleur and La Hougue", at: [-1.3, 49.6], size: 4, left: true, foe: "France" },
+  { year: 1704, name: "Gibraltar taken", at: [-5.35, 36.1], size: 3, left: true, foe: "Spain" },
+  { year: 1718, name: "Cape Passaro", at: [15.1, 36.6], size: 3, foe: "Spain" },
+  { year: 1747, name: "Cape Finisterre", at: [-9.3, 43], size: 3, left: true, foe: "France" },
+  { year: 1759, name: "Lagos", at: [-8.7, 37.1], size: 3, left: true, foe: "France" },
+  { year: 1759, name: "Quiberon Bay", at: [-3.1, 47.4], size: 5, left: true, foe: "France" },
+  { year: 1781, name: "Dogger Bank", at: [3.3, 54.8], size: 2, foe: "The Dutch" },
+  { year: 1794, name: "The Glorious First of June", at: [-13, 47.5], size: 4, left: true, foe: "France" },
+  { year: 1797, name: "Cape St Vincent", at: [-9.5, 36.9], size: 4, left: true, foe: "Spain" },
+  { year: 1797, name: "Camperdown", at: [4.6, 52.8], size: 3, foe: "The Dutch" },
+  { year: 1798, name: "The Nile", at: [30.1, 31.3], size: 5, foe: "France" },
 ];
 
 /* A battle shows for six years: two growing, two full, two fading. */
@@ -199,9 +201,11 @@ export default function TradeRoutes() {
             const r = (5 + b.size * 2.2) * (0.6 + 0.4 * k);
             return (
               <g key={`${b.name}${b.year}`} opacity={k}>
-                <polygon points={burst(cx, cy, r)} className={styles.battle} />
+                <polygon points={burst(cx, cy, r)} className={styles.battle}>
+                  <title>{`${b.name}, ${b.year}`}</title>
+                </polygon>
                 <text x={b.left ? cx - r - 3 : cx + r + 3} y={cy + 3.5} textAnchor={b.left ? "end" : "start"} className={styles.battleLabel}>
-                  {b.name}
+                  {b.foe}
                 </text>
               </g>
             );
