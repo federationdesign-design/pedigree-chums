@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BreedStrip from "../BreedStrip";
+import Nav from "../../../components/Nav/Nav";
+import Footer from "../../../components/Footer/Footer";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
 import AncientFacts from "../../../components/AncientFacts/AncientFacts";
@@ -59,11 +62,20 @@ export default async function EraPage({ params }: Props) {
   const page = eraPageBySlug(era);
   if (!page) notFound();
 
+  /* Site header, footer and the text colour toggle added 22 Sept 2026 at the
+     owner's request, reversing the original "no Nav or Footer" call recorded in
+     docs/social-pages/DECISIONS.md. The toggle sets data-pc-textinvert on this
+     <main>, which the history page's text-toggle rules (history.module.css) use
+     to flip the strip headings, breed names and write-up text to navy. */
   return (
-    <main className={styles.page}>
+    <>
+      <Nav showLogo />
+      <main className={styles.page}>
       <Link href="/britains-dog-history" className={styles.back}>
         Back to Britain&apos;s dog history
       </Link>
+
+      <ArticleTextToggle centered />
 
       {/* The visible era heading is BreedStrip's own stripLabel, a <span>, to
           match the history page exactly. This visually hidden h1 gives the page
@@ -98,6 +110,8 @@ export default async function EraPage({ params }: Props) {
           </div>
         );
       })}
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }

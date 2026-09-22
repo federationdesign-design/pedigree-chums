@@ -1,15 +1,19 @@
 /* Per-era social pages. Deliberately minimal: a back link, then the reused
    BreedStrip slider(s). The era heading and every other visible element come
    from BreedStrip itself, so the treatment matches the history page exactly and
-   nothing is restyled here. No site Nav, Footer or hero, per the brief's "and
-   nothing else" (recorded in docs/social-pages/DECISIONS.md). The body gradient
+   nothing is restyled here. No hero. The site Nav and Footer were left out at
+   first, per the brief's "and nothing else" (docs/social-pages/DECISIONS.md);
+   REVERSED 22 Sept 2026 at the owner's request: Nav, Footer and the text colour
+   toggle are now on every era page. The body gradient
    from the root layout shows through, the same backdrop the history page's
    strips sit on. */
 
 .page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: clamp(20px, 4vw, 48px) 0 clamp(48px, 8vw, 96px);
+  /* Top padding clears the fixed site Nav (menu button 100px plus 18px bar
+     padding on desktop, smaller under 769px). 22 Sept 2026. */
+  padding: 140px 0 clamp(48px, 8vw, 96px);
   /* The strips break full-bleed on their own (margin: calc(50% - 50vw)), so the
      page keeps horizontal overflow contained. */
   overflow-x: hidden;
@@ -85,4 +89,11 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Nav clearance on narrow screens, where the menu button shrinks (22 Sept 2026). */
+@media (max-width: 768px) {
+  .page {
+    padding-top: 100px;
+  }
 }
