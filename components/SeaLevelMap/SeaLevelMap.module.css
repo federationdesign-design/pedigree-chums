@@ -179,7 +179,7 @@
   gap: 8px;
 }
 
-/* Height key: seven band swatches in a row (22 Sept 2026). */
+/* Depth key: seven lost-land swatches in a row (22 Sept 2026). */
 .legendTitle {
   width: 100%;
   justify-content: flex-end;
@@ -195,9 +195,10 @@
 }
 
 .swatch {
-  width: 16px;
+  width: 14px;
   height: 14px;
-  border-radius: 3px;
+  border-radius: 4px;
+  border: 1.5px solid var(--white);
 }
 
 .note {
