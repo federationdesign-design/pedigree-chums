@@ -98,8 +98,9 @@
   font-weight: 600;
 }
 
+/* Edge to edge: negative margins cancel the panel padding (owner, 22 Sept 2026). */
 .mapWrap {
-  margin-top: auto;
+  margin: auto calc(-1 * var(--pad)) 0;
 }
 
 .map {
@@ -113,29 +114,31 @@
 }
 
 /* Sea routes: the English one yellow, the Dutch one white. */
+/* English route white, Dutch route orange (owner, 22 Sept 2026: they were yellow
+   and white). Orange is the House of Orange colour, so it doubles as a nod to
+   William. */
 .routeEn {
   fill: none;
-  stroke: var(--yellow-header);
+  stroke: var(--white);
   stroke-width: 2.4;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .routeNl {
   fill: none;
-  stroke: var(--white);
+  stroke: #ff7a1a;
   stroke-width: 2.4;
   stroke-dasharray: 7 5;
   stroke-linecap: round;
 }
 .port {
   fill: var(--navy);
-  stroke: var(--white);
-  stroke-width: 1.2;
+}
+.portNl {
+  fill: #ff7a1a;
 }
 .dogPort {
   fill: var(--yellow-header);
-  stroke: var(--navy);
-  stroke-width: 1.4;
 }
 /* Sea battles: a burst marker sized by how big the fight was. */
 .battle {
@@ -186,7 +189,7 @@
   width: 22px;
   height: 6px;
   border-radius: 3px;
-  background: var(--yellow-header);
+  background: var(--white);
 }
 .swatchBattle {
   display: inline-block;
@@ -198,7 +201,7 @@
 }
 .swatchNl {
   width: 22px;
-  border-top: 4px dashed var(--white);
+  border-top: 4px dashed #ff7a1a;
 }
 
 .note {

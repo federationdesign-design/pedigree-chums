@@ -21,7 +21,7 @@ import { WORLD_PATHS, lonX, latY } from "../../data/worldOutline";
    Europe, Africa and Asia be drawn much bigger. */
 const VIEW = { x: 444, y: 90, w: 531, h: 315 };
 const START = 1600;
-const END = 1800;
+const END = 1805; /* owner, 22 Sept 2026: was 1800 */
 
 type LL = [number, number];
 const pts = (a: LL[]) => a.map(([lo, la]) => `${lonX(lo).toFixed(1)},${latY(la).toFixed(1)}`).join(" ");
@@ -33,25 +33,21 @@ const EN_BENGAL: LL[] = [[80.3, 13.1], [84, 18], [88.4, 22.6]];
 const EN_CHINA: LL[] = [[80.3, 13.1], [92, 6], [98, 3.5], [103, 1.2], [107, 6], [111, 14], [113.3, 23.1]];
 const NL_EAST: LL[] = [[4.9, 52.4], [-6, 46], [-22, 14], [-28, -8], [-8, -32], [18, -34.4], [55, -28], [85, -12], [106.8, -6.2]];
 
-type Port = { year: number; name: string; at: LL; dog?: boolean; left?: boolean };
+/* `dx`/`dy` nudge a label in map units, about a pixel each at the usual size.
+   `noLabel` marks a point shown without text (owner, 22 Sept 2026). */
+type Port = { year: number; name: string; at: LL; dog?: boolean; left?: boolean; dx?: number; dy?: number; noLabel?: boolean };
 const PORTS: Port[] = [
   { year: 1600, name: "London", at: [0, 51.5], left: true },
   { year: 1602, name: "Amsterdam", at: [4.9, 52.4] },
   { year: 1619, name: "Batavia", at: [106.8, -6.2] },
   { year: 1639, name: "Madras", at: [80.3, 13.1], left: true },
-  { year: 1652, name: "Cape Town", at: [18, -34.4] },
+  { year: 1652, name: "Cape Town", at: [18, -34.4], dx: -5, dy: 8 },
   { year: 1668, name: "Bombay", at: [72.8, 19], left: true },
-  { year: 1688, name: "Pugs reach England", at: [-2, 54], dog: true, left: true },
+  { year: 1688, name: "Pugs reach England", at: [-2, 54], dog: true, left: true, noLabel: true },
   { year: 1690, name: "Calcutta", at: [88.4, 22.6] },
   { year: 1699, name: "Canton", at: [113.3, 23.1] },
 ];
 
-/* What came back, drawn as small labels once the route reaches them. */
-const GOODS: { year: number; text: string; at: LL }[] = [
-  { year: 1619, text: "Nutmeg, cloves, pepper", at: [122, -12] },
-  { year: 1639, text: "Cotton, silk, pepper", at: [74, 5] },
-  { year: 1699, text: "Tea, porcelain, and pugs", at: [118, 32] },
-];
 
 /* SEA BATTLES (owner request, 22 Sept 2026): the Royal Navy's best-known fights
    inside this map window, each popping in on its date and fading a few years
@@ -195,11 +191,6 @@ export default function TradeRoutes() {
           {route(EN_INDIA, 1600, styles.routeEn)}
           {route(EN_BENGAL, 1690, styles.routeEn)}
           {route(EN_CHINA, 1699, styles.routeEn)}
-          {GOODS.filter((g) => year >= g.year).map((g) => (
-            <text key={g.text} x={lonX(g.at[0])} y={latY(g.at[1])} className={styles.portLabel} opacity={grow(g.year)}>
-              {g.text}
-            </text>
-          ))}
           {BATTLES.map((b) => {
             const k = battleScale(b, year);
             if (k <= 0) return null;
@@ -220,10 +211,22 @@ export default function TradeRoutes() {
             const cy = latY(p.at[1]);
             return (
               <g key={p.name} opacity={grow(p.year)}>
-                <circle cx={cx} cy={cy} r={p.dog ? 6 : 5} className={p.dog ? styles.dogPort : styles.port} />
-                <text x={p.left ? cx - 8 : cx + 8} y={cy + 3.5} textAnchor={p.left ? "end" : "start"} className={styles.portLabel}>
-                  {p.name}
-                </text>
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={p.dog ? 6 : 5}
+                  className={p.dog ? styles.dogPort : p.name === "Amsterdam" ? styles.portNl : styles.port}
+                />
+                {!p.noLabel && (
+                  <text
+                    x={(p.left ? cx - 8 : cx + 8) + (p.dx ?? 0)}
+                    y={cy + 3.5 + (p.dy ?? 0)}
+                    textAnchor={p.left ? "end" : "start"}
+                    className={styles.portLabel}
+                  >
+                    {p.name}
+                  </text>
+                )}
               </g>
             );
           })}
@@ -233,8 +236,6 @@ export default function TradeRoutes() {
       <ul className={styles.legend}>
         <li><span className={`${styles.swatch} ${styles.swatchEn}`} aria-hidden="true" /> English route</li>
         <li><span className={styles.swatchNl} aria-hidden="true" /> Dutch route</li>
-        <li><span className={`${styles.swatch} ${styles.swatchLand}`} aria-hidden="true" /> Land</li>
-        <li><span className={styles.swatchBattle} aria-hidden="true" /> Sea battle, bigger means bigger fight</li>
       </ul>
       <p className={styles.note}>Simplified map. Routes are drawn through a few points on their general line, not real sailing tracks, and battle markers are sized by how big the fight was, not measured.</p>
     </section>
