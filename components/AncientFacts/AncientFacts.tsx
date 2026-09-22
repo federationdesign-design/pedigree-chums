@@ -162,6 +162,36 @@ export const NINETEENTH_FACTS: Fact[] = [
   },
 ];
 
+/* 1900s page boxes (owner request, 22 Sept 2026). Sources: the NARPAC leaflet and
+   the 1939 pet panic (Wikipedia, British pet massacre; Hilda Kean, The Great Cat
+   and Dog Massacre, 2017; Dogs Trust for the NCDL speaking out); the PDSA Dickin
+   Medal, founded December 1943, 75 recipients including 38 dogs (PDSA; Historic
+   England); Rip as the Air Raid Patrol's first search dog, credited with finding
+   over 100 people (PDSA). */
+export const TWENTIETH_FACTS: Fact[] = [
+  {
+    heading: "One sentence, one panic",
+    paras: [
+      "The 1939 leaflet was mostly about moving pets to the countryside. One line at the end said that if you could not, it really was kindest to have them destroyed.",
+      "That single sentence is blamed for hundreds of thousands of deaths. Nobody was ever ordered to do anything.",
+    ],
+  },
+  {
+    heading: "The stray who saved 100 people",
+    paras: [
+      "Rip was a stray until an air raid warden fed him during the Blitz. He became the Air Raid Patrol's first search dog, without a day of training.",
+      "He is believed to have found more than 100 people buried under bombed buildings, and search dogs have worked that way ever since.",
+    ],
+  },
+  {
+    heading: "A medal for animals",
+    paras: [
+      "In 1943 Maria Dickin, who founded the PDSA, created a medal for animal bravery. It is known as the animals' Victoria Cross.",
+      "It has gone to 75 animals: 38 dogs, 32 pigeons, four horses and one very good cat.",
+    ],
+  },
+];
+
 /* `facts` lets other era pages reuse the same heading, boxes and styling
    (22 Sept 2026); Ancient passes nothing and gets its own boxes as before. */
 export default function AncientFacts({ facts = FACTS }: { facts?: Fact[] }) {

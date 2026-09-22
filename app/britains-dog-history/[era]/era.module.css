@@ -115,3 +115,10 @@ p.pageLead {
     padding-top: 100px;
   }
 }
+
+/* Mobile intro size (owner, 22 Sept 2026). */
+@media (max-width: 768px) {
+  .pageLead {
+    font-size: calc(clamp(28px, 3.6vw, 36px) - 6pt);
+  }
+}

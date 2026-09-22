@@ -197,3 +197,21 @@
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
   color: var(--navy, #0a3a57);
 }
+
+/* Mobile: the play control and slider sit over the top of the map (owner,
+   22 Sept 2026). The top of each drawing is open sea or sky, so nothing is lost. */
+@media (max-width: 768px) {
+  .controls {
+    position: relative;
+    z-index: 2;
+  }
+  .mapWrap {
+    margin-top: -54px;
+  }
+}
+
+/* Source and note text (owner, 22 Sept 2026). */
+.note {
+  font-weight: 500;
+  line-height: 1.3em;
+}

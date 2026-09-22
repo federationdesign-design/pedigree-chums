@@ -246,3 +246,9 @@
   border-color: var(--white);
   color: var(--navy, #0a3a57);
 }
+
+/* Source and note text (owner, 22 Sept 2026). */
+.note {
+  font-weight: 500;
+  line-height: 1.3em;
+}

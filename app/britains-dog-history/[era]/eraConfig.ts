@@ -78,7 +78,18 @@ export const ERA_PAGES: EraPage[] = [
     intro:
       "At the start of the 1800s, dogs worked for a living, hauling carts of milk and bread through London. Then in 1839 a law banned dog carts within 15 miles of Charing Cross, and more than 3,000 dogs are said to have been destroyed, because a dog that could not earn its keep still had to be fed. By the end of the same century Britain was queuing to admire dogs at shows, inventing breeds and writing rules for them. Same country, same dogs, and a completely different idea of what a dog is for.",
   },
-  { slug: "1900s", title: "The 1900s", strips: ["c1900"] },
+  {
+    slug: "1900s",
+    title: "The 1900s",
+    strips: ["c1900"],
+    /* Owner request, 22 Sept 2026. Sources: the NARPAC leaflet "Advice to Animal
+       Owners" and the September 1939 pet panic, about 400,000 in the first days
+       and an estimated 750,000 in all (Wikipedia, British pet massacre; Hilda
+       Kean, 2017); the PDSA Dickin Medal, founded December 1943 by Maria Dickin
+       (PDSA). */
+    intro:
+      "In September 1939, within days of war being declared, British families queued outside animal clinics to have their pets put to sleep. About 400,000 cats and dogs went in the first week, and perhaps 750,000 in all. No law told anyone to do it: a government leaflet had simply said it would be kindest, and fear did the rest. Four years later the same country invented a medal for brave animals, and started pinning it on dogs.",
+  },
   { slug: "crosses", title: "Today's Crossbreeds", strips: ["crosses"] },
 ];
 
