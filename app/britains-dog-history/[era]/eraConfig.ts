@@ -29,7 +29,17 @@ export const ERA_PAGES: EraPage[] = [
     intro:
       "In ancient times, Britain was not an island. It was connected to mainland Europe by Doggerland. But we are sorry to report that Doggerland has nothing to do with dogs! It is named after the Dogger Bank in the North Sea, which got its name from doggers, the medieval Dutch fishing boats that sailed there to catch cod.",
   },
-  { slug: "medieval", title: "Medieval Times", strips: ["medieval"] },
+  {
+    slug: "medieval",
+    title: "Medieval Times",
+    strips: ["medieval"],
+    /* Owner request, 22 Sept 2026 (option A: the accurate 1066 story; the 1688
+       "invitation" story belongs to William III, not the Conqueror). Sources:
+       English Heritage and History.com on 1066; forest-law restrictions per
+       History Hit and encyclopedia.com "forest laws". */
+    intro:
+      "In 1066 William, Duke of Normandy, sailed to England, saying the old king had promised him the crown. He won the Battle of Hastings, took the throne and became known as William the Conqueror. He also turned huge areas into royal forests for his own hunting, so families who had always gathered firewood, found food and grazed their animals there were suddenly breaking the law.",
+  },
   { slug: "tudor", title: "Tudor Times", strips: ["c1500"] },
   { slug: "1700s", title: "The 1700s", strips: ["c1700"] },
   {
