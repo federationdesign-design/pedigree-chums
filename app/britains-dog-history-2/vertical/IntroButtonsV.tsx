@@ -8,11 +8,16 @@
    nothing to draw but itself. Nothing about the game is written here, which is
    the same bargain TimelineRun makes.
 
-   DOG HISTORY is a plain scroll to the very next slide. It carries a data-goto
-   index that the page's own carousel script reads, so the two buttons stay side
-   by side in one row without one of them needing a second mechanism. */
+   FIRST ERA replaced the old DOG HISTORY scroll button on 22 September 2026
+   (owner): it is a plain link to the Medieval era page. The nextPanel prop is
+   gone with it, so the caller no longer passes one.
 
+   Under the two buttons sits the rolling breed picker, a scrolling column of
+   every dog in every era slider. */
+
+import Link from "next/link";
 import BreedStrip, { stripMatches } from "../../britains-dog-history/BreedStrip";
+import BreedRoller from "../../../components/BreedRoller/BreedRoller";
 import { ukBreeds } from "../../../data/uk-breeds";
 import styles from "./vertical.module.css";
 
@@ -21,12 +26,13 @@ import styles from "./vertical.module.css";
    and cannot drift if the data is reordered. */
 const FIRST_ERA = "ancient-medieval";
 
-export default function IntroButtonsV({ nextPanel }: { nextPanel: number }) {
+export default function IntroButtonsV() {
   const firstBreed = ukBreeds
     .filter((b) => stripMatches(b.strip, FIRST_ERA))
     .sort((a, b) => a.anchor - b.anchor)[0];
 
   return (
+    <>
     <div className={styles.introBtnRow}>
       <BreedStrip
         era={FIRST_ERA}
@@ -47,13 +53,11 @@ export default function IntroButtonsV({ nextPanel }: { nextPanel: number }) {
           );
         }}
       />
-      <button
-        type="button"
-        className={`${styles.introBtn} ${styles.introBtnAlt}`}
-        data-goto={nextPanel}
-      >
-        Dog history
-      </button>
+      <Link href="/britains-dog-history/medieval" className={`${styles.introBtn} ${styles.introBtnAlt}`}>
+        First era
+      </Link>
     </div>
+    <BreedRoller />
+    </>
   );
 }

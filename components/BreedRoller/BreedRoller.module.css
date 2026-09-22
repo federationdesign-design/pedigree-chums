@@ -1,0 +1,70 @@
+/* Rolling breed picker for the mobile intro (22 September 2026), built on the
+   owner's date-picker pattern: one column, scroll snap, faded top and bottom. */
+
+.picker {
+  width: 100%;
+  margin: 16px 0 0;
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.label {
+  display: block;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.3rem;
+  color: var(--yellow-header);
+  margin: 0 0 4px;
+}
+
+.list {
+  --text-size: 1.15rem;
+  --line-height: 2.1;
+  list-style: none;
+  margin: 0;
+  padding: calc(50% - (var(--text-size) * var(--line-height))) 0;
+  height: 44vmin;
+  min-height: 190px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y proximity;
+  font-size: var(--text-size);
+  line-height: var(--line-height);
+  text-align: center;
+  mask-image: linear-gradient(to bottom, transparent 0, red 38% 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, red 38% 62%, transparent 100%);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  scroll-snap-align: center;
+  opacity: 0.55;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.on {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.link {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+.name {
+  font-weight: 700;
+}
+.on .name {
+  color: var(--yellow-header);
+}
+.era {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.8;
+}

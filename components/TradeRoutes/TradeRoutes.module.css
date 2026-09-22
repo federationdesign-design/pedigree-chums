@@ -253,8 +253,11 @@
    (owner, 22 Sept 2026). The map is no longer pulled up under it. */
 @media (max-width: 768px) {
   .controls {
+    /* Sticks to the BOTTOM of the screen (owner, 22 Sept 2026): the maps are
+       tall on a phone, so the slider floats with the part of the map you are
+       looking at, London included, instead of sitting off the top. */
     position: sticky;
-    top: 8px;
+    bottom: 8px;
     z-index: 5;
     padding: 8px 12px;
     border-radius: 999px;
@@ -266,9 +269,9 @@
   }
 }
 
-/* Mobile: the slider moves down to sit directly above the map, so the control
-   and the thing it controls are on screen together (owner, 22 Sept 2026). The
-   panel is a flex column, so the children are simply reordered. */
+/* Mobile: the slider comes after the map and sticks to the bottom of the
+   screen, so the control and the map are on screen together (owner, 22 Sept
+   2026). The panel is a flex column, so the children are reordered. */
 @media (max-width: 768px) {
   .title {
     order: 0;
@@ -282,10 +285,10 @@
   .caption {
     order: 3;
   }
-  .controls {
+  .mapWrap {
     order: 4;
   }
-  .mapWrap {
+  .controls {
     order: 5;
   }
   .legend {

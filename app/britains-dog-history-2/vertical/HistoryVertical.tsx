@@ -130,10 +130,9 @@ const LAID_OUT = (() => {
   });
 })();
 
-/* The slide straight after the intro, which is where the blue button goes.
-   Read out of the laid-out sequence rather than typed as 1, so inserting a
-   slide ahead of it cannot leave the button pointing at the wrong screen. */
-const NEXT_PANEL = LAID_OUT.find((l) => l.entry.type !== "intro")?.first ?? 1;
+/* The old blue button scrolled to the slide after the intro; it is a link to the
+   Medieval era page as of 22 September 2026, so the index it used has gone with
+   it. */
 
 export default function HistoryVertical() {
   return (
@@ -161,7 +160,7 @@ export default function HistoryVertical() {
                   story of how they went from tools and outcasts to the treasured
                   companions ruling our sofas today.
                 </p>
-                <IntroButtons nextPanel={NEXT_PANEL} />
+                <IntroButtons />
               </div>
             </div>
           </div>
