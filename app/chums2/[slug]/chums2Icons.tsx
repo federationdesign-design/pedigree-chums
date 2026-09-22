@@ -12,11 +12,19 @@ export const INTRO_GLYPH: ReactElement = (
   </svg>
 );
 
-// Health conditions: a medical cross inside a rounded shield.
+// Health conditions: the owner's own artwork, /health-icon.svg (21 September 2026),
+// replacing the drawn shield. It is used as an ALPHA MASK over a square filled with
+// currentColor, so it takes the rail's colour exactly like the drawn glyphs do: yellow at
+// rest, navy on hover, and black or white in the accessibility views, whatever colours
+// the file itself was drawn in. Only its shape is used.
 export const HEALTH_GLYPH: ReactElement = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3c3 2 5 2 7 2 0 6-1 11-7 15-6-4-7-9-7-15 2 0 4 0 7-2Z" />
-    <path d="M12 8v6M9 11h6" />
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <defs>
+      <mask id="pc-health-icon-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24" style={{ maskType: "alpha" }}>
+        <image href="/health-icon.svg" x="0" y="0" width="24" height="24" preserveAspectRatio="xMidYMid meet" />
+      </mask>
+    </defs>
+    <rect x="0" y="0" width="24" height="24" fill="currentColor" mask="url(#pc-health-icon-mask)" style={{ stroke: "none" }} />
   </svg>
 );
 
