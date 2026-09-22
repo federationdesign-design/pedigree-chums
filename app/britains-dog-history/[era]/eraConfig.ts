@@ -16,10 +16,19 @@ export type EraPage = {
   slug: string;
   title: string; // page <title> and displayed heading, derived from the era name
   strips: string[]; // uk-breeds strip keys, in history-page order
+  intro?: string; // optional lead paragraph under the h1 (added 22 Sept 2026)
 };
 
 export const ERA_PAGES: EraPage[] = [
-  { slug: "ancient", title: "Ancient Times", strips: ["ancient"] },
+  {
+    slug: "ancient",
+    title: "Ancient Times",
+    strips: ["ancient"],
+    /* Owner request, 22 Sept 2026. Dogger Bank is named after doggers, medieval
+       Dutch cod-fishing boats (Wikipedia: Dogger Bank; Dogger (boat)). */
+    intro:
+      "Sorry to disappoint, but Doggerland has nothing to do with dogs! It is named after the Dogger Bank in the North Sea, which got its name from doggers, the medieval Dutch fishing boats that sailed there to catch cod.",
+  },
   { slug: "medieval", title: "Medieval Times", strips: ["medieval"] },
   { slug: "tudor", title: "Tudor Times", strips: ["c1500"] },
   { slug: "1700s", title: "The 1700s", strips: ["c1700"] },

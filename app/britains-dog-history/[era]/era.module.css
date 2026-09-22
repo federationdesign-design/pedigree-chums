@@ -86,6 +86,14 @@
   margin: 0 0 clamp(20px, 3vw, 34px);
 }
 
+/* Lead under the h1: centred, with room before the toggle (22 Sept 2026). */
+p.pageLead {
+  /* p. prefix: outranks history .lead margins whatever the CSS load order. */
+  text-align: center;
+  margin: 0 auto clamp(20px, 3vw, 34px);
+  padding: 0 16px;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

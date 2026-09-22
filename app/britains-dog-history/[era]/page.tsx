@@ -94,6 +94,10 @@ export default async function EraPage({ params }: Props) {
         <span className="display-yellow">{titleTail}</span>
       </PopHeading>
 
+      {/* Optional lead under the h1, in the history page's .lead style so the
+          text toggle flips it (22 Sept 2026). Only Ancient has one so far. */}
+      {page.intro && <p className={`${hist.lead} ${styles.pageLead}`}>{page.intro}</p>}
+
       <ArticleTextToggle centered />
 
       {/* Ancient page only: map and timeline side by side on desktop, stacked
