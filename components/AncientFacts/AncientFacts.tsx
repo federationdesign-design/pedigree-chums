@@ -74,7 +74,7 @@ export const MEDIEVAL_FACTS: Fact[] = [
    play, AKC Family Dog (2024). The Globe opening in 1599 is common knowledge. */
 export const TUDOR_FACTS: Fact[] = [
   {
-    heading: "Forks? How rude!",
+    heading: "Fork! How rude!",
     paras: [
       "In 1608 a traveller from Somerset called Thomas Coryat saw Italians eating with forks and brought the habit home. Most people still ate with a knife and their fingers, and his friends teased him with the nickname 'Furcifer', the fork-carrier.",
       "The family dog, meanwhile, decided a fork was just a very small, very pointy bone.",
