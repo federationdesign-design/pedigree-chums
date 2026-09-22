@@ -67,7 +67,6 @@ const START = 13300;
 /* Site palette from app/globals.css (owner request, 22 Sept 2026). No sea fill:
    the blue panel shows through as the sea. */
 const LAND = "var(--cta)";
-const COAST = "var(--navy)";
 
 export default function SeaLevelMap() {
   /* Slider runs left to right through time: 0 = START years ago, START = today. */
@@ -102,13 +101,15 @@ export default function SeaLevelMap() {
 
   return (
     <section className={styles.panel} aria-labelledby="sea-level-title">
-      <h2 id="sea-level-title" className={`display ${styles.title}`}>
-        Britain Becomes an <span className="display-yellow">Island</span>
-      </h2>
       <div className={styles.mapWrap}>
-        {/* Controls and intro overlaid on the map (owner request, 22 Sept 2026):
-            slider group top left, intro top right. Stacks above the map on small screens. */}
+        {/* Everything overlaid on the map, which fills the panel top to bottom and
+            edge to edge (owner request, 22 Sept 2026): title across the top, slider
+            group top left, intro and key top right. Stacks above the map on small
+            screens. */}
         <div className={styles.overlay}>
+          <h2 id="sea-level-title" className={`display ${styles.title}`}>
+            Britain Becomes an <span className="display-yellow">Island</span>
+          </h2>
           <div className={styles.overlayLeft}>
             <div className={styles.controls}>
               <button type="button" className={styles.play} onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
@@ -147,9 +148,15 @@ export default function SeaLevelMap() {
 
             <p className={styles.caption} aria-live="polite">{caption}</p>
           </div>
-          <p className={styles.intro}>
-            When the first dogs came to Britain, the sea was far lower and Britain was joined to Europe by a lost land called Doggerland. Press play to watch the sea rise.
-          </p>
+          <div className={styles.overlayRight}>
+            <p className={styles.intro}>
+              When the first dogs came to Britain, the sea was far lower and Britain was joined to Europe by a lost land called Doggerland. Press play to watch the sea rise.
+            </p>
+            <ul className={styles.legend}>
+              <li><span className={styles.swatch} style={{ background: LAND }} /> Dry land</li>
+            </ul>
+            <p className={styles.note}>Simplified map. Coastlines and sea levels are approximate.</p>
+          </div>
         </div>
         <svg viewBox={`0 0 ${W} ${H}`} className={styles.map} role="img" aria-label="Map of Britain and Doggerland as the sea rises">
           {SHELF.map(({ d, a }) => (
@@ -159,20 +166,12 @@ export default function SeaLevelMap() {
             <polygon key={`l${i}`} points={pts(a)} style={{ fill: LAND }} />
           ))}
           <polygon points={pts(ICE)} fill="#ffffff" stroke="#b4b2a9" strokeWidth={0.8} opacity={iceOpacity} />
-          {[GB, IE, NO, ...SMALL, EU.slice(0, 25)].map((a, i) => (
-            <polygon key={`c${i}`} points={pts(a)} fill="none" style={{ stroke: COAST }} strokeWidth={1} strokeDasharray="3 2" />
-          ))}
+          {/* Dashed outline of today's coastline removed at owner request, 22 Sept 2026. */}
           <text x={250} y={190} fontSize={13} fill="#ffffff" opacity={sea < -14 ? 1 : 0} className={styles.mapLabel}>
             Doggerland
           </text>
         </svg>
       </div>
-
-      <ul className={styles.legend}>
-        <li><span className={styles.swatch} style={{ background: LAND }} /> Dry land</li>
-        <li><span className={styles.dash} /> Today&apos;s coastline</li>
-      </ul>
-      <p className={styles.note}>Simplified map. Coastlines and sea levels are approximate.</p>
     </section>
   );
 }
