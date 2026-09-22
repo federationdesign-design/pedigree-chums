@@ -35,9 +35,9 @@ const KINDS: Kind[] = [
           { id: "bloodhound", name: "Bloodhound", old: "Blud-hunde", job: "Followed the scent of blood, and was trained to track cattle thieves on the border between England and Scotland.", today: "The Bloodhound.", img: "/bloodhound-square.jpg", pack: ["Bloodhound"] },
           { id: "gazehound", name: "Gazehound", old: "Gasehunde", job: "Hunted by sight, not smell. It picked out one animal from a whole herd and chased it down.", today: "A lost type, though today's sighthounds hunt the same way.", img: "/history/breeds/rough-northern-sighthounds.jpg" },
           { id: "greyhound", name: "Greyhound", old: "Grehunde", job: "The fastest of all, chasing hares, deer and foxes. Caius said its name meant it was top of the dogs.", today: "The Greyhound.", img: "/greyhound-square.jpg", pack: ["Greyhound"] },
-          { id: "leviner", name: "Leviner", old: "Leviner", job: "Halfway between a harrier and a greyhound: a good nose and fast legs. It was led on a leash called a lyam.", today: "Most like today's lurchers.", img: "/lercher-square.jpg", pack: ["Lurcher"] },
-          { id: "tumbler", name: "Tumbler", old: "Tumbler", job: "A trickster. It pretended to ignore the rabbits, lay low by their burrow, then pounced as they came home.", today: "A lost type." },
-          { id: "stealer", name: "Stealer", old: "Night curre", job: "Hunted rabbits silently in the dark and carried them back to its master.", today: "A lost type." },
+          { id: "leviner", name: "Leviner", old: "Leviner", job: "Halfway between a harrier and a greyhound: a good nose and fast legs. It was led on a leash called a lyam.", today: "A lost type. Longdogs and lurchers are the nearest thing today." },
+          { id: "tumbler", name: "Tumbler", old: "Tumbler", job: "A trickster. It pretended to ignore the rabbits, lay low by their burrow, then pounced as they came home. Caius said it looked like a small mongrel greyhound.", today: "A lost type, but its job lives on in today's lurchers.", pack: ["Lurcher"] },
+          { id: "stealer", name: "Stealer", old: "Night curre", job: "Hunted rabbits silently in the dark and carried them back to its master: a poacher's dog.", today: "A lost type, but its job lives on in today's lurchers.", pack: ["Lurcher"] },
         ],
       },
       {
@@ -181,6 +181,18 @@ export default function CaiusDogs() {
             ))}
           </ul>
         )}
+      </div>
+
+      {/* Why some of Caius's dogs have no level (owner request, 22 Sept 2026). The
+          lurcher link follows Caius's own description of the Tumbler as like "a
+          mungrell Grehounde" and the Stealer as a silent night rabbit-catcher; the
+          word lurcher, from "lurch" (to lurk or steal), is first used for a dog in
+          1668 (Wikipedia, Lurcher). */}
+      <div className={styles.why}>
+        <h3 className={styles.whyTitle}>Why don&apos;t all these dogs have a level?</h3>
+        <p className={styles.whyText}>
+          Caius named dogs by the job they did, not by breed, and most of those jobs never became breeds of their own. The Gazehound hunted by sight, much like our Rough northern sighthounds. The Wappe and the Dancer were mongrels, like our Cur. The Leviner was an in-between hound that has simply been lost. And the Tumbler and the Stealer were crafty poachers&apos; dogs whose job lives on in today&apos;s Lurcher.
+        </p>
       </div>
 
       <p className={styles.note}>

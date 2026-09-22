@@ -194,6 +194,24 @@
   font-weight: 800;
 }
 
+.why {
+  margin: 16px 0 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+  padding: 12px 0 0;
+}
+.whyTitle {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--yellow-header);
+}
+.whyText {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
 .note {
   margin: 14px 0 0;
   text-align: center;
@@ -216,6 +234,7 @@
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardJob,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardToday,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .packName,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .whyText,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
   color: var(--navy, #0a3a57);
 }
