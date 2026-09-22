@@ -58,6 +58,17 @@
   text-align: right;
 }
 
+.overlayBottom {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: min(60%, 460px);
+  padding: var(--pad);
+  text-align: right;
+  text-shadow: 0 1px 3px rgba(10, 58, 87, 0.6);
+}
+
 .intro {
   margin: 0;
   text-align: right;
@@ -223,6 +234,12 @@
     position: static;
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+  .overlayBottom {
+    position: static;
+    width: 100%;
+    text-align: left;
+    padding: 16px var(--pad) var(--pad);
   }
   .overlayLeft,
   .overlayRight {

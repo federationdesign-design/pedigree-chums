@@ -141,7 +141,7 @@ export default function SeaLevelMap() {
       <div className={styles.mapWrap}>
         {/* Everything overlaid on the map, which fills the panel top to bottom and
             edge to edge (owner request, 22 Sept 2026): title across the top, slider
-            group top left, intro and key top right. Stacks above the map on small
+            group top left, intro top right, key bottom right. Stacks above the map on small
             screens. */}
         <div className={styles.overlay}>
           <h2 id="sea-level-title" className={`display ${styles.title}`}>
@@ -198,20 +198,8 @@ export default function SeaLevelMap() {
           </div>
           <div className={styles.overlayRight}>
             <p className={styles.intro}>
-              When the first dogs came to Britain, the sea was far lower and Britain was joined to Europe by a lost land called Doggerland. Press play to watch the sea rise.
+              In the past the sea was far lower and Britain was joined to Europe by now lost to the sea landmass called Doggerland.
             </p>
-            <ul className={styles.legend}>
-              <li><span className={styles.swatch} style={{ background: LAND }} /> Land today</li>
-              <li className={styles.legendTitle}>Lost land, depth under today&apos;s sea</li>
-              <li className={styles.scale}>
-                <span>12 m</span>
-                {DEPTHS.map((d) => (
-                  <span key={d} className={styles.swatch} style={{ background: DEPTH_FILLS[d] }} />
-                ))}
-                <span>120 m</span>
-              </li>
-            </ul>
-            <p className={styles.note}>Simplified map. Coastlines and sea levels are approximate.</p>
           </div>
         </div>
         <svg viewBox={`0 ${CROP_Y} ${W} ${CROP_H}`} className={styles.map} role="img" aria-label="Map of Britain and Doggerland as the sea rises">
@@ -227,6 +215,21 @@ export default function SeaLevelMap() {
             Doggerland
           </text>
         </svg>
+        {/* Key and note moved to the bottom right of the map (owner request, 22 Sept 2026). */}
+        <div className={styles.overlayBottom}>
+          <ul className={styles.legend}>
+            <li><span className={styles.swatch} style={{ background: LAND }} /> Land today</li>
+            <li className={styles.legendTitle}>Lost land, depth under today&apos;s sea</li>
+            <li className={styles.scale}>
+              <span>12 m</span>
+              {DEPTHS.map((d) => (
+                <span key={d} className={styles.swatch} style={{ background: DEPTH_FILLS[d] }} />
+              ))}
+              <span>120 m</span>
+            </li>
+          </ul>
+          <p className={styles.note}>Simplified map. Coastlines and sea levels are approximate.</p>
+        </div>
       </div>
     </section>
   );
