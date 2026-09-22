@@ -141,7 +141,7 @@ export default function SeaLevelMap() {
                 <span className={styles.statValue}>{yearsAgo.toLocaleString("en-GB")}</span>
               </div>
               <div className={styles.stat}>
-                <span className={styles.statLabel}>Sea level against today</span>
+                <span className={styles.statLabel}>Sea level</span>
                 <span className={styles.statValue}>{seaShown === 0 ? "0" : seaShown} m</span>
               </div>
             </div>
