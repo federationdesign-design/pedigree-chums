@@ -6,6 +6,7 @@ import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
+import DomesdayMap from "../../../components/DomesdayMap/DomesdayMap";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
 import AncientFacts, { MEDIEVAL_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
@@ -107,6 +108,14 @@ export default async function EraPage({ params }: Props) {
       {/* Ancient page only: map and timeline side by side on desktop, stacked
           below 1024px, at the top of the page above the strip (owner request,
           22 Sept 2026). */}
+      {/* Medieval page only: Domesday land map at the top (22 Sept 2026). The
+          forest-growth map is to follow alongside it. */}
+      {page.slug === "medieval" && (
+        <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+          <DomesdayMap />
+        </div>
+      )}
+
       {page.slug === "ancient" && (
         <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
           <div className={styles.pair}>
