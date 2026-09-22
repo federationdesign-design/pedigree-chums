@@ -177,7 +177,7 @@ export default function DomesdayMap() {
       <div className={styles.layout}>
         <div className={styles.side}>
           <h2 id="domesday-title" className={`display ${styles.title}`}>
-            Who Held <span className="display-yellow">England</span> in 1086?
+            Who <span className="display-yellow">Owned</span> What in 1086?
           </h2>
           <p className={styles.intro}>
             William the Conqueror&apos;s Domesday Book recorded who held almost every village in England. Each dot is a place in the book, coloured by who held most of it. Tap a button to see whose land was whose.
