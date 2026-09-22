@@ -205,7 +205,7 @@ export default function SeaLevelMap() {
             </p>
           </div>
         </div>
-        <svg viewBox={`0 ${CROP_Y} ${W} ${CROP_H}`} className={styles.map} role="img" aria-label="Map of Britain and Doggerland as the sea rises">
+        <svg viewBox={`0 ${CROP_Y} ${W} ${CROP_H}`} className={styles.map} preserveAspectRatio="xMidYMax slice" role="img" aria-label="Map of Britain and Doggerland as the sea rises">
           {SHELF.map(({ d, a }) => (
             <polygon key={d} points={pts(a)} style={{ fill: DEPTH_FILLS[d] }} opacity={Math.min(1, Math.max(0, (-d + 3 - sea) / 6))} />
           ))}
