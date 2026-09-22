@@ -265,3 +265,33 @@
     margin-top: 0;
   }
 }
+
+/* Mobile: the slider moves down to sit directly above the map, so the control
+   and the thing it controls are on screen together (owner, 22 Sept 2026). The
+   panel is a flex column, so the children are simply reordered. */
+@media (max-width: 768px) {
+  .title {
+    order: 0;
+  }
+  .intro {
+    order: 1;
+  }
+  .stats {
+    order: 2;
+  }
+  .caption {
+    order: 3;
+  }
+  .controls {
+    order: 4;
+  }
+  .mapWrap {
+    order: 5;
+  }
+  .legend {
+    order: 6;
+  }
+  .note {
+    order: 7;
+  }
+}
