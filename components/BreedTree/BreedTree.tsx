@@ -14095,7 +14095,7 @@ export default function BreedTree({
                     );
                   })()
                 ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? chipBand.fg : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? (chipBand === RARITY_BAND.common || chipBand === RARITY_BAND.uncommon ? "#ffffff" /* white on the orange and green tokens too, 21 Sept 2026 (owner), to match their white ring; the band labels elsewhere keep RARITY_BAND's black */ : chipBand.fg) : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
                     {`${item.pct}%`}
                   </text>
                 ))}
