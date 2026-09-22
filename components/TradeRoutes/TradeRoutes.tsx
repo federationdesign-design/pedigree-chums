@@ -53,6 +53,46 @@ const GOODS: { year: number; text: string; at: LL }[] = [
   { year: 1699, text: "Tea, porcelain, and pugs", at: [118, 32] },
 ];
 
+/* SEA BATTLES (owner request, 22 Sept 2026): the Royal Navy's best-known fights
+   inside this map window, each popping in on its date and fading a few years
+   later. `size` is an editorial 1 to 5 for how big and how important the battle
+   was, not a measured figure: 5 is a fleet-destroying victory (Quiberon Bay, the
+   Nile), 2 a smaller action (Dogger Bank). Battles fought in the Americas, such
+   as the Saintes in 1782, are outside this map. */
+type Battle = { year: number; name: string; at: LL; size: number; left?: boolean };
+const BATTLES: Battle[] = [
+  { year: 1667, name: "Raid on the Medway", at: [0.6, 51.4], size: 4, left: true },
+  { year: 1690, name: "Beachy Head", at: [0.3, 50.5], size: 4 },
+  { year: 1692, name: "Barfleur and La Hougue", at: [-1.3, 49.6], size: 4, left: true },
+  { year: 1704, name: "Gibraltar taken", at: [-5.35, 36.1], size: 3, left: true },
+  { year: 1718, name: "Cape Passaro", at: [15.1, 36.6], size: 3 },
+  { year: 1747, name: "Cape Finisterre", at: [-9.3, 43], size: 3, left: true },
+  { year: 1759, name: "Lagos", at: [-8.7, 37.1], size: 3, left: true },
+  { year: 1759, name: "Quiberon Bay", at: [-3.1, 47.4], size: 5, left: true },
+  { year: 1781, name: "Dogger Bank", at: [3.3, 54.8], size: 2 },
+  { year: 1794, name: "The Glorious First of June", at: [-13, 47.5], size: 4, left: true },
+  { year: 1797, name: "Cape St Vincent", at: [-9.5, 36.9], size: 4, left: true },
+  { year: 1797, name: "Camperdown", at: [4.6, 52.8], size: 3 },
+  { year: 1798, name: "The Nile", at: [30.1, 31.3], size: 5 },
+];
+
+/* A battle shows for six years: two growing, two full, two fading. */
+const battleScale = (b: Battle, year: number) => {
+  const d = year - b.year;
+  if (d < 0 || d > 6) return 0;
+  if (d < 2) return d / 2;
+  if (d > 4) return (6 - d) / 2;
+  return 1;
+};
+
+/* An eight-pointed burst, drawn around a centre. */
+const burst = (cx: number, cy: number, r: number) =>
+  Array.from({ length: 16 }, (_, i) => {
+    const a = (Math.PI * i) / 8;
+    const rad = i % 2 === 0 ? r : r * 0.45;
+    return `${(cx + Math.cos(a) * rad).toFixed(1)},${(cy + Math.sin(a) * rad).toFixed(1)}`;
+  }).join(" ");
+
 const EVENTS: [number, string][] = [
   [1699, "English ships begin trading at Canton in China. Tea, silk and porcelain sail home, and so do small flat-faced dogs from the east."],
   [1690, "Calcutta is founded. English trading posts now ring the Indian coast."],
@@ -160,6 +200,21 @@ export default function TradeRoutes() {
               {g.text}
             </text>
           ))}
+          {BATTLES.map((b) => {
+            const k = battleScale(b, year);
+            if (k <= 0) return null;
+            const cx = lonX(b.at[0]);
+            const cy = latY(b.at[1]);
+            const r = (5 + b.size * 2.2) * (0.6 + 0.4 * k);
+            return (
+              <g key={`${b.name}${b.year}`} opacity={k}>
+                <polygon points={burst(cx, cy, r)} className={styles.battle} />
+                <text x={b.left ? cx - r - 3 : cx + r + 3} y={cy + 3.5} textAnchor={b.left ? "end" : "start"} className={styles.battleLabel}>
+                  {b.name}
+                </text>
+              </g>
+            );
+          })}
           {PORTS.filter((p) => year >= p.year).map((p) => {
             const cx = lonX(p.at[0]);
             const cy = latY(p.at[1]);
@@ -179,8 +234,9 @@ export default function TradeRoutes() {
         <li><span className={`${styles.swatch} ${styles.swatchEn}`} aria-hidden="true" /> English route</li>
         <li><span className={styles.swatchNl} aria-hidden="true" /> Dutch route</li>
         <li><span className={`${styles.swatch} ${styles.swatchLand}`} aria-hidden="true" /> Land</li>
+        <li><span className={styles.swatchBattle} aria-hidden="true" /> Sea battle, bigger means bigger fight</li>
       </ul>
-      <p className={styles.note}>Simplified map. Routes are drawn through a few points on their general line, not real sailing tracks.</p>
+      <p className={styles.note}>Simplified map. Routes are drawn through a few points on their general line, not real sailing tracks, and battle markers are sized by how big the fight was, not measured.</p>
     </section>
   );
 }
