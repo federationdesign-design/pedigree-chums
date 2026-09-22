@@ -3,7 +3,10 @@
 
 .picker {
   width: 100%;
-  margin: 16px 0 0;
+  /* auto pushes the picker to the foot of the intro slide when that slide is a
+     flex column, and reads as 0 elsewhere (owner, 22 Sept 2026). */
+  margin: auto 0 0;
+  padding-top: 12px;
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
 }
@@ -13,7 +16,7 @@
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: 1.3rem;
   color: var(--yellow-header);
-  margin: 0 0 4px;
+  margin: 0;
 }
 
 .list {
@@ -21,9 +24,11 @@
   --line-height: 2.1;
   list-style: none;
   margin: 0;
-  padding: calc(50% - (var(--text-size) * var(--line-height))) 0;
-  height: 44vmin;
-  min-height: 190px;
+  /* The old padding was a percentage, which resolves against WIDTH, so it left a
+     huge gap under the heading. Half the list height minus half a row centres the
+     first item properly (owner, 22 Sept 2026). */
+  height: 200px;
+  padding: calc(100px - (var(--text-size) * var(--line-height)) / 2) 0;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scroll-snap-type: y proximity;

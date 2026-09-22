@@ -13,7 +13,11 @@ import { levelBreeds, levelSlug } from "../../data/levels";
    order here is the campaign order and cannot drift from the sliders. Only dogs
    that have their own page are listed, since tapping one opens that page. */
 
-const DOGS = levelBreeds().map((b) => ({ name: b.name, era: b.era, slug: levelSlug(b.name) }));
+/* A to Z, not timeline order (owner, 22 Sept 2026): this is a find-a-dog list,
+   so the alphabet is the useful order. */
+const DOGS = levelBreeds()
+  .map((b) => ({ name: b.name, era: b.era, slug: levelSlug(b.name) }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 export default function BreedRoller() {
   const listRef = useRef<HTMLUListElement | null>(null);
@@ -74,7 +78,7 @@ export default function BreedRoller() {
 
   return (
     <div className={styles.picker}>
-      <span className={styles.label}>Find a dog</span>
+      <span className={styles.label}>Britain&rsquo;s dogs a-z</span>
       <ul className={styles.list} ref={listRef} aria-label="Every dog in the timeline">
         {DOGS.map((d, i) => (
           <li key={d.slug} className={`${styles.item} ${i === centre ? styles.on : ""}`}>
