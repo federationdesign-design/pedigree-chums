@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import styles from "./BreedExplosion.module.css";
 import { ukBreeds } from "../../data/uk-breeds";
 
@@ -16,11 +17,9 @@ import { ukBreeds } from "../../data/uk-breeds";
 
 const FROM = 1800;
 const TO = 1900;
-const MARKS: { year: number; text: string }[] = [
-  { year: 1859, text: "First dog show" },
-  { year: 1873, text: "Kennel Club" },
-  { year: 1891, text: "First Crufts" },
-];
+/* Only the Kennel Club is marked now (owner, 22 Sept 2026): the 1859 first show
+   and 1891 first Crufts lines were removed. */
+const MARKS: { year: number; text: string }[] = [{ year: 1873, text: "Kennel Club" }];
 
 const W = 620;
 const H = 300;
@@ -28,21 +27,21 @@ const PAD = { l: 34, r: 14, t: 34, b: 46 };
 
 export default function BreedExplosion() {
   const decades = useMemo(() => {
-    const out: { decade: number; names: string[] }[] = [];
+    const out: { decade: number; dogs: { name: string; image?: string }[] }[] = [];
     for (let d = FROM; d < TO; d += 10) {
       out.push({
         decade: d,
-        names: ukBreeds
+        dogs: ukBreeds
           .filter((b) => b.anchor >= d && b.anchor < d + 10)
-          .map((b) => b.name)
-          .sort(),
+          .map((b) => ({ name: b.name, image: b.image }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
       });
     }
     return out;
   }, []);
 
   const [open, setOpen] = useState<number | null>(1870);
-  const max = Math.max(...decades.map((d) => d.names.length), 1);
+  const max = Math.max(...decades.map((d) => d.dogs.length), 1);
   const bw = (W - PAD.l - PAD.r) / decades.length;
   const bx = (i: number) => PAD.l + i * bw;
   const by = (n: number) => H - PAD.b - (n / max) * (H - PAD.t - PAD.b);
@@ -71,7 +70,7 @@ export default function BreedExplosion() {
             );
           })}
           {decades.map((d, i) => {
-            const n = d.names.length;
+            const n = d.dogs.length;
             const on = d.decade === open;
             return (
               <g key={d.decade} onClick={() => setOpen(d.decade)} className={styles.barHit}>
@@ -91,9 +90,22 @@ export default function BreedExplosion() {
         </svg>
       </div>
 
+      {/* Tag wall of the decade's dogs, each with its round portrait where the
+          catalogue has one (owner, 22 Sept 2026). */}
       <div className={styles.picked} aria-live="polite">
-        <span className={styles.pickedTitle}>{chosen ? `${chosen.decade}s: ${chosen.names.length} dogs` : "Tap a bar"}</span>
-        <p className={styles.pickedNames}>{chosen ? chosen.names.join(" · ") : ""}</p>
+        <span className={styles.pickedTitle}>{chosen ? `${chosen.decade}s: ${chosen.dogs.length} dogs` : "Tap a bar"}</span>
+        <ul className={styles.tagWall}>
+          {chosen?.dogs.map((dog) => (
+            <li key={dog.name} className={styles.tag}>
+              {dog.image ? (
+                <Image src={encodeURI(dog.image)} alt="" width={40} height={40} className={styles.tagImg} unoptimized />
+              ) : (
+                <span className={styles.tagImg} aria-hidden="true" />
+              )}
+              <span className={styles.tagName}>{dog.name}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <p className={styles.note}>
