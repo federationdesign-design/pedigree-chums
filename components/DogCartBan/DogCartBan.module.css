@@ -1,0 +1,150 @@
+/* The Dog Cart Ban panel, 1800s page (22 September 2026). Blue container matching
+   the other era panels. */
+
+.panel {
+  --pad: clamp(24px, 3.5vw, 48px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 50px 0 0;
+  padding: var(--pad);
+  border-radius: 40px;
+  box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
+  background: linear-gradient(to top right, #00e2ff, #008eff);
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.title {
+  text-align: center;
+  font-size: clamp(40px, 6.5vw, 84px);
+  line-height: 1.05;
+  margin: 0 0 clamp(10px, 1.6vw, 18px);
+}
+
+.intro {
+  margin: 0 0 16px;
+  text-align: center;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  line-height: 1.3;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+.stepBtn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 2px solid var(--navy);
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.stepOn {
+  background: var(--yellow-header);
+  border-color: var(--yellow-header);
+  color: var(--navy);
+}
+.stepBtn:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.caption {
+  margin: 0 0 14px;
+  min-height: 3.2em;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.mapWrap {
+  margin: 0 0 14px;
+}
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.land {
+  fill: var(--cta);
+}
+.ring {
+  fill: rgba(255, 237, 0, 0.18);
+  stroke: var(--yellow-header);
+  stroke-width: 2.5;
+  stroke-dasharray: 7 5;
+}
+.town {
+  fill: var(--navy);
+}
+.townLabel,
+.ringLabel {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  fill: var(--white);
+}
+.ringLabel {
+  fill: var(--yellow-header);
+}
+
+.dogs {
+  margin: 0 0 12px;
+}
+.dogsTitle {
+  display: block;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.dogGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+.dogDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--yellow-header);
+  transition: background 0.3s, opacity 0.3s;
+}
+.dogGone {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  opacity: 0.7;
+}
+.dogsText {
+  margin: 0;
+  font-weight: 600;
+}
+
+.note {
+  margin: auto 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 480px) {
+  .panel {
+    border-radius: 28px;
+  }
+}
+
+/* Text colour toggle: white text flips to navy; yellow stays. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .caption,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .dogs,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
+  color: var(--navy, #0a3a57);
+}

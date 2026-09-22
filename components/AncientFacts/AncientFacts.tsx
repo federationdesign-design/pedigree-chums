@@ -131,6 +131,37 @@ export const EIGHTEENTH_FACTS: Fact[] = [
   },
 ];
 
+/* 1800s page boxes (owner request, 22 Sept 2026). Sources: Metropolitan Police
+   Act 1839 section 56 and its 40 shilling penalty, and the extension to the rest
+   of England and Wales in 1854 (Wikipedia, Drafting (dog); Wikipedia, Victorian
+   morality); the Newcastle show of 28 to 29 June 1859, tacked onto a poultry show,
+   60 dogs, pointers and setters only, shotguns as prizes (Canine Chronicle;
+   BRANCH, Philip Howell; Project Upland); the Kennel Club 1873 and Battersea 1860
+   are standard history. */
+export const NINETEENTH_FACTS: Fact[] = [
+  {
+    heading: "Banned overnight",
+    paras: [
+      "From 1 January 1840, using a dog to pull a cart anywhere within 15 miles of Charing Cross cost you a fine of forty shillings, and five pounds if you did it again.",
+      "In 1854 the ban spread to the rest of England and Wales. Cart dogs simply vanished from British streets.",
+    ],
+  },
+  {
+    heading: "A show for two breeds",
+    paras: [
+      "Britain's first organised dog show was held in Newcastle Town Hall in June 1859, tacked onto a poultry show. Only 60 dogs came, and only pointers and setters were allowed.",
+      "The prizes were not rosettes. They were shotguns, made by one of the organisers.",
+    ],
+  },
+  {
+    heading: "Who says what a breed is?",
+    paras: [
+      "Battersea Dogs Home opened in 1860, and the Kennel Club followed in 1873: the first organisation in the world to write down what each breed should look like.",
+      "From then on a dog could be judged not on what it could do, but on how closely it matched a description in a book.",
+    ],
+  },
+];
+
 /* `facts` lets other era pages reuse the same heading, boxes and styling
    (22 Sept 2026); Ancient passes nothing and gets its own boxes as before. */
 export default function AncientFacts({ facts = FACTS }: { facts?: Fact[] }) {

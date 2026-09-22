@@ -12,8 +12,10 @@ import PostRoads from "../../../components/PostRoads/PostRoads";
 import CaiusDogs from "../../../components/CaiusDogs/CaiusDogs";
 import TradeRoutes from "../../../components/TradeRoutes/TradeRoutes";
 import MoneyForShips from "../../../components/MoneyForShips/MoneyForShips";
+import DogCartBan from "../../../components/DogCartBan/DogCartBan";
+import BreedExplosion from "../../../components/BreedExplosion/BreedExplosion";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
-import AncientFacts, { MEDIEVAL_FACTS, TUDOR_FACTS, EIGHTEENTH_FACTS } from "../../../components/AncientFacts/AncientFacts";
+import AncientFacts, { MEDIEVAL_FACTS, TUDOR_FACTS, EIGHTEENTH_FACTS, NINETEENTH_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
@@ -138,6 +140,16 @@ export default async function EraPage({ params }: Props) {
 
       {/* 1700s page only: the trade map and the money chart, side by side on
           desktop (22 Sept 2026). */}
+      {/* 1800s page only: the dog-cart ban and the breed explosion (22 Sept 2026). */}
+      {page.slug === "1800s" && (
+        <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+          <div className={styles.pair}>
+            <DogCartBan />
+            <BreedExplosion />
+          </div>
+        </div>
+      )}
+
       {page.slug === "1700s" && (
         <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
           <div className={styles.pair}>
@@ -181,6 +193,12 @@ export default async function EraPage({ params }: Props) {
             {strip === "c1500" && (
               <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
                 <AncientFacts facts={TUDOR_FACTS} />
+              </div>
+            )}
+            {/* 1800s page: "Did you know?" boxes after the first strip (22 Sept 2026). */}
+            {strip === "early1800" && (
+              <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+                <AncientFacts facts={NINETEENTH_FACTS} />
               </div>
             )}
             {/* 1700s page: "Did you know?" boxes (22 Sept 2026). */}

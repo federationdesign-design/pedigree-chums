@@ -70,6 +70,13 @@ export const ERA_PAGES: EraPage[] = [
     slug: "1800s",
     title: "The 1800s",
     strips: ["early1800", "spaniels", "mid1800", "late1800"],
+    /* Owner request, 22 Sept 2026. Sources: Metropolitan Police Act 1839 s.56,
+       banning dogs from drawing carts within 15 miles of Charing Cross from 1
+       January 1840; more than 3,000 dogs destroyed as a result (David Lamb,
+       "Carting Dogs in Chandler's Ford"); the first organised dog show, Newcastle,
+       June 1859 (BRANCH, Philip Howell); the Kennel Club, 1873. */
+    intro:
+      "At the start of the 1800s, dogs worked for a living, hauling carts of milk and bread through London. Then in 1839 a law banned dog carts within 15 miles of Charing Cross, and more than 3,000 dogs are said to have been destroyed, because a dog that could not earn its keep still had to be fed. By the end of the same century Britain was queuing to admire dogs at shows, inventing breeds and writing rules for them. Same country, same dogs, and a completely different idea of what a dog is for.",
   },
   { slug: "1900s", title: "The 1900s", strips: ["c1900"] },
   { slug: "crosses", title: "Today's Crossbreeds", strips: ["crosses"] },
