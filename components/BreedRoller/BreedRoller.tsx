@@ -26,13 +26,37 @@ const LEVEL_ROWS: Row[] = levelBreeds().map((b) => ({
   era: b.era,
   href: `/britains-dog-history/dog/${levelSlug(b.name)}`,
 }));
-/* Pack chums show their era too (owner, 22 Sept 2026). Half of them are in the
-   timeline catalogue and take its era; the rest are breeds from elsewhere that
-   the catalogue does not date, so they read "Today". */
+/* Pack chums show an era too (owner, 22 Sept 2026, "none of the 54 were created
+   today"). Three steps, in order:
+     1. the timeline catalogue's own era, where the pack name is in it;
+     2. the same, under the catalogue's fuller name for four pack short names;
+     3. for breeds the catalogue does not carry at all, mostly ones from abroad,
+        the band their `established` year falls in. That year is when the breed
+        was formally recognised, not when the dog first existed, so the band is an
+        honest floor rather than a claim about origins. */
 const ERA_BY_NAME = new Map(ukBreeds.map((b) => [b.name, b.era]));
+const PACK_ALIAS: Record<string, string> = {
+  "West Highland Terrier": "West Highland White Terrier",
+  "Springer Spaniel": "English Springer Spaniel",
+  Labrador: "Labrador Retriever",
+  Corgi: "Pembroke Welsh Corgi",
+};
+const bandFor = (established: string) => {
+  const year = Number(established.match(/[0-9]{4}/)?.[0]);
+  if (!year) return "1800s";
+  if (year < 1700) return "1600s";
+  if (year < 1800) return "1700s";
+  if (year < 1850) return "early 1800s";
+  if (year < 1880) return "mid 1800s";
+  if (year < 1900) return "late 1800s";
+  return "1900s";
+};
+const packEra = (name: string, established: string) =>
+  ERA_BY_NAME.get(name) ?? ERA_BY_NAME.get(PACK_ALIAS[name] ?? "") ?? bandFor(established);
+
 const PACK_ROWS: Row[] = breeds
   .filter((p) => !LEVEL_ROWS.some((r) => r.name === p.name))
-  .map((p) => ({ name: p.name, era: ERA_BY_NAME.get(p.name) ?? "Today", href: `/chums/${p.slug}` }));
+  .map((p) => ({ name: p.name, era: packEra(p.name, p.established), href: `/chums/${p.slug}` }));
 const DOGS: Row[] = [...LEVEL_ROWS, ...PACK_ROWS].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function BreedRoller() {

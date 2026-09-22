@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import styles from "./SeaLevelMap.module.css";
 
 /* Britain becomes an island: an interactive sea level map for the Ancient era
@@ -103,7 +103,68 @@ const DEPTH_FILLS: Record<number, string> = {
 };
 const DEPTHS = [12, 22, 30, 45, 50, 80, 120];
 
+/* ACCESSIBILITY SCHEMES (owner choice A, 22 Sept 2026). The site's schemes crush
+   any coloured inline SVG to grey (SchemeCrushSvg plus the data-pc-crush filter in
+   app/contrast-schemes.css), which flattened seven shades of green into seven
+   shades of nothing. In a scheme this map therefore draws itself in one colour and
+   tells the depths apart by PATTERN: land is solid, and each lost-land band is a
+   diagonal hatch, wide-spaced in the shallows and tight in the deep. Because every
+   paint is then black, white or a url(), SchemeCrushSvg finds no colour and leaves
+   the map alone, so the patterns survive. The key swatches draw the same patterns,
+   at the same order, so the scale still reads. */
+type Scheme = "black-on-white" | "white-on-black" | null;
+const SCHEME_ATTR = "data-pc-contrast-scheme";
+const readScheme = (): Scheme => {
+  const v = document.documentElement.getAttribute(SCHEME_ATTR);
+  return v === "black-on-white" || v === "white-on-black" ? v : null;
+};
+const subscribeScheme = (cb: () => void) => {
+  const obs = new MutationObserver(cb);
+  obs.observe(document.documentElement, { attributes: true, attributeFilter: [SCHEME_ATTR] });
+  return () => obs.disconnect();
+};
+const useScheme = (): Scheme => useSyncExternalStore(subscribeScheme, readScheme, () => null);
+
+/* Hatch spacing per depth, in map units: 4.5 at 12 m down to 1.1 at 120 m. */
+const HATCH_GAP: Record<number, number> = { 12: 4.5, 22: 3.8, 30: 3.2, 45: 2.7, 50: 2.2, 80: 1.7, 120: 1.1 };
+const hatchId = (d: number) => `sea-hatch-${d}`;
+
+function Hatches({ fg }: { fg: string }) {
+  return (
+    <defs>
+      {DEPTHS.map((d) => {
+        const gap = HATCH_GAP[d];
+        return (
+          <pattern key={d} id={hatchId(d)} width={gap} height={gap} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1={0} y1={0} x2={0} y2={gap} stroke={fg} strokeWidth={0.8} />
+          </pattern>
+        );
+      })}
+    </defs>
+  );
+}
+
+/* One key swatch: solid for land, the depth's own hatch otherwise. */
+function Swatch({ depth, fg }: { depth: number | null; fg: string }) {
+  const gap = depth === null ? 0 : HATCH_GAP[depth];
+  const id = depth === null ? "" : `key-${hatchId(depth)}`;
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      {depth !== null && (
+        <defs>
+          <pattern id={id} width={gap} height={gap} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1={0} y1={0} x2={0} y2={gap} stroke={fg} strokeWidth={0.8} />
+          </pattern>
+        </defs>
+      )}
+      <rect x="1" y="1" width="14" height="14" rx="3" fill={depth === null ? fg : `url(#${id})`} stroke={fg} strokeWidth="1.2" />
+    </svg>
+  );
+}
+
 export default function SeaLevelMap() {
+  const scheme = useScheme();
+  const fg = scheme === "white-on-black" ? "#ffffff" : "#000000";
   /* Slider runs left to right through time: 0 = START years ago, START = today. */
   const [t, setT] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -207,13 +268,28 @@ export default function SeaLevelMap() {
           </div>
         </div>
         <svg viewBox={`0 ${CROP_Y} ${W} ${CROP_H}`} className={styles.map} preserveAspectRatio="xMidYMax slice" role="img" aria-label="Map of Britain and Doggerland as the sea rises">
+          {scheme && <Hatches fg={fg} />}
           {SHELF.map(({ d, a }) => (
-            <polygon key={d} points={pts(a)} style={{ fill: DEPTH_FILLS[d] }} opacity={Math.min(1, Math.max(0, (-d + 3 - sea) / 6))} />
+            <polygon
+              key={d}
+              points={pts(a)}
+              style={{ fill: scheme ? `url(#${hatchId(d)})` : DEPTH_FILLS[d] }}
+              stroke={scheme ? fg : undefined}
+              strokeWidth={scheme ? 0.5 : undefined}
+              opacity={Math.min(1, Math.max(0, (-d + 3 - sea) / 6))}
+            />
           ))}
           {[GB, IE, EU, ...SMALL].map((a, i) => (
-            <polygon key={`l${i}`} points={pts(a)} style={{ fill: LAND }} />
+            <polygon key={`l${i}`} points={pts(a)} style={{ fill: scheme ? fg : LAND }} />
           ))}
-          <polygon points={pts(ICE)} fill="#ffffff" stroke="#b4b2a9" strokeWidth={0.8} opacity={iceOpacity} />
+          <polygon
+            points={pts(ICE)}
+            fill={scheme ? "none" : "#ffffff"}
+            stroke={scheme ? fg : "#b4b2a9"}
+            strokeWidth={scheme ? 1.6 : 0.8}
+            strokeDasharray={scheme ? "6 4" : undefined}
+            opacity={iceOpacity}
+          />
           {/* Dashed outline of today's coastline removed at owner request, 22 Sept 2026. */}
           <text x={250} y={190} fontSize={13} fill="#ffffff" opacity={sea < -14 ? 1 : 0} className={styles.mapLabel}>
             Doggerland
@@ -222,13 +298,15 @@ export default function SeaLevelMap() {
         {/* Key and note moved to the bottom right of the map (owner request, 22 Sept 2026). */}
         <div className={styles.overlayBottom}>
           <ul className={styles.legend}>
-            <li><span className={styles.swatch} style={{ background: LAND }} /> Land today</li>
+            <li>
+              {scheme ? <Swatch depth={null} fg={fg} /> : <span className={styles.swatch} style={{ background: LAND }} />} Land today
+            </li>
             <li className={styles.legendTitle}>Lost land, depth under today&apos;s sea</li>
             <li className={styles.scale}>
               <span>12 m</span>
-              {DEPTHS.map((d) => (
-                <span key={d} className={styles.swatch} style={{ background: DEPTH_FILLS[d] }} />
-              ))}
+              {DEPTHS.map((d) =>
+                scheme ? <Swatch key={d} depth={d} fg={fg} /> : <span key={d} className={styles.swatch} style={{ background: DEPTH_FILLS[d] }} />
+              )}
               <span>120 m</span>
             </li>
           </ul>
