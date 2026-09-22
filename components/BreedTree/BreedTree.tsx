@@ -2049,7 +2049,12 @@ const ROD_HITS = 2;
    that the REAL distance between two nodes is always well past the cap, so every
    rod still lands at exactly the cap, now 20px. Raise the floor too only if the
    real distance ever comes in short. */
-const ROD_MAX_PX = 20;
+/* 20 -> 100, 21 September 2026 (owner: the connectors falling into the pit are much
+   shorter than they should be, about five times longer). The real distance between two
+   lifted nodes still sets a rod shorter than this if the two sat closer than 100px;
+   anything further apart lands at 100. A rod's blast reach is half its longest side, so
+   that grows from 10px to 50px; rods still do not pass a blast on (BOMB_TOUCH). */
+const ROD_MAX_PX = 100;
 /* HOW THICK A CONNECTOR IS, 19 September 2026 (owner: 10px long is fine, but they
    are too thick, the maximum should be 5px).
 
