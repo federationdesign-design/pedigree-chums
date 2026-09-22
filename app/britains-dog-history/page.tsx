@@ -10,6 +10,7 @@ import HistoryVertical from "../britains-dog-history-2/vertical/HistoryVertical"
 import styles from "./history.module.css";
 import HistorySection from "../../components/HistorySection/HistorySection";
 import { SECTIONS } from "../../data/historySections";
+import { ERA_PAGES } from "./[era]/eraConfig";
 
 const pageTriangles: Tri[] = [
   { size: 34, top: "5%", left: "4%", speed: 0.16, spin: 0.22 },
@@ -53,6 +54,14 @@ export const metadata: Metadata = {
   },
 };
 
+
+/* Button under each panel's left-column text, through to that era's own page
+   (22 Sept 2026, owner request). Resolved from the section's strip key via
+   ERA_PAGES, so the four 1800s panels all lead to the one 1800s page. */
+const eraLinkFor = (strip?: string) => {
+  const page = strip ? ERA_PAGES.find((p) => p.strips.includes(strip)) : undefined;
+  return page ? { href: `/britains-dog-history/${page.slug}`, label: `Learn more: ${page.title}` } : undefined;
+};
 
 export default function HistoryPage() {
   return (
@@ -123,7 +132,7 @@ export default function HistoryPage() {
                     speed={0.25}
                   />
                 )}
-                <HistorySection section={s} />
+                <HistorySection section={s} eraLink={eraLinkFor(s.era)} />
               </div>
               {s.era && <BreedStrip era={s.era} />}
               </div>

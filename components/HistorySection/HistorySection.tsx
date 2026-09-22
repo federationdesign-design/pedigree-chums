@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import FactHatImage from "../../app/britains-dog-history/FactHatImage";
 import type { Section } from "../../data/historySections";
 import styles from "../../app/britains-dog-history/history.module.css";
@@ -9,7 +10,10 @@ import styles from "../../app/britains-dog-history/history.module.css";
    The copy comes from data/historySections.ts. Extracted 13 August 2026; see
    that file's note. Markup and classes are unchanged from the old inline version
    in the history page, so the desktop page renders exactly as before. */
-export default function HistorySection({ section: s }: { section: Section }) {
+/* `eraLink`: optional button under the left-column text, linking to that era's
+   own page. Passed only by the history index page (22 Sept 2026, owner request);
+   the era pages leave it off, so they render exactly as before. */
+export default function HistorySection({ section: s, eraLink }: { section: Section; eraLink?: { href: string; label: string } }) {
   const prefix = s.title.slice(0, s.title.length - s.accent.length);
   return (
     <section className={styles.section}>
@@ -34,6 +38,11 @@ export default function HistorySection({ section: s }: { section: Section }) {
         </div>
         <p className={styles.sectionIntro}>{s.intro}</p>
         <p className={styles.detail}>{s.detail}</p>
+        {eraLink && (
+          <Link href={eraLink.href} className={styles.eraLink}>
+            {eraLink.label}
+          </Link>
+        )}
       </div>
       <div className={styles.colRight}>
         <ul className={styles.bullets}>
