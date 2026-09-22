@@ -267,3 +267,92 @@
     order: 7;
   }
 }
+
+/* Accessibility schemes (owner, 22 Sept 2026): the map draws itself in one
+   colour, telling its parts apart by SOLID versus OUTLINE versus DASH rather than
+   by hue. Every paint becomes black or white, so SchemeCrushSvg finds no colour
+   and leaves the drawing alone instead of greying it flat. */
+:root[data-pc-contrast-scheme="black-on-white"] .land {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 1.2;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .banned {
+  fill: #000000;
+  fill-opacity: 0.35;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .ring {
+  fill: none;
+  stroke: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .ringOn {
+  fill: #000000;
+  fill-opacity: 0.55;
+  stroke: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .town {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .townLabel, .ringLabel, .mapNote {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .dogLine {
+  stroke: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .recorded {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 2;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .grid {
+  stroke: #000000;
+  stroke-opacity: 0.5;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .axis {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .slider {
+  accent-color: #000000;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .land {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.2;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .banned {
+  fill: #ffffff;
+  fill-opacity: 0.35;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .ring {
+  fill: none;
+  stroke: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .ringOn {
+  fill: #ffffff;
+  fill-opacity: 0.55;
+  stroke: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .town {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .townLabel, .ringLabel, .mapNote {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .dogLine {
+  stroke: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .recorded {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .grid {
+  stroke: #ffffff;
+  stroke-opacity: 0.5;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .axis {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .slider {
+  accent-color: #ffffff;
+}

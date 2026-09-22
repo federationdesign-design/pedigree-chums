@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import BreedStrip from "../BreedStrip";
 import Nav from "../../../components/Nav/Nav";
@@ -76,8 +75,9 @@ export default async function EraPage({ params }: Props) {
   const page = eraPageBySlug(era);
   if (!page) notFound();
 
-  /* The next era in ERA_PAGES order, for the phone button and the swipe. Null on
-     the last era, where both are simply not rendered (22 Sept 2026). */
+  /* The next era in ERA_PAGES order, for the second button and the swipe. On the
+     last era, Today's Crossbreeds, there is nowhere further to go in the timeline,
+     so the button reads CHUMS and leads to Know your chums (owner, 22 Sept 2026). */
   const nextEra = ERA_PAGES[ERA_PAGES.findIndex((p) => p.slug === era) + 1] ?? null;
 
   /* Site header, footer and the text colour toggle added 22 Sept 2026 at the
@@ -111,18 +111,16 @@ export default async function EraPage({ params }: Props) {
 
       <ArticleTextToggle centered />
 
-      {/* Back link moved below the toggle so it no longer crowds the h1 (owner
-          request, 22 Sept 2026; was the first item on the page). On phones this
-          link is replaced by the two buttons below. */}
-      <div className={styles.backRow}>
-        <Link href="/britains-dog-history" className={styles.back}>
-          Back to Britain&apos;s dog history
-        </Link>
-      </div>
+      {/* The old "Back to Britain's dog history" text link was removed on
+          22 Sept 2026 (owner): the buttons below replace it at every width. Its
+          .back and .backRow rules are kept in era.module.css for now.
 
-      {/* Phones only: BACK and NEXT ERA in the history intro's button style, plus
+          BACK and NEXT ERA in the history intro's button style, plus
           a left swipe to the next era (owner request, 22 Sept 2026). */}
-      <EraNav nextHref={nextEra ? `/britains-dog-history/${nextEra.slug}` : null} nextLabel={nextEra ? "Next era" : null} />
+      <EraNav
+        nextHref={nextEra ? `/britains-dog-history/${nextEra.slug}` : "/know-your-chums"}
+        nextLabel={nextEra ? "Next era" : "Chums"}
+      />
 
       {/* Ancient page only: map and timeline side by side on desktop, stacked
           below 1024px, at the top of the page above the strip (owner request,

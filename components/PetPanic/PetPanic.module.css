@@ -186,3 +186,24 @@
   font-weight: 500;
   line-height: 1.3em;
 }
+
+/* Accessibility schemes (owner, 22 Sept 2026): one colour, told apart by SOLID
+   versus OUTLINE rather than by hue. */
+:root[data-pc-contrast-scheme="black-on-white"] .dot {
+  background: #000000;
+  border: 2px solid #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .dotGone {
+  background: transparent;
+  border: 2px solid #000000;
+  opacity: 0.85;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .dot {
+  background: #ffffff;
+  border: 2px solid #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .dotGone {
+  background: transparent;
+  border: 2px solid #ffffff;
+  opacity: 0.85;
+}

@@ -42,9 +42,10 @@
   box-shadow: 0 2px 0 #0c6a9c;
 }
 
-/* Desktop keeps the plain text link above, so the buttons are a phone thing. */
+/* Shown at every width now that the text link has gone (owner, 22 Sept 2026);
+   on desktop the pair is capped so two buttons do not span the page. */
 @media (min-width: 769px) {
   .row {
-    display: none;
+    max-width: 520px;
   }
 }
