@@ -228,7 +228,10 @@
   stroke: #000000;
   stroke-opacity: 0.5;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .axis, .warLabel {
+:root[data-pc-contrast-scheme="black-on-white"] .axis {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .warLabel {
   fill: #000000;
 }
 :root[data-pc-contrast-scheme="white-on-black"] .line {
@@ -258,6 +261,9 @@
   stroke: #ffffff;
   stroke-opacity: 0.5;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .axis, .warLabel {
+:root[data-pc-contrast-scheme="white-on-black"] .axis {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .warLabel {
   fill: #ffffff;
 }

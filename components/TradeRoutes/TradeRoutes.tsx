@@ -34,7 +34,9 @@ const EN_CHINA: LL[] = [[80.3, 13.1], [92, 6], [98, 3.5], [103, 1.2], [107, 6], 
 const NL_EAST: LL[] = [[4.9, 52.4], [-6, 46], [-22, 14], [-28, -8], [-8, -32], [18, -34.4], [55, -28], [85, -12], [106.8, -6.2]];
 
 /* `dx`/`dy` nudge a label in map units, about a pixel each at the usual size.
-   `noLabel` marks a point shown without text (owner, 22 Sept 2026). */
+   `noLabel` marks a point shown without text. The 1688 pug marker was removed on
+   22 Sept 2026 (owner): a lone yellow dot on Britain with no label read as an
+   error, and the caption still tells the story. */
 type Port = { year: number; name: string; at: LL; dog?: boolean; left?: boolean; dx?: number; dy?: number; noLabel?: boolean };
 const PORTS: Port[] = [
   { year: 1600, name: "London", at: [0, 51.5], left: true },
@@ -43,7 +45,6 @@ const PORTS: Port[] = [
   { year: 1639, name: "Madras", at: [80.3, 13.1], left: true },
   { year: 1652, name: "Cape Town", at: [18, -34.4], dx: -5, dy: 8 },
   { year: 1668, name: "Bombay", at: [72.8, 19], left: true },
-  { year: 1688, name: "Pugs reach England", at: [-2, 54], dog: true, left: true, noLabel: true },
   { year: 1690, name: "Calcutta", at: [88.4, 22.6] },
   { year: 1699, name: "Canton", at: [113.3, 23.1] },
 ];

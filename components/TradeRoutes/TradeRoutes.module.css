@@ -129,7 +129,6 @@
   fill: none;
   stroke: #ff7a1a;
   stroke-width: 2.4;
-  stroke-dasharray: 7 5;
   stroke-linecap: round;
 }
 .port {
@@ -154,14 +153,16 @@
 .battleLabel {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 9px;
+  /* The same share of map width that Connected Britain's labels use (owner,
+     22 Sept 2026): about 3 per cent of a 531-unit viewBox. */
+  font-size: 16px;
   fill: var(--white);
 }
 
 .portLabel {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 9px;
+  font-size: 16px;
   fill: var(--white);
 }
 
@@ -204,9 +205,12 @@
   background: var(--family-emergency);
   border: 1.5px solid var(--white);
 }
+/* Solid, to match the line as drawn (owner, 22 Sept 2026: the key said dashed). */
 .swatchNl {
   width: 22px;
-  border-top: 4px dashed #ff7a1a;
+  height: 6px;
+  border-radius: 3px;
+  background: #ff7a1a;
 }
 
 .note {
@@ -315,10 +319,18 @@
 :root[data-pc-contrast-scheme="black-on-white"] .routeNl {
   stroke: #000000;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .port, .portEn {
+:root[data-pc-contrast-scheme="black-on-white"] .port {
   fill: #000000;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .portNl, .dogPort {
+:root[data-pc-contrast-scheme="black-on-white"] .portEn {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .portNl {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 1.4;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .dogPort {
   fill: none;
   stroke: #000000;
   stroke-width: 1.4;
@@ -327,7 +339,13 @@
   fill: #000000;
   stroke: #ffffff;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .pinLabel, .portLabel, .battleLabel {
+:root[data-pc-contrast-scheme="black-on-white"] .pinLabel {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .portLabel {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .battleLabel {
   fill: #000000;
 }
 :root[data-pc-contrast-scheme="black-on-white"] .slider {
@@ -344,10 +362,18 @@
 :root[data-pc-contrast-scheme="white-on-black"] .routeNl {
   stroke: #ffffff;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .port, .portEn {
+:root[data-pc-contrast-scheme="white-on-black"] .port {
   fill: #ffffff;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .portNl, .dogPort {
+:root[data-pc-contrast-scheme="white-on-black"] .portEn {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .portNl {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.4;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .dogPort {
   fill: none;
   stroke: #ffffff;
   stroke-width: 1.4;
@@ -356,7 +382,13 @@
   fill: #ffffff;
   stroke: #000000;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .pinLabel, .portLabel, .battleLabel {
+:root[data-pc-contrast-scheme="white-on-black"] .pinLabel {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .portLabel {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .battleLabel {
   fill: #ffffff;
 }
 :root[data-pc-contrast-scheme="white-on-black"] .slider {

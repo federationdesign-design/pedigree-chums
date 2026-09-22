@@ -408,7 +408,10 @@
 :root[data-pc-contrast-scheme="black-on-white"] .byeRoad {
   stroke: #000000;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .town, .port {
+:root[data-pc-contrast-scheme="black-on-white"] .town {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .port {
   fill: #000000;
 }
 :root[data-pc-contrast-scheme="black-on-white"] .city {
@@ -416,7 +419,16 @@
   stroke: #000000;
   stroke-width: 0.8;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .townLabel, .cityLabel, .ringLabel, .mapNote {
+:root[data-pc-contrast-scheme="black-on-white"] .townLabel {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .cityLabel {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .ringLabel {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .mapNote {
   fill: #000000;
 }
 :root[data-pc-contrast-scheme="black-on-white"] .slider {
@@ -433,7 +445,10 @@
 :root[data-pc-contrast-scheme="white-on-black"] .byeRoad {
   stroke: #ffffff;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .town, .port {
+:root[data-pc-contrast-scheme="white-on-black"] .town {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .port {
   fill: #ffffff;
 }
 :root[data-pc-contrast-scheme="white-on-black"] .city {
@@ -441,7 +456,16 @@
   stroke: #ffffff;
   stroke-width: 0.8;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .townLabel, .cityLabel, .ringLabel, .mapNote {
+:root[data-pc-contrast-scheme="white-on-black"] .townLabel {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .cityLabel {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .ringLabel {
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .mapNote {
   fill: #ffffff;
 }
 :root[data-pc-contrast-scheme="white-on-black"] .slider {

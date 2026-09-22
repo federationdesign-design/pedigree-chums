@@ -63,6 +63,8 @@ export default function DickinMap() {
             <path key={i} d={d} className={styles.land} />
           ))}
           {DOGS.map((d, i) => {
+            /* Labels take the same share of map width as Connected Britain's
+               (owner, 22 Sept 2026). */
             const cx = lonX(d.at[0]);
             const cy = latY(d.at[1]);
             return (
@@ -72,7 +74,7 @@ export default function DickinMap() {
                   x={d.left ? cx - 9 * S : cx + 9 * S}
                   y={cy + 3.5 * S + (d.dy ?? 0)}
                   textAnchor={d.left ? "end" : "start"}
-                  fontSize={9 * S}
+                  fontSize={13 * S}
                   className={styles.pinLabel}
                 >
                   {d.name}
