@@ -39,6 +39,11 @@ const FACTS: Fact[] = [
 
 export default function AncientFacts() {
   return (
+    <>
+      {/* Section heading above the three boxes (owner request, 22 Sept 2026). */}
+      <h2 className={`display ${styles.factsTitle}`}>
+        Did <span className="display-yellow">you</span> know?
+      </h2>
     <div className={styles.grid}>
       {FACTS.map((f) => (
         <section key={f.heading} className={styles.box}>
@@ -51,5 +56,6 @@ export default function AncientFacts() {
         </section>
       ))}
     </div>
+    </>
   );
 }

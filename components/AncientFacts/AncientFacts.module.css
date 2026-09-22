@@ -1,11 +1,20 @@
 /* Three blue boxes in a row on desktop, stacked on small screens. Styled to
    match the blue panels above them (22 Sept 2026). */
 
+/* "Did you know?" h2 above the boxes: global .display (Luckiest Guy, shadow),
+   sized like the blue panel titles (22 Sept 2026). */
+.factsTitle {
+  margin: 50px 0 0;
+  text-align: center;
+  font-size: clamp(40px, 6.5vw, 84px);
+  line-height: 1.05;
+}
+
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: clamp(20px, 2.5vw, 32px);
-  margin: 50px 0 0;
+  margin: clamp(18px, 2.6vw, 30px) 0 0;
   align-items: stretch;
 }
 @media (min-width: 900px) {
@@ -50,6 +59,7 @@
 
 /* Text colour toggle (22 Sept 2026): white body text flips to navy; the yellow
    titles keep their colour. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .factsTitle,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .text {
   color: var(--navy, #0a3a57);
   text-shadow: none;
