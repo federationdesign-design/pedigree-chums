@@ -14062,7 +14062,7 @@ export default function BreedTree({
                      view's colours, inverted on each): an ink disc with an ink ring and a
                      figure in the page colour; a spent badge the reverse, so it still reads
                      as a dead token. Outside a view, the colours below as before. */
-                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? chipBand.bg : CHIP_FILL, stroke: sInk ?? "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? chipBand.bg : CHIP_FILL, stroke: sInk ?? (chipBand && !inert && !item.label ? "#ffffff" : "#0a3a57"), /* WHITE RING ON A RARITY TOKEN, 21 September 2026 (owner: the figure on a rarity-coloured token is white, and its ring should be too). A yellow token, a spent one and a name disc keep navy. THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
                      (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
                      0.09, the weight a first-generation circle wears on the lifted
                      screen, read from the shared RING_FRAC table rather than typed

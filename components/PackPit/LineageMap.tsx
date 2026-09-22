@@ -4523,6 +4523,12 @@ export default function LineageMap({
                       const fill = placedHere ? (rarityTier ? seenFill : "#ffed00") : seen.has(n._id) ? seenFill : undefined;
                       const st: React.CSSProperties = {
                         ...(fill ? { fill } : null),
+                        /* A WHITE RING ON A RARITY-COLOURED NODE, 21 September 2026 (owner:
+                           the outline of a lifted family tree node white, to match the white
+                           figure and the pit tokens). Only where the node wears a rarity
+                           colour on the lift; an unopened yellow node keeps its navy ring,
+                           since white on yellow would vanish. */
+                        ...(fill && rarityTier ? { stroke: "#ffffff" } : null),
                         // clamped so a nested ring can never out-thicken its parent
                         ...(circular ? { ["--ring" as string]: `${clampedRingW(n).toFixed(2)}px` } : null),
                       };
