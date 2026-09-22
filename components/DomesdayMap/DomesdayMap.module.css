@@ -73,11 +73,10 @@
   outline-offset: 2px;
 }
 
-.swatch {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 1.5px solid var(--white);
+/* Holder markers (inline SVG, 22 Sept 2026). */
+.mark {
+  flex: 0 0 auto;
+  display: block;
 }
 
 .shareBlock {
@@ -89,16 +88,18 @@
   font-weight: 700;
   margin: 0 0 8px;
 }
-.shareBar {
-  display: flex;
+/* Share bar: an SVG inside a rounded frame. Named shareGraphic (not "bar") so
+   the SchemeShapes pass leaves it alone in the accessibility schemes. */
+.shareGraphic {
   height: 22px;
   border-radius: 11px;
   overflow: hidden;
-  border: 2px solid var(--white);
+  border: 2px solid;
 }
-.shareSeg {
+.shareSvg {
   display: block;
-  height: 100%;
+}
+.shareSvg rect {
   transition: opacity 0.2s;
 }
 .shareList {
@@ -110,6 +111,11 @@
   padding: 0;
   margin: 8px 0 0;
   font-weight: 600;
+}
+.shareList li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .shareValue {
   font-family: var(--font-display), system-ui, sans-serif;
