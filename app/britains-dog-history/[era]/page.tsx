@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BreedStrip from "../BreedStrip";
 import SeaLevelMap from "../../../components/SeaLevelMap/SeaLevelMap";
+import DogTimeline from "../../../components/DogTimeline/DogTimeline";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
 import { SECTIONS } from "../../../data/historySections";
@@ -83,6 +84,8 @@ export default async function EraPage({ params }: Props) {
             {strip === "ancient" && (
               <div className={styles.sectionHolder}>
                 <SeaLevelMap />
+                {/* Archaeology timeline below the map (22 Sept 2026). */}
+                <DogTimeline />
               </div>
             )}
           </div>
