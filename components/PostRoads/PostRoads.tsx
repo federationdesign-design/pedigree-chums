@@ -19,7 +19,9 @@ import { GB, type LL } from "../SeaLevelMap/SeaLevelMap";
    (four days a year of parish road work). Same projection as the other maps:
    x = (lon + 11) * 20, y = (61 - lat) * 33. */
 
-const VIEW = { x: 100, y: 118, w: 170, h: 255 };
+/* Cropped just above Edinburgh (owner, 22 Sept 2026): the Highlands were empty
+   map. y = (61 - lat) * 33, so y 145 is about 56.6N. */
+const VIEW = { x: 100, y: 145, w: 170, h: 228 };
 const START = 1500;
 const END = 1700;
 

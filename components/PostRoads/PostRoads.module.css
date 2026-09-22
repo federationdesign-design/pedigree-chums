@@ -234,9 +234,11 @@
   border: 1.5px solid var(--white);
 }
 .towns {
+  /* Moved to the top right (owner, 22 Sept 2026): with Scotland cropped the top
+     left is land, and the North Sea corner is empty. */
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   z-index: 1;
   width: min(62%, 340px); /* wider again so rows stay on one line (22 Sept 2026) */
   padding: 2px 0;
