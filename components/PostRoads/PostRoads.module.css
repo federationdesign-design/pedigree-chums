@@ -115,17 +115,10 @@
 }
 
 /* Post roads: yellow lines with a navy casing so they read on the green land. */
-.roadCase {
-  fill: none;
-  stroke: var(--navy);
-  stroke-width: 3.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 .road {
   fill: none;
   stroke: var(--yellow-header);
-  stroke-width: 1.8;
+  stroke-width: 1.2; /* a third thinner, no navy casing (owner, 22 Sept 2026) */
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -139,7 +132,7 @@
 }
 /* Towns: circles whose area follows the population estimate. */
 .city {
-  fill: rgba(255, 255, 255, 0.55);
+  fill: var(--navy); /* dark blue, was light (owner, 22 Sept 2026) */
   stroke: var(--navy);
   stroke-width: 0.6;
   transition: r 0.2s;
@@ -175,7 +168,10 @@
   justify-content: center;
   gap: 8px 20px;
   padding: 0;
-  margin: 12px 0 4px;
+  /* Pulled up to sit over the bottom of the map (owner, 22 Sept 2026). */
+  position: relative;
+  z-index: 1;
+  margin: -2.6rem 0 4px;
   font-weight: 600;
 }
 .legend li {
@@ -234,15 +230,15 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1.5px solid var(--navy);
+  background: var(--navy);
+  border: 1.5px solid var(--white);
 }
 .towns {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1;
-  width: min(32%, 200px);
+  width: min(46%, 290px); /* wider so rows stay on one line (22 Sept 2026) */
   padding: 2px 0;
   font-size: 0.8rem;
   line-height: 1.25;
@@ -250,6 +246,8 @@
 .townsTitle {
   display: block;
   font-weight: 700;
+  font-size: 2em; /* twice as big (owner, 22 Sept 2026) */
+  line-height: 1.1;
   margin: 0 0 6px;
 }
 .townList {

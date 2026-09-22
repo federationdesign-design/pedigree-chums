@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import styles from "./CaiusDogs.module.css";
 
 /* Caius's dog family tree: John Caius's 1570s sorting of England's dogs, from De
@@ -11,7 +12,12 @@ import styles from "./CaiusDogs.module.css";
    "Today" lines are our hedged pointers to modern relatives, not pedigrees.
    Copy flagged for owner review. */
 
-type Dog = { id: string; name: string; old: string; job: string; today: string };
+/* `img`: the dog type's picture from the history page's own breed strips
+   (data/uk-breeds.ts), where one exists; lost types without a card get none.
+   `pack`: today's relatives that are in the 54-dog pack, shown with their cartoon
+   card art. Lost types have no pack dogs and keep the text only (owner, 22 Sept
+   2026). */
+type Dog = { id: string; name: string; old: string; job: string; today: string; img?: string; pack?: string[] };
 type Group = { label: string; dogs: Dog[] };
 type Kind = { id: string; title: string; caius: string; groups: Group[] };
 
@@ -19,17 +25,17 @@ const KINDS: Kind[] = [
   {
     id: "gentle",
     title: "Gentle",
-    caius: "Dogs \"of a gentle kinde, seruing the game\"",
+    caius: "Well-bred dogs for hunting and sport",
     groups: [
       {
         label: "Hunting",
         dogs: [
-          { id: "harrier", name: "Harrier", old: "Harier", job: "Hunted by smell, with long droopy lips and hanging ears. Each one had its favourite quarry: hare, fox, otter, badger and more.", today: "The Harrier and Beagle families." },
-          { id: "terrier", name: "Terrier", old: "Terrare", job: "The smallest scent hound. It crept down into burrows after foxes and badgers, and nipped them until they bolted.", today: "Britain's many terriers." },
-          { id: "bloodhound", name: "Bloodhound", old: "Blud-hunde", job: "Followed the scent of blood, and was trained to track cattle thieves on the border between England and Scotland.", today: "The Bloodhound." },
-          { id: "gazehound", name: "Gazehound", old: "Gasehunde", job: "Hunted by sight, not smell. It picked out one animal from a whole herd and chased it down.", today: "A lost type, though today's sighthounds hunt the same way." },
-          { id: "greyhound", name: "Greyhound", old: "Grehunde", job: "The fastest of all, chasing hares, deer and foxes. Caius said its name meant it was top of the dogs.", today: "The Greyhound." },
-          { id: "leviner", name: "Leviner or Lyemmer", old: "Leviner, or Lyemmer", job: "Halfway between a harrier and a greyhound: a good nose and fast legs. It was led on a leash called a lyam.", today: "Most like today's lurchers." },
+          { id: "harrier", name: "Harrier", old: "Harier", job: "Hunted by smell, with long droopy lips and hanging ears. Each one had its favourite quarry: hare, fox, otter, badger and more.", today: "The Harrier and Beagle families.", img: "/history/breeds/Southern-Hound.jpg", pack: ["Beagle"] },
+          { id: "terrier", name: "Terrier", old: "Terrare", job: "The smallest scent hound. It crept down into burrows after foxes and badgers, and nipped them until they bolted.", today: "Britain's many terriers.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", pack: ["Jack Russell Terrier", "Border Terrier", "West Highland Terrier"] },
+          { id: "bloodhound", name: "Bloodhound", old: "Blud-hunde", job: "Followed the scent of blood, and was trained to track cattle thieves on the border between England and Scotland.", today: "The Bloodhound.", img: "/bloodhound-square.jpg", pack: ["Bloodhound"] },
+          { id: "gazehound", name: "Gazehound", old: "Gasehunde", job: "Hunted by sight, not smell. It picked out one animal from a whole herd and chased it down.", today: "A lost type, though today's sighthounds hunt the same way.", img: "/history/breeds/rough-northern-sighthounds.jpg" },
+          { id: "greyhound", name: "Greyhound", old: "Grehunde", job: "The fastest of all, chasing hares, deer and foxes. Caius said its name meant it was top of the dogs.", today: "The Greyhound.", img: "/greyhound-square.jpg", pack: ["Greyhound"] },
+          { id: "leviner", name: "Leviner", old: "Leviner", job: "Halfway between a harrier and a greyhound: a good nose and fast legs. It was led on a leash called a lyam.", today: "Most like today's lurchers.", img: "/lercher-square.jpg", pack: ["Lurcher"] },
           { id: "tumbler", name: "Tumbler", old: "Tumbler", job: "A trickster. It pretended to ignore the rabbits, lay low by their burrow, then pounced as they came home.", today: "A lost type." },
           { id: "stealer", name: "Stealer", old: "Night curre", job: "Hunted rabbits silently in the dark and carried them back to its master.", today: "A lost type." },
         ],
@@ -37,15 +43,15 @@ const KINDS: Kind[] = [
       {
         label: "Bird dogs",
         dogs: [
-          { id: "spaniel", name: "Land spaniel", old: "Spainel", job: "Found and flushed birds for the hunter's hawk. Most were white with big red spots.", today: "Springer and Cocker Spaniels." },
-          { id: "setter", name: "Setter", old: "Setter", job: "Crept along silently, then lay down to show exactly where the partridges were hiding, ready for the net.", today: "The English Setter." },
-          { id: "water", name: "Water spaniel", old: "Water-spainel, or Fynder", job: "Swam out for ducks, and fetched back arrows that missed their target.", today: "The Irish Water Spaniel. England's own water spaniel is extinct." },
+          { id: "spaniel", name: "Land spaniel", old: "Spainel", job: "Found and flushed birds for the hunter's hawk. Most were white with big red spots.", today: "Springer and Cocker Spaniels.", img: "/history/breeds/original-land-spaniel.jpg", pack: ["Springer Spaniel", "Cocker Spaniel"] },
+          { id: "setter", name: "Setter", old: "Setter", job: "Crept along silently, then lay down to show exactly where the partridges were hiding, ready for the net.", today: "The English and Irish Setters.", img: "/history/breeds/british-setters.jpg", pack: ["Irish Setter"] },
+          { id: "water", name: "Water spaniel", old: "Water-spainel, or Fynder", job: "Swam out for ducks, and fetched back arrows that missed their target.", today: "The Irish Water Spaniel. England's own water spaniel is extinct.", img: "/history/breeds/original-water-spaniel.jpg" },
         ],
       },
       {
         label: "Lapdogs",
         dogs: [
-          { id: "comforter", name: "Comforter", old: "Spainel-gentle, or Comforter", job: "A tiny pet for fine ladies. People believed its warmth could ease a sore tummy.", today: "Toy spaniels such as the Cavalier King Charles." },
+          { id: "comforter", name: "Comforter", old: "Spainel-gentle, or Comforter", job: "A tiny pet for fine ladies. People believed its warmth could ease a sore tummy.", today: "Toy spaniels such as the Cavalier King Charles.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", pack: ["Cavalier King Charles Spaniel"] },
         ],
       },
     ],
@@ -53,13 +59,13 @@ const KINDS: Kind[] = [
   {
     id: "homely",
     title: "Homely",
-    caius: "Dogs \"of a homely kind, apt for sundry necessary vses\"",
+    caius: "Hard-working dogs for everyday jobs",
     groups: [
       {
         label: "Working",
         dogs: [
-          { id: "shepherd", name: "Shepherd's dog", old: "Shepherd's Dog", job: "Moved the sheep at a whistle. Caius noticed that in England the shepherd follows the sheep, not the other way round.", today: "Today's sheepdogs and collies." },
-          { id: "mastiff", name: "Mastiff or Bandog", old: "Mastive, or Bandedogge", job: "A huge guard dog, chained up by day and let loose at night. Sadly it was also made to fight bears and bulls.", today: "The Mastiff and the bulldogs." },
+          { id: "shepherd", name: "Shepherd's dog", old: "Shepherd's Dog", job: "Moved the sheep at a whistle. Caius noticed that in England the shepherd follows the sheep, not the other way round.", today: "Today's sheepdogs and collies.", img: "/history/breeds/medieval-shepherds-dog.jpg", pack: ["Border Collie", "Old English Sheepdog"] },
+          { id: "mastiff", name: "Mastiff or Bandog", old: "Mastive, or Bandedogge", job: "A huge guard dog, chained up by day and let loose at night. Sadly it was also made to fight bears and bulls.", today: "The Mastiff and the bulldogs.", img: "/history/breeds/Old-British-bandogs.jpg", pack: ["Mastiff", "Bulldog"] },
         ],
       },
     ],
@@ -67,19 +73,39 @@ const KINDS: Kind[] = [
   {
     id: "currish",
     title: "Currish",
-    caius: "Dogs \"of a currishe kinde, meete for many toyes\"",
+    caius: "Mixed-up mongrels for odd jobs and tricks",
     groups: [
       {
         label: "Odd jobs",
         dogs: [
           { id: "wappe", name: "Wappe", old: "Wappe, or Warner", job: "Barked to tell the house that visitors had arrived: a furry doorbell.", today: "A lost type." },
-          { id: "turnspit", name: "Turnspit", old: "Turnespete", job: "Ran inside a wooden wheel in the kitchen to turn the meat roasting over the fire.", today: "Extinct." },
+          { id: "turnspit", name: "Turnspit", old: "Turnespete", job: "Ran inside a wooden wheel in the kitchen to turn the meat roasting over the fire.", today: "Extinct.", img: "/history/breeds/Turnspitdog-drawing-remake.jpg" },
           { id: "dancer", name: "Dancer", old: "Daunser", job: "Taught by travelling showmen to dance to drums and harps, stand on its hind legs and beg.", today: "A lost type." },
         ],
       },
     ],
   },
 ];
+
+/* Pack card art for today's relatives, copied from data/breeds.ts (checked 22 Sept
+   2026). Kept here rather than importing the whole breed file into this page. */
+const PACK_ART: Record<string, string> = {
+  Beagle: "/beagle-square.jpg",
+  "Jack Russell Terrier": "/jack-russel-square.jpg",
+  "Border Terrier": "/border terrier-square.jpg",
+  "West Highland Terrier": "/west-highland-square.jpg",
+  Bloodhound: "/bloodhound-square.jpg",
+  Greyhound: "/greyhound-square.jpg",
+  Lurcher: "/lercher-square.jpg",
+  "Springer Spaniel": "/springer-square.jpg",
+  "Cocker Spaniel": "/cooker-square.jpg",
+  "Irish Setter": "/irish-setter-square.jpg",
+  "Cavalier King Charles Spaniel": "/cav-spaniel-square.jpg",
+  "Border Collie": "/collie-square.jpg",
+  "Old English Sheepdog": "/old-english-square.jpg",
+  Mastiff: "/mastiff-square.jpg",
+  Bulldog: "/bulldog-square.jpg",
+};
 
 const ALL = KINDS.flatMap((k) => k.groups.flatMap((g) => g.dogs.map((d) => ({ ...d, kind: k.title }))));
 
@@ -124,13 +150,37 @@ export default function CaiusDogs() {
       </div>
 
       <div className={styles.card} aria-live="polite">
-        <span className={styles.cardKind}>{dog.kind} kind</span>
-        <h3 className={`display ${styles.cardName}`}>{dog.name}</h3>
-        <p className={styles.cardOld}>Caius called it: &ldquo;{dog.old}&rdquo;</p>
+        <div className={styles.cardHead}>
+          {dog.img && (
+            <Image
+              src={encodeURI(dog.img)}
+              alt=""
+              width={96}
+              height={96}
+              className={styles.profile}
+              unoptimized
+            />
+          )}
+          <div>
+            <span className={styles.cardKind}>{dog.kind} kind</span>
+            <h3 className={`display ${styles.cardName}`}>{dog.name}</h3>
+            <p className={styles.cardOld}>Caius called it: &ldquo;{dog.old}&rdquo;</p>
+          </div>
+        </div>
         <p className={styles.cardJob}>{dog.job}</p>
         <p className={styles.cardToday}>
           <span className={styles.todayLabel}>Today:</span> {dog.today}
         </p>
+        {dog.pack && (
+          <ul className={styles.packRow} aria-label="In the Pedigree Chums pack">
+            {dog.pack.map((n) => (
+              <li key={n} className={styles.packDog}>
+                <Image src={encodeURI(PACK_ART[n])} alt="" width={56} height={56} className={styles.packImg} unoptimized />
+                <span className={styles.packName}>{n}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <p className={styles.note}>

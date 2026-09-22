@@ -49,15 +49,16 @@
 
 .kindTitle {
   margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-size: clamp(calc(1.6rem + 2pt), calc(3vw + 2pt), calc(2rem + 2pt)); /* +2pt (22 Sept 2026) */
   line-height: 1;
   color: var(--yellow-header);
 }
 
+/* Plain modern wording, not italic, weight 500, 2pt bigger (22 Sept 2026). */
 .kindQuote {
   margin: 4px 0 10px;
-  font-size: 0.85rem;
-  font-style: italic;
+  font-size: calc(0.85rem + 2pt);
+  font-weight: 500;
   line-height: 1.3;
 }
 
@@ -80,11 +81,11 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 10px;
 }
 
 .chip {
-  padding: 6px 12px;
+  padding: 12px 24px; /* twice the size (owner, 22 Sept 2026) */
   border-radius: 999px;
   /* Navy pills with white text (owner request, 22 Sept 2026). */
   border: 2px solid var(--navy);
@@ -92,7 +93,8 @@
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.8rem;
+  line-height: 1.1;
   cursor: pointer;
 }
 .chip[aria-pressed="true"] {
@@ -109,6 +111,50 @@
   border-top: 2px solid rgba(255, 255, 255, 0.6);
   padding: 14px 0 0;
   min-height: 11em;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 8px;
+}
+.profile {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--white);
+}
+.packRow {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0;
+  margin: 10px 0 0;
+}
+.packDog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 84px;
+  text-align: center;
+}
+.packImg {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--yellow-header);
+  background: var(--white);
+}
+.packName {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.15;
 }
 
 .cardKind {
@@ -169,6 +215,7 @@
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardOld,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardJob,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardToday,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .packName,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
   color: var(--navy, #0a3a57);
 }

@@ -19,7 +19,7 @@ import { GB, type LL } from "../SeaLevelMap/SeaLevelMap";
    (four days a year of parish road work). Same projection as the other maps:
    x = (lon + 11) * 20, y = (61 - lat) * 33. */
 
-const VIEW = { x: 100, y: 140, w: 170, h: 233 };
+const VIEW = { x: 100, y: 118, w: 170, h: 255 };
 const START = 1500;
 const END = 1700;
 
@@ -90,6 +90,14 @@ const TOWNS: Town[] = [
   { name: "Plymouth", at: [-4.14, 50.37], pop: [[1680, 4000]] },
 ];
 
+/* Label nudges in map units (owner, 22 Sept 2026): about 1.5 units is 5px and 3
+   units is 10px at the panel's usual size. Negative moves up. */
+const NUDGE: Record<string, number> = {
+  Holyhead: -1.5, Exeter: -1.5, London: -1.5, "Great Yarmouth": -1.5,
+  Plymouth: 1.5, Salisbury: 1.5, Colchester: 1.5, Norwich: 3,
+};
+const nudge = (name: string) => NUDGE[name] ?? 0;
+
 /* Road ends that are also towns are named by the town label, not twice. */
 const TOWN_NAMES = new Set([...TOWNS.map((tw) => tw.name), "Yarmouth"]);
 
@@ -120,7 +128,7 @@ const EVENTS: [number, string][] = [
   [1580, "In Elizabeth I's day, post riders must blow their horn whenever they meet someone, or four times every mile."],
   [1555, "The Highways Act: every parish must mend its own roads, and everyone works on them for four days a year."],
   [1550, "By the 1550s, post roads also run west to Plymouth and north-west towards Ireland."],
-  [1533, "Regular posts now run from London to Berwick and to Dover. Riders swap tired horses for fresh ones at post-houses along the way."],
+  [1533, "Posts now run from London to Berwick and to Dover. Riders swap horses for fresh ones at post-houses along the way."],
   [1516, "Henry VIII makes Brian Tuke his Master of the Posts, in charge of carrying the king's letters."],
   [1500, "Around 1500, letters travel with messengers, carriers or pedlars. There is no national post."],
 ];
@@ -147,7 +155,7 @@ export default function PostRoads() {
 
   const year = START + t;
   const caption = EVENTS.find((ev) => year >= ev[0])?.[1] ?? "";
-  const whoCan = year >= 1635 ? "Anyone who can pay" : year >= 1516 ? "The king's messengers" : "No post yet";
+  const whoCan = year >= 1635 ? "Anyone who can pay" : year >= 1516 ? "The king's messengers" : "No national post service";
 
   const togglePlay = () => {
     if (!playing && t >= span) setT(0);
@@ -191,12 +199,14 @@ export default function PostRoads() {
 
       <div className={styles.stats}>
         <div className={styles.stat}>
-          <span className={styles.statLabel}>Year</span>
-          <span className={styles.statValue}>{year}</span>
+          {/* Styles swapped (owner, 22 Sept 2026): the title is Luckiest Guy, the
+              changing value below it is Montserrat. */}
+          <span className={styles.statValue}>Year</span>
+          <span className={styles.statLabel}>{year}</span>
         </div>
         <div className={styles.stat}>
-          <span className={styles.statLabel}>Who can send a letter?</span>
-          <span className={styles.statValue}>{whoCan}</span>
+          <span className={styles.statValue}>Who can send a letter?</span>
+          <span className={styles.statLabel}>{whoCan}</span>
         </div>
       </div>
 
@@ -243,7 +253,6 @@ export default function PostRoads() {
                   <polyline points={d} className={styles.byeRoad} opacity={p} />
                 ) : (
                   <>
-                    <polyline points={d} pathLength={1} className={styles.roadCase} strokeDasharray="1" strokeDashoffset={1 - p} />
                     <polyline points={d} pathLength={1} className={styles.road} strokeDasharray="1" strokeDashoffset={1 - p} />
                   </>
                 )}
@@ -251,7 +260,7 @@ export default function PostRoads() {
                   <>
                     <circle cx={ex} cy={ey} r={1.8} className={styles.town} />
                     {!TOWN_NAMES.has(r.end) && (
-                    <text x={r.left ? ex - 2.6 : ex + 2.6} y={ey + 1.8} textAnchor={r.left ? "end" : "start"} className={styles.townLabel}>{r.end}</text>)}
+                    <text x={r.left ? ex - 2.6 : ex + 2.6} y={ey + 1.8 + nudge(r.end)} textAnchor={r.left ? "end" : "start"} className={styles.townLabel}>{r.end}</text>)}
                   </>
                 )}
               </g>
@@ -264,7 +273,7 @@ export default function PostRoads() {
               <text
                 key={tw.name}
                 x={tw.left ? cx - r - 1.2 : cx + r + 1.2}
-                y={cy - r - 0.6}
+                y={cy - r - 0.6 + nudge(tw.name)}
                 textAnchor={tw.left ? "end" : "start"}
                 className={styles.cityLabel}
               >
@@ -273,7 +282,7 @@ export default function PostRoads() {
             );
           })}
           <circle cx={lx} cy={ly} r={2.6} className={styles.london} />
-          <text x={lx + 3.2} y={ly + 5.5} className={styles.townLabel}>London</text>
+          <text x={lx + 3.2} y={ly + 5.5 + nudge("London")} className={styles.townLabel}>London</text>
         </svg>
       </div>
 
