@@ -2,9 +2,11 @@
    .section / .glowLayer): same gradient, radius and shadow. Added 22 Sept 2026. */
 
 .panel {
+  --pad: clamp(24px, 3.5vw, 48px);
   position: relative;
+  overflow: hidden;
   margin: 50px 0 0;
-  padding: clamp(24px, 3.5vw, 48px);
+  padding: var(--pad);
   border-radius: 40px;
   box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
   background: linear-gradient(to top right, #00e2ff, #008eff);
@@ -19,12 +21,39 @@
   margin: 0 0 clamp(10px, 1.6vw, 18px);
 }
 
+/* Map runs edge to edge of the panel: negative margins cancel the panel padding.
+   No frame. Owner request, 22 Sept 2026. */
+.mapWrap {
+  position: relative;
+  margin: 0 calc(-1 * var(--pad));
+}
+
+.overlay {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: var(--pad);
+  text-shadow: 0 1px 3px rgba(10, 58, 87, 0.6);
+  pointer-events: none;
+}
+.overlay > * {
+  pointer-events: auto;
+}
+
+.overlayLeft {
+  width: min(44%, 440px);
+}
+
 .intro {
-  max-width: 720px;
-  margin: 0 auto clamp(18px, 2.6vw, 28px);
-  text-align: center;
+  width: min(40%, 440px);
+  margin: 0;
+  text-align: right;
   font-weight: 600;
-  font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
   line-height: 1.3;
 }
 
@@ -32,8 +61,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  max-width: 720px;
-  margin: 0 auto 16px;
+  margin: 0 0 12px;
 }
 
 .play {
@@ -66,8 +94,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  max-width: 720px;
-  margin: 0 auto 12px;
+  margin: 0 0 12px;
 }
 
 .stat {
@@ -91,19 +118,11 @@
 }
 
 .caption {
-  max-width: 720px;
-  min-height: 3.2em;
-  margin: 0 auto 16px;
+  min-height: 4.4em;
+  margin: 0;
   font-size: 1.05rem;
   line-height: 1.45;
   font-weight: 600;
-}
-
-.mapWrap {
-  margin: 0;
-  border-radius: 22px;
-  overflow: hidden;
-  border: 3px solid var(--white);
 }
 
 .map {
@@ -161,5 +180,22 @@
   }
   .stats {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Small screens: the overlay would cover most of the map, so it stacks above. */
+@media (max-width: 720px) {
+  .overlay {
+    position: static;
+    flex-direction: column-reverse;
+    gap: 16px;
+    padding: 0 var(--pad) 16px;
+  }
+  .overlayLeft,
+  .intro {
+    width: 100%;
+  }
+  .intro {
+    text-align: left;
   }
 }

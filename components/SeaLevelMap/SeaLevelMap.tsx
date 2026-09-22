@@ -64,9 +64,9 @@ const EVENTS: [number, string][] = [
 
 /* Timeline runs from 13,300 years ago (owner request, 22 Sept 2026; was 20,000). */
 const START = 13300;
-/* Site palette from app/globals.css (owner request, 22 Sept 2026). */
+/* Site palette from app/globals.css (owner request, 22 Sept 2026). No sea fill:
+   the blue panel shows through as the sea. */
 const LAND = "var(--cta)";
-const SEA = "var(--blue-deep)";
 const COAST = "var(--navy)";
 
 export default function SeaLevelMap() {
@@ -105,50 +105,53 @@ export default function SeaLevelMap() {
       <h2 id="sea-level-title" className={`display ${styles.title}`}>
         Britain Becomes an <span className="display-yellow">Island</span>
       </h2>
-      <p className={styles.intro}>
-        When the first dogs came to Britain, the sea was far lower and Britain was joined to Europe by a lost land called Doggerland. Press play to watch the sea rise.
-      </p>
-
-      <div className={styles.controls}>
-        <button type="button" className={styles.play} onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
-          {playing ? (
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" /><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" /></svg>
-          ) : (
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
-          )}
-        </button>
-        <input
-          type="range"
-          min={0}
-          max={START}
-          step={50}
-          value={t}
-          onChange={(e) => {
-            setPlaying(false);
-            setT(Number(e.target.value));
-          }}
-          className={styles.slider}
-          aria-label="Years ago"
-          aria-valuetext={`${yearsAgo.toLocaleString("en-GB")} years ago`}
-        />
-      </div>
-
-      <div className={styles.stats}>
-        <div className={styles.stat}>
-          <span className={styles.statLabel}>Years ago</span>
-          <span className={styles.statValue}>{yearsAgo.toLocaleString("en-GB")}</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statLabel}>Sea level against today</span>
-          <span className={styles.statValue}>{seaShown === 0 ? "0" : seaShown} m</span>
-        </div>
-      </div>
-
-      <p className={styles.caption} aria-live="polite">{caption}</p>
-
       <div className={styles.mapWrap}>
+        {/* Controls and intro overlaid on the map (owner request, 22 Sept 2026):
+            slider group top left, intro top right. Stacks above the map on small screens. */}
+        <div className={styles.overlay}>
+          <div className={styles.overlayLeft}>
+            <div className={styles.controls}>
+              <button type="button" className={styles.play} onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
+                {playing ? (
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" /><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" /></svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+                )}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={START}
+                step={50}
+                value={t}
+                onChange={(e) => {
+                  setPlaying(false);
+                  setT(Number(e.target.value));
+                }}
+                className={styles.slider}
+                aria-label="Years ago"
+                aria-valuetext={`${yearsAgo.toLocaleString("en-GB")} years ago`}
+              />
+            </div>
+
+            <div className={styles.stats}>
+              <div className={styles.stat}>
+                <span className={styles.statLabel}>Years ago</span>
+                <span className={styles.statValue}>{yearsAgo.toLocaleString("en-GB")}</span>
+              </div>
+              <div className={styles.stat}>
+                <span className={styles.statLabel}>Sea level against today</span>
+                <span className={styles.statValue}>{seaShown === 0 ? "0" : seaShown} m</span>
+              </div>
+            </div>
+
+            <p className={styles.caption} aria-live="polite">{caption}</p>
+          </div>
+          <p className={styles.intro}>
+            When the first dogs came to Britain, the sea was far lower and Britain was joined to Europe by a lost land called Doggerland. Press play to watch the sea rise.
+          </p>
+        </div>
         <svg viewBox={`0 0 ${W} ${H}`} className={styles.map} role="img" aria-label="Map of Britain and Doggerland as the sea rises">
-          <rect x={0} y={0} width={W} height={H} style={{ fill: SEA }} />
           {SHELF.map(({ d, a }) => (
             <polygon key={d} points={pts(a)} style={{ fill: LAND }} opacity={Math.min(1, Math.max(0, (-d + 3 - sea) / 6))} />
           ))}
