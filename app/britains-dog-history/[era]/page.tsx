@@ -32,7 +32,14 @@ import PopHeading from "../../../components/PopHeading/PopHeading";
    with "Tudor Britain" and is the one the history page itself filters out, so it
    is excluded here too. */
 const sectionForStrip = (strip: string) =>
-  SECTIONS.find((s) => s.era === strip && s.title !== "Dogs in the armed forces");
+  SECTIONS.find((s) => s.era === strip && s.title !== "Dogs in the armed forces" && s.title !== MOVED_TO_CROSSES);
+
+/* "Into the modern home" was written against the 1900s strip but belongs with
+   today's dogs (owner, 22 Sept 2026), so it is filtered out above and rendered at
+   the foot of Today's Crossbreeds instead. Its era in data/historySections.ts is
+   left alone, since the history index page still places it by that. */
+const MOVED_TO_CROSSES = "Into the modern home";
+const movedSection = SECTIONS.find((s) => s.title === MOVED_TO_CROSSES);
 
 /* The six per-era social pages: /britains-dog-history/[era]. Share-only and
    unlisted, one era each, purely additive. The history index page is untouched.
@@ -249,6 +256,13 @@ export default async function EraPage({ params }: Props) {
           </div>
         );
       })}
+
+      {/* Today's Crossbreeds only: the write-up moved off the 1900s page. */}
+      {page.slug === "crosses" && movedSection && (
+        <div className={styles.sectionHolder}>
+          <HistorySection section={movedSection} />
+        </div>
+      )}
       </main>
       <Footer />
     </>
