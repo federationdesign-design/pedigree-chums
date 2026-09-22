@@ -17,20 +17,34 @@ const DEBT: [number, number][] = [
   [1757, 77.8], [1763, 132.1], [1776, 130.5], [1781, 187.8], [1786, 243.2], [1793, 244.7], [1802, 523.3],
 ];
 
+/* War bands. Labels name who Britain was fighting (owner, 22 Sept 2026), with
+   "Seven" shortened to "7", and wrap onto a second line when the band is narrow. */
 const WARS: { from: number; to: number; name: string }[] = [
-  { from: 1689, to: 1697, name: "France" },
-  { from: 1702, to: 1713, name: "Spain" },
-  { from: 1739, to: 1748, name: "Spain and France" },
-  { from: 1756, to: 1763, name: "Seven Years War" },
-  { from: 1775, to: 1783, name: "America" },
-  { from: 1793, to: 1802, name: "France again" },
+  { from: 1689, to: 1697, name: "fight: France" },
+  { from: 1702, to: 1713, name: "fight: Spain" },
+  { from: 1739, to: 1748, name: "fight: Spain and France" },
+  { from: 1756, to: 1763, name: "7 Years War" },
+  { from: 1775, to: 1783, name: "fight: America" },
+  { from: 1793, to: 1802, name: "fight: France again" },
 ];
 
-const MARKS: { year: number; text: string }[] = [
-  { year: 1694, text: "Bank of England" },
-  { year: 1763, text: "Empire in India and Canada" },
-  { year: 1783, text: "America lost" },
-];
+/* Greedy wrap for a band label: about 4.6px a character at 9px type. */
+const wrapLabel = (text: string, width: number) => {
+  const max = Math.max(6, Math.floor(width / 4.6));
+  const lines: string[] = [];
+  let line = "";
+  for (const word of text.split(" ")) {
+    const next = line ? `${line} ${word}` : word;
+    if (next.length > max && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+};
 
 const X0 = 1685;
 const X1 = 1805;
@@ -63,12 +77,23 @@ export default function MoneyForShips() {
               <text x={PAD.l - 6} y={py(m) + 3.5} textAnchor="end" className={styles.axis}>{m === 0 ? "0" : `£${m}m`}</text>
             </g>
           ))}
-          {WARS.map((w) => (
-            <g key={w.name}>
-              <rect x={px(w.from)} y={PAD.t} width={px(w.to) - px(w.from)} height={H - PAD.t - PAD.b} className={styles.war} />
-              <text x={(px(w.from) + px(w.to)) / 2} y={PAD.t + 10} textAnchor="middle" className={styles.warLabel}>{w.name}</text>
-            </g>
-          ))}
+          {WARS.map((w) => {
+            const x0 = px(w.from);
+            const x1 = px(w.to);
+            const lines = wrapLabel(w.name, x1 - x0);
+            return (
+              <g key={w.name}>
+                <rect x={x0} y={PAD.t} width={x1 - x0} height={H - PAD.t - PAD.b} className={styles.war} />
+                <text x={(x0 + x1) / 2} y={PAD.t + 10} textAnchor="middle" className={styles.warLabel}>
+                  {lines.map((l, i) => (
+                    <tspan key={l} x={(x0 + x1) / 2} dy={i === 0 ? 0 : 10}>
+                      {l}
+                    </tspan>
+                  ))}
+                </text>
+              </g>
+            );
+          })}
           <polygon points={area} className={styles.fill} />
           <polyline points={line} className={styles.line} />
           {DEBT.map(([y, m]) => (
@@ -76,14 +101,8 @@ export default function MoneyForShips() {
               <title>{`${y}: about £${m}m`}</title>
             </circle>
           ))}
-          {MARKS.map((mk) => (
-            <g key={mk.year}>
-              <line x1={px(mk.year)} x2={px(mk.year)} y1={H - PAD.b} y2={H - PAD.b + 6} className={styles.grid} />
-              <text x={px(mk.year)} y={H - PAD.b + 16} textAnchor="middle" className={styles.mark}>{mk.text}</text>
-            </g>
-          ))}
           {[1700, 1750, 1800].map((y) => (
-            <text key={y} x={px(y)} y={H - PAD.b + 26} textAnchor="middle" className={styles.axis}>{y}</text>
+            <text key={y} x={px(y)} y={H - PAD.b + 16} textAnchor="middle" className={styles.axis}>{y}</text>
           ))}
         </svg>
       </div>
@@ -93,6 +112,22 @@ export default function MoneyForShips() {
         <li><span className={styles.big}>£132m</span> by 1763, after winning the Seven Years War</li>
         <li><span className={styles.big}>£523m</span> by 1802, and the biggest navy in the world</li>
       </ul>
+      {/* Explainer on bonds (owner request, 22 Sept 2026). Copy flagged for review.
+          The last paragraph is deliberately careful: the money was not conjured from
+          nothing, it was a promise that future taxes would pay for it. */}
+      <div className={styles.explain}>
+        <h3 className={styles.explainTitle}>So what is a bond?</h3>
+        <p className={styles.explainText}>
+          A bond is a posh IOU. You lend the government some money, and it promises to pay you back later, with interest every year until it does.
+        </p>
+        <p className={styles.explainText}>
+          It is not the same as money. A coin is worth what it says right now. A bond is a promise about the future. But because everyone believed Parliament would pay, people bought and sold bonds happily, so a bond worked almost as well as cash.
+        </p>
+        <p className={styles.explainText}>
+          That belief is what let the government spend sums it did not have. It borrowed from thousands of people at once, paid the interest out of taxes, and the Bank of England printed paper notes backed by the loan. It looked like money out of thin air. Really it was a promise that future taxpayers would pick up the bill, and they did, for two hundred years.
+        </p>
+      </div>
+
       <p className={styles.note}>Shaded bands are wars. Figures are the published national debt for the years shown, rounded.</p>
     </section>
   );

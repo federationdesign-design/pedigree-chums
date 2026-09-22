@@ -58,12 +58,6 @@
   font-weight: 700;
   fill: var(--white);
 }
-.mark {
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  fill: var(--yellow-header);
-}
 .fill {
   fill: rgba(255, 237, 0, 0.25);
 }
@@ -95,6 +89,28 @@
   margin-right: 8px;
 }
 
+/* Bond explainer under the chart (22 Sept 2026). */
+.explain {
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+  padding: 14px 0 0;
+  margin: 0 0 14px;
+}
+.explainTitle {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--yellow-header);
+}
+.explainText {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+.explainText:last-child {
+  margin-bottom: 0;
+}
+
 .note {
   margin: auto 0 0;
   text-align: center;
@@ -111,6 +127,7 @@
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .facts,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .explainText,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
   color: var(--navy, #0a3a57);
 }
