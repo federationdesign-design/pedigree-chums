@@ -49,7 +49,7 @@ export default function MoneyForShips() {
   return (
     <section className={styles.panel} aria-labelledby="money-ships-title">
       <h2 id="money-ships-title" className={`display ${styles.title}`}>
-        Money for <span className="display-yellow">Ships</span>
+        The Adoption of <span className="display-yellow">Capitalism</span>
       </h2>
       <p className={styles.intro}>
         After 1688 Britain borrowed money the Dutch way, and promised Parliament would pay it back. That let it borrow more cheaply than its rivals, and spend the money on warships.
