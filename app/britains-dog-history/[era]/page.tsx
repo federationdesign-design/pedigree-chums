@@ -76,14 +76,10 @@ export default async function EraPage({ params }: Props) {
         return (
           <div key={strip}>
             <BreedStrip era={strip} />
-            {section && (
-              <div className={styles.sectionHolder}>
-                <HistorySection section={section} />
-              </div>
-            )}
-            {/* Ancient era only: sea level map in its own blue panel (22 Sept 2026). */}
+            {/* Ancient era only: sea level map, timeline and fact boxes, placed above
+                the Ancient Dogs write-up panel (owner request, 22 Sept 2026). */}
             {strip === "ancient" && (
-              <div className={styles.sectionHolder}>
+              <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
                 {/* Map and timeline side by side on desktop, stacked below
                     1024px (owner request, 22 Sept 2026). */}
                 <div className={styles.pair}>
@@ -92,6 +88,11 @@ export default async function EraPage({ params }: Props) {
                 </div>
                 {/* Three boxed facts from the social slides (22 Sept 2026). */}
                 <AncientFacts />
+              </div>
+            )}
+            {section && (
+              <div className={styles.sectionHolder}>
+                <HistorySection section={section} />
               </div>
             )}
           </div>

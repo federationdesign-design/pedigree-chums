@@ -21,13 +21,18 @@
   background: linear-gradient(to top right, #00e2ff, #008eff);
   color: var(--white);
   font-family: var(--font-body), system-ui, sans-serif;
+  text-align: center;
 }
 
+/* Luckiest Guy (--font-display), owner request 22 Sept 2026. Its cap height is
+   about 0.6 of the em box, so the size is up and the line height kept tight. */
 .heading {
   margin: 0 0 14px;
-  font-size: clamp(1.3rem, 2.2vw, 1.6rem);
-  line-height: 1.2;
-  font-weight: 700;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: var(--yellow-header);
 }
 

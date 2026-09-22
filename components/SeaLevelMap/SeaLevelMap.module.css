@@ -8,6 +8,10 @@
      (22 Sept 2026). */
   container-type: inline-size;
   position: relative;
+  /* Column flex so that when the panel is stretched to match the timeline
+     beside it, the map is pushed down to touch the panel bottom (22 Sept 2026). */
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   margin: 50px 0 0;
   /* No padding: the map touches the panel top, bottom and sides. Owner request,
@@ -32,6 +36,9 @@
    No frame. Owner request, 22 Sept 2026. */
 .mapWrap {
   position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .overlay {
@@ -169,6 +176,7 @@
   display: block;
   width: 100%;
   height: auto;
+  margin-top: auto;
 }
 
 .mapLabel {
@@ -244,11 +252,11 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
+  /* Key stays overlaid bottom right, over France, at every width (owner
+     request, 22 Sept 2026); only its inset and size shrink. */
   .overlayBottom {
-    position: static;
-    width: 100%;
-    text-align: left;
-    padding: 16px var(--pad) var(--pad);
+    padding: 16px;
+    width: min(70%, 360px);
   }
   .overlayLeft,
   .overlayRight {
@@ -260,12 +268,5 @@
   }
   .title {
     order: -2;
-  }
-  .legend,
-  .legendTitle {
-    justify-content: flex-start;
-  }
-  .note {
-    text-align: left;
   }
 }
