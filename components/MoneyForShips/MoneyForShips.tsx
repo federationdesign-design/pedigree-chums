@@ -139,9 +139,6 @@ export default function MoneyForShips() {
       <div className={styles.explain}>
         <h3 className={styles.explainTitle}>So what is a bond?</h3>
         <p className={styles.explainText}>
-          A bond is a posh IOU. You lend the government some money, and it promises to pay you back later, with interest every year until it does.
-        </p>
-        <p className={styles.explainText}>
           It is not the same as money. A coin is worth what it says right now. A bond is a promise about the future. But because everyone believed Parliament would pay, people bought and sold bonds happily, so a bond worked almost as well as cash.
         </p>
         <p className={styles.explainText}>
