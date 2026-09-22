@@ -42,7 +42,7 @@ export default function AncientFacts() {
     <div className={styles.grid}>
       {FACTS.map((f) => (
         <section key={f.heading} className={styles.box}>
-          <h3 className={styles.heading}>{f.heading}</h3>
+          <h3 className={styles.boxTitle}>{f.heading}</h3>
           {f.paras.map((p) => (
             <p key={p} className={styles.text}>
               {p}

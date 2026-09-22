@@ -102,3 +102,15 @@
     border-radius: 28px;
   }
 }
+
+/* Text colour toggle (22 Sept 2026): every white text flips to navy. Yellow text
+   (the accent word and the dates) keeps its colour. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .itemTitle,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .text,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .sources,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .sources a {
+  color: var(--navy, #0a3a57);
+  text-shadow: none;
+}

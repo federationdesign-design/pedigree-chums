@@ -26,7 +26,9 @@
 
 /* Luckiest Guy (--font-display), owner request 22 Sept 2026. Its cap height is
    about 0.6 of the em box, so the size is up and the line height kept tight. */
-.heading {
+/* Named boxTitle, not heading: app/globals.css flips any [class*="heading"] to
+   navy under the text toggle, which turned these yellow titles blue (22 Sept 2026). */
+.boxTitle {
   margin: 0 0 14px;
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: clamp(1.6rem, 2.8vw, 2.1rem);
@@ -44,4 +46,11 @@
 }
 .text:last-child {
   margin-bottom: 0;
+}
+
+/* Text colour toggle (22 Sept 2026): white body text flips to navy; the yellow
+   titles keep their colour. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .text {
+  color: var(--navy, #0a3a57);
+  text-shadow: none;
 }

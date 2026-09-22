@@ -270,3 +270,20 @@
     order: -2;
   }
 }
+
+/* Text colour toggle (22 Sept 2026): every white text flips to navy, with the
+   legibility shadow dropped. Yellow values and the accent word keep their colour. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .statLabel,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .caption,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .legend li,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .overlay,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .overlayBottom {
+  color: var(--navy, #0a3a57);
+  text-shadow: none;
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .mapLabel {
+  fill: var(--navy, #0a3a57);
+}
