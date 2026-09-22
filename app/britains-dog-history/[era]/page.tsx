@@ -14,6 +14,7 @@ import { ERA_INTRO } from "../../../data/eraIntros";
 import { SECTIONS } from "../../../data/historySections";
 import { ERA_PAGES, eraPageBySlug } from "./eraConfig";
 import styles from "./era.module.css";
+import hist from "../history.module.css";
 
 /* The write-up panel for a strip: the same section that sits above this strip on
    the history page, matched by era. "Dogs in the armed forces" shares era c1500
@@ -76,13 +77,13 @@ export default async function EraPage({ params }: Props) {
         Back to Britain&apos;s dog history
       </Link>
 
-      <ArticleTextToggle centered />
+      {/* Visible h1 at the top, in the strip label's own style (history.module.css
+          .stripLabel, so the text toggle flips it too). Replaces the visually hidden
+          h1; on single-strip pages the matching label above the rail is hidden
+          (owner request, 22 Sept 2026). The 1800s page keeps its four sub-labels. */}
+      <h1 className={`${hist.stripLabel} ${styles.pageTitle}`}>{page.title}</h1>
 
-      {/* The visible era heading is BreedStrip's own stripLabel, a <span>, to
-          match the history page exactly. This visually hidden h1 gives the page
-          a real heading for screen readers and search, without altering the
-          visual match. */}
-      <h1 className={styles.srOnly}>{page.title}</h1>
+      <ArticleTextToggle centered />
 
       {/* Ancient page only: map and timeline side by side on desktop, stacked
           below 1024px, at the top of the page above the strip (owner request,
@@ -100,7 +101,7 @@ export default async function EraPage({ params }: Props) {
         const section = sectionForStrip(strip);
         return (
           <div key={strip}>
-            <BreedStrip era={strip} />
+            <BreedStrip era={strip} hideLabel={page.strips.length === 1} />
             {/* Ancient era only: the three fact boxes, above the Ancient Dogs write-up
                 panel (owner request, 22 Sept 2026). The map and timeline moved to
                 the top of the page, see above. */}

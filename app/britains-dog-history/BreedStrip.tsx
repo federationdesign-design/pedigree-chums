@@ -121,6 +121,7 @@ export default function BreedStrip({
   label,
   labelName,
   playName,
+  hideLabel,
 }: {
   era: string;
   renderLevels?: (open: BreedStripOpen) => React.ReactNode;
@@ -160,6 +161,9 @@ export default function BreedStrip({
      openFor), so this no longer decides what a tap does; it tells the header picture's
      "pc:play-chum" which card to open. */
   playName?: string;
+  /* Hide the era label above the rail. Used by the single-strip era pages, which
+     show the same words as their own visible h1 at the top (22 Sept 2026). */
+  hideLabel?: boolean;
 }) {
   const router = useRouter();
   const { confirmLeave } = useLeaveDialog();
@@ -838,7 +842,7 @@ export default function BreedStrip({
           {label ?? ERA_LABELS[era]}
           {labelName ? <> <span className={styles.stripLabelName}>{labelName}</span></> : null}
         </h2>
-      ) : (
+      ) : hideLabel ? null : (
         <span className={styles.stripLabel}>{label ?? ERA_LABELS[era]}</span>
       )}
 
