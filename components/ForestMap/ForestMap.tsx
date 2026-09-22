@@ -23,7 +23,9 @@ import { GB, type LL } from "../SeaLevelMap/SeaLevelMap";
    Same projection as the other maps: x = (lon + 11) * 20, y = (61 - lat) * 33. */
 
 const VIEW = { x: 88, y: 168, w: 178, h: 204 };
-const START = 1066;
+/* Starts at 1067, not 1066, so a few small forests already show and can be seen
+   growing (owner request, 22 Sept 2026). */
+const START = 1067;
 const END = 1400;
 
 const px = ([lo, la]: LL) => `${((lo + 11) * 20).toFixed(1)},${((61 - la) * 33).toFixed(1)}`;
