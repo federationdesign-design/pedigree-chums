@@ -330,6 +330,11 @@
     position: relative;
     z-index: 2;
   }
+  /* Nudged down 10px so it clears Falmouth, the last node on the road (owner,
+     22 Sept 2026). */
+  .legend {
+    margin-top: calc(-2.6rem + 10px);
+  }
 }
 
 /* Mobile: the slider sticks to the top of the screen while the panel is on it,
