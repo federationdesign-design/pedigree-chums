@@ -4,6 +4,9 @@ import styles from "./DogTimeline.module.css";
    (/britains-dog-history/ancient), shown below the sea level map. Added
    22 September 2026 at the owner's request. Copy flagged for owner review.
 
+   Starts at Gough's Cave, 14,300 years ago (owner request, 22 Sept 2026): the
+   wolf-to-dog and Türkiye entries and the Britain / wider-world key were removed.
+
    Dates are as reported by the sources listed at the foot of the panel. Star Carr
    is given as about 11,000 years ago: the site was first occupied then, and its
    dog was dated to about 9,500 radiocarbon years BP, which is older in calendar
@@ -12,16 +15,6 @@ import styles from "./DogTimeline.module.css";
 type Entry = { when: string; title: string; text: string; uk?: boolean };
 
 const ENTRIES: Entry[] = [
-  {
-    when: "20,000 to 40,000 years ago",
-    title: "From wolf to dog",
-    text: "Somewhere in the world, a population of grey wolves began living alongside people. Over many generations they became the first dogs, the first animals ever domesticated by humans.",
-  },
-  {
-    when: "15,800 years ago",
-    title: "The oldest dog DNA",
-    text: "Bones from Pınarbaşı, a cave in central Türkiye, hold the oldest genetically confirmed dog yet found. By 14,000 years ago, dogs were living right across Europe.",
-  },
   {
     when: "14,300 years ago",
     title: "Gough's Cave, Somerset",
@@ -75,11 +68,6 @@ export default function DogTimeline() {
           </li>
         ))}
       </ol>
-
-      <p className={styles.key}>
-        <span className={`${styles.keyDot} ${styles.keyUk}`} aria-hidden="true" /> Found in Britain
-        <span className={styles.keyDot} aria-hidden="true" /> The wider world
-      </p>
 
       <p className={styles.sources}>
         Sources:{" "}

@@ -50,7 +50,7 @@ const CURVE: [number, number][] = [[20000,-120],[16000,-100],[14500,-80],[12000,
    Rounded from fossil beetle studies: warm at the start, a sharp cold snap (the
    Younger Dryas, about 12,900 to 11,700 years ago), then fast warming. Added
    22 Sept 2026 at owner request. Flagged for owner review. */
-const TEMP: [number, number][] = [[13300,14],[12900,13],[12700,10],[11800,10],[11500,16],[9000,17.5],[6000,17],[3000,16],[0,16.5]];
+const TEMP: [number, number][] = [[14300,16],[13300,14],[12900,13],[12700,10],[11800,10],[11500,16],[9000,17.5],[6000,17],[3000,16],[0,16.5]];
 const T_MIN = 8;
 const T_MAX = 20;
 
@@ -82,8 +82,9 @@ const EVENTS: [number, string][] = [
   [-1, "Today, Doggerland lies under the North Sea. Trawlers still net its bones and tools."],
 ];
 
-/* Timeline runs from 13,300 years ago (owner request, 22 Sept 2026; was 20,000). */
-const START = 13300;
+/* Timeline runs from 14,300 years ago, the Gough's Cave dog (owner request,
+   22 Sept 2026; was 13,300, originally 20,000). */
+const START = 14300;
 /* Site palette from app/globals.css (owner request, 22 Sept 2026). No sea fill:
    the blue panel shows through as the sea. */
 const LAND = "var(--cta)";
@@ -129,7 +130,9 @@ export default function SeaLevelMap() {
   const mercury = (38 * Math.min(1, Math.max(0, (temp - T_MIN) / (T_MAX - T_MIN)))).toFixed(1);
   const seaShown = Math.round(sea);
   const caption = EVENTS.find((e) => yearsAgo >= e[0])?.[1] ?? "";
-  const iceOpacity = Math.min(0.95, Math.max(0, (yearsAgo - 13500) / 4500));
+  /* Ice kept hidden from the 14,300 start: the drawn sheet is the Ice Age peak
+     extent, far larger than the ice left by then (22 Sept 2026). */
+  const iceOpacity = Math.min(0.95, Math.max(0, (yearsAgo - 14500) / 4500));
 
   const togglePlay = () => {
     if (!playing && t >= START) setT(0);
