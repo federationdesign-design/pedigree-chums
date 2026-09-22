@@ -1406,9 +1406,21 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lurcher",
     note: "Not a breed but a type: a sighthound crossed with a working dog, long the poacher's and traveller's companion, fast and quiet.",
     children: [
-      { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
+      /* REBUILT FROM OLDER DOGS, 22 September 2026 (owner, option B): the Lurcher
+         moved from the early-1800s strip to Tudor 'n' Stuart times (the word is
+         first used for a dog in 1668, and Caius described its job in 1576), so its
+         parents must sit in earlier strips. The Greyhound and the Black and Tan
+         Terrier are 1700s-strip dogs and would have come AFTER it. Same 50/30/20
+         split, older stock:
+         - Celtic Coursing Hound replaces the Greyhound: the sighthound side. It
+           carries the Gaulish coursing hounds, the vertragus, and Caius's own Latin
+           name for the Tumbler, the lurcher's Tudor forerunner, is Vertagus.
+         - Old working collies stays: it was already a medieval-strip dog.
+         - Earth and hunt terriers replaces the Black and Tan Terrier: the
+           terrier side, from the medieval strip. */
+      { name: "Celtic Coursing Hound", note: "The swift sight-hunting stock behind every running dog, and the lurcher's speed. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 50 },
       { name: "Old working collies", note: "Herding or pastoral blood for brains and biddability. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 30 },
-      { name: "Black and Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 20 }
+      { name: "Earth and hunt terriers", note: "Old go-to-ground terrier stock for grit and a harder coat. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 20 }
     ]
   },
 

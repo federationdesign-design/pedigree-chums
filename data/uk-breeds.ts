@@ -131,7 +131,8 @@ export const ukBreeds: UKBreed[] = [
   // convention. era is an honest band label, never a bare year; anchor is purely
   // an ordering device, never shown to the user, so an anchor must not be read as
   // a researched date. Lurcher (1802) and Longdog (1803) read "1800s" and are now
-  // banded as "early 1800s" like the rest of the strip.
+  // banded as "early 1800s" like the rest of the strip. (22 September 2026: the
+  // Lurcher has since moved to the c1500 strip; Longdog stays here.)
   { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
   { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
 
@@ -180,7 +181,11 @@ export const ukBreeds: UKBreed[] = [
   { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.jpg", tag: "popular" },
   { name: "Bullmastiff", strip: "mid1800", era: "1860s", anchor: 1866, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "endangered" },
   { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/Whippet-square.jpg" , tag: "popular" },
-  { name: "Lurcher", strip: "early1800", era: "early 1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/lercher-square.jpg" , tag: "popular" },
+  /* 22 September 2026 (owner): the Lurcher moved here from the early-1800s strip.
+     The word is first used for a dog in 1668 and Caius described its poaching
+     job in 1576. Its family tree was rebuilt from older dogs to match (see its
+     record in data/lineage.ts). Anchor 1668 orders it last in this strip. */
+  { name: "Lurcher", strip: "c1500", era: "1600s", anchor: 1668, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/lercher-square.jpg" , tag: "popular" },
   { name: "Longdog", strip: "early1800", era: "early 1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" , tag: "endangered" },
   { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier.jpg", tag: "extinct" },
   { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/yorkshire-square.jpg" , tag: "in-decline" },
