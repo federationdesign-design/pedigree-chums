@@ -14,7 +14,11 @@ import { WORLD_PATHS, lonX, latY } from "../../data/worldOutline";
    of honour and the Wikipedia table. Places are where the dog did the work, not
    where the medal was given, and are marked at map scale only. */
 
-const VIEW = { x: 495, y: 90, w: 420, h: 215 };
+/* Europe and North Africa only (owner, 22 Sept 2026): Judy served in the Far
+   East, and keeping her on the map shrank Europe to nothing, so she is a note
+   under the card instead. Marker and label sizes scale with the window. */
+const VIEW = { x: 504, y: 96, w: 102, h: 88 };
+const S = VIEW.w / 420;
 
 type Dog = {
   name: string;
@@ -34,7 +38,6 @@ const DOGS: Dog[] = [
   { name: "Brian", breed: "Alsatian", year: 1947, at: [-0.6, 49.3], place: "Normandy", left: true, story: "A patrol dog with a parachute battalion. He landed in Normandy with them and, once he had done the jumps, was a qualified paratrooper." },
   { name: "Rifleman Khan", breed: "Alsatian", year: 1945, at: [3.6, 51.5], place: "Walcheren", story: "A family pet lent to the army. When his landing craft was hit he swam back through the water to drag his handler ashore." },
   { name: "Ricky", breed: "Welsh collie", year: 1947, at: [5.75, 51.28], place: "Nederweert", story: "He was clearing mines along a canal bank in Holland when one exploded. Wounded in the head, he stayed calm and kept working." },
-  { name: "Judy", breed: "Pointer", year: 1946, at: [101, -0.5], place: "Sumatra", story: "A ship's dog on HMS Gnat and HMS Grasshopper who ended up in a prisoner of war camp, where she kept the prisoners going." },
   { name: "Antis", breed: "Alsatian", year: 1949, at: [14.4, 50.1], place: "Czechoslovakia", story: "He flew with a Czech airman in the RAF, then years later helped his owner escape across the frontier." },
 ];
 
@@ -45,7 +48,7 @@ export default function DickinMap() {
   return (
     <section className={styles.panel} aria-labelledby="dickin-title">
       <h2 id="dickin-title" className={`display ${styles.title}`}>
-        The Animals&rsquo; <span className="display-yellow">VC</span>
+        The Animals&rsquo; <span className="display-yellow">Victoria Cross</span>
       </h2>
       <p className={styles.intro}>
         In 1943 Maria Dickin founded a medal for animals: the animals&rsquo; Victoria Cross. Four years after the panic, Britain was pinning bronze on dogs. Tap a marker.
@@ -61,8 +64,14 @@ export default function DickinMap() {
             const cy = latY(d.at[1]);
             return (
               <g key={d.name} onClick={() => setPick(i)} className={styles.hit}>
-                <circle cx={cx} cy={cy} r={i === pick ? 7 : 5} className={i === pick ? styles.pinOn : styles.pin} />
-                <text x={d.left ? cx - 9 : cx + 9} y={cy + 3.5} textAnchor={d.left ? "end" : "start"} className={styles.pinLabel}>
+                <circle cx={cx} cy={cy} r={(i === pick ? 7 : 5) * S} className={i === pick ? styles.pinOn : styles.pin} />
+                <text
+                  x={d.left ? cx - 9 * S : cx + 9 * S}
+                  y={cy + 3.5 * S}
+                  textAnchor={d.left ? "end" : "start"}
+                  fontSize={9 * S}
+                  className={styles.pinLabel}
+                >
                   {d.name}
                 </text>
               </g>
@@ -76,6 +85,10 @@ export default function DickinMap() {
         <h3 className={`display ${styles.cardName}`}>{dog.name}</h3>
         <p className={styles.cardStory}>{dog.story}</p>
       </div>
+
+      <p className={styles.aside}>
+        <strong>Off the map:</strong> Judy, a pointer, was ship&rsquo;s dog on HMS Gnat and HMS Grasshopper and ended up in a prisoner of war camp in Sumatra, where she kept the prisoners going. She got her medal in 1946.
+      </p>
 
       <p className={styles.note}>
         The medal has gone to 75 animals so far, 38 of them dogs, along with pigeons, horses and one cat. Markers show roughly where each dog served.

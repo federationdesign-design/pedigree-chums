@@ -125,8 +125,15 @@
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .intro,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .caption,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .counterText,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .refusers,
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .note {
   color: var(--navy, #0a3a57);
+}
+
+.refusers {
+  margin: 0 0 14px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 /* Source and note text (owner, 22 Sept 2026). */
