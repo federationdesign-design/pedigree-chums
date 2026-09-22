@@ -369,6 +369,23 @@
   height: 100%;
   overflow: hidden;
 }
+/* The same navy wash the hero carries, held at the hero's DARKEST value (owner,
+   22 Sept 2026), so scrolling from the intro photograph into a section
+   photograph reads as one continuous tint rather than two different ones. The
+   hero's own gradient runs 0.15 to 0.82; this is a flat 0.82. */
+.slideImg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(10, 58, 87, 0.82);
+}
+/* Everything drawn over the photograph has to sit above the wash. */
+.slideCount,
+.slideTitleWrap {
+  z-index: 2;
+}
 
 /* The photograph and the video are interchangeable in the sticky top, so they
    are sized by one rule rather than two that could drift apart. */
