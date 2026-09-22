@@ -42,6 +42,29 @@ const STEPS: { label: string; text: string; dots: number }[] = [
   },
 ];
 
+/* What a week's food actually looked like (owner request, 22 Sept 2026). Sources:
+   rationing began on 8 January 1940 with bacon and ham, butter and sugar, meat
+   followed on 11 March 1940, tea in July 1940, cheese in May 1941, milk and eggs
+   from late May 1941, and almost everything except bread and vegetables was on
+   the ration by August 1942 (Wikipedia, Rationing in the United Kingdom; Historic
+   UK; Who Do You Think You Are). The amounts are the typical adult weekly ration
+   as published by the Ministry of Food and reproduced by the Imperial War
+   Museum's partners; they moved up and down through the war. */
+const RATIONS: [string, string][] = [
+  ["Bacon and ham", "4oz a week, about four rashers"],
+  ["Other meat", "1s 2d worth, about two chops"],
+  ["Butter", "2oz a week"],
+  ["Margarine", "4oz a week"],
+  ["Cooking fat", "4oz a week"],
+  ["Cheese", "2oz a week"],
+  ["Milk", "3 pints a week"],
+  ["Eggs", "1 fresh egg a week"],
+  ["Sugar", "8oz a week"],
+  ["Tea", "2oz a week"],
+  ["Jam", "1lb every two months"],
+  ["Sweets", "12oz every four weeks"],
+];
+
 export default function PetPanic() {
   const [step, setStep] = useState(0);
   const gone = STEPS[step].dots;
@@ -88,6 +111,25 @@ export default function PetPanic() {
       <p className={styles.refusers}>
         Not everyone joined in. The National Canine Defence League, today&rsquo;s Dogs Trust, spoke out against it, and vets, charities and ordinary owners argued to keep animals alive. Within four years Britain would be giving dogs medals.
       </p>
+
+      {/* Rationing block (owner request, 22 Sept 2026). */}
+      <div className={styles.rations}>
+        <h3 className={`display ${styles.rationsTitle}`}>What a week&rsquo;s food looked like</h3>
+        <p className={styles.rationsIntro}>
+          Rationing started on 8 January 1940, four months after the panic, with bacon and ham, butter and sugar. Meat followed in March, tea in July, then cheese, milk and eggs in 1941. By 1942 almost everything except bread and vegetables was on the ration, and everyone had a ration book with their name on it.
+        </p>
+        <dl className={styles.rationList}>
+          {RATIONS.map(([what, how]) => (
+            <div key={what} className={styles.ration}>
+              <dt className={styles.rationWhat}>{what}</dt>
+              <dd className={styles.rationHow}>{how}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className={styles.rationsIntro}>
+          No ration book was ever issued for a dog or a cat. Pets lived on scraps, leftovers and whatever their owners could spare, which is exactly what people had been afraid of in 1939.
+        </p>
+      </div>
 
       <p className={styles.note}>
         Figures are estimates from later histories. The leaflet never ordered anything: it was fear, and a single sentence, that did it.

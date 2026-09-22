@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import styles from "./DickinMap.module.css";
-import { WORLD_PATHS, lonX, latY } from "../../data/worldOutline";
+import { lonX, latY } from "../../data/worldOutline";
+import { EUROPE_PATHS } from "../../data/europeOutline";
 
 /* The Dickin Medal map. The 1900s era page, added 22 September 2026 at the
    owner's request. Copy flagged for owner review.
@@ -28,6 +29,8 @@ type Dog = {
   place: string;
   story: string;
   left?: boolean;
+  /* Label nudge in map units, about 5.5px each (owner, 22 Sept 2026). */
+  dy?: number;
 };
 
 const DOGS: Dog[] = [
@@ -36,8 +39,8 @@ const DOGS: Dog[] = [
   { name: "Jet and Irma", breed: "Alsatians", year: 1945, at: [1.2, 53.2], place: "London", story: "Civil Defence rescue dogs who worked the wreckage of bombed buildings, finding people trapped underneath." },
   { name: "Rob", breed: "Collie", year: 1945, at: [9.5, 34], place: "North Africa", story: "A farm collie who joined the SAS and made more than 20 parachute jumps during the North African campaign." },
   { name: "Brian", breed: "Alsatian", year: 1947, at: [-0.6, 49.3], place: "Normandy", left: true, story: "A patrol dog with a parachute battalion. He landed in Normandy with them and, once he had done the jumps, was a qualified paratrooper." },
-  { name: "Rifleman Khan", breed: "Alsatian", year: 1945, at: [3.6, 51.5], place: "Walcheren", story: "A family pet lent to the army. When his landing craft was hit he swam back through the water to drag his handler ashore." },
-  { name: "Ricky", breed: "Welsh collie", year: 1947, at: [5.75, 51.28], place: "Nederweert", story: "He was clearing mines along a canal bank in Holland when one exploded. Wounded in the head, he stayed calm and kept working." },
+  { name: "Rifleman Khan", breed: "Alsatian", year: 1945, at: [3.6, 51.5], place: "Walcheren", dy: -0.9, story: "A family pet lent to the army. When his landing craft was hit he swam back through the water to drag his handler ashore." },
+  { name: "Ricky", breed: "Welsh collie", year: 1947, at: [5.75, 51.28], place: "Nederweert", dy: 1.45, story: "He was clearing mines along a canal bank in Holland when one exploded. Wounded in the head, he stayed calm and kept working." },
   { name: "Antis", breed: "Alsatian", year: 1949, at: [14.4, 50.1], place: "Czechoslovakia", story: "He flew with a Czech airman in the RAF, then years later helped his owner escape across the frontier." },
 ];
 
@@ -56,7 +59,7 @@ export default function DickinMap() {
 
       <div className={styles.mapWrap}>
         <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} className={styles.map} role="img" aria-label="Map showing where Dickin Medal dogs served">
-          {WORLD_PATHS.map((d, i) => (
+          {EUROPE_PATHS.map((d, i) => (
             <path key={i} d={d} className={styles.land} />
           ))}
           {DOGS.map((d, i) => {
@@ -67,7 +70,7 @@ export default function DickinMap() {
                 <circle cx={cx} cy={cy} r={(i === pick ? 7 : 5) * S} className={i === pick ? styles.pinOn : styles.pin} />
                 <text
                   x={d.left ? cx - 9 * S : cx + 9 * S}
-                  y={cy + 3.5 * S}
+                  y={cy + 3.5 * S + (d.dy ?? 0)}
                   textAnchor={d.left ? "end" : "start"}
                   fontSize={9 * S}
                   className={styles.pinLabel}
