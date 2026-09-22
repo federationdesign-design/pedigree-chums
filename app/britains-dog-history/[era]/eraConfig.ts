@@ -27,7 +27,7 @@ export const ERA_PAGES: EraPage[] = [
     /* Owner request, 22 Sept 2026. Dogger Bank is named after doggers, medieval
        Dutch cod-fishing boats (Wikipedia: Dogger Bank; Dogger (boat)). */
     intro:
-      "Sorry to disappoint, but Doggerland has nothing to do with dogs! It is named after the Dogger Bank in the North Sea, which got its name from doggers, the medieval Dutch fishing boats that sailed there to catch cod.",
+      "In ancient times, Britain was not an island. It was connected to mainland Europe by Doggerland. But we are sorry to report that Doggerland has nothing to do with dogs! It is named after the Dogger Bank in the North Sea, which got its name from doggers, the medieval Dutch fishing boats that sailed there to catch cod.",
   },
   { slug: "medieval", title: "Medieval Times", strips: ["medieval"] },
   { slug: "tudor", title: "Tudor Times", strips: ["c1500"] },
