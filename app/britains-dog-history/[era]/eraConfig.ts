@@ -14,7 +14,16 @@
 
 export type EraPage = {
   slug: string;
-  title: string; // page <title> and displayed heading, derived from the era name
+  /* The heading READERS see. Short and funny by design, and the owner wants it
+     left alone (23 September 2026). */
+  title: string;
+  /* What SEARCH sees, added 23 September 2026. A <title> and a <meta
+     description> can differ from the on-page h1, and should here: "Medieval
+     Times" is a fine heading and a useless search result. These name the era, the
+     dogs and the thing people actually type. Written once, stored here so the
+     page component stays free of copy. */
+  seoTitle: string;
+  seoDescription: string;
   strips: string[]; // uk-breeds strip keys, in history-page order
   intro?: string; // optional lead paragraph under the h1 (added 22 Sept 2026)
 };
@@ -23,6 +32,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "ancient",
     title: "Ancient Times",
+    seoTitle:
+      "Ancient Dogs of Britain: Celtic Hounds, Doggerland and the First Dogs",
+    seoDescription:
+      "How dogs reached Britain when it was still joined to Europe by Doggerland, and the Celtic hounds, mastiffs and herding dogs the Romans found here. Maps, dates and the breeds they became.",
     strips: ["ancient"],
     /* Owner request, 22 Sept 2026. Dogger Bank is named after doggers, medieval
        Dutch cod-fishing boats (Wikipedia: Dogger Bank; Dogger (boat)). */
@@ -40,6 +53,10 @@ export const ERA_PAGES: EraPage[] = [
        Guthrum, Great Heathen Army). */
     slug: "saxons",
     title: "Saxons 'n' Normans",
+    seoTitle:
+      "Saxon and Norman Dogs: Who Owned Britain from the Romans to 1066",
+    seoDescription:
+      "Romans, Saxons, Vikings and Normans each took Britain and each brought dogs. An interactive map of who held what, the forest laws that followed, and the nine breeds of the period.",
     strips: ["saxon"],
     intro:
       "For six hundred years Britain belonged to whoever had just arrived. The Romans came in AD 43 and left in 410. Then Anglo-Saxon kingdoms filled the map, Viking raiders took the north and east until Alfred stopped them in 878, and in 1066 the Normans took the lot. Every wave brought its own dogs, and Britain kept the best of each.",
@@ -47,6 +64,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "medieval",
     title: "Medieval Times",
+    seoTitle:
+      "Medieval Dogs in Britain: Forest Laws, Royal Hunts and Hunting Hounds",
+    seoDescription:
+      "William the Conqueror turned huge areas into royal forests, and dogs paid the price. The hunting hounds, terriers and herding dogs of medieval Britain, with a playable map of the forests.",
     strips: ["medieval"],
     /* Owner request, 22 Sept 2026 (option A: the accurate 1066 story; the 1688
        "invitation" story belongs to William III, not the Conqueror). Sources:
@@ -66,6 +87,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "tudor",
     title: "Tudor 'n' Stuart Times",
+    seoTitle:
+      "Tudor and Stuart Dogs: Britain's First Book of Dogs, 1576",
+    seoDescription:
+      "John Caius wrote the first book about English dogs in 1576, naming types we have since lost. Tudor and Stuart Britain's dogs, its post roads and the breeds that survived.",
     strips: ["c1500"],
     /* Owner request, 22 Sept 2026. Sources: a signpost's "post" is the wooden
        pole, while the letter post comes from horses "posted" in relays; a 1697
@@ -78,6 +103,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "1700s",
     title: "The 1700s",
+    seoTitle:
+      "Georgian Dogs and the 1700s: Trade, Empire and the Pug's Arrival",
+    seoDescription:
+      "How Britain's ships, debts and empire shaped its dogs in the 1700s, from pugs arriving with William of Orange to the sporting breeds of the Georgian era.",
     strips: ["c1700"],
     /* Owner request, 22 Sept 2026: the William of Orange story, saved for this
        page. Sources: The National Archives (the Immortal Seven's letter of 30
@@ -90,6 +119,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "1800s",
     title: "The 1800s",
+    seoTitle:
+      "Victorian Dogs: The Dog Cart Ban, the Kennel Club and the Breed Explosion",
+    seoDescription:
+      "London banned dog carts in 1839 and thousands of dogs were destroyed. By 1900 Britain was inventing breeds by the dozen. The Victorian century that made the modern dog.",
     strips: ["early1800", "spaniels", "mid1800", "late1800"],
     /* Owner request, 22 Sept 2026. Sources: Metropolitan Police Act 1839 s.56,
        banning dogs from drawing carts within 15 miles of Charing Cross from 1
@@ -102,6 +135,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "1900s",
     title: "The 1900s",
+    seoTitle:
+      "Dogs in Wartime Britain: The 1939 Pet Massacre and the Dickin Medal",
+    seoDescription:
+      "In one week of September 1939 Britain destroyed 400,000 pets. Four years later it was giving dogs medals. Wartime rationing, the Dickin Medal dogs and the century's breeds.",
     strips: ["c1900"],
     /* Owner request, 22 Sept 2026. Sources: the NARPAC leaflet "Advice to Animal
        Owners" and the September 1939 pet panic, about 400,000 in the first days
@@ -111,7 +148,15 @@ export const ERA_PAGES: EraPage[] = [
     intro:
       "In September 1939, within days of war being declared, British families queued outside animal clinics to have their pets put to sleep. About 400,000 cats and dogs went in the first week, and perhaps 750,000 in all. No law told anyone to do it: a government leaflet had simply said it would be kindest, and fear did the rest. Four years later the same country invented a medal for brave animals, and started pinning it on dogs.",
   },
-  { slug: "crosses", title: "Today's Crossbreeds", strips: ["crosses"] },
+  {
+    slug: "crosses",
+    title: "Today's Crossbreeds",
+    seoTitle:
+      "Crossbreed Dogs in Britain: Cockapoos, Labradoodles and Today's Pack",
+    seoDescription:
+      "Why Britain fell for the crossbreed, how the cockapoo and labradoodle were made, and where today's most popular dogs came from.",
+    strips: ["crosses"],
+  },
 ];
 
 export function eraPageBySlug(slug: string): EraPage | undefined {

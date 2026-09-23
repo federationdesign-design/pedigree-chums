@@ -62,20 +62,32 @@ export function generateStaticParams(): { era: string }[] {
 
 export const dynamicParams = false;
 
-/* Metadata derived from the era name (title) and the strips' existing intro
-   notes (description), for SEO only; the notes are not shown on the page. No new
-   copywriting: a page whose strips carry no note falls back to the era title. */
+/* SEARCH METADATA, rewritten 23 September 2026 (owner). It used to be the era
+   name plus whatever the strips' intro notes happened to say, which gave results
+   reading "Medieval Times" with a stitched description.
+
+   The <title> and description now come from eraConfig's seoTitle and
+   seoDescription, written for what people actually search. THE ON-PAGE HEADING IS
+   UNCHANGED: the owner wants the short, funny titles kept, and a <title> is
+   allowed to differ from an h1. The old note-stitching stays as the fallback for
+   any era added without its own description. */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { era } = await params;
   const page = eraPageBySlug(era);
   if (!page) return { title: "Era Not Found" };
-  const desc = page.strips
+  const fallback = page.strips
     .map((s) => ERA_INTRO[s]?.note)
     .filter(Boolean)
     .join(" ");
+  const title = page.seoTitle || page.title;
+  const description = page.seoDescription || fallback || page.title;
+  const url = `/britains-dog-history/${page.slug}`;
   return {
-    title: page.title,
-    description: desc || page.title,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, type: "article" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
