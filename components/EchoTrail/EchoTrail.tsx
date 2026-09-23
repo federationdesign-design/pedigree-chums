@@ -126,6 +126,22 @@ const SPOTS: Spot[] = [
 const VIEW = { x: 500, y: 70, w: 320, h: 150 };
 const px = (s: Spot) => [lonX(s.at[0]), latY(s.at[1])] as const;
 
+/* "written down about AD 1000" ran off the end of the control on a phone, so the
+   date breaks after "about" (owner, 23 September 2026). */
+function WhenLabel({ when }: { when: string }) {
+  const at = when.indexOf("about ");
+  if (at === -1) return <>{when}</>;
+  const head = when.slice(0, at + "about".length);
+  const tail = when.slice(at + "about".length).trim();
+  return (
+    <>
+      {head}
+      <br />
+      {tail}
+    </>
+  );
+}
+
 const PLAY_MS = 1600;
 
 export default function EchoTrail() {
@@ -170,6 +186,72 @@ export default function EchoTrail() {
         between them is broken on purpose, because these stories are not descended from one another.
       </p>
 
+      <div className={styles.tabs} role="tablist" aria-label="Cultures">
+        {SPOTS.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            role="tab"
+            aria-selected={s.id === open.id}
+            className={`${styles.tab}${s.id === open.id ? " " + styles.tabOn : ""}`}
+            onClick={() => setStep(i)}
+          >
+            {s.figure}
+          </button>
+        ))}
+      </div>
+
+      {/* The portrait and the name sit on one row; the write-up runs the full
+          width underneath rather than indenting past the portrait (owner,
+          23 Sept 2026). */}
+      <div className={styles.mapWrap}>
+        <svg
+          viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`}
+          className={styles.map}
+          role="img"
+          aria-label="Map from Egypt to East Anglia showing seven cultures that placed a dog at the door of the dead"
+        >
+          {WORLD_PATHS.map((d, i) => (
+            <path key={i} d={d} className={styles.land} />
+          ))}
+
+          {/* The broken route. Drawn as separate dashed hops, not one path, so it
+              can never read as a migration arrow, and only as far as the slider
+              has reached. */}
+          {shown.slice(0, -1).map((s, i) => {
+            const a = px(s);
+            const b = px(shown[i + 1]);
+            return <line key={s.id} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} className={styles.hop} />;
+          })}
+
+          {SPOTS.map((s, i) => {
+            const [cx, cy] = px(s);
+            const on = s.id === open.id;
+            return (
+              <g key={s.id} className={styles.spot} onClick={() => setStep(i)}>
+                <circle cx={cx} cy={cy} r={on ? 7 : 5} className={on ? styles.dotOn : styles.dot} />
+                {/* A name appears as the timeline reaches its dot and STAYS, so
+                    the last step shows the whole trail named (owner, 23 Sept
+                    2026). */}
+                {i <= step && (
+                  <text
+                    x={(s.labelLeft ? cx - 9 : cx + 9) + (s.dx ?? 0)}
+                    y={cy + 3 + (s.dy ?? 0)}
+                    textAnchor={s.labelLeft ? "end" : "start"}
+                    className={styles.label}
+                  >
+                    {s.figure}
+                  </text>
+                )}
+                <circle cx={cx} cy={cy} r={14} className={styles.hit}>
+                  <title>{`${s.figure}, ${s.place}`}</title>
+                </circle>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
       {/* The era-page map control: a round play button beside the slider, both
           inside one bar (owner, 23 Sept 2026). */}
       <div className={styles.controls}>
@@ -199,74 +281,9 @@ export default function EchoTrail() {
           aria-label="Move along the trail"
           aria-valuetext={`${open.figure}, ${open.when}`}
         />
-        <span className={styles.stepWhen}>{open.when}</span>
+        <span className={styles.stepWhen}><WhenLabel when={open.when} /></span>
       </div>
 
-      <div className={styles.mapWrap}>
-        <svg
-          viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`}
-          className={styles.map}
-          role="img"
-          aria-label="Map from Egypt to East Anglia showing seven cultures that placed a dog at the door of the dead"
-        >
-          {WORLD_PATHS.map((d, i) => (
-            <path key={i} d={d} className={styles.land} />
-          ))}
-
-          {/* The broken route. Drawn as separate dashed hops, not one path, so it
-              can never read as a migration arrow, and only as far as the slider
-              has reached. */}
-          {shown.slice(0, -1).map((s, i) => {
-            const a = px(s);
-            const b = px(shown[i + 1]);
-            return <line key={s.id} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} className={styles.hop} />;
-          })}
-
-          {SPOTS.map((s, i) => {
-            const [cx, cy] = px(s);
-            const on = s.id === open.id;
-            return (
-              <g key={s.id} className={styles.spot} onClick={() => setStep(i)}>
-                <circle cx={cx} cy={cy} r={on ? 7 : 5} className={on ? styles.dotOn : styles.dot} />
-                {/* The name appears only as the timeline reaches its dot, so the
-                    map is not a wall of text (owner, 23 Sept 2026). */}
-                {on && (
-                  <text
-                    x={(s.labelLeft ? cx - 9 : cx + 9) + (s.dx ?? 0)}
-                    y={cy + 3 + (s.dy ?? 0)}
-                    textAnchor={s.labelLeft ? "end" : "start"}
-                    className={styles.label}
-                  >
-                    {s.figure}
-                  </text>
-                )}
-                <circle cx={cx} cy={cy} r={14} className={styles.hit}>
-                  <title>{`${s.figure}, ${s.place}`}</title>
-                </circle>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-
-      <div className={styles.tabs} role="tablist" aria-label="Cultures">
-        {SPOTS.map((s, i) => (
-          <button
-            key={s.id}
-            type="button"
-            role="tab"
-            aria-selected={s.id === open.id}
-            className={`${styles.tab}${s.id === open.id ? " " + styles.tabOn : ""}`}
-            onClick={() => setStep(i)}
-          >
-            {s.figure}
-          </button>
-        ))}
-      </div>
-
-      {/* The portrait and the name sit on one row; the write-up runs the full
-          width underneath rather than indenting past the portrait (owner,
-          23 Sept 2026). */}
       <div className={styles.card} aria-live="polite">
         <div className={styles.cardTop}>
           {open.img && (
