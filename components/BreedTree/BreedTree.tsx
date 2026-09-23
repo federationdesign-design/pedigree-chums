@@ -801,6 +801,9 @@ const QMARK_VB = 720;
    the art further out, lower it to pull the face inside the disc. The collider is
    untouched either way: see the note at the scale site. */
 const FACE_FILL_K = 2.2;
+/* How far the face sits off the circle centre, in SCREEN pixels, negative
+   up (owner, 23 September 2026). Zero is dead centre. */
+const FACE_NUDGE_Y = -5;
 /* SUPERSEDED BY RARITY_FACE_SRC, 23 September 2026 (owner's five tier faces).
    Kept, unused, because it is the fallback to bring back in one line if the art
    has to be pulled: set the resting href to this and restore the depth filter.
@@ -6994,7 +6997,7 @@ export default function BreedTree({
              only: an ear cannot be grabbed and does not collide. That is the
              owner's ask, and it is the reason the art may overhang at all. */
           const sc = (drawR(d, v, k) * FACE_FILL_K) / QMARK_VB;
-          q.setAttribute("transform", `translate(${tx},${ty}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
+          q.setAttribute("transform", `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
         }
         /* THE MARK IS THE HIGHLIGHT. While a
            dog chain is being drawn, every circle holding its breed turns its
