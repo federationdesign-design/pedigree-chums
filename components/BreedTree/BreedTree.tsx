@@ -6982,6 +6982,37 @@ export default function BreedTree({
         const hasPhoto = (c?.getAttribute("fill") ?? "").startsWith("url(") && !c?.style.fill;
         const showQ = fellRef.current && d.depth > 0 && paintable && !hasPhoto;
         q.style.display = showQ ? "inline" : "none";
+        /* THE FACE IS THE WHOLE DOG IN THE PIT, 23 September 2026 (owner: hide the
+           circle completely, leaving only the PNG; the lifted layer keeps its
+           circles as they are).
+
+           The art carries its own disc, so the SVG circle under it is now just a
+           second rim showing past the ears. It goes to a transparent fill and no
+           stroke while a face is up, and back to whatever the render and the chain
+           code set the moment the face comes down.
+
+           FILL "transparent", NOT "none". A circle with fill:none is not hit
+           tested, so the dog would stop being grabbable, tappable and chainable.
+           Transparent keeps the whole disc as the target, which is also why the
+           collider is unchanged: it was never the drawn ring that was doing that
+           work.
+
+           THE CHAIN STATE RIDES IN THE KEY because the chain block above writes
+           fill and stroke of its own on the same element. Including it here means
+           this re-asserts itself on the frame a circle joins or leaves a chain,
+           rather than losing to whichever ran last. A chained circle shows the
+           tier's SECOND face, which has the darker disc drawn into it. */
+        const faceOnly = `${showQ ? 1 : 0}:${c?.dataset.chained ?? ""}`;
+        if (c && c.dataset.faceOnly !== faceOnly) {
+          c.dataset.faceOnly = faceOnly;
+          if (showQ) {
+            c.style.fill = "transparent";
+            c.style.stroke = "none";
+          } else {
+            c.style.fill = "";
+            c.style.stroke = "";
+          }
+        }
         if (showQ) {
           /* THE FACE FILLS THE CIRCLE, 23 September 2026 (owner: the new art
              should totally encapsulate the circle, with the ears and the tongue
