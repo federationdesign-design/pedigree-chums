@@ -50,6 +50,8 @@ const PAGES: [path: string, freq: "weekly" | "monthly" | "yearly", priority: num
   ["/dogs-at-work/the-dog-that-finds-you-when-nobody-else-can", "monthly", 0.7],
   ["/dogs-at-work/the-dog-that-gives-you-your-world-back", "monthly", 0.7],
   ["/dogs-at-work/the-farm-worker-with-four-legs", "monthly", 0.7],
+  /* Article 7, the military dogs (23 September 2026). */
+  ["/dogs-at-work/the-dog-they-gave-a-medal-to", "monthly", 0.7],
 
   ["/good-dog-bad-dog", "monthly", 0.8],
   ["/good-dog-bad-dog/argos", "monthly", 0.7],

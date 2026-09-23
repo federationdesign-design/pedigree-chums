@@ -74,4 +74,16 @@ export const PAYSLIPS: Record<string, PayslipData> = {
     paidIn: "Praise, treats, the free run after",
     retirement: "Sofas, walks, nobody's commute",
   },
+  /* Article 7, the military dogs (owner, 23 September 2026). Same seven fields as
+     the others: every Dogs at Work page carries the payslip, which is the device
+     that ties the series together. */
+  "the-dog-they-gave-a-medal-to": {
+    jobTitle: "Explosives and casualty finder",
+    department: "Armed forces",
+    shiftPattern: "Whenever the handler goes",
+    officialDuties: "Search, alert, stay",
+    humanValue: "Lives not lost",
+    paidIn: "A ball, a tug toy, a hand on the head",
+    retirement: "Adopted by the handler, if there is one left to adopt him",
+  },
 };
