@@ -7122,10 +7122,20 @@ export default function BreedTree({
              rarity ever differs from the last one written, the same guard the
              fill and the ring already use. */
           const faceTier = rarityTier(treesContaining(d.data.name));
-          const tap = (held || twinBand ? "1" : "0") + `:${faceTier}`;
+          /* TWO VALUES, ON PURPOSE, 24 September 2026. `chained` is the QUESTION,
+             and `tap` is the KEY that decides whether anything is rewritten.
+
+             THE BUG THIS FIXES. They were one string: the key carried the tier,
+             `"1:common"`, and the branch below still tested `tap === "1"`, which
+             can never be true once the tier is appended. Every circle therefore
+             drew the resting face and the chained set was never used at all.
+             Keep them apart: the key needs the tier so a face is redrawn if a
+             breed's rarity changes, and the branch needs the bare state. */
+          const chained = held || !!twinBand;
+          const tap = `${chained ? 1 : 0}:${faceTier}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", tap === "1" ? RARITY_FACE_CHAINED_SRC[faceTier] : RARITY_FACE_SRC[faceTier]);
+            qi.setAttribute("href", chained ? RARITY_FACE_CHAINED_SRC[faceTier] : RARITY_FACE_SRC[faceTier]);
             /* NO FILTER ON EITHER NOW. Both faces are the owner's own art and
                already carry their tier colour; tinting would flatten them to one
                hue. The bt-qmark filters are left defined, unused, so the old
