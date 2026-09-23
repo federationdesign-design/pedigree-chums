@@ -4,6 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./good-dog-bad-dog.module.css";
+import MobileCarousel from "./MobileCarousel";
 
 export const metadata: Metadata = {
   title: "Good Dog, Bad Dog",
@@ -202,102 +203,10 @@ export default function GoodDogBadDogPage() {
           <div className={styles.mobileProgress} id="mobile-progress" />
         </div>
 
-        {/* Carousel script -- progress bar, intro button, vertical-flick advance.
-            No preventDefault, no scroll hijack: touch-action pan-x in CSS lets the
-            browser own horizontal panning; vertical flicks are read passively. */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){
-          var carousel = document.getElementById('mobile-carousel');
-          var bar = document.getElementById('mobile-progress');
-          if(!carousel || !bar) return;
-          function update() {
-            var max = carousel.scrollWidth - carousel.clientWidth;
-            bar.style.width = (max > 0 ? (carousel.scrollLeft / max) * 100 : 0) + '%';
-          }
-          carousel.addEventListener('scroll', update, { passive: true });
-          update();
-
-          function goTo(idx) {
-            /* Re-queried each time so the handler still works if React has
-               replaced these nodes during hydration. */
-            var c = document.getElementById('mobile-carousel');
-            if (!c) return;
-            var count = c.children.length;
-            if (idx < 0) idx = 0;
-            if (idx > count - 1) idx = count - 1;
-            var from = c.scrollLeft;
-            var target = idx * c.clientWidth;
-            /* scroll-snap-type: x mandatory blocks programmatic smooth scrolling
-               on iOS Safari, which is why this button did nothing while native
-               swiping worked. The touchend handler below already relies on the
-               same off/on trick -- that is the only reason it succeeds. */
-            c.style.scrollSnapType = 'none';
-            c.scrollTo({ left: target, behavior: 'smooth' });
-            /* If smooth scrolling was ignored outright, jump there instead. */
-            setTimeout(function(){
-              if (Math.abs(c.scrollLeft - from) < 2) c.scrollLeft = target;
-            }, 400);
-            setTimeout(function(){ c.style.scrollSnapType = ''; }, 700);
-          }
-
-          /* Delegated rather than bound directly, so the button keeps working
-             even if its node is re-created after this script has run. */
-          document.addEventListener('click', function(e){
-            var t = e.target;
-            if (t && t.closest && t.closest('#intro-next-btn')) goTo(1);
-          });
-
-          /* Continuous vertical drag -> horizontal movement.
-             touch-action: pan-x means the browser has no default action for
-             vertical touches, so passive listeners are safe: no preventDefault,
-             no interference with native horizontal swiping. */
-          var GAIN = 1.6;           /* px of horizontal travel per px of vertical drag */
-          var startX = 0, startY = 0, startLeft = 0, lastY = 0, lastT = 0, vel = 0;
-          var axis = null;          /* null | 'v' | 'h' */
-
-          carousel.addEventListener('touchstart', function(e){
-            if (e.touches.length !== 1) return;
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            startLeft = carousel.scrollLeft;
-            lastY = startY; lastT = Date.now(); vel = 0;
-            axis = null;
-          }, { passive: true });
-
-          carousel.addEventListener('touchmove', function(e){
-            if (e.touches.length > 1) return; /* pinch: let the browser zoom */
-            var t = e.touches[0];
-            if (!axis) {
-              var adx = Math.abs(t.clientX - startX);
-              var ady = Math.abs(t.clientY - startY);
-              if (adx < 6 && ady < 6) return;           /* not decided yet */
-              axis = ady > adx ? 'v' : 'h';
-              if (axis === 'v') carousel.style.scrollSnapType = 'none';
-            }
-            if (axis !== 'v') return;                    /* horizontal: native handles it */
-            var now = Date.now();
-            if (now > lastT) vel = (lastY - t.clientY) / (now - lastT);
-            lastY = t.clientY; lastT = now;
-            carousel.scrollLeft = startLeft + (startY - t.clientY) * GAIN;
-          }, { passive: true });
-
-          carousel.addEventListener('touchend', function(){
-            if (axis !== 'v') return;
-            axis = null;
-            var w = carousel.clientWidth;
-            var idx;
-            if (Math.abs(vel) > 0.35) {
-              /* decisive flick at release: continue one slide in that direction */
-              idx = (vel > 0 ? Math.ceil : Math.floor)(carousel.scrollLeft / w);
-            } else {
-              idx = Math.round(carousel.scrollLeft / w);
-            }
-            var count = carousel.children.length;
-            if (idx < 0) idx = 0;
-            if (idx > count - 1) idx = count - 1;
-            carousel.scrollTo({ left: idx * w, behavior: 'smooth' });
-            setTimeout(function(){ carousel.style.scrollSnapType = ''; }, 450);
-          }, { passive: true });
-        })();` }} />
+        {/* Carousel behaviour: progress bar, the intro button and the
+            vertical-flick advance. Moved into a client component on 23 September
+            2026, see MobileCarousel.tsx for why. */}
+        <MobileCarousel />
 
       </main>
       <Footer />
