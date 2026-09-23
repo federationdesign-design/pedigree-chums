@@ -173,7 +173,7 @@ const BODY: Row[] = [
   "The letters are an accident. The alliance was not.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "22px", letterSpacing: "0.1em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 10px", lineHeight: 1.15 };
+const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "22px", letterSpacing: "0.1em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 10px", lineHeight: 1.15 };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.9rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, margin: "0 0 10px" };
 const cardBodyLast: React.CSSProperties = { ...cardBody, margin: 0 };
 
@@ -303,6 +303,16 @@ export default function AnubisPage() {
                 if (typeof b !== "string" && "h" in b && b.h === "The provider becomes the sacrifice") {
                   return (
                     <React.Fragment key={i}>
+                      {/* Moved out of the sidebar on 23 September 2026 (owner) to
+                          sit immediately above the trail map, where it answers the
+                          question the map raises. */}
+                      <div className={styles.sidebarCard}>
+                        <div style={{ padding: "18px 20px" }}>
+                          <p style={cardTitle}>How Egypt reached Britain</p>
+                          <p style={cardBodyLast}>Egyptian gods really did come to Britain &mdash; up the Roman road, not down a line of pharaohs. The cult of Isis (Anubis in tow) spread across the Empire, and a jug from Roman London is scratched <em>&quot;Londini ad fanum Isidis&quot;</em> &mdash; &quot;at the temple of Isis in London.&quot;</p>
+                        </div>
+                      </div>
+
                       <EchoTrail />
                       {/* One panel per god, in the trail's own order, starting with
                           Anubis (owner, 23 Sept 2026). The rest follow in later
@@ -329,13 +339,6 @@ export default function AnubisPage() {
 
 
 
-            {/* Egypt reached Britain */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "18px 20px" }}>
-                <p style={cardTitle}>How Egypt reached Britain</p>
-                <p style={cardBodyLast}>Egyptian gods really did come to Britain &mdash; up the Roman road, not down a line of pharaohs. The cult of Isis (Anubis in tow) spread across the Empire, and a jug from Roman London is scratched <em>&quot;Londini ad fanum Isidis&quot;</em> &mdash; &quot;at the temple of Isis in London.&quot;</p>
-              </div>
-            </div>
 
             {/* Sources */}
             <div className={styles.sidebarCard}>
