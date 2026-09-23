@@ -31,7 +31,9 @@ type LL = [number, number];
 const pt = ([lo, la]: LL) => [(lo + 11) * 20, (61 - la) * 33] as const;
 const px = (p: LL) => pt(p).map((n) => n.toFixed(1)).join(",");
 const poly = (a: LL[]) => a.map(px).join(" ");
-const VIEW = { x: 88, y: 168, w: 178, h: 204 };
+/* 20px off the top of Scotland (owner, 23 Sept 2026): the view starts lower and
+   is that much shorter, so nothing else moves. */
+const VIEW = { x: 88, y: 188, w: 178, h: 184 };
 
 const START = 1;
 const END = 1100;
@@ -48,10 +50,10 @@ const NORMAN: LL[] = [[-5.8, 55.2], [2.2, 55.2], [2.2, 49.7], [-5.8, 49.7]];
 
 type Wave = { from: number; name: string; area: LL[]; fill: string; pattern: string };
 const WAVES: Wave[] = [
-  { from: 43, name: "Romans", area: ROMAN, fill: "var(--family-emergency)", pattern: "wob-hatch" },
-  { from: 500, name: "Saxons", area: SAXON, fill: "var(--family-science)", pattern: "wob-dots" },
-  { from: 878, name: "Danelaw", area: DANELAW, fill: "var(--family-people)", pattern: "wob-cross" },
-  { from: 1066, name: "Normans", area: NORMAN, fill: "var(--navy)", pattern: "wob-vert" },
+  { from: 43, name: "Romans", area: ROMAN, fill: "#a61010", pattern: "wob-hatch" },
+  { from: 500, name: "Saxons", area: SAXON, fill: "#ffed00", pattern: "wob-dots" },
+  { from: 878, name: "Danelaw", area: DANELAW, fill: "#ff1313", pattern: "wob-cross" },
+  { from: 1066, name: "Normans", area: NORMAN, fill: "#c018e2", pattern: "wob-vert" },
 ];
 
 /* Rome leaves: the Roman wash fades out over the fifth century. */
@@ -223,7 +225,6 @@ export default function WhoOwnsBritain() {
           {wall && (
             <line x1={pt([-3.1, 55.0])[0]} y1={pt([-3.1, 55.0])[1]} x2={pt([-1.4, 55.0])[0]} y2={pt([-1.4, 55.0])[1]} className={styles.wall} />
           )}
-          <polygon points={poly(GB)} className={styles.coast} />
           {year >= 793 && year < 900 && (
             <circle cx={pt([-1.8, 55.7])[0]} cy={pt([-1.8, 55.7])[1]} r={2.4} className={styles.raid}>
               <title>Lindisfarne, raided 793</title>

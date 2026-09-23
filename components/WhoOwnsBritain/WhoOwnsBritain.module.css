@@ -101,14 +101,7 @@
 }
 
 .britons {
-  fill: var(--family-rural, #97aa31);
-}
-/* The coastline is drawn again on top, unfilled, so every wave keeps a clean
-   edge where it meets the sea. */
-.coast {
-  fill: none;
-  stroke: var(--white);
-  stroke-width: 1.1;
+  fill: #4cb847;
 }
 .wall {
   stroke: var(--white);
@@ -142,11 +135,11 @@
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.8);
 }
-.swBritons { background: var(--family-rural, #97aa31); }
-.swRomans { background: var(--family-emergency, #d71f6c); }
-.swSaxons { background: var(--family-science, #10d1b7); }
-.swDanes { background: var(--family-people, #2b7095); }
-.swNormans { background: var(--navy, #0a3a57); }
+.swBritons { background: #4cb847; }
+.swRomans { background: #a61010; }
+.swSaxons { background: #ffed00; }
+.swDanes { background: #ff1313; }
+.swNormans { background: #c018e2; }
 
 .note {
   margin: 0;
@@ -156,21 +149,24 @@
   opacity: 0.9;
 }
 
-/* Mobile: the slider floats at the foot of the screen with the map in view, the
-   same pattern as the other era maps. */
+/* Mobile (owner, 23 September 2026). The slider sits ON the lower part of the
+   map rather than below it, the key text drops a point and its swatches become
+   plain roundels, and the captions drop two points. */
 @media (max-width: 768px) {
   .caption {
     text-align: center;
     padding: 0 14px;
+    font-size: 0.92rem;
     line-height: 1.3em;
   }
   .mapWrap {
     order: 4;
+    /* Negative bottom margin pulls the controls up over the foot of the map. */
+    margin-bottom: -72px;
   }
   .controls {
     order: 5;
-    position: sticky;
-    bottom: 8px;
+    position: relative;
     z-index: 5;
     margin: 0 10px 12px;
     padding: 8px 12px;
@@ -180,6 +176,13 @@
   }
   .legend {
     order: 6;
+    font-size: 0.82rem;
+  }
+  .swatch {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
   }
   .note {
     order: 7;
@@ -192,9 +195,6 @@
   fill: none;
   stroke: #000000;
   stroke-width: 1;
-}
-:root[data-pc-contrast-scheme="black-on-white"] .coast {
-  stroke: #000000;
 }
 :root[data-pc-contrast-scheme="black-on-white"] .wall {
   stroke: #000000;
@@ -210,9 +210,6 @@
   fill: none;
   stroke: #ffffff;
   stroke-width: 1;
-}
-:root[data-pc-contrast-scheme="white-on-black"] .coast {
-  stroke: #ffffff;
 }
 :root[data-pc-contrast-scheme="white-on-black"] .wall {
   stroke: #ffffff;
