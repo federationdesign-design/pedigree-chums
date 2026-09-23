@@ -5,6 +5,7 @@ import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
+import Image from "next/image";
 import EchoTrail from "../../../components/EchoTrail/EchoTrail";
 import XolotlPanel from "../../../components/XolotlPanel/XolotlPanel";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
@@ -175,15 +176,6 @@ const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", font
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.9rem", fontWeight: 500, color: "#fff", lineHeight: 1.6, margin: "0 0 10px" };
 const cardBodyLast: React.CSSProperties = { ...cardBody, margin: 0 };
 
-const PACK: [string, string][] = [
-  ["Egypt", "Anubis -- embalmer, guardian and guide of the dead"],
-  ["Greece", "Cerberus -- three-headed hound on the gates of Hades"],
-  ["Norse", "Garmr -- the blood-caked dog at the door of Hel"],
-  ["Wales", "Cwn Annwn -- spectral red-eared hounds whose howl foretells a death"],
-  ["India", "Yama's two dogs -- watchers of the road of the dead"],
-  ["Aztec", "Xolotl -- the dog-headed god who leads souls across the underworld"],
-  ["England", "Black Shuck -- the East Anglian omen-hound of the lanes and churchyards"],
-];
 
 // Article + breadcrumb structured data for this essay. Every value comes from
 // this page: headline is the on-page heading, description reuses the metadata
@@ -274,21 +266,11 @@ export default function AnubisPage() {
           </article>
 
           <aside className={styles.sidebar}>
-            {/* The worldwide pack */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "18px 20px" }}>
-                <p style={cardTitle}>The worldwide pack</p>
-                <p style={{ ...cardBody, fontSize: "0.82rem", color: "#aac4d4" }}>Dogs guarding the door of the dead, culture by culture -- invented over and over, with no contact between them.</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: 4 }}>
-                  {PACK.map(([place, who]) => (
-                    <div key={place} style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 8 }}>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", margin: "0 0 2px" }}>{place}</p>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.84rem", fontWeight: 500, color: "#fff", lineHeight: 1.45, margin: 0 }}>{who}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {/* The worldwide pack card was removed on 23 September 2026 (owner):
+                the Trail of Echoes map in the article now carries the same seven
+                figures with a great deal more detail, so the sidebar list only
+                repeated it. The list itself went with it: the map component now
+                owns that content. */}
 
             {/* Jackal, and other insults */}
             <div className={styles.sidebarCard}>
@@ -299,10 +281,20 @@ export default function AnubisPage() {
               </div>
             </div>
 
+
             {/* Taxonomy */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "18px 20px" }}>
                 <p style={cardTitle}>Is Anubis even a jackal?</p>
+                {/* The god's own portrait, as used on the map (owner, 23 Sept 2026). */}
+                <Image
+                  src="/Anubis-profile.png"
+                  alt=""
+                  width={96}
+                  height={96}
+                  unoptimized
+                  style={{ width: 84, height: 84, borderRadius: "50%", objectFit: "cover", border: "2px solid var(--yellow)", margin: "0 0 12px" }}
+                />
                 <p style={cardBody}>Possibly not. The animal long called the &quot;Egyptian jackal&quot; was shown by DNA (from 2011, formalised in 2015) to be a wolf &mdash; now the <strong>African golden wolf</strong>.</p>
                 <p style={cardBodyLast}>His black coat is symbolic, not literal: the black of decay and, at once, the black of the life-giving Nile silt.</p>
               </div>
