@@ -286,14 +286,31 @@ That is the pattern across every job in this series: not a dog doing a human's w
         },
       ],
     },
-    article: ARTICLE_BIO_DETECTION,
+    /* ONE PANEL, ONE ARTICLE (owner, 23 September 2026). The deck swipes the
+       article below in step with the panel, so a reused article shows the reader
+       the same piece twice. This panel used to repeat article 1; it now carries
+       article 7, the military dogs, which is also the better fit: a search dog
+       ahead of a patrol is the clearest case of a job people cannot do alone. */
+    article: {
+      family: "Security",
+      subLabel: "Military dogs",
+      headline: "The Dog They Gave a Medal To",
+      dek: `Rifleman Khan was a family pet from Surrey, lent to the army, who went into cold water under shellfire for a man he had known a few months. Britain gave him a medal. What military dogs actually do, why a ball is the only wage that works, and what happens when the job ends.`,
+      image: "/miltray-dog-img.jpg",
+      imageAlt: "a military working dog at work with its handler",
+      ctaLabel: "Military dogs",
+      href: "/dogs-at-work/the-dog-they-gave-a-medal-to",
+    },
   },
   {
     // Slide 8: the "What we get back is bigger than the task" panel, paired with a
     // reuse of article 2 (see the panel-split note at the top).
     id: "bigger-than-the-task",
     order: 8,
-    published: "live",
+    /* HELD BACK, 23 September 2026 (owner): this panel reused article 2, and the
+       deck must run one panel to one article. The copy is finished and waiting;
+       set it back to "live" the day article 8 lands, and give it that article. */
+    published: "draft",
     panel: {
       sections: [
         {
