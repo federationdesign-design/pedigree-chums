@@ -223,6 +223,16 @@ export default function XolotlPanel() {
         </svg>
       </div>
 
+      {/* What the land colour is telling you. */}
+      <ul className={styles.mapKey}>
+        <li>
+          <span className={`${styles.keySwatch} ${styles.keyBefore}`} aria-hidden="true" /> Aztec Mexico
+        </li>
+        <li>
+          <span className={`${styles.keySwatch} ${styles.keyAfter}`} aria-hidden="true" /> After the conquest, 1521
+        </li>
+      </ul>
+
       <div className={styles.card} aria-live="polite">
         <div className={styles.cardTop}>
           <Image src="/Xolotl-profile.png" alt="" width={96} height={96} className={styles.portrait} unoptimized />

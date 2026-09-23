@@ -247,7 +247,7 @@
 .cardFigure {
   margin: 0;
   font-family: var(--font-display, "Luckiest Guy", cursive), system-ui, sans-serif;
-  font-size: calc(1.3rem + 3pt);
+  font-size: calc(1.3rem + 5pt);
   line-height: 1.1;
   color: var(--yellow-header, #ffed00);
   letter-spacing: 0.02em;
@@ -275,8 +275,12 @@
 }
 
 /* Two points smaller and tighter (owner, 23 Sept 2026). */
+/* Ruled off from the write-up, so the small print is not read as part of it
+   (owner, 23 Sept 2026). */
 .note {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
   font-size: calc(0.76rem - 2pt);
   font-weight: 500;
   line-height: 1.2em;
@@ -285,7 +289,9 @@
 
 @media (max-width: 640px) {
   .label {
-    font-size: 11px;
+    /* 11px came from the trail map, whose view is eight times wider; here it
+       filled the map (owner, 23 Sept 2026). */
+    font-size: 1.9px;
   }
 }
 
@@ -333,3 +339,32 @@
 :root[data-pc-contrast-scheme="white-on-black"] .slider {
   accent-color: #ffffff;
 }
+
+/* The key for the land colour, which changes at 1521 (owner, 23 Sept 2026). */
+.mapKey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.mapKey li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.keySwatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+.keyBefore {
+  background: var(--cta, #4cb847);
+}
+.keyAfter {
+  background: #6f8a63;
+}
+
