@@ -518,14 +518,27 @@
 }
 
 /* ---- the gaze loop diagram ---- */
-.node {
-  fill: rgba(255, 255, 255, 0.16);
-  stroke: var(--white, #ffffff);
-  stroke-width: 2;
+/* The lemniscate: one unbroken line, which is the whole argument. */
+.loop {
+  fill: rgba(255, 255, 255, 0.12);
+  stroke: var(--yellow-header, #ffed00);
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+/* The wolf: the same figure, drawn as a line that never closes. */
+.loopOff {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 3;
+  stroke-dasharray: 6 9;
+  stroke-linecap: round;
+}
+.flow {
+  fill: var(--yellow-header, #ffed00);
 }
 .nodeLabel {
   font-family: var(--font-display, "Luckiest Guy", cursive), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   fill: var(--white, #ffffff);
 }
 .nodeSub {
@@ -533,21 +546,6 @@
   font-size: 9px;
   font-weight: 700;
   fill: var(--yellow-header, #ffed00);
-}
-.arm {
-  fill: none;
-  stroke: var(--yellow-header, #ffed00);
-  stroke-width: 3;
-  stroke-linecap: round;
-  marker-end: none;
-}
-/* The wolf version: the same arms, drawn broken, because the loop never closes. */
-.armOff {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.55);
-  stroke-width: 2;
-  stroke-dasharray: 5 7;
-  stroke-linecap: round;
 }
 .armLabel {
   font-family: var(--font-body), system-ui, sans-serif;

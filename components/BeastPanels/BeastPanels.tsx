@@ -282,25 +282,41 @@ export function GazeLoop() {
       </div>
 
       <div className={styles.mapWrap}>
-        <svg viewBox="0 0 320 170" className={styles.map} role="img" aria-label={wolf ? "The loop between wolf and handler, broken" : "The loop between dog and owner, closed"}>
-          {/* The two ends */}
-          <circle cx={70} cy={85} r={40} className={styles.node} />
-          <text x={70} y={80} textAnchor="middle" className={styles.nodeLabel}>{wolf ? "WOLF" : "DOG"}</text>
-          <text x={70} y={96} textAnchor="middle" className={styles.nodeSub}>{wolf ? "avoids the eyes" : "gazes"}</text>
+        {/* AN INFINITY SYMBOL, not two circles joined by a line (owner, 23 September
+            2026). The point of the 2015 finding is that this is one continuous
+            circuit with no beginning: the dog's gaze raises the owner's oxytocin,
+            the owner's response raises the dog's, and round it goes. A lemniscate
+            says that in one shape. The wolf version is the same figure drawn
+            broken, because the circuit never closes. */}
+        <svg viewBox="0 0 340 180" className={styles.map} role="img" aria-label={wolf ? "The loop between wolf and handler, drawn broken because it never closes" : "The loop between dog and owner, drawn as a continuous infinity symbol"}>
+          <defs>
+            <path
+              id="gaze-loop-path"
+              d="M170,90 C140,34 66,34 66,90 C66,146 140,146 170,90 C200,34 274,34 274,90 C274,146 200,146 170,90 Z"
+            />
+          </defs>
 
-          <circle cx={250} cy={85} r={40} className={styles.node} />
-          <text x={250} y={80} textAnchor="middle" className={styles.nodeLabel}>HUMAN</text>
-          <text x={250} y={96} textAnchor="middle" className={styles.nodeSub}>{wolf ? "no change" : "oxytocin up"}</text>
+          {/* The circuit itself. */}
+          <use href="#gaze-loop-path" className={wolf ? styles.loopOff : styles.loop} />
 
-          {/* Top arm: the dog looks, the human's oxytocin rises. */}
-          <path d="M104,62 C140,20 180,20 216,62" className={wolf ? styles.armOff : styles.arm} />
-          <text x={160} y={28} textAnchor="middle" className={styles.armLabel}>
+          {/* Which way it runs. Hidden on the wolf version, where nothing runs. */}
+          {!wolf && (
+            <>
+              <polygon points="116,42 126,46 116,51" className={styles.flow} />
+              <polygon points="224,138 214,134 224,129" className={styles.flow} />
+            </>
+          )}
+
+          <text x={104} y={86} textAnchor="middle" className={styles.nodeLabel}>{wolf ? "WOLF" : "DOG"}</text>
+          <text x={104} y={102} textAnchor="middle" className={styles.nodeSub}>{wolf ? "looks away" : "gazes"}</text>
+
+          <text x={236} y={86} textAnchor="middle" className={styles.nodeLabel}>HUMAN</text>
+          <text x={236} y={102} textAnchor="middle" className={styles.nodeSub}>{wolf ? "no change" : "oxytocin up"}</text>
+
+          <text x={170} y={22} textAnchor="middle" className={styles.armLabel}>
             {wolf ? "the look never comes" : "the look"}
           </text>
-
-          {/* Bottom arm: the human responds, the dog's own oxytocin rises. */}
-          <path d="M216,108 C180,150 140,150 104,108" className={wolf ? styles.armOff : styles.arm} />
-          <text x={160} y={158} textAnchor="middle" className={styles.armLabel}>
+          <text x={170} y={170} textAnchor="middle" className={styles.armLabel}>
             {wolf ? "so nothing comes back" : "attention, touch, talk"}
           </text>
         </svg>
