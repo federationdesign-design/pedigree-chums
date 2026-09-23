@@ -66,11 +66,14 @@
 }
 
 .caption {
-  min-height: 5.2em;
+  /* One height for every caption on the era maps (owner, 23 September 2026): the
+     lines vary from two to four and the map jumped each time. Four lines at
+     1.2em, reserved whatever the text does. A point smaller than it was. */
+  min-height: 4.8em;
+  font-size: calc(1.05rem - 1pt);
+  line-height: 1.2em;
   margin: 0 0 12px;
   font-weight: 600;
-  font-size: 1.05rem;
-  line-height: 1.35;
 }
 
 /* Edge to edge: the negative margins cancel the panel padding. */
@@ -135,8 +138,6 @@
   .caption {
     text-align: center;
     padding: 0 14px;
-    font-size: 0.92rem;
-    line-height: 1.3em;
   }
   .when {
     text-align: center;
