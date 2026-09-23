@@ -795,7 +795,42 @@ const RING_PALETTE = ["#fff200", "#ffdf00", "#1ab0f0", "#36b8ff"];
    any shape lands correctly without a code change; the only cost is that a very
    wide file uses less of the box's height. */
 const QMARK_VB = 720;
-const QMARK_SRC = "/dogfacequestion.svg";
+/* SUPERSEDED BY RARITY_FACE_SRC, 23 September 2026 (owner's five tier faces).
+   Kept, unused, because it is the fallback to bring back in one line if the art
+   has to be pulled: set the resting href to this and restore the depth filter.
+   The tapped face is a different file and is still in use. */
+// const QMARK_SRC = "/dogfacequestion.svg";
+/* FIVE FACES, ONE PER RARITY TIER, 23 September 2026 (owner's own artwork). They
+   replace the question-mark face on a resting circle: a dog that says which tier
+   it is, instead of one grey mark tinted by depth.
+
+   THE FILTERS COME OFF WITH IT. bt-qmark-0 to bt-qmark-3, -hi and -ink exist to
+   recolour one flat mark; each of these files already carries its tier colour, so
+   a resting circle now draws its face with filter "none". The filters are still
+   defined and still used by the TAPPED face, which is one file and is still
+   tinted.
+
+   KEYED BY TIER, not by breed, so a new dog needs no new art: rarityTier reads
+   how many trees the breed appears in and the face follows. */
+const RARITY_FACE_SRC: Record<RarityTier, string> = {
+  extremelyRare: "/extreme-rare.png",
+  rare: "/rare.png",
+  uncommon: "/uncommon.png",
+  common: "/common.png",
+  veryCommon: "/very-common.png",
+};
+/* THE CHAINED FACE, one per tier as well (owner, 23 September 2026). It replaces
+   QMARK_TAPPED_SRC, the single shared mark every chained circle wore whatever its
+   breed, so held and available circles now say the tier as well as the state.
+   The "2" files are the owner's own names and are kept verbatim so the file and
+   the reference cannot drift apart. */
+const RARITY_FACE_CHAINED_SRC: Record<RarityTier, string> = {
+  extremelyRare: "/extreme-rare2.png",
+  rare: "/rare2.png",
+  uncommon: "/uncommon2.png",
+  common: "/common2.png",
+  veryCommon: "/very-common2.png",
+};
 /* THE TAPPED FACE, worn by a circle that is
    actually HELD in a chain, in place of the resting mark. Not by a glowing twin
    and not by every circle of the chain's breed: those keep the ordinary mark,
@@ -815,7 +850,9 @@ const QMARK_SRC = "/dogfacequestion.svg";
 
    The underscore in the filename is deliberate: the file arrived with a space
    in it, which is trouble in a URL. */
-const QMARK_TAPPED_SRC = "/dogfacequestion_tapped.svg";
+/* SUPERSEDED BY RARITY_FACE_CHAINED_SRC, 23 September 2026 (the owner's five
+   chained faces). Kept, unused, as the one-line restore if the art is pulled. */
+// const QMARK_TAPPED_SRC = "/dogfacequestion_tapped.svg";
 /* ONE STICK ONLY, 19 September 2026 (owner: remove the small stick, leaving
    only the big one, and give the big one the small one's physics).
 
@@ -7022,10 +7059,22 @@ export default function BreedTree({
                white on the purple and the royal blue and black on the rest.
              Three signals against one lost, and the weakest fill pair still has a
              double-weight ring and a different coloured mark on it. Enough. */
-          const tap = held || twinBand ? "1" : "0";
+          /* THE RESTING FACE IS THE BREED'S RARITY FACE, 23 September 2026
+             (owner). The tapped face is unchanged and still says "this one is in
+             the chain".
+             The tier rides in the key so a circle is re-drawn if its breed's
+             rarity ever differs from the last one written, the same guard the
+             fill and the ring already use. */
+          const faceTier = rarityTier(treesContaining(d.data.name));
+          const tap = (held || twinBand ? "1" : "0") + `:${faceTier}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", tap === "1" ? QMARK_TAPPED_SRC : QMARK_SRC);
+            qi.setAttribute("href", tap === "1" ? RARITY_FACE_CHAINED_SRC[faceTier] : RARITY_FACE_SRC[faceTier]);
+            /* NO FILTER ON EITHER NOW. Both faces are the owner's own art and
+               already carry their tier colour; tinting would flatten them to one
+               hue. The bt-qmark filters are left defined, unused, so the old
+               question mark can be restored in one line if the art is pulled. */
+            qi.setAttribute("filter", "none");
           }
         }
       }
@@ -14084,9 +14133,11 @@ export default function BreedTree({
                  first pass would flash at the origin. */
               const qmarkEl = (
                 <g data-qmark style={{ display: "none", pointerEvents: "none" }} aria-hidden="true">
-                  <image href={QMARK_SRC} width={QMARK_VB} height={QMARK_VB}
-                    preserveAspectRatio="xMidYMid meet"
-                    filter={`url(#bt-qmark-${(d.depth - 1 + 4) % 4})`} />
+                  {/* The rarity face, as the writer will set it on the first
+                      frame; drawn here too so a circle never flashes the old
+                      tinted mark (owner, 23 September 2026). */}
+                  <image href={RARITY_FACE_SRC[rarityTier(treesContaining(d.data.name))]} width={QMARK_VB} height={QMARK_VB}
+                    preserveAspectRatio="xMidYMid meet" />
                 </g>
               );
               return (

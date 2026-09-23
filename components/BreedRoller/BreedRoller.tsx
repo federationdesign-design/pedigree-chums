@@ -24,10 +24,17 @@ type Row = { name: string; era: string; href: string };
 const LEVEL_ROWS: Row[] = levelBreeds().map((b) => ({
   name: b.name,
   era: b.era,
-  /* Straight into a playing round, not the level's start screen (owner,
-     23 September 2026): readers arriving from this list did not realise there was
-     a game here. Closing the level returns them to the history page. */
-  href: `/britains-dog-history/play/${levelSlug(b.name)}`,
+  /* THE LEVEL'S START SCREEN, 23 September 2026 (owner). It pointed at
+     /britains-dog-history/play/<slug> for a few hours, which is a different route
+     with a different job: it plays the time tunnel and drops the reader straight
+     into a RUNNING ROUND. The shortcut was meant to reach the LEARN area, and a
+     reader who picked a dog from this list arrived mid-game instead.
+
+     /dog/<slug> opens the level's start screen and waits, with PLAY and LEARN
+     both on it, so learn is one tap away and nothing starts on its own. The
+     /play route is left in place and still works; it is simply not what this
+     list links to. */
+  href: `/britains-dog-history/dog/${levelSlug(b.name)}`,
 }));
 /* Pack chums show an era too (owner, 22 Sept 2026, "none of the 54 were created
    today"). Three steps, in order:
