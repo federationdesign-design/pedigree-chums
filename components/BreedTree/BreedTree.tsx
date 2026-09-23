@@ -795,6 +795,12 @@ const RING_PALETTE = ["#fff200", "#ffdf00", "#1ab0f0", "#36b8ff"];
    any shape lands correctly without a code change; the only cost is that a very
    wide file uses less of the box's height. */
 const QMARK_VB = 720;
+/* HOW MUCH OF THE CIRCLE THE FACE COVERS, as a multiple of the RADIUS, so 2 is
+   exactly the diameter (owner, 23 September 2026). 2.2 lets the ears and the
+   tongue break the rim, which is what the artwork is drawn for. Raise it to push
+   the art further out, lower it to pull the face inside the disc. The collider is
+   untouched either way: see the note at the scale site. */
+const FACE_FILL_K = 2.2;
 /* SUPERSEDED BY RARITY_FACE_SRC, 23 September 2026 (owner's five tier faces).
    Kept, unused, because it is the fallback to bring back in one line if the art
    has to be pulled: set the resting href to this and restore the depth filter.
@@ -5731,6 +5737,14 @@ export default function BreedTree({
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
   useEffect(() => () => clearCdTimers(), []);
   const shakeInnerRef = useRef<(() => void) | null>(null);
+  /* THE SHAKE IS DEAD FOR HALF A SECOND AFTER A DOG COMPLETES, 23 September 2026
+     (owner). The auto button on the lifted layer sits on the shake button's exact
+     spot; as the layer closes, a second press meant for auto lands on the shake
+     underneath and jolts the pit. The lock is a timestamp rather than a disabled
+     flag so nothing has to be cleared: any press before it simply does nothing,
+     and it expires on its own if the round ends or the layer is reopened. */
+  const shakeLockUntilRef = useRef(0);
+  const SHAKE_LOCK_MS = 500;
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
   // The render-side view of a badge body. J17 adds the fuse fields, which the
@@ -6966,12 +6980,20 @@ export default function BreedTree({
         const showQ = fellRef.current && d.depth > 0 && paintable && !hasPhoto;
         q.style.display = showQ ? "inline" : "none";
         if (showQ) {
-          /* 0.9 -> 1.4 of the RADIUS, so the box is 70% of the disc across.
-             The old artwork was a tall narrow question mark and filled its square
-             box; the dog face is 813.7 x 463.5, so `meet` fits it by WIDTH and it
-             would have read tiny at the old figure. One number if it wants
-             changing. */
-          const sc = (drawR(d, v, k) * 1.4) / QMARK_VB;
+          /* THE FACE FILLS THE CIRCLE, 23 September 2026 (owner: the new art
+             should totally encapsulate the circle, with the ears and the tongue
+             free to break the rim).
+
+             1.4 to FACE_FILL_K of the RADIUS. At 1.4 the art sat in the middle of
+             the disc as a mark on it; these five faces ARE the dog, so the square
+             box is drawn at the full diameter and a little over, which puts the
+             face edge to edge and lets a pointed ear or a tongue cross the rim.
+
+             THE HIT BOX DOES NOT MOVE WITH IT. The body is still Bodies.circle at
+             the circle's own radius, so what sticks out past the rim is drawing
+             only: an ear cannot be grabbed and does not collide. That is the
+             owner's ask, and it is the reason the art may overhang at all. */
+          const sc = (drawR(d, v, k) * FACE_FILL_K) / QMARK_VB;
           q.setAttribute("transform", `translate(${tx},${ty}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
         }
         /* THE MARK IS THE HIGHLIGHT. While a
@@ -14901,6 +14923,10 @@ export default function BreedTree({
                       ? () => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); }
                       : d.kind === "shake"
                       ? () => {
+                          // Swallowed, not queued: a press during the lock is the
+                          // stray second tap on the closing layer, and firing it
+                          // late would be the same jolt a moment later.
+                          if (performance.now() < shakeLockUntilRef.current) return;
                           if (!fellRef.current) { setLearnPeek(false); setStartPeek(false); setStarted(true); runFallRef.current?.(); }
                           shakeInnerRef.current?.();
                         }
@@ -16187,6 +16213,9 @@ export default function BreedTree({
             }
           }}
           onScatter={(data) => {
+            /* The lift is closing, so the shake underneath it is locked for half
+               a second: see shakeLockUntilRef. */
+            shakeLockUntilRef.current = performance.now() + SHAKE_LOCK_MS;
             // the learnt % circles, their rods and the name pill tip into the
             // pit as live objects at the very instant the layer drops them
             for (const c of data.circles ?? []) {

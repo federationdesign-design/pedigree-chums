@@ -697,12 +697,26 @@
      the padding scaled by the same fifth so the shape holds: 22.68 -> 18.14 and
      9 -> 7.2. The icon is the element itself, an <img> with this padding, so it
      comes down with the container rather than needing its own rule. */
-  width: 60.5px;
-  height: 60.5px;
+  /* SIZED OFF THE SHAKE BUTTON ITSELF, 23 September 2026 (owner: the auto icon
+     and its container should match the shake icon's size and position exactly).
+
+     WHY A FIXED 60.5px COULD NOT. The shake square is drawn INSIDE the pit's SVG,
+     at 84 * 1.2 * 0.75 = 75.6 units, and those units scale with the stage: on a
+     phone the square comes out well under 60.5 CSS px while this button stayed
+     put, so the auto read as the larger of the two. The formula below is the same
+     75.6 against a 1000-unit stage, which is 7.56vw, clamped so it neither shrinks
+     to nothing on a narrow phone nor passes the desktop square.
+
+     THE POSITION ALREADY MATCHED and is untouched: .autoWrap sits on the same
+     right and bottom insets. */
+  width: clamp(44px, 7.56vw, 75.6px);
+  height: clamp(44px, 7.56vw, 75.6px);
   box-sizing: border-box;
-  padding: 7.2px;
+  /* The padding is the same ninth of the box it was at 60.5. */
+  padding: clamp(5.2px, 0.9vw, 9px);
   background: var(--yellow);
-  border-radius: 18.14px;
+  /* The same three-tenths of the box the square uses for its rx. */
+  border-radius: clamp(13.2px, 2.27vw, 22.7px);
   object-fit: contain;
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
   transition: transform 0.15s ease;
