@@ -6983,7 +6983,15 @@ export default function BreedTree({
              still measures 6.03 on the orange and better on the other two. The
              black filter is left defined: nothing else uses it today, but
              removing it would take a def other states may want back. */
-          const ink = chainBand ? (chainBand.fg === "#ffffff" ? "hi" : "ink") : chSingle ? "hi" : `${(d.depth - 1 + 4) % 4}`;
+          /* COMMON TAKES THE WHITE FACE, 23 September 2026 (owner). It is the one
+             light tier that does: uncommon and very common keep the navy set
+             earlier today. White on the common orange #f47421 measures 2.85:1,
+             where the navy it replaces was 6.03, and the face is a line drawing
+             rather than text. Asked for with that figure in front of the owner and
+             recorded here so it is not quietly reverted. */
+          const ink = chainBand
+            ? (chainBand.fg === "#ffffff" || chainBand === RARITY_BAND.common ? "hi" : "ink")
+            : chSingle ? "hi" : `${(d.depth - 1 + 4) % 4}`;
           if (q.dataset.hi !== ink) {
             q.dataset.hi = ink;
             qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
