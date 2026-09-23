@@ -42,6 +42,36 @@ const FACTS: Fact[] = [
    Charter of the Forest summaries; dogs' toes and bows banned, encyclopedia.com
    "forest laws" (Assize of the Forest, 1184); firewood and pig grazing restored,
    History Hit on the 1217 Charter, clause 9. */
+/* Saxons 'n' Normans page boxes, 23 September 2026 (owner). Copy flagged for
+   owner review. Sources: the Lindisfarne raid of 793 and the Great Heathen Army
+   of 865 (Wikipedia: Viking Age, Great Heathen Army); the Five Boroughs of the
+   Danelaw, Leicester, Nottingham, Derby, Stamford and Lincoln (Historic UK); Old
+   Norse place-name endings -by and -thorpe (standard place-name scholarship);
+   the Domesday Book of 1086 (already cited on the Medieval page). */
+export const SAXON_FACTS: Fact[] = [
+  {
+    heading: "One raid started it all (793)",
+    paras: [
+      "Vikings attacked the monastery at Lindisfarne, off the Northumbrian coast, and the raids went on for years.",
+      "By 865 the raiding had turned into an invasion: the Great Heathen Army landed and took East Anglia, Northumbria and much of Mercia.",
+    ],
+  },
+  {
+    heading: "Half of England under Danish law",
+    paras: [
+      "After Alfred beat Guthrum in 878, the two sides drew a line from the Thames up to Bedford and on towards Chester.",
+      "Everything north and east of it was the Danelaw, run from five Danish towns: Leicester, Nottingham, Derby, Stamford and Lincoln.",
+    ],
+  },
+  {
+    heading: "You can still hear them",
+    paras: [
+      "Town names ending in -by, like Grimsby, Derby and Whitby, are Old Norse for a farm or village.",
+      "So is -thorpe, meaning a smaller settlement. Look at a map of Yorkshire and Lincolnshire and you are looking at where the Vikings settled.",
+    ],
+  },
+];
+
 export const MEDIEVAL_FACTS: Fact[] = [
   {
     heading: "The Domesday Book (1086)",

@@ -17,7 +17,7 @@ import BreedExplosion from "../../../components/BreedExplosion/BreedExplosion";
 import PetPanic from "../../../components/PetPanic/PetPanic";
 import DickinMap from "../../../components/DickinMap/DickinMap";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
-import AncientFacts, { MEDIEVAL_FACTS, TUDOR_FACTS, EIGHTEENTH_FACTS, NINETEENTH_FACTS, TWENTIETH_FACTS } from "../../../components/AncientFacts/AncientFacts";
+import AncientFacts, { SAXON_FACTS, MEDIEVAL_FACTS, TUDOR_FACTS, EIGHTEENTH_FACTS, NINETEENTH_FACTS, TWENTIETH_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
@@ -27,6 +27,7 @@ import styles from "./era.module.css";
 import hist from "../history.module.css";
 import PopHeading from "../../../components/PopHeading/PopHeading";
 import WhoOwnsBritain from "../../../components/WhoOwnsBritain/WhoOwnsBritain";
+import DrawnBritain from "../../../components/DrawnBritain/DrawnBritain";
 
 /* The write-up panel for a strip: the same section that sits above this strip on
    the history page, matched by era. "Dogs in the armed forces" shares era c1500
@@ -137,6 +138,17 @@ export default async function EraPage({ params }: Props) {
       {/* Ancient page only: map and timeline side by side on desktop, stacked
           below 1024px, at the top of the page above the strip (owner request,
           22 Sept 2026). */}
+      {/* Saxons 'n' Normans page only: who held Britain between the Romans and the
+          Normans, and how badly we drew the place (23 Sept 2026). */}
+      {page.slug === "saxons" && (
+        <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+          <div className={styles.pair}>
+            <WhoOwnsBritain />
+            <DrawnBritain />
+          </div>
+        </div>
+      )}
+
       {/* Medieval page only: the forest-growth map and the Domesday land map,
           side by side on desktop in the same two-column pair as Ancient
           (22 Sept 2026). */}
@@ -241,11 +253,9 @@ export default async function EraPage({ params }: Props) {
               </div>
             )}
             {/* 1700s page: "Did you know?" boxes (22 Sept 2026). */}
-            {/* Saxons 'n' Normans page only: who held which part of Britain
-                between the Romans and the Normans (22 Sept 2026). */}
             {strip === "saxon" && (
-              <div className={styles.sectionHolder}>
-                <WhoOwnsBritain />
+              <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
+                <AncientFacts facts={SAXON_FACTS} />
               </div>
             )}
             {strip === "c1700" && (
