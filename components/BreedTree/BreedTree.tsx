@@ -7941,7 +7941,24 @@ export default function BreedTree({
       // rectangles and settle fine, so they keep CIRCLE_OPTS. Starting values, one
       // place to tune.
       const FREED_CIRCLE_OPTS = { restitution: 0.35, friction: 0.5, frictionStatic: 1.0, frictionAir: 0.015, density: 0.001 };
-      const BADGE_OPTS = { restitution: 0.65, friction: 0.1, frictionAir: 0.01, density: 0.001 };
+      /* CHIPS ARE A QUARTER OF THE WEIGHT, 23 September 2026 (owner). Density
+         0.001 to 0.00025, so a chip presses down with a quarter of the force it
+         did and the same mass ratio holds against a dog circle, which keeps
+         FREED_CIRCLE_OPTS at 0.001.
+
+         WHY. A heavy pit was sinking bodies into each other: four hundred chips
+         stacked in a three-sided box put more load on the solver than one step a
+         frame can resolve, so contacts overlapped instead of meeting. Less weight
+         per chip is less load. It is the cheapest of the three routes and it does
+         not touch the solver or remove any object.
+
+         WHAT IT CHANGES, said plainly because it is tuned behaviour. Mass drives
+         momentum, so a chip now carries less punch when thrown and is shoved
+         further by anything it meets. Restitution, friction and air drag are
+         untouched, so the bounce and the roll are the same; it is the weight
+         behind them that moved. If the throw feels weak, this figure is the one
+         to raise, not the restitution. */
+      const BADGE_OPTS = { restitution: 0.65, friction: 0.1, frictionAir: 0.01, density: 0.00025 };
       const mkCircle = (b: Body, kind: string, opts: any) => {
         const p = pxFromWorld(b.x, b.y);
         const mb = Bodies.circle(p.x, p.y, Math.max(2, b.r * pxPerWorld), opts);
