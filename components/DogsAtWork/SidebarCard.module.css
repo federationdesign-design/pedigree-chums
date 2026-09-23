@@ -76,6 +76,51 @@
   opacity: 0.9;
 }
 
+/* Two breed roundels sitting inline with their label. */
+.breedPair {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* The molecule diagram: schematic, in the card's own palette. */
+.molecule {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  margin: 0 auto 12px;
+}
+.moleculeBond {
+  stroke: var(--cream, #ffffff);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.moleculeRing {
+  fill: none;
+  stroke: var(--cream, #ffffff);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.moleculeRingInner {
+  fill: none;
+  stroke: var(--cream, #ffffff);
+  stroke-width: 1.6;
+  opacity: 0.7;
+}
+.moleculeAtom {
+  fill: var(--yellow-header, #ffed00);
+}
+.moleculeAtomO {
+  fill: #ff6b6b;
+}
+.moleculeLabel {
+  font-family: var(--font-display, "Luckiest Guy", cursive), system-ui, sans-serif;
+  font-size: 15px;
+  fill: var(--navy, #0a3a57);
+}
+
 /* Title line with a round portrait beside it (owner, 23 September 2026). */
 .titleRow {
   display: flex;

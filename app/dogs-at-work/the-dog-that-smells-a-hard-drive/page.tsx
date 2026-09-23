@@ -101,6 +101,41 @@ const CARDS: ArticleCard[] = [
     pairWith: "chemical",
     node: (
       <SidebarCard title="The smell of a memory chip">
+        {/* Triphenylphosphine oxide, drawn (owner, 23 September 2026): a
+            phosphorus atom double-bonded to an oxygen, with three benzene rings
+            hanging off it. Schematic, in the site's own colours, rather than a
+            textbook diagram someone else owns. */}
+        <svg viewBox="0 0 200 150" className={sidebar.molecule} role="img" aria-label="The triphenylphosphine oxide molecule: a phosphorus atom double bonded to oxygen, with three benzene rings attached">
+          <g className={sidebar.moleculeBond}>
+            <line x1="100" y1="78" x2="100" y2="46" />
+            <line x1="104" y1="78" x2="104" y2="46" />
+            <line x1="100" y1="82" x2="54" y2="110" />
+            <line x1="102" y1="82" x2="150" y2="110" />
+            <line x1="100" y1="82" x2="100" y2="124" />
+          </g>
+          {[
+            [54, 118],
+            [150, 118],
+            [100, 132],
+          ].map(([cx, cy], i) => (
+            <g key={i}>
+              <polygon
+                points={[0, 1, 2, 3, 4, 5]
+                  .map((n) => {
+                    const a2 = (Math.PI / 3) * n - Math.PI / 2;
+                    return `${(cx + Math.cos(a2) * 15).toFixed(1)},${(cy + Math.sin(a2) * 15).toFixed(1)}`;
+                  })
+                  .join(" ")}
+                className={sidebar.moleculeRing}
+              />
+              <circle cx={cx} cy={cy} r={7} className={sidebar.moleculeRingInner} />
+            </g>
+          ))}
+          <circle cx="102" cy="80" r="13" className={sidebar.moleculeAtom} />
+          <text x="102" y="85" textAnchor="middle" className={sidebar.moleculeLabel}>P</text>
+          <circle cx="102" cy="38" r="13" className={sidebar.moleculeAtomO} />
+          <text x="102" y="43" textAnchor="middle" className={sidebar.moleculeLabel}>O</text>
+        </svg>
         <p className={sidebar.text}>
           Triphenylphosphine oxide, or TPPO, is used to coat circuit boards so memory chips do not overheat. Hard
           drives, SD cards, phones, memory sticks: the same compound, and therefore the same smell, on all of them.
@@ -114,9 +149,21 @@ const CARDS: ArticleCard[] = [
     node: (
       <SidebarCard title="Tweed and Rob">
         <div className={sidebar.text}>
+          {/* The two breeds get their own cartoon roundels (owner, 23 September
+              2026). The dogs themselves belong to the force, so this is our own
+              card art for the breeds rather than portraits of Tweed and Rob. */}
+          <div className={sidebar.medalRow}>
+            <span className={sidebar.attrName}>Breeds</span>
+            <span className={sidebar.breedPair}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/springer-square.jpg" alt="" className={sidebar.medalThumb} loading="lazy" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/lab-square.jpg" alt="" className={sidebar.medalThumb} loading="lazy" />
+              <span>Springer spaniel and Labrador</span>
+            </span>
+          </div>
           {[
             ["Force", "Devon and Cornwall Police"],
-            ["Breeds", "Springer spaniel and Labrador"],
             ["First", "The first digital detection dogs in the UK"],
             ["Searches", "More than 1,200 with handler PC Martin King"],
             ["Best find", "A Coca-Cola can that was a money box full of SD cards"],
