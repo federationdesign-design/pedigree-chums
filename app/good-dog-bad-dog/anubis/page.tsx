@@ -5,6 +5,7 @@ import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
+import EchoTrail from "../../../components/EchoTrail/EchoTrail";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 
 export const metadata: Metadata = {
@@ -244,9 +245,27 @@ export default function AnubisPage() {
           <article className={styles.essay}>
             <div className={styles.essayBody}>
               {BODY.map((b, i) => {
-                if (typeof b === "string") return <p key={i}>{b}</p>;
-                if ("h" in b) return <h2 key={i} className={styles.subhead}>{b.h}</h2>;
-                return <blockquote key={i} className={styles.pullquote}>{b.quote}</blockquote>;
+                const block =
+                  typeof b === "string" ? (
+                    <p key={i}>{b}</p>
+                  ) : "h" in b ? (
+                    <h2 key={i} className={styles.subhead}>{b.h}</h2>
+                  ) : (
+                    <blockquote key={i} className={styles.pullquote}>{b.quote}</blockquote>
+                  );
+                /* The map lands between "Everyone posts a dog at the door" and
+                   "The provider becomes the sacrifice", where the brief asks for
+                   it: the reader has met the idea and is ready to see how far it
+                   travels (Anubis_article_updates.docx, sections 5 and 7). */
+                if (typeof b !== "string" && "h" in b && b.h === "The provider becomes the sacrifice") {
+                  return (
+                    <div key={i}>
+                      <EchoTrail />
+                      {block}
+                    </div>
+                  );
+                }
+                return block;
               })}
             </div>
           </article>

@@ -1,0 +1,184 @@
+/* The Anubis essay's interactive map. Dark, to sit inside the essay column
+   rather than fight it: the era pages' blue panels belong to a different part of
+   the site and would read as an advert here. 23 September 2026. */
+
+.panel {
+  margin: 44px 0;
+  padding: clamp(20px, 3vw, 34px);
+  border-radius: 24px;
+  background: var(--navy, #0a3a57);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+.titleAccent {
+  color: var(--yellow-header, #ffed00);
+}
+
+.intro {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #cfe2ef;
+}
+
+.mapWrap {
+  margin: 0 0 14px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.land {
+  fill: rgba(255, 255, 255, 0.14);
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 0.6;
+}
+
+/* Dashes, never a solid line: a continuous arrow would claim a lineage the
+   essay denies. */
+.hop {
+  stroke: var(--yellow-header, #ffed00);
+  stroke-width: 1.4;
+  stroke-dasharray: 5 6;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.spot {
+  cursor: pointer;
+}
+.dot {
+  fill: #ffffff;
+  stroke: var(--navy, #0a3a57);
+  stroke-width: 1.4;
+}
+.dotOn {
+  fill: var(--yellow-header, #ffed00);
+  stroke: #ffffff;
+  stroke-width: 1.6;
+}
+/* A generous invisible target: the drawn dots are far too small for a thumb. */
+.hit {
+  fill: transparent;
+}
+.label {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  fill: #ffffff;
+  paint-order: stroke;
+  stroke: var(--navy, #0a3a57);
+  stroke-width: 2.4;
+  pointer-events: none;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+}
+.tab {
+  padding: 7px 11px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tab:focus-visible {
+  outline: 3px solid var(--yellow-header, #ffed00);
+  outline-offset: 2px;
+}
+.tabOn {
+  background: var(--yellow-header, #ffed00);
+  border-color: var(--yellow-header, #ffed00);
+  color: var(--navy, #0a3a57);
+}
+
+.card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  margin: 0 0 2px;
+}
+.cardPlace {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #aac4d4;
+}
+.cardWhen {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #aac4d4;
+}
+.cardFigure {
+  margin: 0 0 6px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.3rem;
+  color: var(--yellow-header, #ffed00);
+  letter-spacing: 0.02em;
+}
+.cardBody {
+  margin: 0 0 8px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.55;
+}
+.cardEvidence {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #aac4d4;
+}
+.cardOffTrail {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--yellow-header, #ffed00);
+}
+
+.note {
+  margin: 12px 0 0;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #aac4d4;
+}
+
+@media (max-width: 640px) {
+  .label {
+    font-size: 11px;
+  }
+}
