@@ -8,6 +8,12 @@
 export type Family =
   | "Medical"
   | "Security"
+  /* Added 23 September 2026 (owner): the military article's article page shows
+     an "Armed forces" tag, and the deck pill read "Security", which is a
+     different word for the same thing and looked like a mistake. The family is
+     its own entry rather than a relabel of Security, because the digital
+     detection dogs are Security and should stay that way. */
+  | "Armed forces"
   | "Emergency"
   | "People"
   | "Rural and Traditional"
@@ -22,6 +28,7 @@ export type PublicationState = "live" | "draft";
 export const FAMILY_PILL_LABEL: Record<Family, string> = {
   Medical: "Medical",
   Security: "Security",
+  "Armed forces": "Armed forces",
   Emergency: "Emergency",
   People: "People",
   "Rural and Traditional": "Rural",

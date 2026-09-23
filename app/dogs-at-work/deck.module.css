@@ -483,6 +483,14 @@
   color: var(--cream);
 }
 
+/* Armed forces, added 23 September 2026. Navy on cream: the six existing family
+   colours are all taken, and a seventh hue would weaken the set, so this one
+   inverts instead. */
+.pill[data-family="Armed forces"] {
+  background: var(--cream);
+  color: var(--navy);
+}
+
 .pill[data-family="Emergency"] {
   background: var(--family-emergency);
   color: var(--cream);

@@ -292,7 +292,7 @@ That is the pattern across every job in this series: not a dog doing a human's w
        article 7, the military dogs, which is also the better fit: a search dog
        ahead of a patrol is the clearest case of a job people cannot do alone. */
     article: {
-      family: "Security",
+      family: "Armed forces",
       subLabel: "Military dogs",
       headline: "The Dog They Gave a Medal To",
       dek: `Rifleman Khan was a family pet from Surrey, lent to the army, who went into cold water under shellfire for a man he had known a few months. Britain gave him a medal. What military dogs actually do, why a ball is the only wage that works, and what happens when the job ends.`,
