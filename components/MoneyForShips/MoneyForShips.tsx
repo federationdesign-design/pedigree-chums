@@ -49,9 +49,13 @@ const wrapLabel = (text: string, width: number) => {
 const X0 = 1685;
 const X1 = 1805;
 const YMAX = 550;
+/* TWICE THE HEIGHT AND EDGE TO EDGE (owner, 23 September 2026). H was 300; the
+   chart is easier to read tall, and the extra room lets the axis figures and the
+   war dots grow with it. The right padding drops to zero so the line runs to the
+   edge of the panel, and the left keeps just enough for the pound figures. */
 const W = 620;
-const H = 300;
-const PAD = { l: 44, r: 14, t: 16, b: 34 };
+const H = 600;
+const PAD = { l: 52, r: 0, t: 24, b: 52 };
 
 const px = (year: number) => PAD.l + ((year - X0) / (X1 - X0)) * (W - PAD.l - PAD.r);
 const py = (m: number) => H - PAD.b - (m / YMAX) * (H - PAD.t - PAD.b);
@@ -74,7 +78,7 @@ export default function MoneyForShips() {
           {[0, 100, 200, 300, 400, 500].map((m) => (
             <g key={m}>
               <line x1={PAD.l} x2={W - PAD.r} y1={py(m)} y2={py(m)} className={styles.grid} />
-              <text x={PAD.l - 6} y={py(m) + 3.5} textAnchor="end" className={styles.axis}>{m === 0 ? "0" : `£${m}m`}</text>
+              <text x={PAD.l - 8} y={py(m) + 7} textAnchor="end" className={styles.axis}>{m === 0 ? "0" : `£${m}m`}</text>
             </g>
           ))}
           {WARS.map((w) => {
@@ -89,13 +93,13 @@ export default function MoneyForShips() {
                 <line x1={x1} x2={x1} y1={PAD.t} y2={H - PAD.b} className={styles.warEdge} />
                 {/* At the top of each dashed line, not on the debt curve, so they are
                     never hidden behind the line's own dots (owner, 22 Sept 2026). */}
-                <circle cx={x0} cy={PAD.t} r={4.5} className={styles.warStart}>
+                <circle cx={x0} cy={PAD.t} r={8} className={styles.warStart}>
                   <title>{`${w.name} begins, ${w.from}`}</title>
                 </circle>
-                <circle cx={x1} cy={PAD.t} r={4.5} className={styles.warEnd}>
+                <circle cx={x1} cy={PAD.t} r={8} className={styles.warEnd}>
                   <title>{`${w.name} ends, ${w.to}`}</title>
                 </circle>
-                <text x={(x0 + x1) / 2} y={PAD.t + 16} textAnchor="middle" className={styles.warLabel}>
+                <text x={(x0 + x1) / 2} y={PAD.t + 26} textAnchor="middle" className={styles.warLabel}>
                   {lines.map((l, i) => (
                     <tspan key={l} x={(x0 + x1) / 2} dy={i === 0 ? 0 : 10}>
                       {l}
@@ -108,12 +112,12 @@ export default function MoneyForShips() {
           <polygon points={area} className={styles.fill} />
           <polyline points={line} className={styles.line} />
           {DEBT.map(([y, m]) => (
-            <circle key={y} cx={px(y)} cy={py(m)} r={3} className={styles.dot}>
+            <circle key={y} cx={px(y)} cy={py(m)} r={5} className={styles.dot}>
               <title>{`${y}: about £${m}m`}</title>
             </circle>
           ))}
           {[1700, 1750, 1800].map((y) => (
-            <text key={y} x={px(y)} y={H - PAD.b + 16} textAnchor="middle" className={styles.axis}>{y}</text>
+            <text key={y} x={px(y)} y={H - PAD.b + 30} textAnchor="middle" className={styles.axis}>{y}</text>
           ))}
         </svg>
       </div>
