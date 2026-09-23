@@ -39,15 +39,19 @@ import { PAYSLIPS } from "../data/payslips";
    hardware wallet holding 295 Bitcoin, is from Bloomberg's account of UK crypto
    seizures.
 
-   NO PHOTOGRAPHS OF POLICE DOGS: those belong to the forces. Hero is our own
-   spaniel art until the owner supplies something. */
+   HERO IMAGE. The owner's working spaniel photograph, working-spaniel-img.jpg,
+   supplied 23 September 2026, replacing the spaniel illustration the page
+   launched with.
+
+   NO PHOTOGRAPHS OF POLICE DOGS THEMSELVES: those belong to the forces, so none
+   are used here. */
 
 export const metadata: Metadata = {
   title: "The Dog That Can Smell a Hard Drive | Dogs at Work",
   description:
     "Every memory chip ever made carries the same chemical, and a spaniel in Devon can smell it. How Britain's digital detection dogs find a fortune hidden inside something the size of a fingernail.",
   openGraph: {
-    images: ["/spaniel.png"],
+    images: ["/working-spaniel-img.jpg"],
   },
 };
 
@@ -179,7 +183,7 @@ const ARTICLE_JSONLD = {
       "@type": "Article",
       headline: HEADLINE,
       description: metadata.description,
-      image: `${SITE_URL}/spaniel.png`,
+      image: `${SITE_URL}/working-spaniel-img.jpg`,
       publisher: { "@id": `${SITE_URL}/#organization` },
       mainEntityOfPage: `${SITE_URL}/dogs-at-work/the-dog-that-smells-a-hard-drive`,
     },
@@ -206,8 +210,8 @@ export default function DigitalDogsPage() {
         <div className={styles.essayHero}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/spaniel.png"
-            alt="Illustration of a springer spaniel, the breed of Britain's first digital detection dog."
+            src="/working-spaniel-img.jpg"
+            alt="A working spaniel, the breed of Britain's first digital detection dog."
             className={styles.essayHeroImg}
           />
           <div className={styles.essayHeroTint} />

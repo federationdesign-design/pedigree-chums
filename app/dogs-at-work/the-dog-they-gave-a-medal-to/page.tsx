@@ -98,6 +98,20 @@ const BODY: (string | { h: string; id: string })[] = [
 
 const CARDS: ArticleCard[] = [
   {
+    id: "khan-card",
+    /* Khan now sits first, Irma second (owner, 23 September 2026). The pairings
+       are unchanged: on mobile each card still lands beside its own passage. */
+    pairWith: "why",
+    node: (
+      <SidebarCard title="Rifleman Khan" thumb={{ src: "/german-shepard-square.jpg", alt: "" }}>
+        <p className={sidebar.text}>
+          Alsatian, 6th Battalion Cameronians. Dickin Medal, 27 March 1945, for rescuing L/Cpl Muldoon from drowning
+          under heavy shellfire during the assault on Walcheren. A family pet before the war, and afterwards.
+        </p>
+      </SidebarCard>
+    ),
+  },
+  {
     id: "irma-card",
     pairWith: "irma",
     node: (
@@ -105,18 +119,6 @@ const CARDS: ArticleCard[] = [
         <p className={sidebar.text}>
           Alsatian, London Civil Defence. Dickin Medal, 1945, for helping rescue 191 people from blitzed buildings.
           Her owner, Margaret Griffin, received the British Empire Medal for training her.
-        </p>
-      </SidebarCard>
-    ),
-  },
-  {
-    id: "khan-card",
-    pairWith: "why",
-    node: (
-      <SidebarCard title="Rifleman Khan" thumb={{ src: "/german-shepard-square.jpg", alt: "" }}>
-        <p className={sidebar.text}>
-          Alsatian, 6th Battalion Cameronians. Dickin Medal, 27 March 1945, for rescuing L/Cpl Muldoon from drowning
-          under heavy shellfire during the assault on Walcheren. A family pet before the war, and afterwards.
         </p>
       </SidebarCard>
     ),
