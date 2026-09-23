@@ -94,9 +94,11 @@
   stroke-dasharray: 4 3;
 }
 
+/* The same cream the other UK maps use for land (owner, 23 Sept 2026); the pill
+   toggles keep the yellow. */
 .drawn {
-  fill: var(--yellow-header);
-  fill-opacity: 0.9;
+  fill: var(--cream);
+  fill-opacity: 0.95;
   stroke: var(--white);
   stroke-width: 1.4;
   /* The shapes are far apart, so the change is worth animating. */
@@ -123,7 +125,7 @@
   height: 12px;
   border-radius: 4px;
 }
-.swDrawn { background: var(--yellow-header); }
+.swDrawn { background: var(--cream); }
 .swGhost { background: rgba(255, 255, 255, 0.35); border: 1px dashed rgba(255, 255, 255, 0.8); }
 
 .note {

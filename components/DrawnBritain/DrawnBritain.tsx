@@ -9,9 +9,9 @@ import { GB } from "../SeaLevelMap/SeaLevelMap";
 
    Four maps, each the best anyone could do at the time, with today's coastline
    ghosted behind so the difference reads at a glance:
-     Ptolemy, about AD 150   Scotland bent east at a right angle
-     The Cotton map, c. 1025 Anglo-Saxon, drawn as a lumpy oblong at the edge of
-                             the known world
+     Roman (Ptolemy), about AD 150   Scotland bent east at a right angle
+     Anglo-Saxon (the Cotton map), c. 1025   a lumpy oblong at the edge of the
+                             known world
      Matthew Paris, c. 1250  the first map where England looks like England
      The Gough map, c. 1360  towns and roads, and a coastline you would recognise
 
@@ -78,14 +78,16 @@ type Frame = {
 const FRAMES: Frame[] = [
   {
     id: "ptolemy",
-    title: "Ptolemy",
+    /* Named by WHO drew it, not the mapmaker (owner, 23 Sept 2026): "Ptolemy"
+       and "The Cotton map" meant nothing to a reader arriving here. */
+    title: "Roman",
     when: "about AD 150",
     bend: rotateNorth,
     caption: "The Romans mapped Britain from reports and rough measurements, and Scotland came out bent east at a right angle. Nobody corrected it for over a thousand years.",
   },
   {
     id: "cotton",
-    title: "The Cotton map",
+    title: "Anglo-Saxon",
     when: "about 1025",
     bend: squash,
     caption: "An Anglo-Saxon world map, with Britain a lumpy oblong in the bottom corner. It is not a mistake so much as a different job: this map shows where places sit in the world, not what the coast looks like.",
