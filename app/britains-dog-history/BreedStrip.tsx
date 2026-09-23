@@ -117,6 +117,7 @@ export default function BreedStrip({
   era,
   renderLevels,
   initialLevel,
+  autoPlay,
   closeHref,
   only,
   label,
@@ -131,6 +132,9 @@ export default function BreedStrip({
      it. Opened quiet, so the visitor lands on the level's start screen rather
      than sitting through the time tunnel: the owner asked for the start screen. */
   initialLevel?: string;
+  /* With initialLevel, drop the reader into a playing pit instead of the start
+     screen, tunnel and all (owner, 23 September 2026). The A to Z roller uses it. */
+  autoPlay?: boolean;
   /* WHERE CLOSING THE LEVEL GOES, and the signal that this is a per-level page
      showing the GAME ONLY (owner, 20 September 2026: no text underneath, no strip,
      close goes to that dog's era page). When set, nothing but the level is
@@ -198,7 +202,8 @@ export default function BreedStrip({
      moving on is never undone by a re-render. */
   const [active, setActive] = useState<Active | null>(() => {
     const na = initialLevel ? activeFor(initialLevel) : null;
-    return na ? { ...na, quiet: true } : null;
+    /* autoPlay wants the tunnel, so it is NOT quiet. */
+    return na ? { ...na, quiet: !autoPlay } : null;
   });
   // Bumped on a retry so the modal remounts even though the level name has not
   // changed. Without it, Restart on the same level would leave the round exactly
@@ -796,6 +801,7 @@ export default function BreedStrip({
       diver={active.diver}
       quiet={active.quiet}
       navFading={navFading}
+      startInPlay={!!autoPlay && active.name === initialLevel}
       onClose={() => {
         // Walking out of a live round forfeits it, the same as losing it. The
         // modal does this for its own back-out controls; this is the last way

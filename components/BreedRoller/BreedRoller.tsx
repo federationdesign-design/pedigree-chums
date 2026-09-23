@@ -24,7 +24,10 @@ type Row = { name: string; era: string; href: string };
 const LEVEL_ROWS: Row[] = levelBreeds().map((b) => ({
   name: b.name,
   era: b.era,
-  href: `/britains-dog-history/dog/${levelSlug(b.name)}`,
+  /* Straight into a playing round, not the level's start screen (owner,
+     23 September 2026): readers arriving from this list did not realise there was
+     a game here. Closing the level returns them to the history page. */
+  href: `/britains-dog-history/play/${levelSlug(b.name)}`,
 }));
 /* Pack chums show an era too (owner, 22 Sept 2026, "none of the 54 were created
    today"). Three steps, in order:

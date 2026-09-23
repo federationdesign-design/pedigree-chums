@@ -141,6 +141,11 @@ type Props = {
   /* True for the brief moment BreedStrip holds this level on screen so the
      outgoing diagram can fade before the next one replaces it. */
   navFading?: boolean;
+  /* STRAIGHT INTO THE ROUND, 23 September 2026 (owner): arrivals from the A to Z
+     roller land in a playing pit rather than on the start screen, because readers
+     coming that way did not realise there was a game here at all. The time tunnel
+     still plays; only the start screen is skipped. */
+  startInPlay?: boolean;
   onClose: () => void;
   nextLevelLabel?: string;
   /* The next era's name, set only when the level just won is the last of its
@@ -226,7 +231,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -468,7 +473,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
      pit comes back armed and the dogs drop, rather than waiting on the start
      screen. autoStart is cleared by every other remount path so a restart
      cannot leak into the next one. */
-  const [autoStart, setAutoStart] = useState(false);
+  const [autoStart, setAutoStart] = useState(startInPlay);
   const restartLevel = () => {
     onSpendLife?.();
     setScore(bankedScore ?? 0);
