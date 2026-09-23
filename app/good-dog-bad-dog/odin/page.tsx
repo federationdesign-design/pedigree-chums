@@ -37,8 +37,10 @@ import { BreedFacts, RescueRoll, GazeLoop } from "../../../components/BeastPanel
    Topal et al., Journal of Comparative Psychology, 1998, for the strange-situation
    work on attachment.
 
-   NO FILM STILLS. The hero image is our own German Shepherd card art, so the page
-   can go live without waiting on Paramount. */
+   HERO IMAGE. Supplied by the owner on 23 September 2026 as obin-uber-hero-img.jpg
+   (the file name's "obin" is the owner's spelling and is kept so the file and the
+   reference cannot drift apart). It replaces the German Shepherd card art the page
+   launched with. Check the licence before the page is promoted anywhere paid. */
 
 export const metadata: Metadata = {
   title: "Odin: Why a Dog Will Not Leave You | Pedigree Chums",
@@ -50,6 +52,7 @@ export const metadata: Metadata = {
     description:
       "One man, one dog, fifty-eight miles. The real rescues behind the film, and what the science says about why dogs stay.",
     url: `${SITE_URL}/good-dog-bad-dog/odin`,
+    images: ["/obin-uber-hero-img.jpg"],
     type: "article",
   },
 };
@@ -130,7 +133,7 @@ const ARTICLE_JSONLD = {
       "@type": "Article",
       headline: HEADLINE,
       description: metadata.description,
-      image: `${SITE_URL}/german-shepard-square.jpg`,
+      image: `${SITE_URL}/obin-uber-hero-img.jpg`,
       datePublished: "2026-09-24",
       dateModified: "2026-09-24",
       publisher: { "@id": `${SITE_URL}/#organization` },
@@ -159,8 +162,8 @@ export default function HeartOfTheBeastPage() {
         <div className={styles.essayHero}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/german-shepard-square.jpg"
-            alt="Illustration of a German Shepherd, the breed that plays Odin in Heart of the Beast."
+            src="/obin-uber-hero-img.jpg"
+            alt="Odin, the retired combat dog of Heart of the Beast, played by a German Shepherd called Uber."
             className={styles.essayHeroImg}
           />
           <div className={styles.essayHeroTint} />
