@@ -39,6 +39,7 @@ const LIVES_STREAK = 3;
 const ERA_LABELS: Record<string, string> = {
   "ancient-medieval": "Ancient to medieval",
   ancient: "Ancient times",
+  saxon: "Saxons 'n' Normans", // new era, 22 Sept 2026
   medieval: "Medieval times",
   c1500: "Tudor 'n' Stuart times", // renamed 22 Sept 2026 (was "Tudor times")
   c1700: "The 1700s",

@@ -116,6 +116,7 @@ const THEMES: Record<string, LevelTheme> = {
 };
 THEMES["ancient"] = THEMES["ancient-medieval"];
 THEMES["medieval"] = THEMES["ancient-medieval"];
+THEMES["saxon"] = THEMES["ancient-medieval"]; // new era, 22 Sept 2026
 
 // REVERTED TO STANDARD (owner request): ancient, medieval and Tudor drop back to
 // the plain body gradient and the flat pit-bottom floor, the same as every other

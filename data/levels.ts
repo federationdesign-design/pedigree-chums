@@ -30,7 +30,7 @@ export function levelCardKind(name: string): BreedCardKind | null {
 }
 
 // Timeline order across every era. Moved here from BreedStrip, unchanged.
-export const STRIP_ORDER = ["ancient", "medieval", "c1500", "c1700", "early1800", "spaniels", "mid1800", "late1800", "c1900", "crosses"];
+export const STRIP_ORDER = ["ancient", "saxon", "medieval", "c1500", "c1700", "early1800", "spaniels", "mid1800", "late1800", "c1900", "crosses"];
 
 // Every level, in campaign order. The same sort and filter BreedStrip uses.
 export function levelBreeds(): UKBreed[] {

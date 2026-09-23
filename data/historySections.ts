@@ -52,6 +52,33 @@ export const SECTIONS: Section[] = [
     image: "/history/acident-main-img.jpg",
     imageAlt: "Early British working dogs, the hunting and guarding types found before breeds were standardised",
   },
+  /* NEW SECTION, 22 September 2026 (owner): the write-up for the Saxons 'n'
+     Normans strip. Copy flagged for owner review. Facts: the Lindisfarne raid of
+     793 and the Danelaw of 878 are standard history; the Domesday Book of 1086
+     and the Norman forest laws are already cited on the Medieval page. */
+  {
+    title: "Saxon and Norman Dogs",
+    accent: "Dogs",
+    anchor: "saxon-dogs",
+    era: "saxon",
+    intro:
+      "Between the Romans leaving and the Normans arriving, Britain was settled again and again. Saxon farmers, Norse settlers and Norman lords all brought dogs, and the dogs did what the new owners needed: herding, guarding, driving stock to market and hunting.",
+    bullets: [
+      "Saxon farms kept sturdy herding and guard dogs, the stock behind Britain's later collies.",
+      "Norse settlers brought their own working dogs into the north and east.",
+      "Norman lords brought hunting hounds and the laws that reserved the deer for themselves.",
+      "The scent hound rises: the Talbot and the Rache are named in this period.",
+    ],
+    detail:
+      "Dogs in these centuries were valued by what they could do, not by how they looked. A farm dog that moved cattle, a watchdog that barked at strangers and a hound that could follow a trail were worth real money, and the law said so. After 1066 the Norman kings made hunting a royal privilege, which turned some dogs into prized possessions and left others on the wrong side of the forest laws.",
+    facts: [
+      { text: "The first recorded Viking raid on Britain hit the monastery at Lindisfarne in 793." },
+      { text: "After Alfred beat Guthrum in 878, everything north and east of a line from London to Chester lived under Danish law: the Danelaw." },
+      { text: "England became one kingdom under Aethelstan in 927, less than 150 years before the Normans took it." },
+    ],
+    image: "/history/breeds/medieval-shepherds-dog.jpg",
+    imageAlt: "A medieval shepherd's dog beside its flock",
+  },
   {
     title: "Medieval Dogs",
     accent: "Dogs",

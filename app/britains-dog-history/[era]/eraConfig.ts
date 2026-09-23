@@ -30,6 +30,21 @@ export const ERA_PAGES: EraPage[] = [
       "In ancient times, Britain was not an island. It was connected to mainland Europe by Doggerland. But we are sorry to report that Doggerland has nothing to do with dogs! It is named after the Dogger Bank in the North Sea, which got its name from doggers, the medieval Dutch fishing boats that sailed there to catch cod.",
   },
   {
+    /* NEW ERA, 22 September 2026 (owner): the 600 years between Britain becoming
+       an island and 1066, which the timeline used to jump. Nine dogs moved here
+       from the ancient and medieval strips. Sources for the intro: the Roman
+       invasion of 43 and the end of Roman rule in 410; the Anglo-Saxon kingdoms;
+       the first Viking raid on Lindisfarne in 793; Alfred's victory at Edington
+       in 878 and the Danelaw that followed; Aethelstan's single kingdom of
+       England in 927 (Wikipedia: Roman Britain, Danelaw, Treaty of Alfred and
+       Guthrum, Great Heathen Army). */
+    slug: "saxons",
+    title: "Saxons 'n' Normans",
+    strips: ["saxon"],
+    intro:
+      "For six hundred years Britain belonged to whoever had just arrived. The Romans came in AD 43 and left in 410. Then Anglo-Saxon kingdoms filled the map, Viking raiders took the north and east until Alfred stopped them in 878, and in 1066 the Normans took the lot. Every wave brought its own dogs, and Britain kept the best of each.",
+  },
+  {
     slug: "medieval",
     title: "Medieval Times",
     strips: ["medieval"],

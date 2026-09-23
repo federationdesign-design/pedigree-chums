@@ -6,6 +6,13 @@
 // (Kennel Club Vulnerable Native / At Watch lists).
 // `image` is the pack's square art where we have it; otherwise a dog icon shows.
 
+/* THE SAXONS 'N' NORMANS STRIP, 22 September 2026 (owner). Nine dogs moved out
+   of "ancient" and "medieval" into their own era, covering roughly 410 to 1215:
+   Old British Bandogs, Celtic Heeler, Earth Dog, Drover's Dog, Shepherd's Dogs,
+   Bloodhound, Scottish Deerhound, Rache and Talbot. Ancient keeps eight and
+   Medieval nine. Anchors are untouched, so the timeline order inside each strip
+   is unchanged; campaign progress is held by NAME, so nobody loses their place. */
+
 export type UKBreed = {
   name: string;
   strip: string;
@@ -87,13 +94,13 @@ export const ukBreeds: UKBreed[] = [
   // user, so an anchor must not be read as a researched date. All nine are
   // banded "Medieval". Rache's anchor moved from 1150 to 1160 to break its tie
   // with Scottish Deerhound and give a stable sort.
-  { name: "Shepherd's Dogs", strip: "medieval", era: "Medieval", anchor: 1070, note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families.", image: "/history/breeds/medieval-shepherds-dog.jpg", tag: "extinct" },
-  { name: "Drover's Dog", strip: "medieval", era: "Medieval", anchor: 1060, note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns.", image: "/history/breeds/medieval-drover-dog.jpg", tag: "extinct" },
-  { name: "Earth Dog", strip: "medieval", era: "Medieval", anchor: 1050, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
-  { name: "Talbot", strip: "medieval", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
+  { name: "Shepherd's Dogs", strip: "saxon", era: "Medieval", anchor: 1070, note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families.", image: "/history/breeds/medieval-shepherds-dog.jpg", tag: "extinct" },
+  { name: "Drover's Dog", strip: "saxon", era: "Medieval", anchor: 1060, note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns.", image: "/history/breeds/medieval-drover-dog.jpg", tag: "extinct" },
+  { name: "Earth Dog", strip: "saxon", era: "Medieval", anchor: 1050, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
+  { name: "Talbot", strip: "saxon", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
 
-  { name: "Bloodhound", strip: "medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/bloodhound-square.jpg", tag: "endangered" },
-  { name: "Scottish Deerhound", strip: "medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
+  { name: "Bloodhound", strip: "saxon", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/bloodhound-square.jpg", tag: "endangered" },
+  { name: "Scottish Deerhound", strip: "saxon", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
 
   // The 1500s and 1600s
   // 19 August 2026: c1500 strip. era is an honest band label, never a bare year
@@ -228,7 +235,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/history/breeds/rough-collie-photo.jpg", tag: "in-decline" },
   { name: "Border Collie", strip: "late1800", era: "late 1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/collie-square.jpg" , tag: "popular" },
   { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/golden-square.jpg", tag: "popular" },
-  { name: "Celtic Heeler", strip: "ancient", era: "Ancient", anchor: 900, note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis.", image: "/history/breeds/medieval-corgi.jpg", tag: "extinct" },
+  { name: "Celtic Heeler", strip: "saxon", era: "Ancient", anchor: 900, note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis.", image: "/history/breeds/medieval-corgi.jpg", tag: "extinct" },
   { name: "Cardigan Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1880, note: "The older, long-tailed corgi, first shown in 1919.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
   { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/corgi-square.jpg", tag: "trending" },
   { name: "Lancashire Heeler", strip: "late1800", era: "late 1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
@@ -274,7 +281,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Maltipoo", strip: "crosses", era: "1990s", anchor: 1994, note: "Maltese crossed with a Poodle.", image: "/multipoo-square.jpg", tag: "trending" },
   { name: "Jackapoo", strip: "crosses", era: "1990s", anchor: 1996, note: "Jack Russell Terrier crossed with a Poodle.", image: "/jackapoo-square.jpg", tag: "trending" },
   { name: "Celtic Hound", strip: "ancient", era: "Ancient", anchor: 80, note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound.", tag: "extinct", image: "/history/breeds/celtic-hound-remake.jpg" },
-  { name: "Rache", strip: "medieval", era: "Medieval", anchor: 1160, note: "Medieval scenting hound that hunted by nose in the pack.", tag: "extinct", image: "/history/breeds/rache.jpg" },
+  { name: "Rache", strip: "saxon", era: "Medieval", anchor: 1160, note: "Medieval scenting hound that hunted by nose in the pack.", tag: "extinct", image: "/history/breeds/rache.jpg" },
   { name: "Buckhound", strip: "medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
   { name: "Southern Hound", strip: "medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot.", tag: "extinct", image: "/history/breeds/Southern-Hound.jpg" },
   { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, ancestor of the fell terriers.", tag: "extinct", image: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg" },
@@ -297,7 +304,7 @@ export const ukBreeds: UKBreed[] = [
   // rather than arithmetic. Third, these anchors are ordering devices, not
   // researched dates: only the era band is shown to the user. Notes and images
   // are taken from each node's lineage entry, trimmed to strip-note length.
-  { name: "Old British Bandogs", strip: "ancient", era: "Ancient", anchor: 600, note: "Heavy chained guard dogs of old England, set loose at night and worked by butchers and baiters.", image: "/history/breeds/Old-British-bandogs.jpg", tag: "extinct" },
+  { name: "Old British Bandogs", strip: "saxon", era: "Ancient", anchor: 600, note: "Heavy chained guard dogs of old England, set loose at night and worked by butchers and baiters.", image: "/history/breeds/Old-British-bandogs.jpg", tag: "extinct" },
   { name: "Old Highland Terriers", strip: "medieval", era: "Medieval", anchor: 1315, note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", image: "/history/breeds/Old-Highland-terriers.jpg", tag: "extinct" },
   { name: "Old working collies", strip: "medieval", era: "Medieval", anchor: 1355, note: "The old hill-collie landrace of Scotland and the borders, behind the Rough, Smooth and Border collies.", image: "/history/breeds/Old-working-collies-cluster.jpg", tag: "extinct" },
   { name: "Welsh herding dogs", strip: "medieval", era: "Medieval", anchor: 1375, note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace behind the region's sheep-working breeds.", image: "/history/breeds/Welsh-herding-dogs-cluster.jpg", tag: "extinct" },
