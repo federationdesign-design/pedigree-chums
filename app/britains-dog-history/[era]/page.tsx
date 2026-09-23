@@ -26,6 +26,7 @@ import { ERA_PAGES, eraPageBySlug } from "./eraConfig";
 import styles from "./era.module.css";
 import hist from "../history.module.css";
 import PopHeading from "../../../components/PopHeading/PopHeading";
+import WhoOwnsBritain from "../../../components/WhoOwnsBritain/WhoOwnsBritain";
 
 /* The write-up panel for a strip: the same section that sits above this strip on
    the history page, matched by era. "Dogs in the armed forces" shares era c1500
@@ -236,6 +237,13 @@ export default async function EraPage({ params }: Props) {
               </div>
             )}
             {/* 1700s page: "Did you know?" boxes (22 Sept 2026). */}
+            {/* Saxons 'n' Normans page only: who held which part of Britain
+                between the Romans and the Normans (22 Sept 2026). */}
+            {strip === "saxon" && (
+              <div className={styles.sectionHolder}>
+                <WhoOwnsBritain />
+              </div>
+            )}
             {strip === "c1700" && (
               <div className={`${styles.sectionHolder} ${styles.ancientBlock}`}>
                 <AncientFacts facts={EIGHTEENTH_FACTS} />
