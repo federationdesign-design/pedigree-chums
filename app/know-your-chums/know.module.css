@@ -471,14 +471,29 @@
   pointer-events: none;
   z-index: 2;
 }
-.chumTag_trending { background: #2e9e5b; }
+/* A SCALE, RED TO GREEN (owner, 23 September 2026). The bands used to be green
+   or amber in pairs, which said nothing about the distance between them. Now each
+   step has its own colour, thriving at one end and gone at the other:
+     trending    the bright green off the buttons
+     popular     the darker green these two shared
+     rare        amber, between in decline and endangered: scarce here, but the
+                 Kennel Club's two lists are native breeds only, so an import can
+                 never be given either of those
+     in decline  yellow, which needs navy type on it to stay readable
+     endangered  orange
+     extinct     red (no dog in the pack carries it; the band is here so the
+                 scale is complete wherever it is reused) */
+.chumTag_trending { background: #22c55e; }
 .chumTag_popular { background: #2e9e5b; }
+.chumTag_indecline {
+  background: #ffed00;
+  color: #0a3a57;
+}
 .chumTag_endangered { background: #e08a1e; }
-.chumTag_indecline { background: #e08a1e; }
-/* Amber reads as "scarce" across all three, which is what these bands share.
-   "Rare in the UK" is the longest label, so it keeps the band on one line by
+.chumTag_extinct { background: #d64545; }
+/* "Rare in the UK" is the longest label, so it keeps the band on one line by
    dropping the letter-spacing rather than the type size. */
-.chumTag_rare { background: #e08a1e; letter-spacing: 0.02em; }
+.chumTag_rare { background: #f0a437; letter-spacing: 0.02em; }
 
 .chumImg {
   width: 100%;
