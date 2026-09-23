@@ -309,6 +309,39 @@ The dog does the task. The value shows up somewhere else entirely.`,
     },
     article: ARTICLE_MEDICAL_ALERT,
   },
+  {
+    /* Slide 9: the military dogs (owner, 23 September 2026), paired with article 7,
+       "The Dog They Gave a Medal To". The panel copy is written to the same shape
+       as the others and sits inside the section 9 budgets. The card image is the
+       German Shepherd card art rather than a medal-dog photograph, because those
+       belong to PDSA and the IWM. */
+    id: "military-dogs",
+    order: 9,
+    published: "live",
+    panel: {
+      sections: [
+        {
+          subheading: "The dog does not know it is *at war*",
+          thumbnail: { src: "/german-sheperd-card.jpg", alt: "illustration of a German Shepherd" },
+          body: `A search dog walking a route ahead of a patrol is not looking for a bomb. It is looking for a smell, and when it finds one it sits down and waits to be paid.
+
+The payment is a ball, a tug toy and a hand on the head from one particular person. That is the whole contract, and it is why the handler and the dog are treated as a single unit rather than a soldier and his equipment.
+
+Britain has given the animals' Victoria Cross to more German Shepherds than any other breed. Not one of them knew what it was being given.`,
+        },
+      ],
+    },
+    article: {
+      family: "Security",
+      subLabel: "Military dogs",
+      headline: "The Dog They Gave a Medal To",
+      dek: `Rifleman Khan was a family pet from Surrey, lent to the army, who went into cold water under shellfire for a man he had known a few months. Britain gave him a medal. What military dogs actually do, why a ball is the only wage that works, and what happens when the job ends.`,
+      image: "/german-sheperd-card.jpg",
+      imageAlt: "an illustration of a German Shepherd, the breed given more Dickin Medals than any other",
+      ctaLabel: "Military dogs",
+      href: "/dogs-at-work/the-dog-they-gave-a-medal-to",
+    },
+  },
 ];
 
 validateSlides(SLIDES);
