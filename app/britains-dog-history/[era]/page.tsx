@@ -86,7 +86,9 @@ export default async function EraPage({ params }: Props) {
   /* The next era in ERA_PAGES order, for the second button and the swipe. On the
      last era, Today's Crossbreeds, there is nowhere further to go in the timeline,
      so the button reads CHUMS and leads to Know your chums (owner, 22 Sept 2026). */
-  const nextEra = ERA_PAGES[ERA_PAGES.findIndex((p) => p.slug === era) + 1] ?? null;
+  const eraIndex = ERA_PAGES.findIndex((p) => p.slug === era);
+  const nextEra = ERA_PAGES[eraIndex + 1] ?? null;
+  const prevEra = eraIndex > 0 ? ERA_PAGES[eraIndex - 1] : null;
 
   /* Site header, footer and the text colour toggle added 22 Sept 2026 at the
      owner's request, reversing the original "no Nav or Footer" call recorded in
@@ -126,6 +128,8 @@ export default async function EraPage({ params }: Props) {
           BACK and NEXT ERA in the history intro's button style, plus
           a left swipe to the next era (owner request, 22 Sept 2026). */}
       <EraNav
+        backHref={prevEra ? `/britains-dog-history/${prevEra.slug}` : "/britains-dog-history"}
+        backLabel="Back"
         nextHref={nextEra ? `/britains-dog-history/${nextEra.slug}` : "/know-your-chums"}
         nextLabel={nextEra ? "Next era" : "Chums"}
       />
