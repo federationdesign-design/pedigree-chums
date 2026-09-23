@@ -83,7 +83,9 @@ const BODY: (string | { h: string; id: string })[] = [
 
   { h: "What the job costs", id: "cost" },
   "A military dog does not get to decide that it has had enough.",
-  "The physical price is obvious and it is the part the films show: the injuries, the joints, the teeth, the working life that ends years before the dog does. The rest is less visible. Dogs coming back from deployments have been diagnosed with a condition that looks very much like post-traumatic stress: a dog that will not enter a building, or will not work a vehicle, or attaches itself to one person and refuses to be handed on.",
+  /* Was "the part the films show", which assumed the reader had arrived from the
+     Odin article. This page stands alone (owner, 23 September 2026). */
+  "The physical price is the easy part to picture: the injuries, the worn joints, the broken teeth, the working life that ends years before the dog does. The rest is less visible. Dogs coming back from deployments have been diagnosed with a condition that looks very much like post-traumatic stress: a dog that will not enter a building, or will not work a vehicle, or attaches itself to one person and refuses to be handed on.",
   "And there is the part nobody writes citations for. A dog that has spent its adult life with one handler, in a job that the two of them did together, does not understand a posting, a discharge, or a funeral. It understands that the person stopped coming.",
   "We are good at counting the finds, the routes cleared and the lives not lost. We are worse at counting that.",
 
@@ -99,7 +101,7 @@ const CARDS: ArticleCard[] = [
     id: "irma-card",
     pairWith: "irma",
     node: (
-      <SidebarCard title="Crumstone Irma">
+      <SidebarCard title="Crumstone Irma" thumb={{ src: "/german-shepard-square.jpg", alt: "" }}>
         <p className={sidebar.text}>
           Alsatian, London Civil Defence. Dickin Medal, 1945, for helping rescue 191 people from blitzed buildings.
           Her owner, Margaret Griffin, received the British Empire Medal for training her.
@@ -111,7 +113,7 @@ const CARDS: ArticleCard[] = [
     id: "khan-card",
     pairWith: "why",
     node: (
-      <SidebarCard title="Rifleman Khan">
+      <SidebarCard title="Rifleman Khan" thumb={{ src: "/german-shepard-square.jpg", alt: "" }}>
         <p className={sidebar.text}>
           Alsatian, 6th Battalion Cameronians. Dickin Medal, 27 March 1945, for rescuing L/Cpl Muldoon from drowning
           under heavy shellfire during the assault on Walcheren. A family pet before the war, and afterwards.
@@ -123,7 +125,11 @@ const CARDS: ArticleCard[] = [
     id: "the-eight",
     pairWith: "breed",
     node: (
-      <SidebarCard title="The eight Alsatians">
+      /* The same cartoon roundel against each name (owner, 23 September 2026).
+         Photographs of these dogs belong to PDSA and the Imperial War Museum, so
+         the card uses our own art: identical portraits, which at least say "all
+         eight were this breed" rather than pretending to show the individuals. */
+      <SidebarCard title="The eight Alsatians" thumb={{ src: "/german-shepard-square.jpg", alt: "" }}>
         <div className={sidebar.text}>
           {[
             ["Jet of Iada", "1945, Blitz rescue, 150 people"],
@@ -135,9 +141,13 @@ const CARDS: ArticleCard[] = [
             ["Antis", "1949, French Air Force and RAF"],
             ["Appollo", "2002, first search dog at Ground Zero"],
           ].map(([name, what]) => (
-            <div key={name} className={sidebar.attrRow}>
-              <span className={sidebar.attrName}>{name}</span>
-              <span>{what}</span>
+            <div key={name} className={sidebar.medalRow}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/german-shepard-square.jpg" alt="" className={sidebar.medalThumb} loading="lazy" />
+              <span>
+                <span className={sidebar.medalName}>{name}</span>
+                <span className={sidebar.medalWhat}>{what}</span>
+              </span>
             </div>
           ))}
         </div>
