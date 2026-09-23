@@ -75,8 +75,16 @@
     -webkit-overflow-scrolling: touch;
     padding-bottom: 8px;
   }
+  /* The row is inset 10px like everything else on the page, and a card is sized
+     so the NEXT one peeks in rather than being sliced off (owner, 23 September
+     2026: the right-hand card was cropped hard). */
+  .grid {
+    padding-left: 10px;
+    padding-right: 10px;
+    scroll-padding-left: 10px;
+  }
   .box {
-    flex: 0 0 86%;
-    scroll-snap-align: center;
+    flex: 0 0 calc(100% - 44px);
+    scroll-snap-align: start;
   }
 }

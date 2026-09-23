@@ -9,6 +9,14 @@
   padding: 0 clamp(20px, 6vw, 90px);
 }
 
+/* Phones: the same 10px inset as the panels and the intro text above them
+   (owner, 23 September 2026). */
+@media (max-width: 768px) {
+  .row {
+    padding: 0 10px;
+  }
+}
+
 .btn {
   flex: 1 1 0;
   min-width: 0;

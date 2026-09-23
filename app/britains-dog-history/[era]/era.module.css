@@ -73,11 +73,17 @@
   }
 }
 
-/* Below 480 the outer inset shrinks so the panel copy gets more line width. This
-   file is loaded by the era pages only; the history page never sees it. */
-@media (max-width: 480px) {
+/* ONE INSET ON PHONES, 23 September 2026 (owner). The intro text sits 10px from
+   each edge and everything below it now matches: the panels, the buttons and the
+   Did you know row. The breed strip is the exception, as it is a full-bleed
+   slider that runs off both edges on purpose. This file is loaded by the era
+   pages only; the history page never sees it. */
+@media (max-width: 768px) {
   .sectionHolder {
-    padding: 0 12px;
+    padding: 0 10px;
+  }
+  p.pageLead {
+    padding: 0 10px;
   }
 }
 
