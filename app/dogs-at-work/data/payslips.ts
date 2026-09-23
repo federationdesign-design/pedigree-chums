@@ -86,4 +86,14 @@ export const PAYSLIPS: Record<string, PayslipData> = {
     paidIn: "A ball, a tug toy, a hand on the head",
     retirement: "Adopted by the handler, if there is one left to adopt him",
   },
+  /* Article 8, the digital detection dogs (owner, 23 September 2026). */
+  "the-dog-that-smells-a-hard-drive": {
+    jobTitle: "Hidden data finder",
+    department: "Digital forensics",
+    shiftPattern: "Whenever a warrant is served",
+    officialDuties: "Sniff, sit, point the nose",
+    humanValue: "Evidence nobody else could find",
+    paidIn: "Dinner, one piece at a time",
+    retirement: "The handler's sofa, off duty at last",
+  },
 };

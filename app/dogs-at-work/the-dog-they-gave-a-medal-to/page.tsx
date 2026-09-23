@@ -34,15 +34,20 @@ import { PAYSLIPS } from "../data/payslips";
    York and Washington after 11 September 2001. Kuno (2020) and Bass (2023) are
    recent recipients and are named only where the text says so.
 
-   NO PHOTOGRAPHS OF THE MEDAL DOGS. The images belong to PDSA and the IWM, so the
-   page runs on our own German Shepherd art until permission is in hand. */
+   HERO IMAGE. The owner's military dog photograph, miltray-dog-img.jpg (his
+   spelling, kept so the file and the reference cannot drift apart). It is already
+   the card image on the Dogs at Work deck; the article page was still on the
+   German Shepherd card art, which is the fault fixed here on 23 September 2026.
+
+   NO PHOTOGRAPHS OF THE MEDAL DOGS THEMSELVES: those belong to PDSA and the IWM,
+   so none are used anywhere on this page. */
 
 export const metadata: Metadata = {
   title: "The Dog They Gave a Medal To | Dogs at Work",
   description:
     "Britain has given the animals' Victoria Cross to more Alsatians than any other breed. What military dogs actually do, why the same qualities that make them good at it make them vulnerable, and what happens when the work stops.",
   openGraph: {
-    images: ["/german-shepard-square.jpg"],
+    images: ["/miltray-dog-img.jpg"],
   },
 };
 
@@ -178,7 +183,7 @@ const ARTICLE_JSONLD = {
       "@type": "Article",
       headline: HEADLINE,
       description: metadata.description,
-      image: `${SITE_URL}/german-shepard-square.jpg`,
+      image: `${SITE_URL}/miltray-dog-img.jpg`,
       publisher: { "@id": `${SITE_URL}/#organization` },
       mainEntityOfPage: `${SITE_URL}/dogs-at-work/the-dog-they-gave-a-medal-to`,
     },
@@ -205,8 +210,8 @@ export default function MilitaryDogsPage() {
         <div className={styles.essayHero}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/german-shepard-square.jpg"
-            alt="Illustration of a German Shepherd, the breed given more Dickin Medals than any other."
+            src="/miltray-dog-img.jpg"
+            alt="A military working dog at work with its handler."
             className={styles.essayHeroImg}
           />
           <div className={styles.essayHeroTint} />
