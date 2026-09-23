@@ -1157,6 +1157,11 @@ const isFullShare = (pct: number) => Math.round(pct) >= 100;
    PIT TOKENS ONLY. RARITY_BAND.veryCommon is untouched, so the lifted card's
    band, the rarity ring, the twins and every other reader keep #ffd23e. */
 const VERY_COMMON_TOKEN = "#ffed00";
+/* THE RING AND THE FIGURE ON THAT TOKEN, navy (owner, 23 September 2026). They
+   were VERY_COMMON_TOKEN too for a few hours, which made a flat lemon disc with
+   no visible ring and a figure at 1.00:1; navy reads 9.89:1 on it. The token now
+   matches the common orange one, which also rings and reads navy. */
+const VERY_COMMON_TOKEN_INK = "#0a3a57";
 
 const DOG_FILL_FADE_MS = 150;
 /* HOW MUCH SMALLER A SCATTERED CHIP LANDS than it looked on the lift, 23
@@ -14208,7 +14213,7 @@ export default function BreedTree({
                      view's colours, inverted on each): an ink disc with an ink ring and a
                      figure in the page colour; a spent badge the reverse, so it still reads
                      as a dead token. Outside a view, the colours below as before. */
-                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN : chipBand.bg) : CHIP_FILL, stroke: sInk ?? (chipBand === RARITY_BAND.veryCommon && !inert && !item.label ? VERY_COMMON_TOKEN : chipBand === RARITY_BAND.common && !inert && !item.label ? "#0a3a57" /* THE COMMON TOKEN RINGS AND READS NAVY, 23 September 2026 (owner). White measured 2.85:1 on the orange; navy is 6.03. The other tiers keep the white ring. */ : chipBand && !inert && !item.label ? "#ffffff" : "#0a3a57"), /* WHITE RING ON A RARITY TOKEN, 21 September 2026 (owner: the figure on a rarity-coloured token is white, and its ring should be too). A yellow token, a spent one and a name disc keep navy. THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN : chipBand.bg) : CHIP_FILL, stroke: sInk ?? (chipBand === RARITY_BAND.veryCommon && !inert && !item.label ? VERY_COMMON_TOKEN_INK : chipBand === RARITY_BAND.common && !inert && !item.label ? "#0a3a57" /* THE COMMON TOKEN RINGS AND READS NAVY, 23 September 2026 (owner). White measured 2.85:1 on the orange; navy is 6.03. The other tiers keep the white ring. */ : chipBand && !inert && !item.label ? "#ffffff" : "#0a3a57"), /* WHITE RING ON A RARITY TOKEN, 21 September 2026 (owner: the figure on a rarity-coloured token is white, and its ring should be too). A yellow token, a spent one and a name disc keep navy. THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
                      (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
                      0.09, the weight a first-generation circle wears on the lifted
                      screen, read from the shared RING_FRAC table rather than typed
@@ -14236,7 +14241,7 @@ export default function BreedTree({
                     );
                   })()
                 ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN : chipBand === RARITY_BAND.common ? "#0a3a57" : chipBand === RARITY_BAND.uncommon ? "#ffffff" /* white on the orange and green tokens too, 21 Sept 2026 (owner), to match their white ring; the band labels elsewhere keep RARITY_BAND's black */ : chipBand.fg) : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN_INK : chipBand === RARITY_BAND.common ? "#0a3a57" : chipBand === RARITY_BAND.uncommon ? "#ffffff" /* white on the orange and green tokens too, 21 Sept 2026 (owner), to match their white ring; the band labels elsewhere keep RARITY_BAND's black */ : chipBand.fg) : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
                     {`${item.pct}%`}
                   </text>
                 ))}
