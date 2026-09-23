@@ -25,9 +25,11 @@ import { WORLD_PATHS, lonX, latY } from "../../data/worldOutline";
    actually uses. He now has his own panel underneath, which makes his point more
    forcefully than a lone marker did.
 
-   THE ORDER IS THE OWNER'S, not chronology: Anubis, Yama's dogs, Garmr, Cerberus,
-   Cwn Annwn, Black Shuck. Each card shows its own date, so a reader can see that
-   Garmr is written down long after Cerberus.
+   THE ORDER IS CHRONOLOGICAL (owner, 23 September 2026), because the slider has to
+   read as a timeline: Anubis about 3100 BC, Yama's dogs about 1500 BC, Cerberus by
+   about 700 BC, Garmr about AD 1000, Cwn Annwn about 1100, Black Shuck 1577. The
+   dates are when each figure is first WRITTEN DOWN, the only thing anyone can
+   date; the belief behind each is older, and the cards say so in their own words.
 
    Card copy is 35 to 55 words each, per section 6 of the brief: culture, figure,
    role, one striking detail, and an evidence note. */
@@ -41,8 +43,9 @@ type Spot = {
   body: string;
   evidence: string;
   labelLeft?: boolean;
-  /* Round thumbnail beside the write-up. Drop a square image at this path to
-     switch it on; the card simply omits the portrait until the file exists. */
+  /* Round thumbnail beside the write-up, in /public, named as the owner supplied
+     them on 23 September 2026. The card omits the portrait if the file is missing,
+     so nothing breaks if one is renamed. */
   img?: string;
 };
 
@@ -55,7 +58,7 @@ const SPOTS: Spot[] = [
     when: "from about 3100 BC",
     body: "Embalmer, guardian of the cemetery and guide of the dead, and the impartial referee at the weighing of the heart. The likeliest reason a dog got the job at all is that jackals and pariah dogs were already digging in the desert graves.",
     evidence: "British Museum, Book of the Dead judgement scenes and Anubis collection records.",
-    img: "/good-dog-bad-dog/anubis/anubis.png",
+    img: "/Anubis-profile.png",
   },
   {
     id: "india",
@@ -66,17 +69,7 @@ const SPOTS: Spot[] = [
     body: "Shabala and Shyama, the four-eyed brindled watchdogs of Yama, lord of the dead. The mourner is told to hurry past them. They guard the road rather than a door, which is a rarer idea than it sounds.",
     evidence: "Rigveda 10.14, the funeral hymn.",
     labelLeft: true,
-    img: "/good-dog-bad-dog/anubis/yama.png",
-  },
-  {
-    id: "norse",
-    place: "Norse world",
-    figure: "Garmr",
-    at: [10, 60],
-    when: "recorded about AD 1200",
-    body: "The blood-caked dog howling at the mouth of Hel, whose barking announces the end of the world. Norse settlement is also the route by which a hellhound idea reached the part of England that later produced Black Shuck.",
-    evidence: "Poetic Edda, Voluspa and Grimnismal.",
-    img: "/good-dog-bad-dog/anubis/garmr.png",
+    img: "/Yamas-profile.png",
   },
   {
     id: "greece",
@@ -86,18 +79,28 @@ const SPOTS: Spot[] = [
     when: "by about 700 BC",
     body: "The monstrous hound on the gates of Hades, whose job was less keeping the living out than keeping the dead in. Hecate, goddess of crossroads and boundaries, also kept hounds, and was heard before she was seen.",
     evidence: "Hesiod, Theogony; Homer, Iliad, on the hound of Hades.",
-    img: "/good-dog-bad-dog/anubis/cerberus.png",
+    img: "/Cerberus-profile.png",
+  },
+  {
+    id: "norse",
+    place: "Norse world",
+    figure: "Garmr",
+    at: [10, 60],
+    when: "written down about AD 1000",
+    body: "The blood-caked dog howling at the mouth of Hel, whose barking announces the end of the world. Norse settlement is also the route by which a hellhound idea reached the part of England that later produced Black Shuck.",
+    evidence: "Voluspa, about AD 1000, preserved in the Poetic Edda; also Grimnismal.",
+    img: "/Garmr-profile.png",
   },
   {
     id: "wales",
     place: "Wales",
     figure: "Cwn Annwn",
     at: [-4.2, 52.4],
-    when: "medieval",
+    when: "written down about 1100",
     body: "Spectral white hounds with red ears, hunting the sky for souls. Hearing them meant a death was coming. They grow quieter as they get closer, which is the detail that makes them frightening rather than merely loud.",
     evidence: "The Mabinogion, first branch: Pwyll's meeting with Arawn.",
     labelLeft: true,
-    img: "/good-dog-bad-dog/anubis/cwn-annwn.png",
+    img: "/Cwn-Annwn-profile.png",
   },
   {
     id: "england",
@@ -107,7 +110,7 @@ const SPOTS: Spot[] = [
     when: "from about 1577",
     body: "A vast black dog of the lanes, marshes and churchyards, the size of a calf, with eyes like coals. In 1577 he was said to have burst into churches at Bungay and Blythburgh during a storm. The scorch marks are still shown to visitors.",
     evidence: "Abraham Fleming's pamphlet, 1577; the name probably from Old English scucca, demon.",
-    img: "/good-dog-bad-dog/anubis/black-shuck.png",
+    img: "/Black-Shuck-profile.png",
   },
 ];
 
@@ -118,7 +121,7 @@ const XOLOTL = {
   when: "by about AD 1300",
   body: "The dog-headed god who guides the dead across the underworld river. The Aztecs had no contact with Egypt, Greece, India or Britain, and arrived at the same idea anyway. Dogs were buried with their owners to make the crossing with them.",
   evidence: "Codex Borgia and Codex Magliabechiano.",
-  img: "/good-dog-bad-dog/anubis/xolotl.png",
+  img: "/Xolotl-profile.png",
 };
 
 /* Cropped to the part of the sheet the trail actually crosses, Ireland to India.
@@ -144,6 +147,7 @@ export default function EchoTrail() {
       </p>
 
       <div className={styles.controls}>
+        <span className={styles.stepWhen}>{open.when}</span>
         <input
           type="range"
           min={0}
