@@ -58,7 +58,10 @@ const SPOTS: Spot[] = [
     place: "Egypt",
     figure: "Anubis",
     at: [31, 27],
-    dy: -2.5,
+    /* Up five and left five (owner, 23 Sept 2026); a map unit is about half a
+       pixel at the size this draws. */
+    dx: -2.5,
+    dy: -5,
     when: "from about 3100 BC",
     body: "Embalmer, guardian of the cemetery and guide of the dead, and the impartial referee at the weighing of the heart. The likeliest reason a dog got the job at all is that jackals and pariah dogs were already digging in the desert graves.",
     evidence: "British Museum, Book of the Dead judgement scenes and Anubis collection records.",
@@ -100,9 +103,10 @@ const SPOTS: Spot[] = [
     place: "Wales",
     figure: "Cwn Annwn",
     at: [-4.2, 52.4],
-    /* Ran off the left edge as a left-hand label (owner, 23 Sept 2026). */
-    dx: 10,
-    dy: 2.5,
+    /* Ran off the left edge as a left-hand label; then down ten and left five
+       (owner, 23 Sept 2026). */
+    dx: 7.5,
+    dy: 7.5,
     when: "written down about 1100",
     body: "Spectral white hounds with red ears, hunting the sky for souls. Hearing them meant a death was coming. They grow quieter as they get closer, which is the detail that makes them frightening rather than merely loud.",
     evidence: "The Mabinogion, first branch: Pwyll's meeting with Arawn.",

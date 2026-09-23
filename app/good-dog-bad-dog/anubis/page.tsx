@@ -8,6 +8,7 @@ import styles from "../good-dog-bad-dog.module.css";
 import Image from "next/image";
 import EchoTrail from "../../../components/EchoTrail/EchoTrail";
 import XolotlPanel from "../../../components/XolotlPanel/XolotlPanel";
+import AnubisPanel from "../../../components/AnubisPanel/AnubisPanel";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 
 export const metadata: Metadata = {
@@ -250,11 +251,56 @@ export default function AnubisPage() {
                    "The provider becomes the sacrifice", where the brief asks for
                    it: the reader has met the idea and is ready to see how far it
                    travels (Anubis_article_updates.docx, sections 5 and 7). */
+                /* Two sidebar cards moved into the reading column on 23 September
+                   2026 (owner), each landing on the paragraph it answers. */
+                if (b === "The jackal did not change. The story did.") {
+                  return (
+                    <div key={i}>
+                      {block}
+          {/* Taxonomy */}
+          <div className={styles.sidebarCard}>
+            <div style={{ padding: "18px 20px" }}>
+              <p style={cardTitle}>Is Anubis even a jackal?</p>
+              {/* The god's own portrait, as used on the map (owner, 23 Sept 2026). */}
+              <Image
+                src="/Anubis-profile.png"
+                alt=""
+                width={96}
+                height={96}
+                unoptimized
+                style={{ width: 84, height: 84, borderRadius: "50%", objectFit: "cover", border: "2px solid var(--yellow)", margin: "0 0 12px" }}
+              />
+              <p style={cardBody}>Possibly not. The animal long called the &quot;Egyptian jackal&quot; was shown by DNA (from 2011, formalised in 2015) to be a wolf &mdash; now the <strong>African golden wolf</strong>.</p>
+              <p style={cardBodyLast}>His black coat is symbolic, not literal: the black of decay and, at once, the black of the life-giving Nile silt.</p>
+            </div>
+          </div>
+                    </div>
+                  );
+                }
+                if (typeof b === "string" && b.startsWith("Perhaps humans did not invent the divine dog")) {
+                  return (
+                    <div key={i}>
+                      {block}
+          {/* Jackal, and other insults */}
+          <div className={styles.sidebarCard}>
+            <div style={{ padding: "18px 20px" }}>
+              <p style={cardTitle}>Jackal, and other insults</p>
+              <p style={cardBody}>Half the dog is buried in our language as an insult. To be a <strong>jackal</strong> is to be a sneak who does another&apos;s dirty work &mdash; from the old idea that the jackal was the lion&apos;s servant.</p>
+              <p style={cardBodyLast}>It has company: <strong>cur</strong>, <strong>mongrel</strong>, <strong>hangdog</strong>, &quot;gone to the dogs,&quot; &quot;in the doghouse.&quot; The animal we call loyal is also the animal we reach for when we want to name a coward.</p>
+            </div>
+          </div>
+                    </div>
+                  );
+                }
                 if (typeof b !== "string" && "h" in b && b.h === "The provider becomes the sacrifice") {
                   return (
                     <div key={i}>
                       <EchoTrail />
-                      {/* Xolotl stands apart, which is the argument (23 Sept 2026). */}
+                      {/* One panel per god, in the trail's own order, starting with
+                          Anubis (owner, 23 Sept 2026). The rest follow in later
+                          patches. */}
+                      <AnubisPanel />
+                      {/* Xolotl stands apart, which is the argument. */}
                       <XolotlPanel />
                       {block}
                     </div>
@@ -272,33 +318,8 @@ export default function AnubisPage() {
                 repeated it. The list itself went with it: the map component now
                 owns that content. */}
 
-            {/* Jackal, and other insults */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "18px 20px" }}>
-                <p style={cardTitle}>Jackal, and other insults</p>
-                <p style={cardBody}>Half the dog is buried in our language as an insult. To be a <strong>jackal</strong> is to be a sneak who does another&apos;s dirty work &mdash; from the old idea that the jackal was the lion&apos;s servant.</p>
-                <p style={cardBodyLast}>It has company: <strong>cur</strong>, <strong>mongrel</strong>, <strong>hangdog</strong>, &quot;gone to the dogs,&quot; &quot;in the doghouse.&quot; The animal we call loyal is also the animal we reach for when we want to name a coward.</p>
-              </div>
-            </div>
 
 
-            {/* Taxonomy */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "18px 20px" }}>
-                <p style={cardTitle}>Is Anubis even a jackal?</p>
-                {/* The god's own portrait, as used on the map (owner, 23 Sept 2026). */}
-                <Image
-                  src="/Anubis-profile.png"
-                  alt=""
-                  width={96}
-                  height={96}
-                  unoptimized
-                  style={{ width: 84, height: 84, borderRadius: "50%", objectFit: "cover", border: "2px solid var(--yellow)", margin: "0 0 12px" }}
-                />
-                <p style={cardBody}>Possibly not. The animal long called the &quot;Egyptian jackal&quot; was shown by DNA (from 2011, formalised in 2015) to be a wolf &mdash; now the <strong>African golden wolf</strong>.</p>
-                <p style={cardBodyLast}>His black coat is symbolic, not literal: the black of decay and, at once, the black of the life-giving Nile silt.</p>
-              </div>
-            </div>
 
             {/* Egypt reached Britain */}
             <div className={styles.sidebarCard}>

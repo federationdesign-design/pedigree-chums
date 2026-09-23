@@ -35,6 +35,10 @@ type Stop = {
   at?: [number, number]; // lon, lat
   place?: string;
   labelLeft?: boolean;
+  /* Label nudges in MAP UNITS. This view is 40 units across, so one unit is
+     roughly sixteen pixels as drawn (owner, 23 September 2026). */
+  dx?: number;
+  dy?: number;
 };
 
 const STOPS: Stop[] = [
@@ -54,6 +58,7 @@ const STOPS: Stop[] = [
     body: "The Aztec capital rises on an island in Lake Texcoco. Xolotl, god of lightning and death, guides the sun through the underworld each night, and his dog guides the dead through Mictlan.",
     at: [-99.13, 19.43],
     place: "Tenochtitlan",
+    dy: -0.6,
   },
   {
     id: "dogofxolotl",
@@ -70,6 +75,8 @@ const STOPS: Stop[] = [
     body: "Cortes comes ashore near Veracruz with roughly six hundred men. Within two years the city is gone, and with it the official religion that had given the dog its meaning.",
     at: [-96.13, 19.19],
     place: "Veracruz",
+    dx: -2.2,
+    dy: 0.95,
   },
   {
     id: "fall",
@@ -149,35 +156,15 @@ export default function XolotlPanel() {
         went with it.
       </p>
 
-      <div className={styles.controls}>
-        <button type="button" className={styles.play} onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
-          {playing ? (
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-              <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
-              <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-              <path d="M8 5v14l11-7z" fill="currentColor" />
-            </svg>
-          )}
-        </button>
-        <input
-          type="range"
-          min={0}
-          max={STOPS.length - 1}
-          step={1}
-          value={step}
-          onChange={(e) => {
-            setPlaying(false);
-            setStep(Number(e.target.value));
-          }}
-          className={styles.slider}
-          aria-label="Move through the story"
-          aria-valuetext={`${open.year}, ${open.heading}`}
-        />
-        <span className={styles.stepWhen}>{open.year}</span>
-      </div>
+      {/* What the land colour is telling you. */}
+      <ul className={styles.mapKey}>
+        <li>
+          <span className={`${styles.keySwatch} ${styles.keyBefore}`} aria-hidden="true" /> Aztec Mexico
+        </li>
+        <li>
+          <span className={`${styles.keySwatch} ${styles.keyAfter}`} aria-hidden="true" /> After the conquest, 1521
+        </li>
+      </ul>
 
       <div className={styles.mapWrap}>
         <svg
@@ -209,8 +196,8 @@ export default function XolotlPanel() {
                 <circle cx={cx} cy={cy} r={on ? 1.6 : 1.1} className={on ? styles.dotOn : styles.dot} />
                 {on && (
                   <text
-                    x={s.labelLeft ? cx - 2.2 : cx + 2.2}
-                    y={cy + 0.7}
+                    x={(s.labelLeft ? cx - 2.2 : cx + 2.2) + (s.dx ?? 0)}
+                    y={cy + 0.7 + (s.dy ?? 0)}
                     textAnchor={s.labelLeft ? "end" : "start"}
                     className={styles.label}
                   >
@@ -223,15 +210,35 @@ export default function XolotlPanel() {
         </svg>
       </div>
 
-      {/* What the land colour is telling you. */}
-      <ul className={styles.mapKey}>
-        <li>
-          <span className={`${styles.keySwatch} ${styles.keyBefore}`} aria-hidden="true" /> Aztec Mexico
-        </li>
-        <li>
-          <span className={`${styles.keySwatch} ${styles.keyAfter}`} aria-hidden="true" /> After the conquest, 1521
-        </li>
-      </ul>
+      <div className={styles.controls}>
+        <button type="button" className={styles.play} onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
+          {playing ? (
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+              <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="M8 5v14l11-7z" fill="currentColor" />
+            </svg>
+          )}
+        </button>
+        <input
+          type="range"
+          min={0}
+          max={STOPS.length - 1}
+          step={1}
+          value={step}
+          onChange={(e) => {
+            setPlaying(false);
+            setStep(Number(e.target.value));
+          }}
+          className={styles.slider}
+          aria-label="Move through the story"
+          aria-valuetext={`${open.year}, ${open.heading}`}
+        />
+        <span className={styles.stepWhen}>{open.year}</span>
+      </div>
 
       <div className={styles.card} aria-live="polite">
         <div className={styles.cardTop}>

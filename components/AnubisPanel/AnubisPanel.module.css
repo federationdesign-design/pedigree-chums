@@ -1,8 +1,6 @@
-/* The Anubis essay's interactive map, in the era pages' panel style (owner,
-   23 September 2026): the same light blue gradient, radius and shadow the maps on
-   /britains-dog-history use. It earns its keep here as well as there, because the
-   panel blue reads as the sea and the land can then be the same green those maps
-   use, with no extra colour introduced. */
+/* Anubis's own panel, the first of the six per-god infographics (owner chose
+   option B, six separate components, 23 September 2026). Same panel furniture as
+   the Xolotl map so the set reads as a series; only the map and the story differ. */
 
 .panel {
   margin: 44px 0;
@@ -39,6 +37,12 @@
    style: the name fell back to Montserrat and the small print stayed at body size.
    Prefixing with .panel makes them (0,2,0) and they win (23 September 2026). */
 
+/* THE ARTICLE OUTSCORES A BARE CLASS. `.essayBody p` in
+   good-dog-bad-dog.module.css is (0,1,1) and every rule below was (0,1,0), so the
+   panel's own type, colour and size were being overruled by the essay's body
+   style: the name fell back to Montserrat and the small print stayed at body size.
+   Prefixing with .panel makes them (0,2,0) and they win (23 September 2026). */
+
 .panel .intro {
   margin: 0 0 16px;
   font-size: 0.95rem;
@@ -63,17 +67,29 @@
 .land {
   fill: var(--cta, #4cb847);
   stroke: rgba(255, 255, 255, 0.5);
-  stroke-width: 0.4;
+  stroke-width: 0.12;
+  transition: fill 600ms ease;
+}
+/* From the fourth century AD the temples close and the land goes grey: the god
+   is not forgotten, he is switched off. */
+.landAfter {
+  fill: #8c8f86;
 }
 
 /* Dashes, never a solid line: a continuous arrow would claim a lineage the
    essay denies. */
-.hop {
-  stroke: var(--white, #ffffff);
-  stroke-width: 1.4;
-  stroke-dasharray: 5 6;
+/* The Nile, drawn by hand: the 1-degree coastline data has no rivers, and this
+   map makes no sense without it. */
+.nile {
+  fill: none;
+  stroke: #1e6fd9;
+  stroke-width: 0.5;
   stroke-linecap: round;
-  opacity: 0.75;
+  stroke-linejoin: round;
+}
+/* The desert either side of it. */
+.desert {
+  fill: #d8c08a;
 }
 
 .spot {
@@ -151,7 +167,9 @@
    so it no longer has to fight five others for legibility. */
 .label {
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 9px;
+  /* The view is 40 units wide, not 320, so the type is sized to match. A quarter
+     smaller again on 23 September 2026 (owner). */
+  font-size: 1.15px;
   font-weight: 800;
   fill: var(--white, #ffffff);
   pointer-events: none;
@@ -292,7 +310,9 @@
 
 @media (max-width: 640px) {
   .label {
-    font-size: 11px;
+    /* 11px came from the trail map, whose view is eight times wider; here it
+       filled the map. A quarter smaller again on 23 Sept 2026 (owner). */
+    font-size: 1.45px;
   }
 }
 
@@ -305,12 +325,15 @@
   stroke: #000000;
   stroke-width: 0.8;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .hop {
+:root[data-pc-contrast-scheme="black-on-white"] .hop,
+:root[data-pc-contrast-scheme="black-on-white"] .dot,
+:root[data-pc-contrast-scheme="black-on-white"] .dotOn {
   stroke: #000000;
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .hop {
   fill: none;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .dot,
-:root[data-pc-contrast-scheme="black-on-white"] .dotOn,
 :root[data-pc-contrast-scheme="black-on-white"] .label {
   fill: #000000;
 }
@@ -322,12 +345,15 @@
   stroke: #ffffff;
   stroke-width: 0.8;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .hop {
+:root[data-pc-contrast-scheme="white-on-black"] .hop,
+:root[data-pc-contrast-scheme="white-on-black"] .dot,
+:root[data-pc-contrast-scheme="white-on-black"] .dotOn {
   stroke: #ffffff;
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .hop {
   fill: none;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .dot,
-:root[data-pc-contrast-scheme="white-on-black"] .dotOn,
 :root[data-pc-contrast-scheme="white-on-black"] .label {
   fill: #ffffff;
 }
@@ -335,3 +361,33 @@
   accent-color: #ffffff;
 }
 
+/* The key for the land colour, which changes at 1521 (owner, 23 Sept 2026). */
+.mapKey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.mapKey li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.keySwatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+.keyBefore {
+  background: var(--cta, #4cb847);
+}
+.keyNile {
+  background: #1e6fd9;
+}
+.keyAfter {
+  background: #8c8f86;
+}
