@@ -13,12 +13,15 @@
   font-family: var(--font-body), system-ui, sans-serif;
 }
 
+/* The era-page panel heading: centred, big, in the display face (owner,
+   23 Sept 2026). */
 .title {
-  margin: 0 0 8px;
+  margin: 0 0 clamp(10px, 1.6vw, 18px);
+  text-align: center;
   text-shadow: 0 2px 0 rgba(10, 58, 87, 0.35);
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.5rem, 3.4vw, 2.2rem);
-  line-height: 1.1;
+  font-family: var(--font-display, "Luckiest Guy", cursive), system-ui, sans-serif;
+  font-size: clamp(34px, 5.6vw, 64px);
+  line-height: 1.05;
   letter-spacing: 0.02em;
 }
 .titleAccent {
@@ -152,11 +155,12 @@
   gap: 6px;
   margin: 0 0 14px;
 }
+/* Navy pill, white text, the site's own chip (owner, 23 Sept 2026). */
 .tab {
   padding: 7px 11px;
-  border: 1.5px solid var(--white, #ffffff);
+  border: 1.5px solid var(--navy, #0a3a57);
   border-radius: 999px;
-  background: transparent;
+  background: var(--navy, #0a3a57);
   color: #ffffff;
   font-family: var(--font-body), system-ui, sans-serif;
   font-size: 0.78rem;
@@ -173,15 +177,21 @@
   color: var(--navy, #0a3a57);
 }
 
+/* No tint and no outline: the write-up sits straight on the panel (owner,
+   23 Sept 2026). */
 .card,
 .outlier {
+  padding: 4px 0 0;
+}
+/* Portrait and name share a row; the write-up below runs the full width. */
+.cardTop {
   display: flex;
   gap: 14px;
-  align-items: flex-start;
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  align-items: center;
+  margin: 0 0 10px;
+}
+.cardNames {
+  min-width: 0;
 }
 /* Xolotl's own panel, below the map and visibly separate from the trail. */
 .outlier {
@@ -212,26 +222,29 @@
 }
 .cardPlace {
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--yellow-header, #ffed00);
 }
 .cardWhen {
   font-size: 0.72rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.88);
 }
+/* Luckiest Guy, three points up, still yellow. The fallback is named because
+   --font-display is not always in scope inside an essay (owner, 23 Sept 2026). */
 .cardFigure {
-  margin: 0 0 6px;
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 1.3rem;
+  margin: 0;
+  font-family: var(--font-display, "Luckiest Guy", cursive), system-ui, sans-serif;
+  font-size: calc(1.3rem + 3pt);
+  line-height: 1.1;
   color: var(--yellow-header, #ffed00);
   letter-spacing: 0.02em;
 }
 .cardBody {
   margin: 0 0 8px;
-  font-size: 0.92rem;
+  font-size: calc(0.92rem - 1pt);
   font-weight: 500;
   line-height: 1.55;
 }

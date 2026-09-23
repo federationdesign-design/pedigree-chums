@@ -159,8 +159,11 @@ export default function EchoTrail() {
 
   return (
     <section className={styles.panel} aria-labelledby="echo-trail-title">
-      <h2 id="echo-trail-title" className={styles.title}>
-        A trail of echoes, <span className={styles.titleAccent}>not a family tree</span>
+      {/* Shorter and centred, to match the era-page panel headings (owner,
+          23 Sept 2026). "Not a family tree" now lives in the line underneath,
+          where it reads as the argument rather than as a subtitle. */}
+      <h2 id="echo-trail-title" className={`display ${styles.title}`}>
+        A Trail of <span className="display-yellow">Echoes</span>
       </h2>
       <p className={styles.intro}>
         Seven cultures, one idea: a dog at the edge of the dark. Tap a marker to meet each of them. The line
@@ -261,19 +264,24 @@ export default function EchoTrail() {
         ))}
       </div>
 
+      {/* The portrait and the name sit on one row; the write-up runs the full
+          width underneath rather than indenting past the portrait (owner,
+          23 Sept 2026). */}
       <div className={styles.card} aria-live="polite">
-        {open.img && (
-          <Image src={open.img} alt="" width={96} height={96} className={styles.portrait} unoptimized />
-        )}
-        <div className={styles.cardText}>
-          <p className={styles.cardHead}>
-            <span className={styles.cardPlace}>{open.place}</span>
-            <span className={styles.cardWhen}>{open.when}</span>
-          </p>
-          <p className={styles.cardFigure}>{open.figure}</p>
-          <p className={styles.cardBody}>{open.body}</p>
-          <p className={styles.cardEvidence}>{open.evidence}</p>
+        <div className={styles.cardTop}>
+          {open.img && (
+            <Image src={open.img} alt="" width={96} height={96} className={styles.portrait} unoptimized />
+          )}
+          <div className={styles.cardNames}>
+            <p className={styles.cardHead}>
+              <span className={styles.cardPlace}>{open.place}</span>
+              <span className={styles.cardWhen}>{open.when}</span>
+            </p>
+            <p className={styles.cardFigure}>{open.figure}</p>
+          </div>
         </div>
+        <p className={styles.cardBody}>{open.body}</p>
+        <p className={styles.cardEvidence}>{open.evidence}</p>
       </div>
 
       <p className={styles.note}>

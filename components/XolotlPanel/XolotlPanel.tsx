@@ -140,8 +140,8 @@ export default function XolotlPanel() {
 
   return (
     <section className={styles.panel} aria-labelledby="xolotl-title">
-      <h2 id="xolotl-title" className={styles.title}>
-        Xolotl: the god they <span className={styles.titleAccent}>destroyed</span>
+      <h2 id="xolotl-title" className={`display ${styles.title}`}>
+        The God They <span className="display-yellow">Destroyed</span>
       </h2>
       <p className={styles.intro}>
         The Aztecs never met any of the others, and arrived at the same idea anyway. Then Spain arrived, and this
@@ -224,15 +224,17 @@ export default function XolotlPanel() {
       </div>
 
       <div className={styles.card} aria-live="polite">
-        <Image src="/Xolotl-profile.png" alt="" width={96} height={96} className={styles.portrait} unoptimized />
-        <div className={styles.cardText}>
-          <p className={styles.cardHead}>
-            <span className={styles.cardPlace}>Mexico</span>
-            <span className={styles.cardWhen}>{open.year}</span>
-          </p>
-          <p className={styles.cardFigure}>{open.heading}</p>
-          <p className={styles.cardBody}>{open.body}</p>
+        <div className={styles.cardTop}>
+          <Image src="/Xolotl-profile.png" alt="" width={96} height={96} className={styles.portrait} unoptimized />
+          <div className={styles.cardNames}>
+            <p className={styles.cardHead}>
+              <span className={styles.cardPlace}>Mexico</span>
+              <span className={styles.cardWhen}>{open.year}</span>
+            </p>
+            <p className={styles.cardFigure}>{open.heading}</p>
+          </div>
         </div>
+        <p className={styles.cardBody}>{open.body}</p>
       </div>
 
       <p className={styles.note}>
