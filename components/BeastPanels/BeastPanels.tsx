@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./BeastPanels.module.css";
 
 /* THE THREE PANELS FOR THE HEART OF THE BEAST ESSAY, 23 September 2026 (owner).
@@ -83,14 +84,17 @@ export function BreedFacts() {
 
       <div className={styles.card}>
         <div className={styles.cardTop}>
-          <Image
-            src="/german-shepard-square.jpg"
-            alt=""
-            width={96}
-            height={96}
-            className={styles.portrait}
-            unoptimized
-          />
+          {/* The portrait links to the chum page (owner, 23 September 2026). */}
+          <Link href="/chums/german-shepherd" className={styles.portraitLink} aria-label="German Shepherd">
+            <Image
+              src="/german-shepard-square.jpg"
+              alt=""
+              width={96}
+              height={96}
+              className={styles.portrait}
+              unoptimized
+            />
+          </Link>
           <div className={styles.cardNames}>
             <p className={styles.cardHead}>
               <span className={styles.cardPlace}>Pack chum</span>

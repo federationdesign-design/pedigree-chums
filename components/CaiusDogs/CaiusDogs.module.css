@@ -253,3 +253,25 @@
   font-weight: 500;
   line-height: 1.3em;
 }
+
+/* The pack thumbnails link to the chum pages (owner, 23 September 2026). */
+.packLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+}
+.packLink img {
+  transition: transform 160ms ease;
+}
+.packLink:hover img {
+  transform: scale(1.06);
+}
+.packLink:focus-visible {
+  outline: 3px solid var(--yellow-header, #ffed00);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+

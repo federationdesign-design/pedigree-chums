@@ -7,7 +7,7 @@ import Footer from "../../../components/Footer/Footer";
 import styles from "../dogs-at-work.module.css";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import Payslip from "../../../components/Payslip/Payslip";
-import SidebarCard from "../../../components/DogsAtWork/SidebarCard";
+import SidebarCard, { BreedRoundel } from "../../../components/DogsAtWork/SidebarCard";
 import sidebar from "../../../components/DogsAtWork/SidebarCard.module.css";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
 import { PAYSLIPS } from "../data/payslips";
@@ -144,8 +144,7 @@ const CARDS: ArticleCard[] = [
             ["Appollo", "2002, first search dog at Ground Zero"],
           ].map(([name, what]) => (
             <div key={name} className={sidebar.medalRow}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/german-shepard-square.jpg" alt="" className={sidebar.medalThumb} loading="lazy" />
+              <BreedRoundel slug="german-shepherd" src="/german-shepard-square.jpg" className={sidebar.medalThumb} label="German Shepherd" />
               <span>
                 <span className={sidebar.medalName}>{name}</span>
                 <span className={sidebar.medalWhat}>{what}</span>

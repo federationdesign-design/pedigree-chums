@@ -557,3 +557,21 @@
 :global(main[data-pc-textinvert="on"]) .armLabel {
   fill: var(--navy, #0a3a57);
 }
+
+/* The breed portrait links to that dog's chum page. */
+.portraitLink {
+  display: inline-flex;
+  border-radius: 50%;
+  line-height: 0;
+}
+.portraitLink img {
+  transition: transform 160ms ease;
+}
+.portraitLink:hover img {
+  transform: scale(1.06);
+}
+.portraitLink:focus-visible {
+  outline: 3px solid var(--navy, #0a3a57);
+  outline-offset: 3px;
+}
+

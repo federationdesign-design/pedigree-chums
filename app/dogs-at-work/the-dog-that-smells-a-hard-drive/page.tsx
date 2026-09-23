@@ -7,7 +7,7 @@ import Footer from "../../../components/Footer/Footer";
 import styles from "../dogs-at-work.module.css";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import Payslip from "../../../components/Payslip/Payslip";
-import SidebarCard from "../../../components/DogsAtWork/SidebarCard";
+import SidebarCard, { BreedRoundel } from "../../../components/DogsAtWork/SidebarCard";
 import sidebar from "../../../components/DogsAtWork/SidebarCard.module.css";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
 import { PAYSLIPS } from "../data/payslips";
@@ -155,11 +155,10 @@ const CARDS: ArticleCard[] = [
           <div className={sidebar.medalRow}>
             <span className={sidebar.attrName}>Breeds</span>
             <span className={sidebar.breedPair}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/springer-square.jpg" alt="" className={sidebar.medalThumb} loading="lazy" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/lab-square.jpg" alt="" className={sidebar.medalThumb} loading="lazy" />
-              <span>Springer spaniel and Labrador</span>
+              {/* The names under the pictures were removed on 23 September 2026
+                  (owner); each roundel links to that dog's chum page instead. */}
+              <BreedRoundel slug="springer-spaniel" src="/springer-square.jpg" className={sidebar.medalThumb} label="Springer Spaniel" />
+              <BreedRoundel slug="labrador" src="/lab-square.jpg" className={sidebar.medalThumb} label="Labrador" />
             </span>
           </div>
           {[

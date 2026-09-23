@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 import styles from "./SidebarCard.module.css";
 
 // A Dogs at Work article sidebar card: the navy, hairline-bordered box with a
@@ -15,6 +16,23 @@ export interface SidebarCardProps {
      2026), used on the cards about real dogs. With one present the title drops a
      size so the pair still fits the card width; see .titleRow in the stylesheet. */
   thumb?: { src: string; alt?: string };
+}
+
+/* A round breed portrait that links to that dog's chum page (owner, 23 September
+   2026). The site had almost nothing pointing at the 54 chum pages, and these
+   roundels are the natural way in: the reader is already looking at the breed.
+
+   IT IS FOR BREED ART ONLY. The Pick a Chum profile pictures (lab-chat-profile-*,
+   collie-chat-profile-* and the rest) are NOT breed art, they are the chatbot's
+   own characters, and they must never be swept into this. Pass a chum slug here
+   and nothing else. */
+export function BreedRoundel({ slug, src, className, label }: { slug: string; src: string; className: string; label: string }) {
+  return (
+    <Link href={`/chums/${slug}`} className={styles.roundelLink} aria-label={label}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className={className} loading="lazy" />
+    </Link>
+  );
 }
 
 export default function SidebarCard({ title, children, thumb }: SidebarCardProps) {

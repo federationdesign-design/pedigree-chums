@@ -74,7 +74,10 @@ export default function GelertPage() {
             </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
-              <span className={styles.tagBreed}>Irish Wolfhound</span>
+              {/* The breed tag links to the chum page (owner, 23 September 2026): this page
+                  has no breed roundel, only the Gelert painting, which is the story
+                  rather than the breed. */}
+              <Link href="/chums/irish-wolfhound" className={styles.tagBreed}>Irish Wolfhound</Link>
             </div>
             <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>

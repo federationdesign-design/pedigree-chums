@@ -9297,6 +9297,17 @@ export default function BreedTree({
         // only. See BadgeItem.rarity.
         opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean; name?: string }
       ) => {
+        /* NO 100% TOKENS IN THE PIT, 23 September 2026 (owner). A chip reading
+           100% carries no information: it is the dog's whole ancestry, so every
+           reader already knows it, and it is the one figure that can never be a
+           surprise. The guard sits HERE rather than at the call sites because
+           three different paths spawn chips (the learn-layer scatter, the pop
+           path and dogClose) and a rule written three times is a rule that drifts.
+
+           A LABELLED CHIP IS EXEMPT: that is a solo dog circle carrying a breed
+           name, not a percentage, and its pct is not drawn. */
+        if (!opts?.label && Math.round(pctVal) >= 100) return;
+
         // client px in, which is the physics space itself now
         const bl = badgeBodiesRef.current;
         if (!bl) return;

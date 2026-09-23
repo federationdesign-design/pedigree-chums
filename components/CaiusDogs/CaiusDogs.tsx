@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./CaiusDogs.module.css";
+import { breeds } from "../../data/breeds";
 
 /* Caius's dog family tree: John Caius's 1570s sorting of England's dogs, from De
    Canibus Britannicis (Latin) and Abraham Fleming's 1576 English translation, Of
@@ -107,6 +109,13 @@ const PACK_ART: Record<string, string> = {
   Bulldog: "/bulldog-square.jpg",
 };
 
+/* Every name in PACK_ART is one of the 54 chums, so each thumbnail links to that
+   dog's page (owner, 23 September 2026). Those pages had almost nothing pointing
+   at them, and a reader already looking at the breed is the natural way in. The
+   slugs come from data/breeds.ts rather than being typed again, so a renamed chum
+   cannot leave a dead link here. */
+const CHUM_SLUG: Record<string, string> = Object.fromEntries(breeds.map((b) => [b.name, b.slug]));
+
 const ALL = KINDS.flatMap((k) => k.groups.flatMap((g) => g.dogs.map((d) => ({ ...d, kind: k.title }))));
 
 export default function CaiusDogs() {
@@ -175,8 +184,17 @@ export default function CaiusDogs() {
           <ul className={styles.packRow} aria-label="In the Pedigree Chums pack">
             {dog.pack.map((n) => (
               <li key={n} className={styles.packDog}>
-                <Image src={encodeURI(PACK_ART[n])} alt="" width={56} height={56} className={styles.packImg} unoptimized />
-                <span className={styles.packName}>{n}</span>
+                {CHUM_SLUG[n] ? (
+                  <Link href={`/chums/${CHUM_SLUG[n]}`} className={styles.packLink} aria-label={n}>
+                    <Image src={encodeURI(PACK_ART[n])} alt="" width={56} height={56} className={styles.packImg} unoptimized />
+                    <span className={styles.packName}>{n}</span>
+                  </Link>
+                ) : (
+                  <>
+                    <Image src={encodeURI(PACK_ART[n])} alt="" width={56} height={56} className={styles.packImg} unoptimized />
+                    <span className={styles.packName}>{n}</span>
+                  </>
+                )}
               </li>
             ))}
           </ul>

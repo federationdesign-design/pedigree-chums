@@ -76,6 +76,23 @@
   opacity: 0.9;
 }
 
+/* The roundel is a link, so it gets a focus ring and a small lift on hover. */
+.roundelLink {
+  display: inline-flex;
+  border-radius: 50%;
+  line-height: 0;
+}
+.roundelLink img {
+  transition: transform 160ms ease;
+}
+.roundelLink:hover img {
+  transform: scale(1.06);
+}
+.roundelLink:focus-visible {
+  outline: 3px solid var(--yellow-header, #ffed00);
+  outline-offset: 2px;
+}
+
 /* Two breed roundels sitting inline with their label. */
 .breedPair {
   display: inline-flex;
