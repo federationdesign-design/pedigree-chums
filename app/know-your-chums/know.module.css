@@ -133,7 +133,9 @@
   width: clamp(36px, 5vw, 56px);
   height: clamp(36px, 5vw, 56px);
   margin-bottom: 2px;
-  background-color: var(--yellow);
+  /* Lemon, the same yellow as the display type on this page (owner, 23 Sept
+     2026); --yellow is the older orange one. */
+  background-color: var(--yellow-header);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
@@ -898,7 +900,16 @@
 
 /* The facts panel: bullet text navy, icons yellow, titles stay white. */
 .fact { color: #093a58; }
-.factIcon { color: #feed00; fill: #feed00; }
+.factIcon { color: #ffed00; fill: #ffed00; }
+/* The icons are masked shapes painted by background-color, which the scheme
+   sweep resets to the scheme's paper colour, so they vanished. Painted in the
+   scheme's ink instead (owner, 23 Sept 2026). */
+:root[data-pc-contrast-scheme="black-on-white"] .factIcon {
+  background-color: #000000 !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .factIcon {
+  background-color: #ffffff !important;
+}
 .factLabel { color: #ffffff; }
 
 /* ── Round two, matched to the history strip ────────────────────

@@ -893,6 +893,11 @@ export default function BreedStrip({
                         ) : (
                           <DogIcon />
                         )}
+                        {/* Shown ONLY in an accessibility scheme, where the
+                            photograph is replaced by the dog's name (owner,
+                            23 Sept 2026). Hidden from screen readers because the
+                            card already announces the name. */}
+                        <span className={styles.schemeName} aria-hidden="true">{b.name}</span>
                       </span>
                       {kind && (
                         <span className={styles.deskWedge} aria-hidden="true" />

@@ -1059,3 +1059,42 @@
 :global(:root[data-pc-contrast-scheme] #pc-site) .stripFlush .stripLabel {
   background-color: transparent !important;
 }
+
+/* ACCESSIBILITY SCHEMES on the breed cards, 23 September 2026 (owner). The
+   scheme crushes photographs to grey, which left the cartoon dogs as murk. In a
+   scheme the picture goes entirely and the card carries the dog's NAME in
+   Luckiest Guy instead, on the scheme's own background, with a stroke around
+   every frame so the cards read as cards. The yellow corner flash goes too: with
+   no picture under it, it read as a gap in the top left. */
+.schemeName {
+  display: none;
+}
+:root[data-pc-contrast-scheme] .nodeThumb :global(img),
+:root[data-pc-contrast-scheme] .nodeThumb :global(svg) {
+  display: none !important;
+}
+:root[data-pc-contrast-scheme] .deskWedge {
+  display: none !important;
+}
+:root[data-pc-contrast-scheme] .schemeName {
+  display: block;
+  padding: 0 10px;
+  text-align: center;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .schemeName {
+  color: #000000 !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .schemeName {
+  color: #ffffff !important;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .flipFront {
+  box-shadow: inset 0 0 0 3px #000000;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .flipFront {
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+
