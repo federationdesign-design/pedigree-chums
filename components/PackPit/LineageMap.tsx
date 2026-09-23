@@ -3768,6 +3768,14 @@ export default function LineageMap({
                         "fixed" back later. The other four tiers still take band.fg
                         from the table and are untouched.
 
+                        COMMON GOES WHITE TOO, 23 September 2026 (owner). Same kind
+                        of call and recorded the same way: white on the common
+                        orange #f47421 measures 2.85:1 where the black it replaces
+                        was 7.37:1. Asked for explicitly after an audit that put
+                        both figures in front of the owner. Only the lifted card's
+                        BAND LABEL changes; RARITY_BAND.common.fg is untouched, so
+                        every other consumer of the table keeps its black.
+
                         THE FILLS ARE NOT DARKENED, and that was the other route.
                         To carry white they would need uncommon 32% darker,
                         common 23%, very common 45% (#ffd23e to #8c7322, which stops
@@ -3777,7 +3785,7 @@ export default function LineageMap({
                         progress arc all sit on dark grounds and want the fills
                         LIGHTER. One element against three, and the ink is free. */}
                     <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: doneRing ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#ffffff" : band.fg }}>{band.label}</text>
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#ffffff" : rarityTier === "common" ? "#ffffff" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>
