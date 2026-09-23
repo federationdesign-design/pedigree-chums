@@ -44,7 +44,12 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
   {
     title: "Popular UK breeds",
     accent: "breeds",
-    names: ["Boxer", "Jack Russell Terrier", "Greyhound", "Miniature Schnauzer", "Bull Terrier"],
+    /* Swapped 23 September 2026 (owner): the Greyhound carries the endangered
+       badge and the Bull Terrier the in-decline one, so neither belonged in a
+       popular row. The Border Terrier, tagged popular, takes the Greyhound's
+       place and the Greyhound takes its. The Bull Terrier moves to Endangered
+       dogs below, and the Whippet, also tagged popular, fills the gap. */
+    names: ["Boxer", "Jack Russell Terrier", "Border Terrier", "Miniature Schnauzer", "Whippet"],
   },
   /* The rest of the small dogs, once the rows above have taken the ones they
      describe better. */
@@ -56,7 +61,7 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
   {
     title: "The ol' favourites",
     accent: "favourites",
-    names: ["Border Terrier", "West Highland Terrier", "Yorkshire Terrier", "Cavalier King Charles Spaniel", "Whippet", "Lurcher"],
+    names: ["Greyhound", "West Highland Terrier", "Yorkshire Terrier", "Cavalier King Charles Spaniel", "Lurcher"],
   },
   /* The pack's crossbreeds (Cockapoo now sits with the employed dogs above, and the
      Border Collie joined them on 20 September 2026). */
@@ -84,7 +89,7 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
   {
     title: "Endangered dogs",
     accent: "dogs",
-    names: ["Old English Sheepdog", "Bloodhound", "Mastiff", "Irish Setter"],
+    names: ["Old English Sheepdog", "Bloodhound", "Mastiff", "Irish Setter", "Bull Terrier"],
   },
 ];
 
