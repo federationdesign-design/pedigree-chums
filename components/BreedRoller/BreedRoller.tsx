@@ -94,7 +94,21 @@ const PACK_ROWS: Row[] = breeds
   .map((p) => ({ name: p.name, era: packEra(p.name, p.established), href: `/chums/${p.slug}` }));
 const DOGS: Row[] = [...LEVEL_ROWS, ...PACK_ROWS].sort((a, b) => a.name.localeCompare(b.name));
 
-export default function BreedRoller() {
+/* CHUMS MODE, 23 September 2026 (owner): the same roller on Know your chums,
+   listing the 54 pack dogs only and going to their chum pages rather than into a
+   level. Same A to Z rule. */
+const CHUMS: Row[] = breeds
+  .map((p) => ({ name: p.name, era: packEra(p.name, p.established), href: `/chums/${p.slug}` }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+/* mode "history" (the default) lists every timeline level and every pack chum and
+   goes into the game; mode "chums" lists the 54 pack dogs and goes to their chum
+   pages (owner, 23 September 2026, for Know your chums). */
+type Props = { mode?: "history" | "chums" };
+
+export default function BreedRoller({ mode = "history" }: Props) {
+  const rows = mode === "chums" ? CHUMS : DOGS;
+  const label = mode === "chums" ? "Britain\u2019s chums a-z" : "Britain\u2019s dogs a-z";
   const listRef = useRef<HTMLUListElement | null>(null);
   const [centre, setCentre] = useState(0);
 
@@ -104,21 +118,21 @@ export default function BreedRoller() {
     const list = listRef.current;
     if (!list) return;
     try {
-      const saved = window.sessionStorage.getItem("pc-breed-roller");
+      const saved = window.sessionStorage.getItem(`pc-breed-roller-${mode}`);
       if (saved) list.scrollTop = Number(saved);
     } catch {
       /* private mode: not worth breaking the picker over */
     }
     const save = () => {
       try {
-        window.sessionStorage.setItem("pc-breed-roller", String(list.scrollTop));
+        window.sessionStorage.setItem(`pc-breed-roller-${mode}`, String(list.scrollTop));
       } catch {
         /* as above */
       }
     };
     list.addEventListener("scroll", save, { passive: true });
     return () => list.removeEventListener("scroll", save);
-  }, []);
+  }, [mode]);
 
   /* Highlight the row at the TOP of the window, not the middle (owner, 22 Sept
      2026). Centring needed half the list's height as padding at each end, and
@@ -156,9 +170,9 @@ export default function BreedRoller() {
 
   return (
     <div className={styles.picker}>
-      <span className={styles.label}>Britain&rsquo;s dogs a-z</span>
-      <ul className={styles.list} ref={listRef} aria-label="Every dog in the timeline">
-        {DOGS.map((d, i) => (
+      <span className={styles.label}>{label}</span>
+      <ul className={styles.list} ref={listRef} aria-label={mode === "chums" ? "Every chum in the pack" : "Every dog in the timeline"}>
+        {rows.map((d, i) => (
           <li key={d.href} className={`${styles.item} ${i === centre ? styles.on : ""}`}>
             <Link href={d.href} className={styles.link}>
               <span className={styles.name}>{d.name}</span>

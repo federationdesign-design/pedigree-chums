@@ -143,7 +143,7 @@ function BarTable({
 
 export default function BreedStats() {
   return (
-    <section className={styles.statsSection}>
+    <section className={styles.statsSection} id="chum-stats">
       <h2 className={`display ${styles.statsHeading}`}>
         The trends <span className="display-yellow">&amp; stats</span>
       </h2>

@@ -265,7 +265,7 @@ export default function ChumExplorer() {
   return (
     // Task 153: marks the dog-image rails so the global Pick a Chum launcher can observe when the visitor
     // reaches this section (the Collie then names three of the pack). A marker only; no behaviour here.
-    <section className={styles.explorer} data-pc-appear="rails">
+    <section className={styles.explorer} data-pc-appear="rails" id="chum-top-dogs">
       <div className={styles.searchWrap}>
         <ChumSearch hint="Search breeds" />
       </div>

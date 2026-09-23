@@ -6,6 +6,7 @@ import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import BreedStats from "./BreedStats";
 import ChumExplorer from "./ChumExplorer";
+import ChumHeroMobile from "./ChumHeroMobile";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./know.module.css";
 
@@ -53,6 +54,9 @@ export default function KnowYourChums() {
           <div className={styles.heroTris}>
             <Triangles items={heroTriangles} z={2} />
           </div>
+          {/* Phones only: title, two buttons and the A to Z roller, inside the
+              hero (owner, 23 Sept 2026). Hidden above 768px. */}
+          <ChumHeroMobile />
         </section>
 
         {/* Article text toggle, centred as on /home. Inverts the page text
