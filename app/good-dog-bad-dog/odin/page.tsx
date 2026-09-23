@@ -8,8 +8,13 @@ import styles from "../good-dog-bad-dog.module.css";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import { BreedFacts, RescueRoll, GazeLoop } from "../../../components/BeastPanels/BeastPanels";
 
-/* HEART OF THE BEAST, 23 September 2026 (owner), written to publish alongside the
-   film's release on 25 September.
+/* ODIN, 23 September 2026 (owner), written to publish alongside the release of
+   Heart of the Beast on 25 September.
+
+   NAMED AFTER THE DOG, NOT THE FILM (owner, 23 September 2026): the route was
+   /good-dog-bad-dog/heart-of-the-beast for a few hours and is now
+   /good-dog-bad-dog/odin, with a permanent redirect in next.config.ts, because
+   the article is about the dog and the film is only the way in.
 
    THREE STRANDS, as agreed: the film, the dogs who would not leave, and the
    science underneath both. The argument is that the rescue dog and the dog at
@@ -36,15 +41,15 @@ import { BreedFacts, RescueRoll, GazeLoop } from "../../../components/BeastPanel
    can go live without waiting on Paramount. */
 
 export const metadata: Metadata = {
-  title: "Heart of the Beast: Why a Dog Will Not Leave You | Pedigree Chums",
+  title: "Odin: Why a Dog Will Not Leave You | Pedigree Chums",
   description:
     "Brad Pitt's new film strands a man and a three-legged German Shepherd in Alaska. The dogs who really did save their humans, and the science of why a dog attaches to one person and stays.",
-  alternates: { canonical: "/good-dog-bad-dog/heart-of-the-beast" },
+  alternates: { canonical: "/good-dog-bad-dog/odin" },
   openGraph: {
-    title: "Heart of the Beast: Why a Dog Will Not Leave You",
+    title: "Odin: Why a Dog Will Not Leave You",
     description:
       "One man, one dog, fifty-eight miles. The real rescues behind the film, and what the science says about why dogs stay.",
-    url: `${SITE_URL}/good-dog-bad-dog/heart-of-the-beast`,
+    url: `${SITE_URL}/good-dog-bad-dog/odin`,
     type: "article",
   },
 };
@@ -86,6 +91,16 @@ const BODY: Block[] = [
   "The evidence is not perfect. Oxytocin is not a love chemical, and the effect varies with the dog's sex, breed and history with the person. But the broader point survives the caution: dogs are not passive recipients of human affection. They maintain the bond themselves.",
   "So attachment explains why the dog stays. Scent and behaviour explain how the dog knows. Gaze explains how the relationship keeps renewing itself. Humans have benefited enormously from all three.",
 
+  { h: "The bond they did not have to act" },
+  "Which brings us to the part of this that is not fiction at all.",
+  "Uber, the German Shepherd playing Odin, was a working search and rescue dog before he was ever a film dog. He had been on helicopters and been to real incidents. The film did not teach him to be steady in chaos; it hired him because he already was.",
+  "And over the shoot, in New Zealand, wet and cold for twelve hours a day, the thing the article has been describing happened to the actor. Pitt has said since that he wanted the dog to trust him and to feel safe with him, and that this was the first job before any acting could happen. Not a performance of a bond. The actual construction of one, in the order the mechanism requires: safety first, attention second, everything else after that.",
+  "David Ayer, directing, put it in one line. They found the relationship, he said, in the eyes.",
+  { quote: "That is the 2015 experiment, restaged by accident on a film set, by two people who were only trying to get a scene." },
+  "It shows in the working detail too. Pitt has described having to keep treats on him and break mid-scene to call the dog back, then drop straight back into the emotion, because the dog had wandered off after something more interesting. The dog was not acting. It was doing what it liked doing, near a man it had decided to be near, and the camera collected the result.",
+  "Pitt called it a moving experience and says the dog's expressions still get to him. He has three dogs of his own now, one of them a rescue taken on since filming.",
+  "Which is the whole argument, arriving from the least likely direction. You cannot spend months building trust with a dog and come away unchanged, because the loop does not care that one of you is being paid.",
+
   { h: "Is it courage if the dog cannot help it?" },
   "This is where it gets awkward. We call Rip brave. We call Sheila brave. We call Judy brave. Odin is framed as heroic because he stays where leaving would be easier. But does courage require a choice?",
   "A human hero can supposedly understand the danger, consider leaving and decide to stay. The dog in the rubble is not writing an ethical argument. Sheila did not understand the British Empire Medal. Judy did not know what a prisoner of war was. The dog has a person, something is wrong, and leaving does not feel like the correct response.",
@@ -107,7 +122,7 @@ const BODY: Block[] = [
   "The miracle is not simply that the dog stays. It is that two species built a relationship in which, sometimes, leaving feels harder than staying. If the dog keeps its side of that bargain, we owe it ours.",
 ];
 
-const HEADLINE = "Heart of the Beast: Why a Dog Will Not Leave You";
+const HEADLINE = "Odin: Why a Dog Will Not Leave You";
 const ARTICLE_JSONLD = {
   "@context": "https://schema.org",
   "@graph": [
@@ -119,14 +134,14 @@ const ARTICLE_JSONLD = {
       datePublished: "2026-09-24",
       dateModified: "2026-09-24",
       publisher: { "@id": `${SITE_URL}/#organization` },
-      mainEntityOfPage: `${SITE_URL}/good-dog-bad-dog/heart-of-the-beast`,
+      mainEntityOfPage: `${SITE_URL}/good-dog-bad-dog/odin`,
     },
     {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
         { "@type": "ListItem", position: 2, name: "Good Dog, Bad Dog", item: `${SITE_URL}/good-dog-bad-dog` },
-        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/good-dog-bad-dog/heart-of-the-beast` },
+        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/good-dog-bad-dog/odin` },
       ],
     },
   ],
@@ -151,7 +166,7 @@ export default function HeartOfTheBeastPage() {
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>
-              <span className={styles.essayHeroTitleWhite}>Heart of the Beast:</span> Why a Dog Will Not Leave You
+              <span className={styles.essayHeroTitleWhite}>Odin:</span> Why a Dog Will Not Leave You
             </h1>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Good dog</span>
@@ -180,6 +195,29 @@ export default function HeartOfTheBeastPage() {
                    belongs to. Fragments, not wrappers: the essay styles its first
                    paragraph by `p:first-child` and spaces the column by direct
                    children, so a wrapper div breaks both. */
+                /* The film card sits at the top, under the introduction, rather
+                   than in the sidebar (owner, 23 September 2026): the reader wants
+                   the release details before the argument starts. */
+                if (typeof b === "string" && b.startsWith("Whether it means to or not")) {
+                  return (
+                    <React.Fragment key={i}>
+                      {block}
+                  <div className={styles.sidebarCard}>
+                    <div style={{ padding: "18px 20px" }}>
+                      <p style={cardTitle}>The film</p>
+                      <p style={cardBody}>
+                        <strong>Heart of the Beast</strong>, Paramount, released 25 September 2026. Directed by David
+                        Ayer, written by Cameron Alexander. Brad Pitt plays James Belmont; Odin is played by a German
+                        Shepherd called Uber, with other dogs from the same family covering parts of the role.
+                      </p>
+                      <p style={cardBodyLast}>
+                        Rated PG-13 in the United States for violence, peril and injury images. Running time 101 minutes.
+                      </p>
+                    </div>
+                  </div>
+                    </React.Fragment>
+                  );
+                }
                 if (typeof b !== "string" && "h" in b && b.h === "The dogs who would not leave") {
                   return (
                     <React.Fragment key={i}>
@@ -210,19 +248,6 @@ export default function HeartOfTheBeastPage() {
           </article>
 
           <aside className={styles.sidebar}>
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "18px 20px" }}>
-                <p style={cardTitle}>The film</p>
-                <p style={cardBody}>
-                  <strong>Heart of the Beast</strong>, Paramount, released 25 September 2026. Directed by David
-                  Ayer, written by Cameron Alexander. Brad Pitt plays James Belmont; Odin is played by a German
-                  Shepherd called Uber, with other dogs from the same family covering parts of the role.
-                </p>
-                <p style={cardBodyLast}>
-                  Rated PG-13 in the United States for violence, peril and injury images. Running time 101 minutes.
-                </p>
-              </div>
-            </div>
 
             <div className={styles.sidebarCard}>
               <div style={{ padding: "18px 20px" }}>
@@ -231,7 +256,8 @@ export default function HeartOfTheBeastPage() {
                   Nagasawa et al., Science (2015), on the oxytocin-gaze loop and the wolf control group. Wilson et
                   al., PLOS ONE (2022), Queen&apos;s University Belfast, on the detection of stress odour. Topal et
                   al., Journal of Comparative Psychology (1998), on attachment. PDSA Dickin Medal citations for
-                  Rip, Sheila and Judy. Film details from reviews published 22 and 23 September 2026.
+                  Rip, Sheila and Judy. Film details and cast interviews from Variety, Collider, Entertainment Weekly and
+          People, published between August and 23 September 2026.
                 </p>
               </div>
             </div>

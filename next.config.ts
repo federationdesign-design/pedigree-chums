@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/pack-pit", destination: "/", permanent: true },
+      /* Renamed after the dog rather than the film, 23 September 2026. The old
+         route was live for a few hours, so the redirect is permanent. */
+      { source: "/good-dog-bad-dog/heart-of-the-beast", destination: "/good-dog-bad-dog/odin", permanent: true },
       /* ONE SITE, ONE ADDRESS.
 
          Vercel gives every project a permanent .vercel.app hostname. It is not
