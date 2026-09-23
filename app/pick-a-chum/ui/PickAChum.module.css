@@ -2308,3 +2308,18 @@
     margin-top: 10px;
   }
 }
+
+/* Task: the dog speaks first, and on a phone its opening bubble was landing
+   behind the medallion and the three mini portraits beside it (owner,
+   23 September 2026). The visitor's own messages are never affected, as they sit
+   hard right, which is why this only shows on the dog's side.
+
+   The first row in the thread takes 20px of clearance. Only the first: every
+   later message has scrolled clear of the medallion by then, and the gap between
+   rows is unchanged. */
+@media (max-width: 768px) {
+  .threadInner > .msgRow:first-child {
+    margin-top: 20px;
+  }
+}
+
