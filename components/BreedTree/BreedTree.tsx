@@ -1145,6 +1145,18 @@ const MAX_COPIES_PER_BREED = 20;
    A chip reading 100% says the child is the whole of its parent, which the circle
    already shows by filling it, so it is the one figure that can never be news. */
 const isFullShare = (pct: number) => Math.round(pct) >= 100;
+/* THE VERY COMMON TOKEN'S OWN COLOURS, 23 September 2026 (owner): fill, ring and
+   figure all #ffed00, replacing the band's #ffd23e disc with its navy ring and
+   figure.
+
+   STATED PLAINLY BECAUSE IT IS UNUSUAL: with all three the same hex the ring
+   cannot be seen against the disc and the percentage cannot be read at all, at
+   1.00:1. It is the owner's instruction, given as three separate lines, and it is
+   recorded here so nobody "fixes" it back without asking him.
+
+   PIT TOKENS ONLY. RARITY_BAND.veryCommon is untouched, so the lifted card's
+   band, the rarity ring, the twins and every other reader keep #ffd23e. */
+const VERY_COMMON_TOKEN = "#ffed00";
 
 const DOG_FILL_FADE_MS = 150;
 /* HOW MUCH SMALLER A SCATTERED CHIP LANDS than it looked on the lift, 23
@@ -2362,7 +2374,15 @@ const PIT_DRAWS_WORDS = true;
    old flat 12, wherever it used the bomb's own radius. See BOMB_BLAST_R_PX.
 
    EXPECT THE PIT TO FILL FASTER: chips are two to three times the old width. */
-const chipRadiusPx = (share: number, mobile: boolean) => liftNodeScreenR(share, mobile);
+/* 20% SMALLER, 23 September 2026 (owner: make the tokens 20% smaller when
+   falling into the pit). Applied HERE, the one function every chip radius comes
+   through, so the scatter, the two pop paths and the round's own badges all
+   shrink together and no path can be missed. The scatter's own SCATTER_CHIP_K
+   still applies on top of it, so a scattered chip is 0.85 of 0.8.
+   THE BOMB BLAST DOES NOT MOVE: it reads BOMB_BLAST_R_PX, a fixed figure, for
+   exactly this reason. */
+const CHIP_SIZE_K = 0.8;
+const chipRadiusPx = (share: number, mobile: boolean) => liftNodeScreenR(share, mobile) * CHIP_SIZE_K;
 /* THE RADIUS A BOMB'S EXPLOSION IS BUILT FROM, fixed at the old chip size so a bigger
    bomb looks bigger but blasts exactly as it did (owner, 21 September 2026). */
 const BOMB_BLAST_R_PX = 12;
@@ -6757,15 +6777,27 @@ export default function BreedTree({
           c.style.transition = `fill ${DOG_FILL_FADE_MS}ms ease, stroke ${DOG_FILL_FADE_MS}ms ease`;
           // A held circle's rim IS the chain's line, one stroke of the same lemon.
           // It was navy (DOG_CHAIN_INK) under a second lemon ring; both are gone.
-          /* AN AVAILABLE TWIN KEEPS THE RIM IT ALREADY HAD, 23 September 2026
-             (owner: chaining a common dog should not turn its twins' rims black).
-             The empty string clears the inline colour, so the ring falls back to
-             strokeColorFor's depth palette, the yellow it wore before the lift.
-             It was band.fg, which is black on the three light tiers.
-             A twin is still told apart from a held circle by its rim WEIGHT,
-             DOG_CHAIN_TWIN_STROKE_K, which is twice its own, and by the held
-             circle's lemon. */
-          c.style.stroke = chHeld ? DOG_CHAIN_COLOUR : band ? "" : chSingle ? DOG_SINGLE_INK : "";
+          /* EVERY CIRCLE THE CHAIN TOUCHES RINGS WHITE, 23 September 2026 (owner:
+             all circle outlines, chained or chainable, take a white stroke).
+
+             It replaces two different answers: a held circle wore DOG_CHAIN_COLOUR,
+             the chain's own lemon, and an available twin wore whatever the depth
+             palette had given it, which was the rule set earlier the same day when
+             the band's black ink was taken off the twins.
+
+             ONE OF THE THREE SIGNALS GOES WITH IT. Held and available now share a
+             fill and a rim colour; the rim WEIGHT still separates them,
+             DOG_CHAIN_TWIN_STROKE_K on a twin against HELD_RIM_K on a held one,
+             and so does the chain path running through the held circle.
+
+             WHITE MEASURES WELL ON ALL FIVE TIERS as a rim: it is a stroke on a
+             coloured disc, not text, so the 3:1 line applies and purple, royal
+             blue, green, orange and yellow all clear it against white.
+
+             THE HELD RIM IS NO LONGER THE CHAIN'S LINE, which was the reason it
+             was lemon. The path still draws in DOG_CHAIN_COLOUR underneath; the
+             circle's rim simply no longer continues it. */
+          c.style.stroke = (chHeld || band) ? "#ffffff" : chSingle ? DOG_SINGLE_INK : "";
           /* A HELD CIRCLE TAKES ITS RARITY COLOUR, 19 September 2026 (owner),
              replacing DOG_CHAIN_FILL, the sky blue #5cc4ee it wore since the
              chain shipped. The owner wants the circle to keep saying what the
@@ -14151,7 +14183,7 @@ export default function BreedTree({
                      view's colours, inverted on each): an ink disc with an ink ring and a
                      figure in the page colour; a spent badge the reverse, so it still reads
                      as a dead token. Outside a view, the colours below as before. */
-                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? chipBand.bg : CHIP_FILL, stroke: sInk ?? (chipBand && !inert && !item.label ? "#ffffff" : "#0a3a57"), /* WHITE RING ON A RARITY TOKEN, 21 September 2026 (owner: the figure on a rarity-coloured token is white, and its ring should be too). A yellow token, a spent one and a name disc keep navy. THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN : chipBand.bg) : CHIP_FILL, stroke: sInk ?? (chipBand === RARITY_BAND.veryCommon && !inert && !item.label ? VERY_COMMON_TOKEN : chipBand && !inert && !item.label ? "#ffffff" : "#0a3a57"), /* WHITE RING ON A RARITY TOKEN, 21 September 2026 (owner: the figure on a rarity-coloured token is white, and its ring should be too). A yellow token, a spent one and a name disc keep navy. THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
                      (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
                      0.09, the weight a first-generation circle wears on the lifted
                      screen, read from the shared RING_FRAC table rather than typed
@@ -14179,7 +14211,7 @@ export default function BreedTree({
                     );
                   })()
                 ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? (chipBand === RARITY_BAND.common || chipBand === RARITY_BAND.uncommon ? "#ffffff" /* white on the orange and green tokens too, 21 Sept 2026 (owner), to match their white ring; the band labels elsewhere keep RARITY_BAND's black */ : chipBand.fg) : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN : chipBand === RARITY_BAND.common || chipBand === RARITY_BAND.uncommon ? "#ffffff" /* white on the orange and green tokens too, 21 Sept 2026 (owner), to match their white ring; the band labels elsewhere keep RARITY_BAND's black */ : chipBand.fg) : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
                     {`${item.pct}%`}
                   </text>
                 ))}
