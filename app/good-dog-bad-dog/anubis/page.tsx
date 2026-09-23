@@ -6,6 +6,7 @@ import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
 import EchoTrail from "../../../components/EchoTrail/EchoTrail";
+import XolotlPanel from "../../../components/XolotlPanel/XolotlPanel";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 
 export const metadata: Metadata = {
@@ -261,6 +262,8 @@ export default function AnubisPage() {
                   return (
                     <div key={i}>
                       <EchoTrail />
+                      {/* Xolotl stands apart, which is the argument (23 Sept 2026). */}
+                      <XolotlPanel />
                       {block}
                     </div>
                   );

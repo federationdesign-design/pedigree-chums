@@ -1,8 +1,7 @@
-/* The Anubis essay's interactive map, in the era pages' panel style (owner,
-   23 September 2026): the same light blue gradient, radius and shadow the maps on
-   /britains-dog-history use. It earns its keep here as well as there, because the
-   panel blue reads as the sea and the land can then be the same green those maps
-   use, with no extra colour introduced. */
+/* Xolotl's own panel, split out of the trail map on 23 September 2026 (owner).
+   Same panel style as the trail and the era-page maps, so the two read as a pair;
+   only the map scale differs, this one being central Mexico rather than half the
+   world. */
 
 .panel {
   margin: 44px 0;
@@ -52,17 +51,23 @@
 .land {
   fill: var(--cta, #4cb847);
   stroke: rgba(255, 255, 255, 0.5);
-  stroke-width: 0.4;
+  stroke-width: 0.12;
+  transition: fill 600ms ease;
+}
+/* After 1521 the land goes grey-green: the gods are outlawed and the dog is on
+   its own. */
+.landAfter {
+  fill: #6f8a63;
 }
 
 /* Dashes, never a solid line: a continuous arrow would claim a lineage the
    essay denies. */
-.hop {
-  stroke: var(--white, #ffffff);
-  stroke-width: 1.4;
-  stroke-dasharray: 5 6;
+/* The Spanish arrival: a solid line in off the Gulf, the one route in this essay
+   that really was taken. */
+.invasion {
+  stroke: #ff1313;
+  stroke-width: 0.5;
   stroke-linecap: round;
-  opacity: 0.75;
 }
 
 .spot {
@@ -130,7 +135,8 @@
    so it no longer has to fight five others for legibility. */
 .label {
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 9px;
+  /* The view is 40 units wide, not 320, so the type is sized to match. */
+  font-size: 1.5px;
   font-weight: 800;
   fill: var(--white, #ffffff);
   pointer-events: none;
@@ -269,12 +275,15 @@
   stroke: #000000;
   stroke-width: 0.8;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .hop {
+:root[data-pc-contrast-scheme="black-on-white"] .hop,
+:root[data-pc-contrast-scheme="black-on-white"] .dot,
+:root[data-pc-contrast-scheme="black-on-white"] .dotOn {
   stroke: #000000;
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="black-on-white"] .hop {
   fill: none;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .dot,
-:root[data-pc-contrast-scheme="black-on-white"] .dotOn,
 :root[data-pc-contrast-scheme="black-on-white"] .label {
   fill: #000000;
 }
@@ -286,16 +295,18 @@
   stroke: #ffffff;
   stroke-width: 0.8;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .hop {
+:root[data-pc-contrast-scheme="white-on-black"] .hop,
+:root[data-pc-contrast-scheme="white-on-black"] .dot,
+:root[data-pc-contrast-scheme="white-on-black"] .dotOn {
   stroke: #ffffff;
+  fill: #ffffff;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .hop {
   fill: none;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .dot,
-:root[data-pc-contrast-scheme="white-on-black"] .dotOn,
 :root[data-pc-contrast-scheme="white-on-black"] .label {
   fill: #ffffff;
 }
 :root[data-pc-contrast-scheme="white-on-black"] .slider {
   accent-color: #ffffff;
 }
-
