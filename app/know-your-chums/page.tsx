@@ -40,7 +40,11 @@ const heroTriangles: Tri[] = [
 export default function KnowYourChums() {
   return (
     <>
-      <Nav />
+      {/* showLogoMobile: the logo from load on phones, matching
+          /britains-dog-history, because the hero now fills the screen and the
+          scroll gate never fires before the reader has read it (owner, 23 Sept
+          2026). Desktop keeps the scroll gate. */}
+      <Nav showLogoMobile />
       <main className={styles.page}>
         {/* Hero banner, matching the other pages */}
         <section className={styles.hero} aria-label="Know your chums">

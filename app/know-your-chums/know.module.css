@@ -1149,6 +1149,15 @@
 }
 
 @media (max-width: 768px) {
+  /* FULL SCREEN, like the history page's hero (owner, 23 September 2026). That
+     page gives its intro slide 100dvh, so the title, buttons and roller have the
+     whole viewport to sit in; this hero was a fraction of it and the same
+     furniture would not fit. dvh, not vh, so the phone's address bar cannot
+     leave a strip of the section below showing. */
+  .hero {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
   .mHero {
     position: absolute;
     inset: 0;

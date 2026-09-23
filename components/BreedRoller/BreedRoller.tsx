@@ -97,9 +97,30 @@ const DOGS: Row[] = [...LEVEL_ROWS, ...PACK_ROWS].sort((a, b) => a.name.localeCo
 /* CHUMS MODE, 23 September 2026 (owner): the same roller on Know your chums,
    listing the 54 pack dogs only and going to their chum pages rather than into a
    level. Same A to Z rule. */
+/* POPULARITY ORDER, not A to Z (owner, 23 September 2026): the dogs a reader is
+   most likely to be looking for sit at the top, in the order given, and the rest
+   of the pack follows in catalogue order. */
+const POPULAR = [
+  "Labrador",
+  "French Bulldog",
+  "Cockapoo",
+  "Jack Russell Terrier",
+  "Staffordshire Bull Terrier",
+  "Cocker Spaniel",
+  "Bulldog",
+  "Dachshund",
+  "Chihuahua",
+  "Boxer",
+  "Golden Retriever",
+  "Border Collie",
+];
+const popRank = (name: string) => {
+  const i = POPULAR.indexOf(name);
+  return i === -1 ? POPULAR.length : i;
+};
 const CHUMS: Row[] = breeds
   .map((p) => ({ name: p.name, era: packEra(p.name, p.established), href: `/chums/${p.slug}` }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+  .sort((a, b) => popRank(a.name) - popRank(b.name));
 
 /* mode "history" (the default) lists every timeline level and every pack chum and
    goes into the game; mode "chums" lists the 54 pack dogs and goes to their chum
@@ -108,7 +129,7 @@ type Props = { mode?: "history" | "chums" };
 
 export default function BreedRoller({ mode = "history" }: Props) {
   const rows = mode === "chums" ? CHUMS : DOGS;
-  const label = mode === "chums" ? "Britain\u2019s chums a-z" : "Britain\u2019s dogs a-z";
+  const label = mode === "chums" ? "Learn about" : "Britain\u2019s dogs a-z";
   const listRef = useRef<HTMLUListElement | null>(null);
   const [centre, setCentre] = useState(0);
 
