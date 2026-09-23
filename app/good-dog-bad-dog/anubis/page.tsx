@@ -252,10 +252,18 @@ export default function AnubisPage() {
                    it: the reader has met the idea and is ready to see how far it
                    travels (Anubis_article_updates.docx, sections 5 and 7). */
                 /* Two sidebar cards moved into the reading column on 23 September
-                   2026 (owner), each landing on the paragraph it answers. */
+                   2026 (owner), each landing on the paragraph it answers.
+
+                   FRAGMENTS, NOT DIVS. The essay styles paragraphs with
+                   `.essayBody p:first-child`, which means first child of ITS OWN
+                   parent, and spaces the column with `.essayBody > * + *`. A
+                   wrapper div made every wrapped paragraph the first child of that
+                   div, so it took the big intro size, and it took the block out of
+                   the rhythm rule, so the card sat hard against the text above.
+                   A fragment keeps both as direct children of .essayBody. */
                 if (b === "The jackal did not change. The story did.") {
                   return (
-                    <div key={i}>
+                    <React.Fragment key={i}>
                       {block}
           {/* Taxonomy */}
           <div className={styles.sidebarCard}>
@@ -274,12 +282,12 @@ export default function AnubisPage() {
               <p style={cardBodyLast}>His black coat is symbolic, not literal: the black of decay and, at once, the black of the life-giving Nile silt.</p>
             </div>
           </div>
-                    </div>
+                    </React.Fragment>
                   );
                 }
                 if (typeof b === "string" && b.startsWith("Perhaps humans did not invent the divine dog")) {
                   return (
-                    <div key={i}>
+                    <React.Fragment key={i}>
                       {block}
           {/* Jackal, and other insults */}
           <div className={styles.sidebarCard}>
@@ -289,12 +297,12 @@ export default function AnubisPage() {
               <p style={cardBodyLast}>It has company: <strong>cur</strong>, <strong>mongrel</strong>, <strong>hangdog</strong>, &quot;gone to the dogs,&quot; &quot;in the doghouse.&quot; The animal we call loyal is also the animal we reach for when we want to name a coward.</p>
             </div>
           </div>
-                    </div>
+                    </React.Fragment>
                   );
                 }
                 if (typeof b !== "string" && "h" in b && b.h === "The provider becomes the sacrifice") {
                   return (
-                    <div key={i}>
+                    <React.Fragment key={i}>
                       <EchoTrail />
                       {/* One panel per god, in the trail's own order, starting with
                           Anubis (owner, 23 Sept 2026). The rest follow in later
@@ -303,7 +311,7 @@ export default function AnubisPage() {
                       {/* Xolotl stands apart, which is the argument. */}
                       <XolotlPanel />
                       {block}
-                    </div>
+                    </React.Fragment>
                   );
                 }
                 return block;
