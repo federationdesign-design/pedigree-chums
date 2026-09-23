@@ -274,7 +274,9 @@
 }
 .panel .cardBody {
   margin: 0 0 8px;
-  font-size: calc(0.92rem - 2pt);
+  /* Two points up (owner, 23 Sept 2026): it had gone a size too far. The small
+     print under the rule stays where it is. */
+  font-size: 0.92rem;
   font-weight: 500;
   line-height: 1.55;
 }
