@@ -1132,6 +1132,11 @@ const DOG_SINGLE_INK = "#ffffff";
    instant flip on a circle the player never touched reads as a glitch; 150ms
    reads as a response. It softens the paint, never the timing of the answer. */
 const DOG_FILL_FADE_MS = 150;
+/* HOW MUCH SMALLER A SCATTERED CHIP LANDS than it looked on the lift, 23
+   September 2026 (owner: 15% smaller). One constant rather than an inline 0.85
+   at the call site, because the scatter is the only path that sizes a chip off
+   its own on-layer radius and the next person will want to find the figure. */
+const SCATTER_CHIP_K = 0.85;
 /* DOG_CHAIN_FILL, the sky blue #5cc4ee a held circle wore from 18 September
    2026, WAS REMOVED ON 19 September 2026 (owner). A held circle now takes its
    own RARITY_BAND colour, the same entry an available twin draws: see the fill
@@ -6704,7 +6709,15 @@ export default function BreedTree({
           c.style.transition = `fill ${DOG_FILL_FADE_MS}ms ease, stroke ${DOG_FILL_FADE_MS}ms ease`;
           // A held circle's rim IS the chain's line, one stroke of the same lemon.
           // It was navy (DOG_CHAIN_INK) under a second lemon ring; both are gone.
-          c.style.stroke = chHeld ? DOG_CHAIN_COLOUR : band ? band.fg : chSingle ? DOG_SINGLE_INK : "";
+          /* AN AVAILABLE TWIN KEEPS THE RIM IT ALREADY HAD, 23 September 2026
+             (owner: chaining a common dog should not turn its twins' rims black).
+             The empty string clears the inline colour, so the ring falls back to
+             strokeColorFor's depth palette, the yellow it wore before the lift.
+             It was band.fg, which is black on the three light tiers.
+             A twin is still told apart from a held circle by its rim WEIGHT,
+             DOG_CHAIN_TWIN_STROKE_K, which is twice its own, and by the held
+             circle's lemon. */
+          c.style.stroke = chHeld ? DOG_CHAIN_COLOUR : band ? "" : chSingle ? DOG_SINGLE_INK : "";
           /* A HELD CIRCLE TAKES ITS RARITY COLOUR, 19 September 2026 (owner),
              replacing DOG_CHAIN_FILL, the sky blue #5cc4ee it wore since the
              chain shipped. The owner wants the circle to keep saying what the
@@ -6884,7 +6897,13 @@ export default function BreedTree({
              now reads the band exactly as a twin does and the two branches have
              collapsed into one. "ink" is left to chSingle's opposite number and
              to nothing else here. */
-          const ink = chainBand ? (chainBand.fg === "#ffffff" ? "hi" : "black") : chSingle ? "hi" : `${(d.depth - 1 + 4) % 4}`;
+          /* NAVY, NOT BLACK, ON A LIGHT DISC, 23 September 2026 (owner). The
+             face took bt-qmark-black on the three light tiers; it now takes
+             bt-qmark-ink, the #0a3a57 navy, which is the site's own dark and
+             still measures 6.03 on the orange and better on the other two. The
+             black filter is left defined: nothing else uses it today, but
+             removing it would take a def other states may want back. */
+          const ink = chainBand ? (chainBand.fg === "#ffffff" ? "hi" : "ink") : chSingle ? "hi" : `${(d.depth - 1 + 4) % 4}`;
           if (q.dataset.hi !== ink) {
             q.dataset.hi = ink;
             qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
@@ -16019,7 +16038,11 @@ export default function BreedTree({
                  colour says which dog you completed, so every chip in the scatter
                  takes the lifted dog's tier and the payout reads as one event.
                  The share on the face is still the card's own. */
-              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green, name: learnNode?.data.name });
+              /* 15% SMALLER, 23 September 2026 (owner). The chips a closing lift
+                 tips into the pit came down at the radius the node had on the
+                 layer; they now come down at 0.85 of it. Applied to opts.r, which
+                 is the only sizing this path uses, so nothing else moves. */
+              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r * SCATTER_CHIP_K, green: c.green, name: learnNode?.data.name });
             }
             /* THE SOLO DOG'S OWN CIRCLE (owner, 18 September 2026). A leaf has no
                nodes to scatter, so the layer sends its ONE full-size circle as
