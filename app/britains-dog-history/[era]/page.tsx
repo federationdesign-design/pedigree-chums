@@ -17,7 +17,7 @@ import BreedExplosion from "../../../components/BreedExplosion/BreedExplosion";
 import PetPanic from "../../../components/PetPanic/PetPanic";
 import DickinMap from "../../../components/DickinMap/DickinMap";
 import DogTimeline from "../../../components/DogTimeline/DogTimeline";
-import AncientFacts, { SAXON_FACTS, MEDIEVAL_FACTS, TUDOR_FACTS, EIGHTEENTH_FACTS, NINETEENTH_FACTS, TWENTIETH_FACTS } from "../../../components/AncientFacts/AncientFacts";
+import AncientFacts, { ANCIENT_FACTS, SAXON_FACTS, MEDIEVAL_FACTS, TUDOR_FACTS, EIGHTEENTH_FACTS, NINETEENTH_FACTS, TWENTIETH_FACTS } from "../../../components/AncientFacts/AncientFacts";
 import PedigreeBoom from "../../../components/PedigreeBoom/PedigreeBoom";
 import HistorySection from "../../../components/HistorySection/HistorySection";
 import { ERA_INTRO } from "../../../data/eraIntros";
@@ -28,6 +28,8 @@ import hist from "../history.module.css";
 import PopHeading from "../../../components/PopHeading/PopHeading";
 import WhoOwnsBritain from "../../../components/WhoOwnsBritain/WhoOwnsBritain";
 import DrawnBritain from "../../../components/DrawnBritain/DrawnBritain";
+import EraSeo from "../../../components/EraSeo/EraSeo";
+import EraSummary from "../../../components/EraSeo/EraSummary";
 
 /* The write-up panel for a strip: the same section that sits above this strip on
    the history page, matched by era. "Dogs in the armed forces" shares era c1500
@@ -99,6 +101,19 @@ export default async function EraPage({ params }: Props) {
   /* The next era in ERA_PAGES order, for the second button and the swipe. On the
      last era, Today's Crossbreeds, there is nowhere further to go in the timeline,
      so the button reads CHUMS and leads to Know your chums (owner, 22 Sept 2026). */
+  /* The boxes this page shows, reused as its FAQ structured data (23 Sept 2026).
+     One list, so the schema can never drift from what is on screen. */
+  const FACTS_BY_SLUG: Record<string, typeof MEDIEVAL_FACTS> = {
+    ancient: ANCIENT_FACTS,
+    saxons: SAXON_FACTS,
+    medieval: MEDIEVAL_FACTS,
+    tudor: TUDOR_FACTS,
+    "1700s": EIGHTEENTH_FACTS,
+    "1800s": NINETEENTH_FACTS,
+    "1900s": TWENTIETH_FACTS,
+  };
+  const facts = FACTS_BY_SLUG[page.slug];
+
   const eraIndex = ERA_PAGES.findIndex((p) => p.slug === era);
   const nextEra = ERA_PAGES[eraIndex + 1] ?? null;
   const prevEra = eraIndex > 0 ? ERA_PAGES[eraIndex - 1] : null;
@@ -145,6 +160,19 @@ export default async function EraPage({ params }: Props) {
         backLabel="Back"
         nextHref={nextEra ? `/britains-dog-history/${nextEra.slug}` : "/know-your-chums"}
         nextLabel={nextEra ? "Next era" : "Chums"}
+      />
+
+      {/* Search metadata that has to sit in the markup rather than in
+          generateMetadata: Article, breadcrumbs, and the FAQ built from this
+          page's own Did you know boxes (23 Sept 2026). */}
+      <EraSeo
+        url={`/britains-dog-history/${page.slug}`}
+        headline={page.seoTitle || page.title}
+        description={page.seoDescription || page.title}
+        eraTitle={page.title}
+        published={page.published}
+        modified={page.modified}
+        facts={facts}
       />
 
       {/* Ancient page only: map and timeline side by side on desktop, stacked
@@ -297,6 +325,10 @@ export default async function EraPage({ params }: Props) {
           <HistorySection section={movedSection} />
         </div>
       )}
+
+      {/* Plain prose for readers and crawlers, with every breed it names linked to
+          that dog's own page (23 Sept 2026). */}
+      {page.summary && <EraSummary text={page.summary} heading={page.title} />}
       </main>
       <Footer />
     </>

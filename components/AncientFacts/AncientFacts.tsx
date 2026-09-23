@@ -11,7 +11,9 @@ import styles from "./AncientFacts.module.css";
 
 export type Fact = { heading: string; paras: string[] };
 
-const FACTS: Fact[] = [
+/* Exported 23 Sept 2026 so the era page can also feed these to its FAQ
+   structured data. */
+export const ANCIENT_FACTS: Fact[] = [
   {
     heading: "Britain's earliest dogs had no breed standards or pedigrees.",
     paras: [
@@ -224,7 +226,7 @@ export const TWENTIETH_FACTS: Fact[] = [
 
 /* `facts` lets other era pages reuse the same heading, boxes and styling
    (22 Sept 2026); Ancient passes nothing and gets its own boxes as before. */
-export default function AncientFacts({ facts = FACTS }: { facts?: Fact[] }) {
+export default function AncientFacts({ facts = ANCIENT_FACTS }: { facts?: Fact[] }) {
   return (
     <>
       {/* Section heading above the three boxes (owner request, 22 Sept 2026). */}

@@ -884,7 +884,9 @@ export default function BreedStrip({
                         {b.image ? (
                           <Image
                             src={b.image}
-                            alt={b.name}
+                            /* Descriptive alt, 23 Sept 2026: the name alone told
+                               image search nothing about what it was looking at. */
+                            alt={`${b.name}, an illustration of the British dog breed`}
                             width={160}
                             height={160}
                             unoptimized

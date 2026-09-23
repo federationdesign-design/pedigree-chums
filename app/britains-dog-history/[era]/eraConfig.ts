@@ -26,12 +26,24 @@ export type EraPage = {
   seoDescription: string;
   strips: string[]; // uk-breeds strip keys, in history-page order
   intro?: string; // optional lead paragraph under the h1 (added 22 Sept 2026)
+  /* PLAIN PROSE FOR READERS AND CRAWLERS, 23 September 2026. Everything else on
+     these pages is inside a map, a slider or a card, which a search engine reads
+     poorly and will not quote. This paragraph sits in ordinary markup at the foot
+     of the page and names breeds, which are linked to their own pages. */
+  summary?: string;
+  /* Dates for the Article structured data. */
+  published?: string;
+  modified?: string;
 };
 
 export const ERA_PAGES: EraPage[] = [
   {
     slug: "ancient",
     title: "Ancient Times",
+    summary:
+      "Britain's first dogs arrived on foot, across the land bridge that is now the North Sea. They were not breeds as we understand the word, but types shaped by work: coursing hounds that hunted by sight, scent hounds that followed a trail, and heavy dogs that guarded homes and livestock. Roman writers knew them well enough to export them. The Celtic Hound, the Ancient Mastiff and the Celtic Coursing Hound all belong to this period.",
+    published: "2026-09-20",
+    modified: "2026-09-23",
     seoTitle:
       "Ancient Dogs of Britain: Celtic Hounds, Doggerland and the First Dogs",
     seoDescription:
@@ -53,6 +65,10 @@ export const ERA_PAGES: EraPage[] = [
        Guthrum, Great Heathen Army). */
     slug: "saxons",
     title: "Saxons 'n' Normans",
+    summary:
+      "For six hundred years Britain changed hands, and its dogs changed with it. Saxon farms needed herding and guard dogs, Norse settlers brought their own working stock into the north and east, and Norman lords arrived with hunting hounds and the laws that reserved the deer for themselves. The Talbot, the Rache and the Scottish Deerhound are dogs of this period, as are the Drover's Dog and the Shepherd's Dogs behind Britain's later collies.",
+    published: "2026-09-23",
+    modified: "2026-09-23",
     seoTitle:
       "Saxon and Norman Dogs: Who Owned Britain from the Romans to 1066",
     seoDescription:
@@ -64,6 +80,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "medieval",
     title: "Medieval Times",
+    summary:
+      "After 1066 hunting became a royal privilege, and huge areas of England were declared royal forest. Dogs living near them could be lawed, meaning toes were removed so they could not chase deer. The same centuries produced some of Britain's most enduring working types: the Southern Hound, the Buckhound, the Land Spaniels and the early terriers that went to ground after vermin.",
+    published: "2026-09-20",
+    modified: "2026-09-23",
     seoTitle:
       "Medieval Dogs in Britain: Forest Laws, Royal Hunts and Hunting Hounds",
     seoDescription:
@@ -87,6 +107,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "tudor",
     title: "Tudor 'n' Stuart Times",
+    summary:
+      "In 1576 John Caius wrote the first book about English dogs, naming types by the job they did rather than the way they looked. Some, such as the Tumbler and the Leviner, have gone entirely. Others became breeds we would recognise now. This is also when the Lurcher first appears by name, and when Britain's roads and posts began knitting the country together.",
+    published: "2026-09-21",
+    modified: "2026-09-23",
     seoTitle:
       "Tudor and Stuart Dogs: Britain's First Book of Dogs, 1576",
     seoDescription:
@@ -103,6 +127,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "1700s",
     title: "The 1700s",
+    summary:
+      "Georgian Britain built ships, borrowed money on a scale no country had tried before, and traded across the world. Dogs travelled with all of it. Pugs had arrived with William of Orange in 1688, and the century that followed brought sporting dogs bred for the gun, the growth of organised hunting and the first stirrings of dogs kept purely for company.",
+    published: "2026-09-22",
+    modified: "2026-09-23",
     seoTitle:
       "Georgian Dogs and the 1700s: Trade, Empire and the Pug's Arrival",
     seoDescription:
@@ -119,6 +147,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "1800s",
     title: "The 1800s",
+    summary:
+      "London banned dog carts in 1839, and thousands of working dogs were destroyed because they had become worthless overnight. By the end of the century Britain had swung the other way entirely: the Kennel Club was founded in 1873, dog shows became a national pastime, and breeds were being defined, named and multiplied at a rate never seen before or since.",
+    published: "2026-09-22",
+    modified: "2026-09-23",
     seoTitle:
       "Victorian Dogs: The Dog Cart Ban, the Kennel Club and the Breed Explosion",
     seoDescription:
@@ -135,6 +167,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "1900s",
     title: "The 1900s",
+    summary:
+      "In the first week of September 1939 Britain destroyed around 400,000 pets, and 750,000 in total, on the strength of one government pamphlet. Four years later the same country created the Dickin Medal and gave it to dogs for bravery under fire. The century that nearly ended pet keeping in Britain ended with dogs firmly in the family.",
+    published: "2026-09-22",
+    modified: "2026-09-23",
     seoTitle:
       "Dogs in Wartime Britain: The 1939 Pet Massacre and the Dickin Medal",
     seoDescription:
@@ -151,6 +187,10 @@ export const ERA_PAGES: EraPage[] = [
   {
     slug: "crosses",
     title: "Today's Crossbreeds",
+    summary:
+      "The crossbreed is Britain's newest dog story. The cockapoo, the labradoodle and the cavapoo were made on purpose, for temperament and coat rather than for a breed standard, and they now outnumber many pedigree breeds in British homes. It is the oldest idea in dog breeding, bred for the job at hand, wearing a new name.",
+    published: "2026-09-23",
+    modified: "2026-09-23",
     seoTitle:
       "Crossbreed Dogs in Britain: Cockapoos, Labradoodles and Today's Pack",
     seoDescription:
