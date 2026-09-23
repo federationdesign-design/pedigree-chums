@@ -1131,6 +1131,12 @@ const DOG_SINGLE_INK = "#ffffff";
    circle changes as a consequence of a DIFFERENT circle being collected. An
    instant flip on a circle the player never touched reads as a glitch; 150ms
    reads as a response. It softens the paint, never the timing of the answer. */
+/* HOW MANY CIRCLES ONE BREED MAY HAVE IN A PIT, 23 September 2026 (owner).
+   Counted across the whole tree, not per level, and applied in the node pass
+   below. See the note there for why the cap is at draw time rather than in the
+   lineage data. */
+const MAX_COPIES_PER_BREED = 20;
+
 const DOG_FILL_FADE_MS = 150;
 /* HOW MUCH SMALLER A SCATTERED CHIP LANDS than it looked on the lift, 23
    September 2026 (owner: 15% smaller). One constant rather than an inline 0.85
@@ -3238,8 +3244,36 @@ export default function BreedTree({
        SOLO_CHILD_K. These two changes only make sense together, and shipping this
        one alone leaves 68 ancestors drawn as an 8px hairline round a circle that
        fills them, which is worse than deleting them. */
-    const collapse = (n: LineageNode): LineageNode => ({ ...n, children: (n.children ?? []).map(collapse) });
-    const collapsed: LineageNode = { ...root, children: (root.children ?? []).map(collapse) };
+    /* TWENTY COPIES OF A BREED, AND NO MORE, 23 September 2026 (owner: if more
+       than 20 instances of the same dog circle appear in the pit, the 21st does
+       not drop).
+
+       CAPPED AT DRAW TIME, which is what was chosen over trimming the lineage
+       data. The data still says what it says, so the learn layer, the share
+       percentages and ancestorShareOf are all untouched; this only decides how
+       many circles the pack is asked to lay out. A dog that genuinely descends
+       from an ancestor forty times over still reads as forty in the numbers, and
+       draws as twenty.
+
+       THE WHOLE SUBTREE GOES WITH THE 21st, not the node alone: a circle cannot
+       be removed and its children left parentless, and the copies past twenty are
+       overwhelmingly leaves anyway.
+
+       ORDER IS THE TREE'S OWN. The walk is depth-first in the order the children
+       are already in, so the twenty that survive are the first twenty the lineage
+       lists, not a random pick, and the same twenty every time the pit is built. */
+    const seenCount = new Map<string, number>();
+    const collapse = (n: LineageNode): LineageNode | null => {
+      const name = n.name;
+      const n2 = (seenCount.get(name) ?? 0) + 1;
+      seenCount.set(name, n2);
+      if (n2 > MAX_COPIES_PER_BREED) return null;
+      return { ...n, children: (n.children ?? []).map(collapse).filter((c): c is LineageNode => c !== null) };
+    };
+    const collapsed: LineageNode = {
+      ...root,
+      children: (root.children ?? []).map(collapse).filter((c): c is LineageNode => c !== null),
+    };
     const h = hierarchy<LineageNode>(collapsed)
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
