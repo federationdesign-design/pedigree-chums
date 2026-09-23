@@ -55,6 +55,27 @@
   color: var(--navy, #0a3a57);
 }
 
+/* ACCESSIBILITY SCHEMES, 23 September 2026 (owner). The sweep sets the input's
+   colour but a placeholder is painted by its own pseudo-element, which the sweep
+   cannot reach, so it stayed white and disappeared on the white scheme. The
+   border follows too, otherwise the field has no visible edge. */
+:root[data-pc-contrast-scheme="black-on-white"] :global(#pc-site) .searchInput::placeholder {
+  color: #000000 !important;
+}
+:root[data-pc-contrast-scheme="black-on-white"] :global(#pc-site) .searchInput:not(:focus) {
+  border-color: #000000 !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] :global(#pc-site) .searchInput::placeholder {
+  color: #ffffff !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] :global(#pc-site) .searchInput:not(:focus) {
+  border-color: #ffffff !important;
+}
+/* Focus still clears the placeholder, in both schemes. */
+:root[data-pc-contrast-scheme] :global(#pc-site) .searchInput:focus::placeholder {
+  color: transparent !important;
+}
+
 .searchGo {
   position: absolute;
   right: clamp(22px, 3vw, 44px);

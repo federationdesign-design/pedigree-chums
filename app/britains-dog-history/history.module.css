@@ -1084,7 +1084,8 @@
   padding: 0 10px;
   text-align: center;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.2rem, 3vw, 2rem);
+  /* Twice the size (owner, 23 Sept 2026). */
+  font-size: clamp(2.4rem, 6vw, 4rem);
   line-height: 1.05;
   letter-spacing: 0.02em;
 }
@@ -1095,9 +1096,10 @@
   color: #ffffff !important;
 }
 :root[data-pc-contrast-scheme="black-on-white"] :global(#pc-site) .flipFront {
-  box-shadow: inset 0 0 0 3px #000000;
+  /* 8px, up from 3: at 3 the frame was barely there (owner, 23 Sept 2026). */
+  box-shadow: inset 0 0 0 8px #000000 !important;
 }
 :root[data-pc-contrast-scheme="white-on-black"] :global(#pc-site) .flipFront {
-  box-shadow: inset 0 0 0 3px #ffffff;
+  box-shadow: inset 0 0 0 8px #ffffff !important;
 }
 
