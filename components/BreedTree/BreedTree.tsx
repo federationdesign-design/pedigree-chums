@@ -1136,6 +1136,15 @@ const DOG_SINGLE_INK = "#ffffff";
    below. See the note there for why the cap is at draw time rather than in the
    lineage data. */
 const MAX_COPIES_PER_BREED = 20;
+/* NO 100% TOKEN EVER REACHES THE PIT, 23 September 2026 (owner). The first pass
+   put this test inside spawnBadge, which covers the learn-layer scatter and
+   dogClose but NOT the two pop paths or the opening badge list: those three build
+   their Body and call setBadgePcts directly and never go near spawnBadge, which
+   is why 100% chips kept arriving. The test lives here now and all four call it.
+
+   A chip reading 100% says the child is the whole of its parent, which the circle
+   already shows by filling it, so it is the one figure that can never be news. */
+const isFullShare = (pct: number) => Math.round(pct) >= 100;
 
 const DOG_FILL_FADE_MS = 150;
 /* HOW MUCH SMALLER A SCATTERED CHIP LANDS than it looked on the lift, 23
@@ -4816,16 +4825,21 @@ export default function BreedTree({
        this filter and nothing else, because nothing else counts into the dog
        list any more. It is deliberately still depth 1 here. */
     const badgeNodes = badgeSourceNodes(nodes);
-    badgeSrcRef.current = badgeNodes.slice();
     // One layout read for the whole pass, not one per badge: chipRVb measures the
     // stage, and every chip is the same size anyway.
     const chipR = chipRVb();
-    setBadgePcts(
-      badgeNodes.map((n) => {
-        const pct = n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0;
-        return { pct, r: chipR, src: n };
-      }),
-    );
+    /* A 100% CHIP IS DROPPED HERE TOO, and the source list has to drop with it:
+       badgeSrcRef and badgePcts are read by index against each other, so filtering
+       one alone would slide every badge onto the wrong dog. Both are built from
+       the same filtered list below. */
+    const badgeRows = badgeNodes
+      .map((n) => ({
+        n,
+        pct: n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0,
+      }))
+      .filter((row) => !isFullShare(row.pct));
+    badgeSrcRef.current = badgeRows.map((row) => row.n);
+    setBadgePcts(badgeRows.map((row) => ({ pct: row.pct, r: chipR, src: row.n })));
     // k reads only viewRef.current[2], the view WIDTH, and the corrected seed above makes that width exact at
     // mount: clampRootView only shifts y, never the width, so the one number k depends on never needed the
     // measured stage (which is unavailable at the useRef initialiser). That seed is what sizes the first-load
@@ -7838,7 +7852,13 @@ export default function BreedTree({
          stage 2 cannot turn a nested circle into a falling dog. Today it
          returns the same circles d1 does, which is why this stage is
          invisible. See badgeSourceNodes. */
-      const badgeNodes = badgeSourceNodes(nodes);
+      /* AND THE ROUND'S OWN BADGE BODIES, 23 September 2026 (owner). This is the
+         fourth and last place a chip is born, and the one that fills the pit at
+         the start of a round. A 100% chip is left out here as well, and the
+         source list is filtered with it: badgeSrcRef and the body list are read
+         by index against each other, so filtering one alone would slide every
+         badge onto the wrong dog. */
+      const badgeNodes = badgeSourceNodes(nodes).filter((n) => !isFullShare(pctOf(n)));
       badgeSrcRef.current = badgeNodes.slice();
       const badges: Body[] = badgeNodes.map((n, i) => ({
         // bottom LEFT of the circle: the right side is where the level's own
@@ -8399,7 +8419,7 @@ export default function BreedTree({
           // would simply stop existing. It falls free and is NOT in any shared
           // group, so everything including its own dog can knock it about.
           const bl = badgeBodiesRef.current;
-          if (bl) {
+          if (bl && !isFullShare(pctOf(ch))) {
             const kidBomb = rollBomb();
             const kidR = chipRof(pctOf(ch));
             const kb: Body = {
@@ -8465,7 +8485,7 @@ export default function BreedTree({
           MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.8 / 60);
           newMbs.push(mb);
           const bl = badgeBodiesRef.current;
-          if (bl) {
+          if (bl && !isFullShare(pctOf(ch))) {
             // Opening a dog circle is the mini pit's commonest chip source, so
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
@@ -9359,7 +9379,7 @@ export default function BreedTree({
 
            A LABELLED CHIP IS EXEMPT: that is a solo dog circle carrying a breed
            name, not a percentage, and its pct is not drawn. */
-        if (!opts?.label && Math.round(pctVal) >= 100) return;
+        if (!opts?.label && isFullShare(pctVal)) return;
 
         // client px in, which is the physics space itself now
         const bl = badgeBodiesRef.current;
