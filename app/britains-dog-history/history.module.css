@@ -1065,18 +1065,21 @@
    scheme the picture goes entirely and the card carries the dog's NAME in
    Luckiest Guy instead, on the scheme's own background, with a stroke around
    every frame so the cards read as cards. The yellow corner flash goes too: with
-   no picture under it, it read as a gap in the top left. */
+   no picture under it, it read as a gap in the top left.
+
+   #pc-site is in every selector because the sweep's own rules carry an id, and a
+   class-only rule loses to them even with !important. */
 .schemeName {
   display: none;
 }
-:root[data-pc-contrast-scheme] .nodeThumb :global(img),
-:root[data-pc-contrast-scheme] .nodeThumb :global(svg) {
+:root[data-pc-contrast-scheme] :global(#pc-site) .nodeThumb :global(img),
+:root[data-pc-contrast-scheme] :global(#pc-site) .nodeThumb :global(svg) {
   display: none !important;
 }
-:root[data-pc-contrast-scheme] .deskWedge {
+:root[data-pc-contrast-scheme] :global(#pc-site) .deskWedge {
   display: none !important;
 }
-:root[data-pc-contrast-scheme] .schemeName {
+:root[data-pc-contrast-scheme] :global(#pc-site) .schemeName {
   display: block;
   padding: 0 10px;
   text-align: center;
@@ -1085,16 +1088,16 @@
   line-height: 1.05;
   letter-spacing: 0.02em;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .schemeName {
+:root[data-pc-contrast-scheme="black-on-white"] :global(#pc-site) .schemeName {
   color: #000000 !important;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .schemeName {
+:root[data-pc-contrast-scheme="white-on-black"] :global(#pc-site) .schemeName {
   color: #ffffff !important;
 }
-:root[data-pc-contrast-scheme="black-on-white"] .flipFront {
+:root[data-pc-contrast-scheme="black-on-white"] :global(#pc-site) .flipFront {
   box-shadow: inset 0 0 0 3px #000000;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .flipFront {
+:root[data-pc-contrast-scheme="white-on-black"] :global(#pc-site) .flipFront {
   box-shadow: inset 0 0 0 3px #ffffff;
 }
 

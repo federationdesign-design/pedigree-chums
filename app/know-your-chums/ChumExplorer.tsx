@@ -123,6 +123,10 @@ function ChumCard({ breed }: { breed: Breed }) {
           {/* The corner flash from Britain's dog history: the yellow wedge with
               the LEARN artwork over it. Always LEARN here, because every dog on
               this page has a chum page of its own to go to. */}
+          {/* Accessibility schemes only: the photograph is hidden and this name
+              shows in its place (owner, 23 Sept 2026). aria-hidden because the
+              link already announces the dog. */}
+          <span className={styles.schemeName} aria-hidden="true">{breed.name}</span>
           <span className={styles.chumWedge} aria-hidden="true" />
           <span className={styles.chumFlash} aria-hidden="true" />
           {status && (
