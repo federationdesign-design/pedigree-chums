@@ -33,7 +33,7 @@ const LEVEL_ROWS: Row[] = levelBreeds().map((b) => ({
      to the history page. /dog/<slug> opens the level with the per-level page's own
      furniture, the dog counter and the prev and next arrows, and closes to that
      dog's era page. Both exist and both work; this list links to the first. */
-  href: `/britains-dog-history/play/${levelSlug(b.name)}`,
+  href: `/britains-dog-history/learn/${levelSlug(b.name)}`,
 }));
 /* Pack chums show an era too (owner, 22 Sept 2026, "none of the 54 were created
    today"). Three steps, in order:

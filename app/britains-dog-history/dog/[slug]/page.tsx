@@ -5,6 +5,17 @@ import { ERA_PAGES } from "../../[era]/eraConfig";
 import { levelBreeds, levelBySlug, levelSlug } from "../../../../data/levels";
 import styles from "../../[era]/era.module.css";
 
+/* NOT A DESTINATION FOR THE A TO Z ROLLER, 24 September 2026 (owner, plainly:
+   "I never want to see that screen again"). If a reader arrives here from the
+   history page's roller, something has been repointed by mistake: that list goes
+   to /britains-dog-history/learn/<slug>, the learn area. This page is a SHARE
+   TARGET, reached from a pasted link, and it keeps its own furniture, the dog
+   counter, the prev and next arrows and the red close.
+
+   The three routes, so they are not swapped again:
+     /learn/<slug>  the learn area. The roller links here.
+     /play/<slug>   the tunnel and a running round.
+     /dog/<slug>    this page, for sharing a level. */
 /* ONE PAGE PER LEVEL, 20 September 2026 (owner: a URL to share for each level).
    /britains-dog-history/dog/turnspit-dog and so on, 98 of them.
 

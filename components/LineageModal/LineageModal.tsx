@@ -146,6 +146,16 @@ type Props = {
      coming that way did not realise there was a game here at all. The time tunnel
      still plays; only the start screen is skipped. */
   startInPlay?: boolean;
+  /* OPEN IN THE LEARN AREA, 24 September 2026 (owner). The A to Z roller on the
+     history page is meant to land the reader in learn: the chum rail, the blue
+     write-up and the play and close controls. It had no way to say so, which is
+     why it ended up pointing first at the round and then at the per-level page,
+     neither of which is the learn area.
+
+     IT REUSES resumeInLearn, the state the in-game learn button already sets, so
+     there is one path into learn and not two. Unlike that button this one costs
+     no life and restarts nothing: there is no round to leave. */
+  startInLearn?: boolean;
   onClose: () => void;
   nextLevelLabel?: string;
   /* The next era's name, set only when the level just won is the last of its
@@ -231,7 +241,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay, startInLearn = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -442,7 +452,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // which is what keeps this cheap: the pit is remounted from scratch rather
   // than frozen and revived mid-flight. The score carries, so the learn area
   // is really a restart screen wearing something more useful.
-  const [resumeInLearn, setResumeInLearn] = useState(false);
+  const [resumeInLearn, setResumeInLearn] = useState(!!startInLearn);
   const outOfLives = typeof lives === "number" && lives <= 0;
   // The ending overlay shows on a won or lost round, and on a spent run however
   // the last life went. See the note beside the overlay itself.

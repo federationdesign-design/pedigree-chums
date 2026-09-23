@@ -118,6 +118,7 @@ export default function BreedStrip({
   renderLevels,
   initialLevel,
   autoPlay,
+  autoLearn,
   closeHref,
   only,
   label,
@@ -135,6 +136,9 @@ export default function BreedStrip({
   /* With initialLevel, drop the reader into a playing pit instead of the start
      screen, tunnel and all (owner, 23 September 2026). The A to Z roller uses it. */
   autoPlay?: boolean;
+  /* With initialLevel, open the level in its LEARN area rather than its start
+     screen or a running round (owner, 24 September 2026). */
+  autoLearn?: boolean;
   /* WHERE CLOSING THE LEVEL GOES, and the signal that this is a per-level page
      showing the GAME ONLY (owner, 20 September 2026: no text underneath, no strip,
      close goes to that dog's era page). When set, nothing but the level is
@@ -802,6 +806,8 @@ export default function BreedStrip({
       quiet={active.quiet}
       navFading={navFading}
       startInPlay={!!autoPlay && active.name === initialLevel}
+      /* The learn deep link, 24 September 2026 (owner): the roller lands here. */
+      startInLearn={!!autoLearn && active.name === initialLevel}
       onClose={() => {
         // Walking out of a live round forfeits it, the same as losing it. The
         // modal does this for its own back-out controls; this is the last way
