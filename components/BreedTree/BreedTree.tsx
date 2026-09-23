@@ -804,11 +804,11 @@ const FACE_FILL_K = 2.2;
 /* How far the face sits off the circle centre, in SCREEN pixels, negative
    up (owner, 23 September 2026). Zero is dead centre. */
 const FACE_NUDGE_Y = -5;
-/* SUPERSEDED BY RARITY_FACE_SRC, 23 September 2026 (owner's five tier faces).
-   Kept, unused, because it is the fallback to bring back in one line if the art
-   has to be pulled: set the resting href to this and restore the depth filter.
-   The tapped face is a different file and is still in use. */
-// const QMARK_SRC = "/dogfacequestion.svg";
+/* IN USE AGAIN, 24 September 2026 (owner). It is no longer the resting face,
+   which is the tier art, but it is what a circle of ANOTHER breed wears while a
+   chain is live: the old navy disc and question mark, saying plainly that this
+   dog cannot join. See the chain branch in the face writer. */
+const QMARK_SRC = "/dogfacequestion.svg";
 /* FIVE FACES, ONE PER RARITY TIER, 23 September 2026 (owner's own artwork). They
    replace the question-mark face on a resting circle: a dog that says which tier
    it is, instead of one grey mark tinted by depth.
@@ -7002,10 +7002,17 @@ export default function BreedTree({
            this re-asserts itself on the frame a circle joins or leaves a chain,
            rather than losing to whichever ran last. A chained circle shows the
            tier's SECOND face, which has the darker disc drawn into it. */
-        const faceOnly = `${showQ ? 1 : 0}:${c?.dataset.chained ?? ""}`;
+        /* A CIRCLE WEARING THE QUESTION MARK KEEPS ITS DISC, 24 September 2026.
+           The hide below exists because the tier art carries its own disc; the
+           question mark does not, so a circle standing down during a chain would
+           otherwise be a mark floating on the background. The same test as the
+           face writer below, kept in step by the comment rather than shared,
+           since the two run in different passes over the same node. */
+        const standDown = !!dogChainBreedRef.current && d.data.name !== dogChainBreedRef.current;
+        const faceOnly = `${showQ && !standDown ? 1 : 0}:${c?.dataset.chained ?? ""}`;
         if (c && c.dataset.faceOnly !== faceOnly) {
           c.dataset.faceOnly = faceOnly;
-          if (showQ) {
+          if (showQ && !standDown) {
             c.style.fill = "transparent";
             c.style.stroke = "none";
           } else {
@@ -7132,15 +7139,27 @@ export default function BreedTree({
              Keep them apart: the key needs the tier so a face is redrawn if a
              breed's rarity changes, and the branch needs the bare state. */
           const chained = held || !!twinBand;
-          const tap = `${chained ? 1 : 0}:${faceTier}`;
+          /* THE OTHER DOGS STAND DOWN WHILE A CHAIN IS LIVE, 24 September 2026
+             (owner). A circle whose breed is not the chain's cannot join it, and
+             saying so is more useful than showing it its own tier face: it goes
+             back to the navy disc and the question mark, with its depth tint.
+
+             IT IS BREED, NOT RARITY. Two dogs can share a tier and still be
+             different dogs, and only the same dog can chain, which is exactly the
+             confusion this clears up.
+
+             NOTHING IS LOST when the chain ends: `want` is "0" again on the next
+             frame, so every circle takes its tier face back. */
+          const otherBreed = !!dogChainBreedRef.current && d.data.name !== dogChainBreedRef.current;
+          const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", chained ? RARITY_FACE_CHAINED_SRC[faceTier] : RARITY_FACE_SRC[faceTier]);
-            /* NO FILTER ON EITHER NOW. Both faces are the owner's own art and
-               already carry their tier colour; tinting would flatten them to one
-               hue. The bt-qmark filters are left defined, unused, so the old
-               question mark can be restored in one line if the art is pulled. */
-            qi.setAttribute("filter", "none");
+            qi.setAttribute("href", otherBreed ? QMARK_SRC : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : RARITY_FACE_SRC[faceTier]);
+            /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
+               filter would flatten it to one hue. The question mark still is,
+               because it is one flat file and its depth tint is what tells a
+               nested circle from its parent. */
+            qi.setAttribute("filter", otherBreed ? `url(#bt-qmark-${(d.depth - 1 + 4) % 4})` : "none");
           }
         }
       }
