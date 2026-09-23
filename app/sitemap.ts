@@ -54,6 +54,8 @@ const PAGES: [path: string, freq: "weekly" | "monthly" | "yearly", priority: num
   ["/good-dog-bad-dog", "monthly", 0.8],
   ["/good-dog-bad-dog/argos", "monthly", 0.7],
   ["/good-dog-bad-dog/anubis", "monthly", 0.7],
+  /* Added 23 September 2026 for the 25 September film release. */
+  ["/good-dog-bad-dog/heart-of-the-beast", "monthly", 0.7],
   ["/good-dog-bad-dog/bulls-eye", "monthly", 0.7],
   ["/good-dog-bad-dog/gelert", "monthly", 0.7],
   ["/good-dog-bad-dog/greyfriars-bobby", "monthly", 0.7],
