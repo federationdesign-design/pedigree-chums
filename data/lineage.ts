@@ -1829,6 +1829,18 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
   /* OLD BALKAN SPOTTED HOUNDS, 24 September 2026 (owner, Group 2). A leaf. Picture made for it. */
+  /* CORDED HERDING DOGS, 24 September 2026 (owner). The rope-coated herding dogs
+     of North Africa, said to have come into Iberia with the Moors in the 700s: the
+     generally accepted theory for the root of the Barbet and the European water
+     dogs. A LEAF. The Hungarian corded dogs (Komondor, Puli) came west by another
+     road, with the Cumans, and are cousins in coat rather than descendants. */
+  "Corded herding dogs": {
+    name: "Corded herding dogs",
+    note: "The corded North African herding dogs the Moors are said to have brought into Iberia in the 700s, the generally accepted root of the European water dogs. A theory rather than a record. Now extinct.",
+    img: "/history/breeds/corded-herding-dogs.jpg",
+    children: []
+  },
+
   "Old Balkan spotted hounds": {
     name: "Old Balkan spotted hounds",
     note: "Lean, patched hounds of the inland Balkans, said to lie behind the spotted dogs of Dalmatia. Now extinct.",
@@ -3292,13 +3304,17 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old European water dogs": {
     name: "Old European water dogs",
     note: "The pan-European water dog: England's Great Water Dog, Germany's Pudelhund, France's Barbet. Most likely an old shaggy herding stock that took to the water, though where it first came from is still argued over. Now extinct.",
-    /* ITS PARENTS, 24 September 2026 (owner, Group 2). Its own note already says
-       it: an old shaggy herding stock that took to the water. That stock is the
-       main line. The Portuguese fishing dogs take a QUARTER, speculative, because
-       which way the water dogs travelled is itself disputed. Reaches 15 chums. */
+    /* ITS PARENTS, 24 September 2026 (owner, Group 2, corrected the same day).
+       First written as Shaggy upland herders at 75, which was wrong twice over:
+       that record is the British upland collie stock, and 75 is far too much for
+       a theory. The source (the UK Barbet club) gives the generally accepted
+       theory as CORDED HERDING DOGS from North Africa, brought into Iberia by the
+       Moors in the 700s. A generally accepted theory counts as plausible, so HALF
+       under the split rule; the Portuguese fishing dogs take the other half.
+       Reaches 15 chums. */
     children: [
-      { name: "Shaggy upland herders", note: "The old shaggy herding stock its note says took to the water. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 75 },
-      { name: "Portuguese fishing dogs", note: "The fishing crews' water dogs of the Atlantic coast. Now extinct.", img: "/history/breeds/Portuguese-fishing-dogs.jpg", value: 25 }
+      { name: "Corded herding dogs", note: "The corded North African herding dogs the Moors are said to have brought into Iberia in the 700s, the generally accepted root of the European water dogs. A theory rather than a record. Now extinct.", img: "/history/breeds/corded-herding-dogs.jpg", value: 50 },
+      { name: "Portuguese fishing dogs", note: "The fishing crews' water dogs of the Atlantic coast. Now extinct.", img: "/history/breeds/Portuguese-fishing-dogs.jpg", value: 50 }
     ]
   },
   "Fishermen's water dogs": {
