@@ -7,10 +7,25 @@ import styles from "../../britains-dog-history/[era]/era.module.css";
 import PlayIntro from "./PlayIntro";
 
 /* THE CHUMS WITH AN INTRO CLIP, by slug, played full screen on a phone before the
-   game (owner, 24 September 2026). The Labrador only, as the trial. A chum not
-   listed here goes straight into its game, as before. */
+   game (owner, 24 September 2026). The Labrador was the trial; thirteen more
+   joined the same day. A chum not listed here goes straight into its game. The
+   file names are the owner's own, kept verbatim so a file and its line cannot
+   drift apart. */
 const INTRO_VIDEOS: Record<string, string> = {
+  "basset-hound": "/bassetcardjump_low-res.mp4",
+  beagle: "/beagle-cardjump_low-res.mp4",
+  "bichon-frise": "/bichon-cardjump_low-res.mp4",
+  "border-terrier": "/border-terrier-cardjump_low-res.mp4",
+  boxer: "/boxer-cardjump_1_low-res.mp4",
+  "bull-terrier": "/bull-terrier-cardjump_low-res.mp4",
+  bulldog: "/bulldog-cardjump_low-res.mp4",
+  cockapoo: "/cockapoo-cardjump_low-res.mp4",
+  "french-bulldog": "/french-bulldog-cardjump_low-res.mp4",
   labrador: "/labcardjump_low-res.mp4",
+  "miniature-schnauzer": "/miniature-schnauzercardjump_low-res.mp4",
+  "staffordshire-bull-terrier": "/staffy-cardjump_low-res.mp4",
+  "west-highland-terrier": "/westie-cardjump_low-res.mp4",
+  "yorkshire-terrier": "/yorkie-cardjump_low-res.mp4",
 };
 
 /* A CHUM'S GAME ON ITS OWN PAGE, 24 September 2026 (owner).
