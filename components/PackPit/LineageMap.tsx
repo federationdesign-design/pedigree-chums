@@ -209,7 +209,10 @@ export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common
      the device the two neighbouring yellows were the problem the swap was warned
      about, and the owner has ruled the orange back. Do not reapply the lemon
      without a plan for very common, which is #ffd23e. */
-  common:        { bg: "#f47421", fg: "#000000", label: "COMMON" },         // orange
+  /* SWAPPED WITH VERY COMMON, 24 September 2026 (owner: orange is very common,
+     yellow is common). Common takes very common's yellow, #ffd23e, and very
+     common takes the orange below. Labels unchanged; black fg reads on both. */
+  common:        { bg: "#ffd23e", fg: "#000000", label: "COMMON" },         // yellow
   /* #fcee23 -> #ffd23e, 18 September 2026 (owner). The lemon becomes the site's
      own --yellow, so the top tier sits in the palette rather than beside it.
      ALL FIVE READERS MOVE TOGETHER and that is intended, audited before the
@@ -222,7 +225,7 @@ export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common
      old, so the label is still comfortably readable.
      The dog chain path moved OFF #ffd23e in the commit beside this one, or it
      would have been drawn in exactly the colour of the circles it joins. */
-  veryCommon:    { bg: "#ffd23e", fg: "#000000", label: "VERY COMMON" },    // site yellow
+  veryCommon:    { bg: "#f47421", fg: "#000000", label: "VERY COMMON" },    // orange (was #ffd23e, swapped with common 24 Sept 2026)
 };
 // How long the rarity ring takes to draw itself on around the lifted circle, and
 // how long it waits first. The lift's own fade is 0.2s, so the draw holds back
@@ -3797,7 +3800,7 @@ export default function LineageMap({
                         progress arc all sit on dark grounds and want the fills
                         LIGHTER. One element against three, and the ink is free. */}
                     <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: doneRing ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#ffffff" : rarityTier === "common" ? "#ffffff" : band.fg }}>{band.label}</text>
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#ffffff" : rarityTier === "veryCommon" ? "#ffffff" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>

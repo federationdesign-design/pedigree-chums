@@ -843,12 +843,18 @@ const FACE_NUDGE_Y = -5;
    UNCOMMON4 IS IN TWO OF THE LISTS, chain and resting, exactly as given. Nothing
    stops that: the state decides which table is read, so the file simply appears
    in both. */
+/* COMMON AND VERY COMMON SWAPPED LOOKS, 24 September 2026 (owner: "the orange
+   and the orange dog PNG are the very common, yellow is the common"). In every
+   table below the two tiers' files were exchanged, so very common now wears the
+   orange cast (common*.png) and common the yellow (very-common*.png). The file
+   names were NOT renamed: they describe the artwork, not the tier. The tier
+   colours swapped with them in RARITY_BAND (LineageMap.tsx). */
 const FACE_BOMB_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare3.png",
   rare: "/rare4.png",
   uncommon: "/uncommon3.png",
-  common: "/common3.png",
-  veryCommon: "/very-common6.png",
+  common: "/very-common6.png",
+  veryCommon: "/common3.png",
 };
 /* AND WHAT EVERY DOG DOES WHEN A CHAIN IS COLLECTED, 24 September 2026 (owner's
    casting). The whole pit pulls this face for FACE_COLLECT_MS and then goes back
@@ -861,8 +867,8 @@ const FACE_COLLECT_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare2.png",
   rare: "/rare2.png",
   uncommon: "/uncommon6.png",
-  common: "/common4.png",
-  veryCommon: "/very-common2.png",
+  common: "/very-common2.png",
+  veryCommon: "/common4.png",
 };
 const FACE_COLLECT_MS = 600;
 /* THE OUTLINE ON EVERY DOG NAME IN THE PIT, black (owner, 24 September 2026),
@@ -888,8 +894,8 @@ const FACE_RESIST_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare3.png",
   rare: "/rare4.png",
   uncommon: "/uncommon3.png",
-  common: "/common3.png",
-  veryCommon: "/very-common3.png",
+  common: "/very-common3.png",
+  veryCommon: "/common3.png",
 };
 /* HOW HARD A SINGLE DOG RESISTS BEING DRAGGED (owner, 24 September 2026: "it
    becomes really heavy and there's lots of resistance"). The drag's own elastic,
@@ -903,8 +909,8 @@ const FACE_SHAKE_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare5.png",
   rare: "/rare2.png",
   uncommon: "/uncommon6.png",
-  common: "/common4.png",
-  veryCommon: "/very-common5.png",
+  common: "/very-common5.png",
+  veryCommon: "/common4.png",
 };
 /* THE STAND-DOWN FACE, 24 September 2026 (owner's casting). A dog of another
    breed, which cannot join the chain being drawn, wears this one.
@@ -917,15 +923,15 @@ const FACE_STANDDOWN_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare4.png",
   rare: "/rare6.png",
   uncommon: "/uncommon2.png",
-  common: "/common5.png",
-  veryCommon: "/very-common3.png",
+  common: "/very-common3.png",
+  veryCommon: "/common5.png",
 };
 const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
   extremelyRare: ["/extreme-rare.png", "/extreme-rare2.png"],
   rare: ["/rare.png", "/rare3.png", "/rare6.png"],
   uncommon: ["/uncommon.png", "/uncommon2.png", "/uncommon4.png", "/uncommon5.png"],
-  common: ["/common.png", "/common2.png", "/common5.png"],
-  veryCommon: ["/very-common2.png", "/very-common3.png", "/very-common4.png"],
+  common: ["/very-common2.png", "/very-common3.png", "/very-common4.png"],
+  veryCommon: ["/common.png", "/common2.png", "/common5.png"],
 };
 /* HOW LONG A BOMB OR SHAKE FACE HOLDS, and how long a resting face is kept
    before the dog picks another.
@@ -992,8 +998,8 @@ const RARITY_FACE_CHAINED_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare4.png",
   rare: "/rare5.png",
   uncommon: "/uncommon4.png",
-  common: "/common6.png",
-  veryCommon: "/very-common.png",
+  common: "/very-common.png",
+  veryCommon: "/common6.png",
 };
 /* THE TAPPED FACE, worn by a circle that is
    actually HELD in a chain, in place of the resting mark. Not by a glowing twin
@@ -2101,8 +2107,8 @@ type RarityTier = "extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon
    only thing that would genuinely put more rare dogs in front of a player is
    changing what the pit drops, which is a different job. */
 function rarityTier(count: number): RarityTier {
-  if (count >= 60) return "veryCommon";   // 60+   VERY COMMON     (yellow)
-  if (count >= 20) return "common";       // 20-59 COMMON          (orange)
+  if (count >= 60) return "veryCommon";   // 60+   VERY COMMON     (orange since 24 Sept 2026)
+  if (count >= 20) return "common";       // 20-59 COMMON          (yellow since 24 Sept 2026)
   if (count >= 10) return "uncommon";     // 10-19 UNCOMMON        (green)
   if (count >= 4) return "rare";          // 4-9   RARE            (royal blue)
   return "extremelyRare";                 // 1-3   EXTREMELY RARE  (purple)
