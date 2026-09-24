@@ -4,6 +4,14 @@ import BreedStrip from "../../britains-dog-history/BreedStrip";
 import { breeds } from "../../../data/breeds";
 import { stripCardFor } from "../../../data/levels";
 import styles from "../../britains-dog-history/[era]/era.module.css";
+import PlayIntro from "./PlayIntro";
+
+/* THE CHUMS WITH AN INTRO CLIP, by slug, played full screen on a phone before the
+   game (owner, 24 September 2026). The Labrador only, as the trial. A chum not
+   listed here goes straight into its game, as before. */
+const INTRO_VIDEOS: Record<string, string> = {
+  labrador: "/labcardjump_low-res.mp4",
+};
 
 /* A CHUM'S GAME ON ITS OWN PAGE, 24 September 2026 (owner).
 
@@ -50,7 +58,9 @@ export default async function PlayChumPage({ params }: Props) {
   return (
     <main>
       <h1 className={styles.srOnly}>{b.name}</h1>
-      <BreedStrip era={stripCardFor(b.name).strip} initialLevel={b.name} playOnArrival closeHref={`/chums/${slug}`} />
+      <PlayIntro video={INTRO_VIDEOS[slug]}>
+        <BreedStrip era={stripCardFor(b.name).strip} initialLevel={b.name} playOnArrival closeHref={`/chums/${slug}`} />
+      </PlayIntro>
     </main>
   );
 }
