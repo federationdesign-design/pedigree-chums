@@ -22,6 +22,7 @@
   flex: 0 0 calc((100% - 3 * 14px) / 4);
   scroll-snap-align: start;
   display: block;
+  position: relative;
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(10, 58, 87, 0.3);
@@ -37,3 +38,79 @@
 @media (max-width: 640px) {
   .card { flex-basis: 100%; }
 }
+
+/* THE CARD FOOTER, 24 September 2026 (owner's mock-up). Rows sit right-aligned
+   over the foot of the picture: a white display-font label, an emoji in a round
+   chip, and a round figure chip. The label carries a dark shadow to hold it on
+   any photograph. Sizes follow the card, so they scale from four across to one. */
+.actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 4% 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;
+}
+.row {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  font: inherit;
+}
+.rowLabel {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1rem, 2.1vw, 1.6rem);
+  color: #ffffff;
+  line-height: 1;
+  padding-top: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 0 10px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+  margin-right: 2px;
+}
+.dot {
+  flex: 0 0 auto;
+  width: clamp(34px, 3.2vw, 46px);
+  height: clamp(34px, 3.2vw, 46px);
+  border-radius: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  line-height: 1;
+}
+.dotPlay { background: #29c3f5; font-size: clamp(1.05rem, 1.6vw, 1.4rem); }
+.dotFilm { background: var(--yellow, #ffd23e); font-size: clamp(1.05rem, 1.6vw, 1.4rem); }
+.dotDogs { background: #2547c4; }
+.dotSecs { background: #22c55e; }
+.dotNum {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(0.85rem, 1.25vw, 1.1rem);
+}
+.dotUnit {
+  font-family: var(--font-body, Montserrat), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+/* On a phone the one card is the full width, so the footer can be bigger. */
+@media (max-width: 640px) {
+  .rowLabel { font-size: 1.7rem; }
+  .dot { width: 48px; height: 48px; }
+  .dotPlay, .dotFilm { font-size: 1.4rem; }
+  .dotNum { font-size: 1.15rem; }
+}
+

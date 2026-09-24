@@ -40,3 +40,29 @@ export function chumCircleCount(name: string): number {
   walk(lin, null, 0);
   return n;
 }
+
+/* THE CHUMS WITH A FULL FILM ON VIMEO (owner, 24 September 2026), by slug. The
+   homepage play slider adds a Watch video row to these. Border Collie is listed
+   but has no intro clip, so it is not on the slider yet; it will show the row the
+   day it gets one. */
+export const CHUM_VIMEO: Record<string, string> = {
+  labrador: "1218972477",
+  "staffordshire-bull-terrier": "1221597339",
+  "border-collie": "1218974120",
+  "french-bulldog": "1229938542",
+};
+
+/* A Vimeo film's length in whole seconds, from Vimeo's public oEmbed endpoint,
+   asked on the server and cached for a day. Null if Vimeo does not answer, in
+   which case the slider leaves the seconds circle out rather than guess. */
+export async function vimeoSeconds(id: string): Promise<number | null> {
+  try {
+    const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(`https://vimeo.com/${id}`)}`, { next: { revalidate: 86400 } });
+    if (!res.ok) return null;
+    const d = (await res.json()) as { duration?: number };
+    return typeof d.duration === "number" && d.duration > 0 ? Math.round(d.duration) : null;
+  } catch {
+    return null;
+  }
+}
+

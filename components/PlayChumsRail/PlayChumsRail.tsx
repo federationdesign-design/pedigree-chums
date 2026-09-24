@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { breeds } from "../../data/breeds";
-import { INTRO_VIDEOS, chumCircleCount } from "../../data/playIntros";
+import { CHUM_VIMEO, INTRO_VIDEOS, chumCircleCount, vimeoSeconds } from "../../data/playIntros";
+import WatchVideoRow from "./WatchVideoRow";
 import styles from "./PlayChumsRail.module.css";
 
 /* THE CHUM PLAY LINKS ON THE HOMEPAGE (owner, 24 September 2026): every chum with
@@ -13,27 +14,52 @@ import styles from "./PlayChumsRail.module.css";
 // The still for a clip: the same name with -last.jpg in place of .mp4.
 const lastFrameOf = (clip: string) => clip.replace(/\.mp4$/, "-last.jpg");
 
-export default function PlayChumsRail() {
+export default async function PlayChumsRail() {
   const chums = Object.keys(INTRO_VIDEOS)
     .map((slug) => breeds.find((b) => b.slug === slug))
     .filter((b): b is (typeof breeds)[number] => !!b)
     .map((b) => ({ b, circles: chumCircleCount(b.name) }))
     .sort((x, y) => x.circles - y.circles);
+  // Each film's length, asked of Vimeo once per build (cached a day).
+  const secs = new Map<string, number | null>();
+  await Promise.all(chums.map(async ({ b }) => {
+    const id = CHUM_VIMEO[b.slug];
+    if (id) secs.set(b.slug, await vimeoSeconds(id));
+  }));
   return (
     /* NO VISIBLE TITLE (owner, 24 September 2026: the "Play a chum" heading is
        removed). A screen reader still hears what the row is, from the label. */
     <section className={styles.wrap} aria-label="Play a chum">
       <div className={styles.rail}>
-        {chums.map(({ b }) => (
-          <Link key={b.slug} href={`/play/${b.slug}`} className={styles.card} aria-label={`Play the ${b.name}`}>
-            {/* THE LAST FRAME OF THE CHUM'S OWN INTRO CLIP (owner, 24 September
-                2026), in place of the card built from its square photo. The frame
-                already carries the dog's name, so nothing is drawn over it. Each
-                sits beside its clip in public/ as <clip>-last.jpg, 480px wide. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className={styles.img} src={lastFrameOf(INTRO_VIDEOS[b.slug])} alt="" loading="lazy" width={480} height={682} />
-          </Link>
-        ))}
+        {chums.map(({ b, circles }) => {
+          const poster = lastFrameOf(INTRO_VIDEOS[b.slug]);
+          const vimeoId = CHUM_VIMEO[b.slug];
+          return (
+            <div key={b.slug} className={styles.card}>
+              {/* THE LAST FRAME OF THE CHUM'S OWN INTRO CLIP. The frame already
+                  carries the dog's name. A tap on the picture plays the game. */}
+              <Link href={`/play/${b.slug}`} tabIndex={-1} aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className={styles.img} src={poster} alt="" loading="lazy" width={480} height={682} />
+              </Link>
+              {/* THE CARD'S FOOTER (owner, 24 September 2026, from his mock-up):
+                  PLAY GAME with the joystick and the level's circle count on
+                  every card, and WATCH VIDEO with the film's length above it on
+                  the chums that have a film. */}
+              <div className={styles.actions}>
+                {vimeoId ? <WatchVideoRow name={b.name} vimeoId={vimeoId} poster={poster} seconds={secs.get(b.slug) ?? null} /> : null}
+                <Link href={`/play/${b.slug}`} className={styles.row} aria-label={`Play the ${b.name} game, ${circles} dogs`}>
+                  <span className={styles.rowLabel}>Play game</span>
+                  <span className={`${styles.dot} ${styles.dotPlay}`} aria-hidden="true">🕹️</span>
+                  <span className={`${styles.dot} ${styles.dotDogs}`} aria-hidden="true">
+                    <span className={styles.dotNum}>{circles}</span>
+                    <span className={styles.dotUnit}>dogs</span>
+                  </span>
+                </Link>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
