@@ -2516,24 +2516,23 @@
    underneath it. */
 .chainCount {
   position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  /* HARD TO THE BOTTOM, 20 September 2026 (owner: move it to the bottom of the
-     screen). Was 96px up, which was clearing the PLAY and AUTO squares; the owner
-     wants it lower, so it sits on the floor strip with only the safe area and a
-     little air under it. */
-  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  /* TOP RIGHT, 24 September 2026 (owner), left of the pit's corner squares.
+     paintChainCount measures the close X and sets top and right exactly; these
+     are only the first paint, roughly the same place. */
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: calc(16px + 2 * var(--pit-ui-size, 60px) + 40px);
   z-index: 62;
   /* TWICE THE SIZE, 24 September 2026 (owner): type, padding, corner and shadow
      all doubled together so the pill keeps its shape. */
   padding: 20px 32px 12px 32px;
   border-radius: 40px;
-  /* THE COLOUR IS SET INLINE NOW, 24 September 2026 (owner): navy to light green
-     as the chain fills, with the text swapping between white and navy to stay
-     readable. See paintChainCount. These two are only the first paint. */
-  background: var(--navy);
+  /* THE FILL IS SET INLINE, royal blue to green as the chain fills. See
+     paintChainCount. This is only the first paint. */
+  background: #2547c4;
+  /* WHITE, always (owner). The navy shadow holds it on the bright green end. */
   color: #ffffff;
-  transition: background 0.3s ease, color 0.3s ease;
+  text-shadow: 0 2px 0 rgba(10, 58, 87, 0.6);
+  transition: background 0.3s ease;
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: 48px;
   line-height: 1.1;

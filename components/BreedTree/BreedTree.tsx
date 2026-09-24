@@ -907,10 +907,14 @@ const FACE_IDLE_MAX_MS = 9000;
    2026). Decided per circle from its index, not rolled each frame, so a dog keeps
    the way it faces for the whole round instead of flickering. */
 const FACE_FLIP_SHARE = 0.4;
-/* THE CHAIN COUNTER'S TWO ENDS, as RGB: navy at none joined, light green at all
-   of them (owner, 24 September 2026). See paintChainCount. */
-const CHAIN_COUNT_FROM = [10, 58, 87] as const;
-const CHAIN_COUNT_TO = [143, 227, 154] as const;
+/* THE CHAIN COUNTER'S TWO ENDS, as HSL (owner, 24 September 2026: the pit's own
+   vibrant colours, high saturation, nothing washed out). The royal blue is the
+   RARE band's #2547c4 and the green is the site's medical green #17c138.
+   BLENDED IN HSL, not RGB: a straight RGB blend of blue and green runs through a
+   grey teal in the middle, while HSL keeps the saturation up and passes through a
+   bright cyan instead. See paintChainCount. */
+const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
+const CHAIN_COUNT_TO = [132, 79, 42] as const;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
    (owner, 24 September 2026). It used to call the count off altogether. */
 const BOMB_ADDS_SECS = 10;
@@ -12778,23 +12782,28 @@ export default function BreedTree({
       const held = dogChainNodesRef.current.size;
       el.textContent = `${held}/${total}`;
       el.setAttribute("aria-label", `${held} of ${total} joined`);
-      /* DARK BLUE TO LIGHT GREEN AS THE CHAIN FILLS (owner, 24 September 2026),
-         so the colour alone says how far there is to go. CHAIN_COUNT_FROM at none
-         joined, CHAIN_COUNT_TO at all of them, blended in between.
-         THE TEXT SWAPS WITH IT: white reads on the dark end and not on the light
-         one, navy the other way round, so it flips on the fill's own brightness. */
+      /* ROYAL BLUE TO GREEN AS THE CHAIN FILLS (owner, 24 September 2026), so
+         the colour alone says how far there is to go. The text stays white
+         throughout, by request; the CSS gives it a navy shadow to hold it on the
+         brighter green end. */
       const t = Math.max(0, Math.min(1, held / total));
-      const rgb = CHAIN_COUNT_FROM.map((c, j) => Math.round(c + (CHAIN_COUNT_TO[j] - c) * t));
-      el.style.background = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
-      // WCAG relative luminance, then whichever of white or navy has the higher
-      // contrast against this fill.
-      const lin = (c: number) => { const x = c / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
-      const L = (c: readonly number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
-      const lf = L(rgb);
-      const onWhite = 1.05 / (lf + 0.05);
-      const onNavy = (lf + 0.05) / (L(CHAIN_COUNT_FROM) + 0.05);
-      el.style.color = onNavy > onWhite ? "var(--navy, #0a3a57)" : "#ffffff";
+      const hsl = CHAIN_COUNT_FROM.map((c, j) => c + (CHAIN_COUNT_TO[j] - c) * t);
+      el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
       el.style.display = "block";
+      /* TOP RIGHT, LEFT OF THE INFO SQUARE (owner, 24 September 2026). The
+         corner holds the close X, the info square to its left and the brain
+         under it, and on a phone the countdown digits sit over the close X. So
+         the counter goes one slot further left than the info square, level with
+         the row. MEASURED from the close X on screen every time it paints, not a
+         guessed figure: that square is sized off the measured stage and differs
+         on every device. The CSS keeps a fallback for the first paint. */
+      const sq = stageRef.current?.querySelector('[data-ui-square="close"]');
+      const r = sq?.getBoundingClientRect();
+      if (r && r.width > 0) {
+        const gap = r.width * 0.25;
+        el.style.top = `${Math.max(0, r.top + r.height / 2 - el.offsetHeight / 2)}px`;
+        el.style.right = `${window.innerWidth - (r.left - r.width - gap) + gap}px`;
+      }
     };
     /* Named rather than inline, because the magnet measures with the SAME numbers
        the path and the crossing test use. Two spellings of a circle's geometry is
