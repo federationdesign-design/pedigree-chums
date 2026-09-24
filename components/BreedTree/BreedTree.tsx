@@ -907,6 +907,9 @@ const FACE_IDLE_MAX_MS = 9000;
    2026). Decided per circle from its index, not rolled each frame, so a dog keeps
    the way it faces for the whole round instead of flickering. */
 const FACE_FLIP_SHARE = 0.4;
+/* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
+   (owner, 24 September 2026). It used to call the count off altogether. */
+const BOMB_ADDS_SECS = 10;
 /* VERY COMMON COMES IN THREE SHADES OF YELLOW (owner, 24 September 2026: "if we
    do have more than one instance of the very common rarity within the pit, it
    takes a different colour shade"). Every very-common file has a B and a C twin,
@@ -5637,6 +5640,10 @@ export default function BreedTree({
   // ever stop it: once the pit read as full the round was over even if you then
   // cleared the floor. The main pit does not work that way, and this is its rule.
   const cdTickRef = useRef<number | null>(null);
+  /* ADDS SECONDS TO A RUNNING COUNT (owner, 24 September 2026: a bomb adds 10,
+     uncapped). Set by runCountdown for the count it started, and a no-op once
+     that count has reached zero or been torn down. */
+  const cdAddRef = useRef<((secs: number) => void) | null>(null);
   const cdElRef = useRef<HTMLDivElement | null>(null);
   // The centre set of digits. Mobile only, and torn down everywhere the corner
   // set is, or a cancelled countdown would leave a number sitting on the pit.
@@ -5699,47 +5706,15 @@ export default function BreedTree({
   // is already live the moment the flags reset, so this is a non-blocking flourish
   // over a running pit. Its own two timers live in cdPhewRef so a fresh countdown
   // (or teardown) can clear them.
-  const playPhew = (el: HTMLDivElement) => {
-    el.textContent = "Phew!";
-    // Centre and size it like "Oh no...", in case the rescue was caught during the
-    // "0" hold when the corner digits are still top-right on mobile.
-    el.style.alignItems = "center";
-    el.style.justifyContent = "center";
-    el.style.padding = "0";
-    el.style.textAlign = "center";
-    el.style.fontSize = "clamp(6.8rem, 24vw, 16rem)";
-    el.style.textShadow = "0 4px 40px rgba(0,0,0,0.6)";
-    el.style.lineHeight = "1";
-    el.style.transition = "background 0.35s ease";
-    el.style.background = "transparent"; // the danger wash recedes
-    const t1 = window.setTimeout(() => {
-      el.style.transition = "opacity 0.3s ease";
-      el.style.opacity = "0";
-    }, 900);
-    const t2 = window.setTimeout(() => {
-      el.remove();
-      if (cdElRef.current === el) cdElRef.current = null;
-    }, 1200);
-    cdPhewRef.current = [t1, t2];
-  };
+  // playPhew was here: the "Phew!" beat for a rescue after zero. Removed with
+  // cancelCountdown, its only caller, 24 September 2026. git has it.
   // Call the countdown off: stop every timer, then either play the Phew beat (the
   // count had reached zero) or just clear the digits (mid-count, silent, exactly
   // as the pit-full cancel always did). Resets the trigger and opens the 2.5s
   // grace so a chum already mid-air cannot restart it the instant a Phew lands.
-  const cancelCountdown = (now: number) => {
-    clearCdTimers();
-    const el = cdElRef.current;
-    if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
-    if (cdPostZeroRef.current && el) {
-      playPhew(el); // el lives on through the Phew, which owns its own removal
-    } else if (el) {
-      el.remove(); cdElRef.current = null;
-    }
-    cdPostZeroRef.current = false;
-    setFullAlpha(0);
-    fullTriggeredRef.current = false;
-    cdGraceRef.current = now + 2500;
-  };
+  /* cancelCountdown WAS HERE, removed 24 September 2026 (owner: "once the timer
+     starts I want no way of turning it off"). It stopped a running count and
+     played Phew if it had already hit zero. Nothing calls either now; git has it. */
   const runCountdown = () => {
     // Guarded at the source, not at each caller. The floor collision starts a
     // countdown directly and never consulted the poll, so a guard on the poll
@@ -5802,10 +5777,12 @@ export default function BreedTree({
        chances to fumble one, and the length is now a figure to change in one
        place. Everything downstream reads steps.length, the tick is still one
        second (four in slow motion), and the "0" still ends it. */
-    const steps = Array.from({ length: CD_FROM + 1 }, (_, n) => String(CD_FROM - n));
-    let i = 0;
-    el.textContent = steps[i];
-    if (elMid) elMid.textContent = steps[i];
+    /* COUNTED IN SECONDS LEFT, not as an index into a fixed list (owner, 24
+       September 2026): a bomb adds 10 with no cap, so the count can climb past
+       CD_FROM and no list built at the start could hold it. */
+    let left = CD_FROM;
+    el.textContent = String(left);
+    if (elMid) elMid.textContent = String(left);
     setFullAlpha(0);
     cdElRef.current = el;
     cdMidElRef.current = elMid;
@@ -5854,20 +5831,28 @@ export default function BreedTree({
        second of the count is given away on the way in or out, which is on the
        player's side. A ref, like slowmoOnRef above, because this closure is
        older than the state. */
+    // Puts `left` on screen, both sets of digits. The middle set shows only in
+    // the last CD_MID_FROM, so a bomb that lifts the count back above that line
+    // hides it again.
+    const paintLeft = () => {
+      el.textContent = String(left);
+      if (cdMidElRef.current) {
+        cdMidElRef.current.textContent = String(left);
+        cdMidElRef.current.style.display = left <= CD_MID_FROM ? "flex" : "none";
+      }
+      setFullAlpha(Math.max(0, CD_FROM - left) / 10);
+    };
+    cdAddRef.current = (secs: number) => {
+      // Only while this count is still ticking: never after zero, never once gone.
+      if (cdElRef.current !== el || cdTickRef.current == null) return;
+      left += secs;
+      paintLeft();
+    };
     const step = () => {
       if (learnOpenRef.current) { cdTickRef.current = window.setTimeout(step, cdStepMs()); return; }
-      i++;
-      if (i < steps.length) {
-        el.textContent = steps[i];
-        if (cdMidElRef.current) {
-          cdMidElRef.current.textContent = steps[i];
-          /* steps[i] is the number ON SCREEN, so this reads the count itself
-             rather than counting ticks, which keeps it right if the tick is ever
-             rescheduled or the sequence is built differently. */
-          const left = Number(steps[i]);
-          cdMidElRef.current.style.display = Number.isFinite(left) && left <= CD_MID_FROM ? "flex" : "none";
-        }
-        setFullAlpha(i / 10);
+      left--;
+      if (left >= 0) {
+        paintLeft();
         cdTickRef.current = window.setTimeout(step, cdStepMs());
         return;
       }
@@ -10722,10 +10707,11 @@ export default function BreedTree({
              10s restarting. Bombs roll at 1 / BOMB_ODDS and come from the same pops
              that fill the pit, so stalling costs ground: the supply is coupled to
              the problem. */
-          toyTimers.push(window.setTimeout(() => {
-            if (!fullTriggeredRef.current) return;
-            cancelCountdown(performance.now());
-          }, waveCount * BOMB_CHAIN_MS));
+          /* SUPERSEDED, 24 September 2026 (owner): a bomb no longer calls the
+             countdown off. It adds BOMB_ADDS_SECS to a running count instead,
+             uncapped, once per blast, so a chain of bombs adds once for each. The
+             note above is kept for the history of the old rule. */
+          if (fullTriggeredRef.current) cdAddRef.current?.(BOMB_ADDS_SECS);
           // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
           // once, near takes two hits, far takes one and only if already lit.
           const SHOVE_R = bsz * 5.5;
@@ -11082,7 +11068,8 @@ export default function BreedTree({
       // was never re-tested, so the digits kept running. Both halves of the
       // test needed a caller that is not tied to motion. It now has two: the
       // loop, unchanged, and the poll below.
-      const anyChumOnFloor = () => chumBodiesRef.current.some((c) => c.onFloor);
+      // anyChumOnFloor was here. Its only readers were the two ways of calling
+      // the count off, both removed 24 September 2026 (owner).
       // Occupancy: is the pit "full"? Split out of checkFull so the 400ms poll AND
       // the immediate rescue check (tryCancelRef, fired the moment a chum is
       // collected) read the exact same answer.
@@ -11194,24 +11181,22 @@ export default function BreedTree({
           fullTriggeredRef.current = true;
           if (fullDiagOn) fullDiagHitRef.current = [`HIT at ${(now / 1000).toFixed(1)}s, frozen:`, ...fullDiagGuardRef.current, ...fullDiagRef.current];
           runCountdown();
-        } else if (!full && fullTriggeredRef.current && !anyChumOnFloor()) {
-          // ROOM AGAIN and no chum left on the floor, so the countdown is called
-          // off. The floor trigger used to be exempt from this (see the reversal
-          // note by the removed floorTriggeredRef); collecting the chums off the
-          // floor now cancels it too, with the Phew beat if the count hit zero.
-          cancelCountdown(now);
         }
+        /* ROOM AGAIN NO LONGER CALLS THE COUNT OFF (owner, 24 September 2026:
+           "once the timer starts I want no way of turning it off"). This branch
+           was also what a shake set off: a shake throws every dog above the mouth
+           of the pit, the next poll read an empty pit, and the count stopped.
+           Once started, a count now ends only by running out or by the round
+           ending. A bomb adds time to it; see BOMB_ADDS_SECS. */
       };
       // The rescue check, fired straight from the chum-collect handler so it lands
       // the instant the last floor chum is taken, not up to one poll (400ms) later
       // (that immediacy is what makes a clear with half a second of "Oh no" left
       // count). Bypasses the settle-in/grace guard on purpose: fullTriggeredRef
       // already gates it and a rescue should never be held back.
-      tryCancelRef.current = () => {
-        if (!fullTriggeredRef.current) return;
-        const now = performance.now();
-        if (!computeFull() && !anyChumOnFloor()) cancelCountdown(now);
-      };
+      // NO RESCUE NOW (owner, 24 September 2026): once started, the count
+      // cannot be turned off, collecting a chum included. See the poll.
+      tryCancelRef.current = () => {};
       const step = (nowRaf: number) => {
         /* PAUSED: stop dead, draw nothing, schedule nothing. NOT the tail's
            stop-and-tear-down path below, which clears the flashing numbers and
