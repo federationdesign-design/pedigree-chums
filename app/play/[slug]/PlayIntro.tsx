@@ -47,8 +47,6 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   return (
     <div
       onClick={() => setPhase("game")}
-      role="button"
-      aria-label="Skip the intro and start the game"
       style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#0a3a57", cursor: "pointer" }}
     >
       <video
@@ -62,6 +60,34 @@ export default function PlayIntro({ video, children }: { video?: string; childre
         onError={() => setPhase("game")}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
+      {/* THE SKIP BUTTON (owner, 24 September 2026), in the pit's own button
+          style: navy, a 2px yellow edge, corners at 0.3 of the height, yellow
+          lettering in the display font. Bottom right, 18px in like the pit's
+          corner squares, clear of the phone's home bar. A tap anywhere on the
+          clip still skips too; this is the one the player can see. */}
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); setPhase("game"); }}
+        aria-label="Skip the intro and start the game"
+        style={{
+          position: "absolute",
+          right: 18,
+          bottom: "calc(18px + env(safe-area-inset-bottom, 0px))",
+          height: 52,
+          padding: "0 22px",
+          borderRadius: 16,
+          background: "var(--navy, #0a3a57)",
+          border: "2px solid var(--yellow, #ffd23e)",
+          color: "var(--yellow, #ffd23e)",
+          fontFamily: "var(--font-display), system-ui, sans-serif",
+          fontSize: 24,
+          lineHeight: 1,
+          letterSpacing: 1,
+          cursor: "pointer",
+        }}
+      >
+        SKIP
+      </button>
     </div>
   );
 }
