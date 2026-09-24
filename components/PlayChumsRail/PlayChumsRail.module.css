@@ -114,3 +114,33 @@
   .dotNum { font-size: 1.15rem; }
 }
 
+/* THE FILM IN THE CARD, 24 September 2026 (owner). Fills the card exactly, over
+   the still and the footer, on the card's own black so any sliver the player
+   leaves reads as a frame rather than a gap. */
+.player {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #000000;
+}
+.playerFrame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.playerClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: rgba(10, 58, 87, 0.75);
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+

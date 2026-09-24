@@ -35,7 +35,7 @@ export default async function PlayChumsRail() {
           const poster = lastFrameOf(INTRO_VIDEOS[b.slug]);
           const vimeoId = CHUM_VIMEO[b.slug];
           return (
-            <div key={b.slug} className={styles.card}>
+            <div key={b.slug} className={styles.card} data-play-card>
               {/* THE LAST FRAME OF THE CHUM'S OWN INTRO CLIP. The frame already
                   carries the dog's name. A tap on the picture plays the game. */}
               <Link href={`/play/${b.slug}`} tabIndex={-1} aria-hidden="true">
