@@ -864,6 +864,13 @@ const FACE_COLLECT_SRC: Record<RarityTier, string> = {
   veryCommon: "/very-common2.png",
 };
 const FACE_COLLECT_MS = 600;
+/* THE JOIN FLASH (owner, 24 September 2026: "keep all twins on the chained face,
+   but flash a different face on each join"). The moment a dog joins a chain it
+   wears this face for FACE_JOIN_MS, then goes back to the chained face. It is the
+   collect set, the owner's own "celebrating" cast, and differs from the chained
+   face on every tier. Change the table to cast it differently. */
+const FACE_JOIN_SRC: Record<RarityTier, string> = FACE_COLLECT_SRC;
+const FACE_JOIN_MS = 3000;
 /* THE RESISTING FACE (owner's casting, 24 September 2026): worn by a dog with no
    twin while the player tries to drag it. That dog is held, not refused, but on
    an elastic so weak it barely moves: see RESIST_STIFFNESS. */
@@ -4496,6 +4503,8 @@ export default function BreedTree({
   const autoStartRef = useRef(startImmediately);
   // True from the auto start until its drop has run. See the arm block.
   const fallOwedRef = useRef(false);
+  // When each dog's join flash ends, set by the chain's first and joined hooks.
+  const joinFlashRef = useRef<Map<Node, number>>(new Map());
   // The single dog being held against its will, for the face writer. See RESIST.
   const resistNodeRef = useRef<Node | null>(null);
   const backToStartScreen = () => {
@@ -7649,7 +7658,8 @@ export default function BreedTree({
                 `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${flip ? -lsc : lsc},${lsc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`,
               );
               const li = lf.firstElementChild;
-              if (li) li.setAttribute("href", shadeFace(d, chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
+              const liJoin = (joinFlashRef.current.get(d) ?? 0) > nowFx;
+              if (li) li.setAttribute("href", shadeFace(d, liJoin ? FACE_JOIN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
             }
           }
           const resisting = resistNodeRef.current === d;
@@ -7660,10 +7670,12 @@ export default function BreedTree({
             const rr = drawR(d, v, k) * listCtm.a;
             behindList = cx + rr > listBox.left && cx - rr < listBox.right && cy + rr > listBox.top && cy - rr < listBox.bottom;
           }
-          const tap = `${otherBreed ? "x" : chained ? 1 : resisting ? "r" : 0}:${faceTier}:${face.src}:${behindList ? "b" : ""}`;
+          // Flashing its join face? Read against the sim's own frame clock.
+          const joinFlash = (joinFlashRef.current.get(d) ?? 0) > nowFx;
+          const tap = `${otherBreed ? "x" : joinFlash ? "j" : chained ? 1 : resisting ? "r" : 0}:${faceTier}:${face.src}:${behindList ? "b" : ""}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : resisting ? FACE_RESIST_SRC[faceTier] : face.src));
+            qi.setAttribute("href", shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : joinFlash ? FACE_JOIN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : resisting ? FACE_RESIST_SRC[faceTier] : face.src));
             /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
                filter would flatten it to one hue. The question mark still is,
                because it is one flat file and its depth tint is what tells a
@@ -13236,6 +13248,8 @@ export default function BreedTree({
          mark and the stroke colour it had. */
       first: (i) => {
         const n = dogNode(i);
+        // The first dog flashes its join face too.
+        if (n) joinFlashRef.current.set(n, performance.now() + FACE_JOIN_MS);
         chainFirstRef.current = n ?? null;
         dogChainBreedRef.current = n?.data.name ?? null;
         dogChainNodesRef.current = new Set(n ? [n] : []);
@@ -13251,6 +13265,7 @@ export default function BreedTree({
       },
       joined: (i) => {
         const n = dogNode(i);
+        if (n) joinFlashRef.current.set(n, performance.now() + FACE_JOIN_MS);
         if (n) dogChainNodesRef.current.add(n);
         if (n) dogTetherJoinRef.current?.(n);
         paintChainCount();
