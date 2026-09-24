@@ -100,6 +100,14 @@ export const ukBreeds: UKBreed[] = [
   { name: "Talbot", strip: "saxon", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
 
   { name: "Bloodhound", strip: "saxon", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/bloodhound-square.jpg", tag: "endangered" },
+  /* THE FRENCH HOUNDS JOIN THE TIMELINES, 24 September 2026 (owner: they are in
+     the family trees but on no timeline). Four hounds that crossed the Channel,
+     or whose blood did. Placed on the page of the years they reached Britain or
+     its hounds. The two with parents in the data, the Norman and the St Hubert,
+     become playable levels under the game's own rule; the Chien-gris and the
+     King's White Hounds have no parents recorded, so they are history cards. */
+  { name: "Norman Hound", strip: "saxon", era: "Medieval", anchor: 1066, note: "Big, slow, deep-voiced Normandy hound, said to have come over with the Conquest.", image: "/history/breeds/artois-hounds.jpg", tag: "extinct" },
+  { name: "St Hubert Hound", strip: "saxon", era: "Medieval", anchor: 1080, note: "The monks' black scent hound of the Ardennes, said to have crossed with the Normans.", image: "/history/breeds/St-Hubert-Hound.jpg", tag: "extinct" },
   { name: "Scottish Deerhound", strip: "saxon", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
 
   // The 1500s and 1600s
@@ -283,6 +291,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Celtic Hound", strip: "ancient", era: "Ancient", anchor: 80, note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound.", tag: "extinct", image: "/history/breeds/celtic-hound-remake.jpg" },
   { name: "Rache", strip: "saxon", era: "Medieval", anchor: 1160, note: "Medieval scenting hound that hunted by nose in the pack.", tag: "extinct", image: "/history/breeds/rache.jpg" },
   { name: "Buckhound", strip: "medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
+  { name: "Chien-gris", strip: "medieval", era: "Medieval", anchor: 1250, note: "Grey royal scent hound of France, said to have come west with Louis IX.", image: "/history/breeds/Chien-gris.jpg", tag: "extinct" },
   { name: "Southern Hound", strip: "medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot.", tag: "extinct", image: "/history/breeds/Southern-Hound.jpg" },
   { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, ancestor of the fell terriers.", tag: "extinct", image: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg" },
   { name: "North Country Beagle", strip: "c1700", era: "1700s", anchor: 1720, note: "Swift northern hound, bred away into the modern Beagle by 1800.", tag: "extinct", image: "/history/breeds/North-Country-Beagle.jpg" },
@@ -312,6 +321,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Earth and hunt terriers", strip: "medieval", era: "Medieval", anchor: 1392, note: "Hardy go-to-ground terriers used to bolt fox and badger.", image: "/history/breeds/Earth-and-hunt-terrier.jpg", tag: "extinct" },
   { name: "Old English Black and Tan Terrier", strip: "medieval", era: "Medieval", anchor: 1436, note: "The old British black-and-tan working terrier, the rough ratting stock much of Britain's terrier blood came from.", image: "/history/breeds/old-english-black-and-tan-terrier-img.jpg", tag: "extinct" },
   { name: "Land Spaniels", strip: "medieval", era: "Medieval", anchor: 1475, note: "The old English land-spaniel stock that every working spaniel springs from.", image: "/history/breeds/original-land-spaniel.jpg", tag: "extinct" },
+  { name: "King's White Hounds", strip: "medieval", era: "Medieval", anchor: 1480, note: "White pack hound of the French kings, the hound the English Staghound most resembled.", image: "/history/breeds/kings-white-hounds.jpg", tag: "extinct" },
   { name: "Old Welsh Land Spaniels", strip: "c1500", era: "1500s", anchor: 1511, note: "The native red-and-white working spaniels of Wales.", image: "/history/breeds/Old-Welsh-land-spaniels.jpg", tag: "extinct" },
   { name: "Basset and heavy Hounds", strip: "c1500", era: "1500s", anchor: 1525, note: "Low, long, heavy scenting-hound stock that lent weight and bone to the stouter spaniels.", image: "/history/breeds/basset-and-heavy-hounds.jpg", tag: "extinct" },
   /* LOW-SLUNG SOLDIERS' DOGS IS OFF THE STRIP, 19 September 2026 (owner: it is
