@@ -30,6 +30,8 @@
 }
 /* The cookie notice's glass: see CookieDrop.module.css. */
 .ladder {
+  /* The title is capped to 80% of this width: see .title. */
+  container-type: inline-size;
   background: transparent;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -44,8 +46,10 @@
 .topCard {
   position: relative;
   display: block;
-  width: clamp(130px, 55%, 190px);
-  margin: 0 auto 12px;
+  /* The full width of the table, tilted 2 degrees (owner, 24 September 2026). */
+  width: 100%;
+  margin: 0 0 14px;
+  transform: rotate(2deg);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(10, 58, 87, 0.35);
@@ -69,7 +73,11 @@
 }
 .title {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.8rem, 2.4vw, 2.4rem);
+  /* Three times the size (owner), never wider than 80% of the table: the cap is
+     80% of the table's width divided by the word's letters (--chars) at about
+     0.66em a letter in Luckiest Guy. */
+  font-size: min(clamp(5.4rem, 7.2vw, 7.2rem), calc(80cqi / (var(--chars, 6) * 0.66)));
+  white-space: nowrap;
   line-height: 1;
   margin: 0;
   text-transform: uppercase;
@@ -80,13 +88,14 @@
    heads and every row, so they line up. */
 .colHead, .row {
   display: grid;
-  grid-template-columns: 2em minmax(0, 1fr) 4.4em 3.8em;
+  grid-template-columns: 2.6em minmax(0, 1fr) 4.4em 3.8em;
   align-items: center;
   gap: 8px;
 }
 .colHead {
-  padding: 0 6px 6px;
-  font-size: 0.6rem;
+  /* A third bigger, and 5px more air below the line (owner). */
+  padding: 0 6px 11px;
+  font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -94,7 +103,7 @@
   border-bottom: 2px solid rgba(255, 255, 255, 0.35);
 }
 .colHead span:nth-child(3), .colHead span:nth-child(4) { text-align: center; }
-.list { list-style: none; margin: 0; padding: 0; }
+.list { list-style: none; margin: 0; padding: 5px 0 0; } /* 5px more air above the line's far side */
 .list li + li { border-top: 1px solid rgba(255, 255, 255, 0.22); }
 .row {
   padding: 7px 6px;
@@ -104,8 +113,9 @@
 .row:hover, .row:focus-visible { background: rgba(255, 255, 255, 0.14); }
 .rank {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 1.15rem;
-  color: var(--yellow, #ffd23e);
+  /* Lemon, and half as big again (owner). */
+  font-size: 1.725rem;
+  color: #ffed00;
   text-align: right;
   text-shadow: 0 1px 0 rgba(10, 58, 87, 0.5);
 }
@@ -148,3 +158,24 @@
   font-size: 1.1rem;
   text-align: center;
 }
+
+/* THE TEXT COLOUR TOGGLE, 24 September 2026 (owner). ArticleTextToggle, under
+   the page title, sets data-pc-textinvert on <main>; here it turns the glass
+   tables into white panels with navy text. An accessibility scheme wins. */
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .ladder {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(10, 58, 87, 0.25);
+  color: #0a3a57;
+}
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .row,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .colHead {
+  color: #0a3a57;
+}
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .name,
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .rank {
+  text-shadow: none;
+}
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .rank { color: #0a3a57; }
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .colHead { border-bottom-color: rgba(10, 58, 87, 0.35); }
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .list li + li { border-top-color: rgba(10, 58, 87, 0.18); }
+

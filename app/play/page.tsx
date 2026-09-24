@@ -3,6 +3,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PlayChumsRail from "../../components/PlayChumsRail/PlayChumsRail";
 import PlayLadder from "../../components/PlayLadder/PlayLadder";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./play.module.css";
 
 /* THE PLAY PAGE (owner, 24 September 2026): the homepage's chum slider on its
@@ -20,6 +21,9 @@ export default function PlayPage() {
         <h1 className={styles.heading}>
           Come play and learn about some of your <span className={styles.yellow}>chums</span>
         </h1>
+        {/* The text colour toggle, under the title (owner, 24 September 2026):
+            it turns the level tables white with navy text. */}
+        <ArticleTextToggle centered labelOn="Switch to white tables with navy text" labelOff="Switch back to the glass tables" />
       </section>
       {/* TWO ROWS (owner, 24 September 2026): the chums with a film to watch on
           top, the rest below. */}

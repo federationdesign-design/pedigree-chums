@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type React from "react";
 import { breeds, breedCard } from "../../data/breeds";
 import { bust } from "../../data/imgVersion";
 import { chumCircleCount } from "../../data/playIntros";
@@ -115,20 +116,22 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
             ) : null}
           </Link>
         ) : null}
-        <h2 className={styles.title} style={{ color: colour }}>{title}</h2>
+        {/* --chars lets the CSS cap the title at 80% of the table's width, whatever
+            the word's length (see .title). */}
+        <h2 className={styles.title} style={{ color: colour, ["--chars" as string]: title.length } as React.CSSProperties}>{title}</h2>
       </header>
       {/* A TABLE, 24 September 2026 (owner): the column names once at the top,
           a line between the rows. */}
       <div className={styles.colHead} aria-hidden="true">
         <span />
-        <span>Chum</span>
+        <span>Chum history</span>
         <span>Ancestors</span>
-        <span>Circles</span>
+        <span>Instances</span>
       </div>
       <ol className={styles.list}>
         {rows.map((r, i) => (
           <li key={r.slug}>
-            <Link href={`/play/${r.slug}`} className={styles.row} aria-label={`Play the ${r.name}: ${r.dogs} ancestors, ${r.circles} circles`}>
+            <Link href={`/play/${r.slug}`} className={styles.row} aria-label={`Play the ${r.name}: ${r.dogs} ancestors, ${r.circles} instances`}>
               <span className={styles.rank}>{i + 1}</span>
               <span className={styles.chum}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
