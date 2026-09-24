@@ -20,7 +20,7 @@ import styles from "./PlayLadder.module.css";
    not divide by seven (54 chums: five columns of 8, two of 7). Inside each column
    the hardest is at the top. */
 const LEVELS: { title: string; colour: string }[] = [
-  { title: "Oober", colour: "#a855f7" },
+  { title: "Impossible", colour: "#a855f7" }, // was "Oober" (owner, 24 September 2026)
   { title: "Extreme", colour: "#db2777" },
   { title: "Very hard", colour: "#ef4444" },
   { title: "Hard", colour: "#f97316" },
