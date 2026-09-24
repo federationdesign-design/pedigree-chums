@@ -3288,6 +3288,7 @@ export default function BreedTree({
   startImmediately = false,
   startDelayMs = 0,
   startDifficulty,
+  learnBackHref,
   onRestartLevel,
   playLabel = "PLAY",
   onPlayPressed,
@@ -3477,6 +3478,10 @@ export default function BreedTree({
   startDelayMs?: number;
   // Open the pit at this difficulty, 0 easiest to 10, instead of the saved one.
   startDifficulty?: number;
+  /* Where the learn area's red back square goes, instead of the start screen
+     (owner, 24 September 2026). Set when a /play page was reached from the
+     homepage slider and the player chose Learn: back returns to the slider. */
+  learnBackHref?: string;
   /* The pit menu's green square: restart THIS level. Owned by the host, because
      it costs a life and remounts the round, exactly like onBackToStart. */
   onRestartLevel?: () => void;
@@ -15808,7 +15813,7 @@ export default function BreedTree({
                   const act =
                     d.kind === "close"
                       ? (learning
-                          ? backToStartScreen
+                          ? (learnBackHref ? () => { window.location.assign(learnBackHref); } : backToStartScreen)
                           : started
                           ? () => {
                               // The spawn must be OUTSIDE the state updater: React

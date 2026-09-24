@@ -34,6 +34,8 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   /* LEARN INSTEAD (owner, 24 September 2026): the intro's Learn button opens the
      chum's level in its learn area rather than starting the round. */
   const [learn, setLearn] = useState(false);
+  // True when this page was opened from the homepage play slider (?from=home).
+  const [fromHome, setFromHome] = useState(false);
 
   /* A FRESH SET OF TOYS ON EVERY CHUM PLAY PAGE (owner, 24 September 2026). A toy
      thrown clear of the pit is retired for the whole visit, so after a few levels
@@ -61,9 +63,17 @@ export default function PlayIntro({ video, children }: { video?: string; childre
 
   if (phase === "decide") return null;
   if (phase === "game") {
-    type StripProps = { arrivalDelayMs?: number; playOnArrival?: boolean; autoLearn?: boolean };
+    type StripProps = { arrivalDelayMs?: number; playOnArrival?: boolean; autoLearn?: boolean; learnBackHref?: string };
     if (learn && isValidElement(children)) {
-      return cloneElement(children as ReactElement<StripProps>, { playOnArrival: false, autoLearn: true });
+      return cloneElement(children as ReactElement<StripProps>, {
+        playOnArrival: false,
+        autoLearn: true,
+        /* CAME FROM THE HOMEPAGE SLIDER? Then learn's red back square returns
+           there rather than to the start screen (owner, 24 September 2026). The
+           slider's links carry ?from=home. Read on the Learn press, so it is only
+           ever the browser's own address. */
+        learnBackHref: fromHome ? "/home#play-chums" : undefined,
+      });
     }
     if (watched && isValidElement(children)) {
       return cloneElement(children as ReactElement<StripProps>, { arrivalDelayMs: 0 });
@@ -106,7 +116,7 @@ export default function PlayIntro({ video, children }: { video?: string; childre
         <button type="button" className={heroBtn.introBtn} onClick={(e) => { e.stopPropagation(); setPhase("game"); }}>
           Skip video
         </button>
-        <button type="button" className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} onClick={(e) => { e.stopPropagation(); setLearn(true); setPhase("game"); }}>
+        <button type="button" className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} onClick={(e) => { e.stopPropagation(); setFromHome(new URLSearchParams(window.location.search).get("from") === "home"); setLearn(true); setPhase("game"); }}>
           Learn
         </button>
       </div>

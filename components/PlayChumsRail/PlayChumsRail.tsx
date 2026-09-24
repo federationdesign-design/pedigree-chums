@@ -29,7 +29,9 @@ export default async function PlayChumsRail() {
   return (
     /* NO VISIBLE TITLE (owner, 24 September 2026: the "Play a chum" heading is
        removed). A screen reader still hears what the row is, from the label. */
-    <section className={styles.wrap} aria-label="Play a chum">
+    // id: the anchor the learn area's back square returns to. ?from=home on the
+    // links is how a /play page knows it was opened from here.
+    <section id="play-chums" className={styles.wrap} aria-label="Play a chum">
       <div className={styles.rail}>
         {chums.map(({ b, circles }) => {
           const poster = lastFrameOf(INTRO_VIDEOS[b.slug]);
@@ -38,7 +40,7 @@ export default async function PlayChumsRail() {
             <div key={b.slug} className={styles.card} data-play-card>
               {/* THE LAST FRAME OF THE CHUM'S OWN INTRO CLIP. The frame already
                   carries the dog's name. A tap on the picture plays the game. */}
-              <Link href={`/play/${b.slug}`} tabIndex={-1} aria-hidden="true">
+              <Link href={`/play/${b.slug}?from=home`} tabIndex={-1} aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className={styles.img} src={poster} alt="" loading="lazy" width={480} height={682} />
               </Link>
@@ -48,7 +50,7 @@ export default async function PlayChumsRail() {
                   the chums that have a film. */}
               <div className={styles.actions}>
                 {vimeoId ? <WatchVideoRow name={b.name} vimeoId={vimeoId} poster={poster} seconds={secs.get(b.slug) ?? null} /> : null}
-                <Link href={`/play/${b.slug}`} className={styles.row} aria-label={`Play the ${b.name} game, ${circles} dogs`}>
+                <Link href={`/play/${b.slug}?from=home`} className={styles.row} aria-label={`Play the ${b.name} game, ${circles} dogs`}>
                   <span className={styles.rowLabel}>Play game</span>
                   <span className={`${styles.dot} ${styles.dotPlay}`} aria-hidden="true">🕹️</span>
                   <span className={`${styles.dot} ${styles.dotDogs}`} aria-hidden="true">
