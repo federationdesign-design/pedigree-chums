@@ -5305,6 +5305,8 @@ export default function BreedTree({
   const logoPiecesGRef = useRef<SVGGElement>(null);
   const toyBodiesRef = useRef<PropBody[]>([]);
   const toysGRef = useRef<SVGGElement>(null);
+  // The bowl's front face, drawn again above the chum cards. See its render.
+  const bowlFrontGRef = useRef<SVGGElement>(null);
   const chumsGRef = useRef<SVGGElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chumBodiesRef = useRef<any[]>([]);
@@ -7019,6 +7021,19 @@ export default function BreedTree({
             const im = el.querySelector("[data-logo-art]") as SVGImageElement | null;
             if (im) { im.setAttribute("href", want); u.art = want; }
           }
+        }
+      }
+    }
+    /* The bowl's front face follows the real bowl exactly. See its render. */
+    {
+      const bf = bowlFrontGRef.current;
+      if (bf) for (const pr of toyBodiesRef.current) {
+        if (pr.toyKind !== "bowl") continue;
+        const el = bf.querySelector(`[data-toy-idx="${pr.idx}"]`);
+        if (el) {
+          el.setAttribute("transform", `translate(${(pr.x - v[0]) * k},${(pr.y - v[1]) * k}) rotate(${pr.a * 57.2958})`);
+          // Born hidden so it never shows at the origin; revealed once placed.
+          (el as SVGGElement).style.visibility = "visible";
         }
       }
     }
@@ -15480,6 +15495,24 @@ export default function BreedTree({
                 </g>
               );
             })}
+          </g>
+          {/* THE BOWL'S FRONT FACE, ABOVE THE CHUM CARDS (owner, 24 September
+              2026: cards that fall into the bowl were drawn in front of it). The
+              physics already lets things fall INTO the bowl, but every toy is
+              drawn in an earlier layer than the chum cards, so a card inside it
+              was painted over the bowl. This draws the bowl a second time in a
+              layer above the cards, moved every frame with the real one (see the
+              writer beside the toys loop), so a card inside sits behind the
+              bowl's front and anything above the rim still shows. Never takes a
+              press: the real bowl underneath is the one that is grabbed. */}
+          <g ref={bowlFrontGRef} style={{ display: dockAside ? "inline" : "none", pointerEvents: "none" }} aria-hidden="true">
+            {toyList.map((ty, i2) => ty.kind !== "bowl" ? null : (
+              <g key={i2} data-toy-idx={i2} visibility="hidden" style={{ display: deadToys.has(i2) ? "none" : undefined }}>
+                <image href={scheme ? TOY_BOWL_WHITE_SRC : ty.src}
+                  x={-ty.size / 2} y={-ty.h / 2} width={ty.size} height={ty.h}
+                  style={ty.filter && !scheme ? { filter: ty.filter } : undefined} />
+              </g>
+            ))}
           </g>
           <g ref={pillsGRef} style={{ display: dockAside ? "inline" : "none" }} textAnchor="middle">
             {pillList.map((pl, i2) => {
