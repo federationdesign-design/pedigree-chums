@@ -6897,8 +6897,16 @@ export default function BreedTree({
          circle becomes a word and a word is not paintable. Its code is left in
          place rather than torn out here: that is the spec's stage 4, and it was
          not asked for. */
+      /* AND THE TIER TEST, 24 September 2026 (owner). This is the SECOND rule that
+         makes a word, and it is the one that fires MID-ROUND: a circle whose breed
+         has one copy left latches into its name wherever it sits in the tree. The
+         drop-time rule was given wordTier earlier today and this one was not, so a
+         rare dog still turned into a word as its twins were collected, which is
+         what the owner saw on the Cur level.
+         The two rules must ask the same question: see wordTier. */
       const wantWord = paintable && !chHeld && !chTwin && fellRef.current
         && (levelBreedLeft.get(d.data.name) ?? 0) === 1
+        && wordTier(rarityTier(treesContaining(d.data.name)))
         && !!pitBodiesRef.current?.owned.has(d);
       if (wantWord && !orphanWord) {
         orphanSetRef.current.add(d);
