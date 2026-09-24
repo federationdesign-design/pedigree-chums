@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { breeds } from "../../data/breeds";
+import { breeds, breedCard } from "../../data/breeds";
+import { bust } from "../../data/imgVersion";
 import { chumCircleCount } from "../../data/playIntros";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { resolveLineageName } from "../../data/lineageNames";
@@ -97,37 +98,51 @@ const rarityOf = (name: string) => RARITY.find((r) => treesContaining(name) >= r
 type Row = { slug: string; name: string; image: string; circles: number; dogs: number; era: string | null; status: BreedStatus | undefined; rarity: { colour: string; label: string } };
 
 function Ladder({ title, colour, rows }: { title: string; colour: string; rows: Row[] }) {
+  const top = rows[0];
+  const topStatus = top?.status;
   return (
     <section className={styles.ladder} aria-label={`${title} levels`}>
       <header className={styles.head}>
-        <h2 className={styles.title} style={{ color: colour }}>{title}</h2>
-        {/* THE TOP CHUM'S CARD (owner, 24 September 2026): the hardest dog in the
-            table, as its card, opening its game. */}
-        {rows[0] ? (
-          <Link href={`/play/${rows[0].slug}`} className={styles.topCard} aria-label={`Play the ${rows[0].name}, the top of ${title}`}>
+        {/* THE TOP CHUM'S PRINTED CARD, from the pack (owner, 24 September 2026),
+            with the Chum Finder's flash across its foot carrying the chum's
+            status in its status colour. The level's name sits under it. */}
+        {top ? (
+          <Link href={`/play/${top.slug}`} className={styles.topCard} aria-label={`Play the ${top.name}, the top of ${title}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={encodeURI(rows[0].image)} alt="" loading="lazy" width={140} height={140} />
+            <img src={bust(breedCard[top.slug] ?? top.image)} alt="" loading="lazy" width={821} height={1122} />
+            {topStatus ? (
+              <span className={styles.flash} style={{ background: STATUS_COLOUR[topStatus].bg, color: STATUS_COLOUR[topStatus].fg }}>{STATUS_LABEL[topStatus]}</span>
+            ) : null}
           </Link>
         ) : null}
+        <h2 className={styles.title} style={{ color: colour }}>{title}</h2>
       </header>
+      {/* A TABLE, 24 September 2026 (owner): the column names once at the top,
+          a line between the rows. */}
+      <div className={styles.colHead} aria-hidden="true">
+        <span />
+        <span>Chum</span>
+        <span>Ancestors</span>
+        <span>Circles</span>
+      </div>
       <ol className={styles.list}>
         {rows.map((r, i) => (
           <li key={r.slug}>
-            <Link href={`/play/${r.slug}`} className={styles.row} aria-label={`Play the ${r.name}: ${r.dogs} dogs, ${r.circles} circles`}>
+            <Link href={`/play/${r.slug}`} className={styles.row} aria-label={`Play the ${r.name}: ${r.dogs} ancestors, ${r.circles} circles`}>
               <span className={styles.rank}>{i + 1}</span>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className={styles.thumb} src={encodeURI(r.image)} alt="" loading="lazy" width={48} height={48} />
-              <span className={styles.nameBlock}>
-                <span className={styles.name}>{r.name}</span>
-                <span className={styles.meta}>
-                  <span className={styles.dot} style={{ background: r.rarity.colour }} title={r.rarity.label} aria-label={r.rarity.label} />
+              <span className={styles.chum}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className={styles.thumb} src={encodeURI(r.image)} alt="" loading="lazy" width={36} height={36} />
+                <span className={styles.nameLine}>
+                  <span className={styles.name}>{r.name}</span>
                   {r.era ? (
                     <span className={styles.pill} style={r.status ? { background: STATUS_COLOUR[r.status].bg, color: STATUS_COLOUR[r.status].fg } : undefined} title={r.status ? STATUS_LABEL[r.status] : undefined}>{r.era}</span>
                   ) : null}
+                  <span className={styles.dot} style={{ background: r.rarity.colour }} title={r.rarity.label} aria-label={r.rarity.label} />
                 </span>
               </span>
-              <span className={styles.stat}><span className={styles.num}>{r.dogs}</span><span className={styles.unit}>dogs</span></span>
-              <span className={styles.stat}><span className={styles.num}>{r.circles}</span><span className={styles.unit}>circles</span></span>
+              <span className={styles.num}>{r.dogs}</span>
+              <span className={styles.num}>{r.circles}</span>
             </Link>
           </li>
         ))}
