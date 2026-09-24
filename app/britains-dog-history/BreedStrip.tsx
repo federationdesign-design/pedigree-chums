@@ -163,6 +163,7 @@ export default function BreedStrip({
   autoPlay,
   autoLearn,
   playOnArrival,
+  arrivalDelayMs,
   closeHref,
   only,
   label,
@@ -186,6 +187,10 @@ export default function BreedStrip({
   /* With initialLevel, start the round PLAY_ON_ARRIVAL_MS after the page opens,
      with no time tunnel (owner, 24 September 2026). The learn page's ?play link. */
   playOnArrival?: boolean;
+  /* How long playOnArrival waits before the circles fall. PLAY_ON_ARRIVAL_MS if
+     not given. The /play page's intro clip passes 0 when it was watched to the
+     end, so the round starts the moment it finishes (owner, 24 September 2026). */
+  arrivalDelayMs?: number;
   /* WHERE CLOSING THE LEVEL GOES, and the signal that this is a per-level page
      showing the GAME ONLY (owner, 20 September 2026: no text underneath, no strip,
      close goes to that dog's era page). When set, nothing but the level is
@@ -872,7 +877,7 @@ export default function BreedStrip({
       quiet={active.quiet}
       navFading={navFading}
       startInPlay={(!!autoPlay || !!playOnArrival) && active.name === initialLevel}
-      startDelayMs={playOnArrival && active.name === initialLevel ? PLAY_ON_ARRIVAL_MS : 0}
+      startDelayMs={playOnArrival && active.name === initialLevel ? arrivalDelayMs ?? PLAY_ON_ARRIVAL_MS : 0}
       /* The ?play link opens on the easiest difficulty, the smallest circles
          (owner, 24 September 2026). The first level only; the slider's saved
          value then carries it on, and the player can still change it. */

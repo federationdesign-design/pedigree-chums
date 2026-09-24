@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { cloneElement, isValidElement, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
+import Nav from "../../../components/Nav/Nav";
+import heroBtn from "../../britains-dog-history-2/history2.module.css";
 
 /* THE CHUM'S INTRO VIDEO BEFORE ITS GAME, phones only (owner, 24 September 2026:
    a five second clip per chum, trialled on the Labrador first).
@@ -24,6 +26,13 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   // Unknown until the browser has been asked, so nothing is drawn for that frame.
   const [phase, setPhase] = useState<"decide" | "video" | "game">("decide");
   const vidRef = useRef<HTMLVideoElement>(null);
+  /* WATCHED TO THE END, the round starts the instant the clip does, with no
+     second's wait (owner, 24 September 2026). A skip, an error or a refused
+     autoplay keep the usual second, since nothing has just led into the game. */
+  const [watched, setWatched] = useState(false);
+  /* LEARN INSTEAD (owner, 24 September 2026): the intro's Learn button opens the
+     chum's level in its learn area rather than starting the round. */
+  const [learn, setLearn] = useState(false);
 
   // Decided once, on the first frame after mounting, so a later resize can never
   // bring the clip back over a game already running.
@@ -43,11 +52,26 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   }, [phase]);
 
   if (phase === "decide") return null;
-  if (phase === "game") return <>{children}</>;
+  if (phase === "game") {
+    type StripProps = { arrivalDelayMs?: number; playOnArrival?: boolean; autoLearn?: boolean };
+    if (learn && isValidElement(children)) {
+      return cloneElement(children as ReactElement<StripProps>, { playOnArrival: false, autoLearn: true });
+    }
+    if (watched && isValidElement(children)) {
+      return cloneElement(children as ReactElement<StripProps>, { arrivalDelayMs: 0 });
+    }
+    return <>{children}</>;
+  }
   return (
+    <>
+    {/* THE SITE'S MENU AND ACCESSIBILITY SQUARES, top right, over the clip (owner,
+        24 September 2026). The logo stays off; only the two squares show. The
+        clip sits UNDER the nav bar (its z-index 300) so the squares stay on top,
+        and the menu itself still opens over everything. */}
+    <Nav hideLogo />
     <div
       onClick={() => setPhase("game")}
-      style={{ position: "fixed", inset: 0, zIndex: 1000, background: "#0a3a57", cursor: "pointer" }}
+      style={{ position: "fixed", inset: 0, zIndex: 250, background: "#0a3a57", cursor: "pointer" }}
     >
       <video
         ref={vidRef}
@@ -56,38 +80,26 @@ export default function PlayIntro({ video, children }: { video?: string; childre
         playsInline
         autoPlay
         preload="auto"
-        onEnded={() => setPhase("game")}
+        onEnded={() => { setWatched(true); setPhase("game"); }}
         onError={() => setPhase("game")}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
-      {/* THE SKIP BUTTON (owner, 24 September 2026), in the pit's own button
-          style: navy, a 2px yellow edge, corners at 0.3 of the height, yellow
-          lettering in the display font. Bottom right, 18px in like the pit's
-          corner squares, clear of the phone's home bar. A tap anywhere on the
-          clip still skips too; this is the one the player can see. */}
-      <button
-        type="button"
-        onClick={(e) => { e.stopPropagation(); setPhase("game"); }}
-        aria-label="Skip the intro and start the game"
-        style={{
-          position: "absolute",
-          right: 18,
-          bottom: "calc(18px + env(safe-area-inset-bottom, 0px))",
-          height: 52,
-          padding: "0 22px",
-          borderRadius: 16,
-          background: "var(--navy, #0a3a57)",
-          border: "2px solid var(--yellow, #ffd23e)",
-          color: "var(--yellow, #ffd23e)",
-          fontFamily: "var(--font-display), system-ui, sans-serif",
-          fontSize: 24,
-          lineHeight: 1,
-          letterSpacing: 1,
-          cursor: "pointer",
-        }}
+      {/* TWO BUTTONS IN THE HISTORY HERO'S STYLE (owner, 24 September 2026),
+          the same classes as its First dog and First era, so they cannot drift:
+          green SKIP VIDEO starts the round, blue LEARN opens the learn area.
+          Across the foot, 18px in, clear of the phone's home bar. */}
+      <div
+        className={heroBtn.introBtnRow}
+        style={{ position: "absolute", left: 18, right: 18, bottom: "calc(18px + env(safe-area-inset-bottom, 0px))", width: "auto", marginTop: 0 }}
       >
-        SKIP
-      </button>
+        <button type="button" className={heroBtn.introBtn} onClick={(e) => { e.stopPropagation(); setPhase("game"); }}>
+          Skip video
+        </button>
+        <button type="button" className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} onClick={(e) => { e.stopPropagation(); setLearn(true); setPhase("game"); }}>
+          Learn
+        </button>
+      </div>
     </div>
+    </>
   );
 }
