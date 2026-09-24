@@ -864,6 +864,10 @@ const FACE_COLLECT_SRC: Record<RarityTier, string> = {
   veryCommon: "/very-common2.png",
 };
 const FACE_COLLECT_MS = 600;
+/* THE OUTLINE ON EVERY DOG NAME IN THE PIT, black (owner, 24 September 2026),
+   was navy #0a3a57. One figure for both kinds of word: the names that fall as
+   words, and the ones that latch into their name mid-round. */
+const PIT_WORD_OUTLINE = "#000000";
 // How long the snail or jelly square stays inverted after a tap.
 const UI_HIT_MS = 250;
 /* THE JOIN FLASH (owner, 24 September 2026: "keep all twins on the chained face,
@@ -15441,7 +15445,7 @@ export default function BreedTree({
                   dominantBaseline="central"
                   style={{
                     fill: "#ffffff",
-                    stroke: "#0a3a57",
+                    stroke: PIT_WORD_OUTLINE,
                     strokeWidth: Math.max(2, w.fs * 0.16),
                     paintOrder: "stroke",
                     strokeLinejoin: "round",
@@ -15485,7 +15489,7 @@ export default function BreedTree({
                     dominantBaseline="central"
                     style={{
                       fill: "#ffffff",
-                      stroke: "#0a3a57",
+                      stroke: PIT_WORD_OUTLINE,
                       paintOrder: "stroke",
                       strokeLinejoin: "round",
                       fontFamily: "var(--font-display), system-ui, sans-serif",
