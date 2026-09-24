@@ -1084,7 +1084,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           places that spend a life, so a fifth one cannot be added later and miss
           it, and so no effect has to write state during a render pass. */}
       {showEnding && (
-        <div className={`${css.endOverlay}${phase === "won" ? " " + css.winOverlay : ""}`} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
+        <div className={`${css.endOverlay}${phase === "won" ? " " + css.winOverlay : ""}`} role="alertdialog" aria-label={phase === "won" ? "Dog done" : "Game over"}>
           {/* Round Won is its own screen: what you just finished, what it was
               worth, and what is coming next. Next Level is the whole point of
               it, so there is no X competing with the button. Game Over keeps the
@@ -1151,7 +1151,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   one, so this is only the reporting.
                   Hidden at zero rather than showing "0 chums": a level where the
                   reader collected nothing should not be told so. */}
-              <div className={css.winFlash}>Round Won</div>
+              {/* "Dog Done", was "Round Won" (owner, 24 September 2026). */}
+              <div className={css.winFlash}>Dog Done</div>
               {/* THE ERA JOIN. Two messages in one slot: the first lands with
                   the screen, the second pops over the top of it a beat later.
                   Sits ABOVE the next-level block rather than replacing it, so
