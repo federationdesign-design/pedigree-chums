@@ -264,7 +264,10 @@ export default function BreedStrip({
      act the same as all the other parts of the levels"). Unique names collected
      from the pit, carried level to level beside the score and the chum tallies,
      and cleared with them on a fresh run. Nothing is saved to the browser. */
-  const [dogsFound, setDogsFound] = useState<ReadonlySet<string>>(() => new Set());
+  /* Name to the era it was found in, in the order found. The ERA FOUND IN, not the
+     dog's own: only 73 of the 126 have an era of their own in the data, while the
+     level being played always has one. */
+  const [dogsFound, setDogsFound] = useState<ReadonlyMap<string, string>>(() => new Map());
   /* How many times each dog has been caught this run, by name. The picture is
      resolved from the pack data rather than carried through two components,
      because the pack is already the source of truth for it here. */
@@ -704,11 +707,13 @@ export default function BreedStrip({
       onLevelChums={(found, possible) => setChumTallies((t) => [...t, { found, possible }])}
       dogsFound={dogsFound.size}
       dogsTotal={allPitAncestors().size}
+      dogsFoundList={Array.from(dogsFound, ([name, era]) => ({ name, era }))}
       onDogFound={(n) => {
         // Only a name the pit can actually hold counts, so the figure can
         // never pass its own total.
         if (!allPitAncestors().has(n)) return;
-        setDogsFound((s) => (s.has(n) ? s : new Set(s).add(n)));
+        const era = curStrip ? ERA_LABELS[curStrip] ?? curStrip : "";
+        setDogsFound((m) => (m.has(n) ? m : new Map(m).set(n, era)));
       }}
       onChumCaught={(n) => setChumCounts((c) => ({ ...c, [n]: (c[n] ?? 0) + 1 }))}
       topChum={topChum}
@@ -784,7 +789,7 @@ export default function BreedStrip({
         setBankedScore(0); // a fresh run has nothing banked either
         setChumTallies([]);
         setChumCounts({});
-        setDogsFound(new Set());
+        setDogsFound(new Map());
         // A fresh run is a fresh set of toys. See resetToys in BreedTree: they
         // are spent by PROGRESS, and a game over is the opposite of progress.
         resetToys();

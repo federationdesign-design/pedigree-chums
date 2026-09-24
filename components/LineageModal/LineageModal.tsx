@@ -234,6 +234,7 @@ type Props = {
      Passed straight through. */
   dogsFound?: number;
   dogsTotal?: number;
+  dogsFoundList?: { name: string; era: string }[];
   onDogFound?: (name: string) => void;
   /* Each catch as it happens, so the run can count which dog turns up most.
      A chum leaves this level's flood once taken, but the sets reset per level,
@@ -246,7 +247,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay, startInLearn = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible, dogsFound, dogsTotal, onDogFound }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay, startInLearn = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible, dogsFound, dogsTotal, dogsFoundList, onDogFound }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -777,6 +778,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           key={runKey}
           dogsFound={dogsFound}
           dogsTotal={dogsTotal}
+          dogsFoundList={dogsFoundList}
           onDogFound={onDogFound}
           /* The pit needs the era by name as well as by theme: a thrown ball is
              retired for this era and returns in the next one. */

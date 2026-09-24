@@ -3199,6 +3199,7 @@ export default function BreedTree({
   onChumsDropped,
   dogsFound,
   dogsTotal,
+  dogsFoundList,
   onDogFound,
   hideLabels = false,
   disableZoom = false,
@@ -3291,6 +3292,8 @@ export default function BreedTree({
      onDogFound and draws dogsFound / dogsTotal. */
   dogsFound?: number;
   dogsTotal?: number;
+  // Every dog found this run with the era it was found in, oldest first.
+  dogsFoundList?: { name: string; era: string }[];
   onDogFound?: (name: string) => void;
   /* How many cards the flood actually tipped in, reported once when it runs.
      The win screen needs a denominator and this is the only place that knows
@@ -5210,6 +5213,15 @@ export default function BreedTree({
      at the figure the pit mounted with, so opening a level never flashes it. */
   const [foundFlash, setFoundFlash] = useState(false);
   const prevFoundRef = useRef(dogsFound ?? 0);
+  /* THE LIST behind the counter (owner, 24 September 2026): a tap on the counter
+     opens every dog found this run. The counter stays up while it is open. */
+  const [foundListOpen, setFoundListOpen] = useState(false);
+  /* THE CHAIN COUNTER WINS (owner, 24 September 2026). Called by the chain the
+     moment it shows its own counter: the dogs-found flash and its list both go,
+     so the two never share the corner. The chain effect is older than this
+     state, so it reaches it through a ref. */
+  // Built once: both setters are stable, so nothing here goes stale.
+  const foundStandDownRef = useRef<() => void>(() => { setFoundFlash(false); setFoundListOpen(false); });
   /* THE SWIPE WINS OVER THE COLLECT (owner,
      17 September 2026). A second press on an armed card collects it on the
      PRESS, before anyone can know whether a swipe follows. Under the chain flag,
@@ -5984,7 +5996,7 @@ export default function BreedTree({
     const raf = requestAnimationFrame(place);
     window.addEventListener("resize", place);
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", place); };
-  }, [dogsFound, dogsTotal, started, learning, foundFlash]);
+  }, [dogsFound, dogsTotal, started, learning, foundFlash, foundListOpen]);
   // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
   useEffect(() => () => clearCdTimers(), []);
@@ -12841,6 +12853,8 @@ export default function BreedTree({
       if (!el) return;
       const total = chainTotalRef.current;
       if (!total) { el.style.display = "none"; return; }
+      // The chain counter takes priority over the dogs-found counter.
+      foundStandDownRef.current();
       const held = dogChainNodesRef.current.size;
       el.textContent = `${held}/${total}`;
       el.setAttribute("aria-label", `${held} of ${total} joined`);
@@ -16638,12 +16652,42 @@ export default function BreedTree({
       {dogsTotal ? (
         <div
           ref={foundCountRef}
-          className={styles.chainCount}
-          style={{ display: foundFlash && !learning ? "block" : "none" }}
-          role="status"
-          aria-label={`${dogsFound ?? 0} of ${dogsTotal} dogs found`}
+          className={`${styles.chainCount} ${styles.foundCount}`}
+          style={{ display: (foundFlash || foundListOpen) && !learning ? "block" : "none" }}
+          role="button"
+          tabIndex={0}
+          aria-expanded={foundListOpen}
+          aria-label={`${dogsFound ?? 0} of ${dogsTotal} dogs found. Show the list`}
+          onClick={() => setFoundListOpen((o) => !o)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFoundListOpen((o) => !o); } }}
         >
           {`${dogsFound ?? 0}/${dogsTotal}`}
+          {/* THE LIST, hung under the counter so it moves with it. Newest first:
+              the dog just found is the one the player is looking for. */}
+          {foundListOpen && (
+            <div className={styles.foundList} role="dialog" aria-label="Dogs found this run" onClick={(e) => e.stopPropagation()}>
+              <div className={styles.foundListHead}>
+                <span>Dogs found</span>
+                <button type="button" className={styles.foundListClose} aria-label="Close the list" onClick={() => setFoundListOpen(false)}>×</button>
+              </div>
+              {(dogsFoundList ?? []).length === 0 ? (
+                <p className={styles.foundListEmpty}>None yet</p>
+              ) : (
+                <ul className={styles.foundListRows}>
+                  {[...(dogsFoundList ?? [])].reverse().map((d) => {
+                    const band = RARITY_BAND[rarityTier(treesContaining(d.name))];
+                    return (
+                      <li key={d.name} className={styles.foundListRow}>
+                        <span className={styles.foundListName}>{d.name}</span>
+                        <span className={styles.foundListTag} style={{ background: band.bg, color: band.fg }}>{band.label}</span>
+                        <span className={styles.foundListEra}>{d.era}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
       ) : null}
       {dockAside && dropped && cornerShot > 0 && chumsCollected > 0 && (

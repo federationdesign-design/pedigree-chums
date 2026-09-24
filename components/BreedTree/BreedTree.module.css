@@ -2577,3 +2577,69 @@
   display: none;
 }
 
+/* THE DOGS-FOUND COUNTER AND ITS LIST, 24 September 2026 (owner). The counter
+   wears .chainCount's pill and adds only what differs: it takes a press. The list
+   hangs under it, right-aligned to it, in the pit's navy with white text. */
+.foundCount {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.foundList {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(86vw, 360px);
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+  border-radius: 18px;
+  background: var(--navy, #0a3a57);
+  color: #ffffff;
+  text-shadow: none;
+  letter-spacing: 0;
+  font-family: var(--font-body, Montserrat), system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.3;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  cursor: default;
+}
+.foundListHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+.foundListClose {
+  background: none;
+  border: 0;
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.foundListEmpty { margin: 4px 0 0; opacity: 0.8; }
+.foundListRows { list-style: none; margin: 0; padding: 0; }
+.foundListRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "name tag" "era era";
+  gap: 2px 8px;
+  padding: 7px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.foundListName { grid-area: name; font-weight: 700; }
+.foundListTag {
+  grid-area: tag;
+  align-self: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.foundListEra { grid-area: era; font-size: 12px; opacity: 0.8; }
+
