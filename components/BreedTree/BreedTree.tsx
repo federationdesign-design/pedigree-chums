@@ -921,6 +921,8 @@ const CHAIN_COUNT_DROP_PX = 10;
 const FOUND_COUNT_GAP_PX = 10;
 // How long the dogs-found counter stays up after a new dog is found.
 const FOUND_FLASH_MS = 5000;
+// The least space kept between the dogs-found list and any edge of the window.
+const FOUND_LIST_EDGE_PX = 10;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
    (owner, 24 September 2026). It used to call the count off altogether. */
 const BOMB_ADDS_SECS = 10;
@@ -5219,6 +5221,33 @@ export default function BreedTree({
   /* THE LIST behind the counter (owner, 24 September 2026): a tap on the counter
      opens every dog found this run. The counter stays up while it is open. */
   const [foundListOpen, setFoundListOpen] = useState(false);
+  const foundListRef = useRef<HTMLDivElement>(null);
+  /* THE LIST STAYS ON SCREEN (owner, 24 September 2026: it was running off the
+     left edge). It hangs right-aligned under the counter, and the counter can sit
+     near the left of a narrow pit, so the list could start off screen. Measured
+     once it has rendered, before paint: shifted sideways back inside the window
+     with FOUND_LIST_EDGE_PX of air, and its height capped to the room left below
+     it, so it scrolls rather than running off the bottom. Re-run on a resize and
+     when a new dog makes it longer. */
+  useLayoutEffect(() => {
+    const el = foundListRef.current;
+    if (!foundListOpen || !el) return;
+    const fit = () => {
+      el.style.transform = "";
+      el.style.maxHeight = "";
+      const r = el.getBoundingClientRect();
+      const m = FOUND_LIST_EDGE_PX;
+      let dx = 0;
+      if (r.left < m) dx = m - r.left;
+      else if (r.right > window.innerWidth - m) dx = window.innerWidth - m - r.right;
+      if (dx) el.style.transform = `translateX(${dx}px)`;
+      const room = window.innerHeight - r.top - m;
+      if (r.bottom > window.innerHeight - m) el.style.maxHeight = `${Math.max(120, room)}px`;
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [foundListOpen, dogsFoundList?.length]);
   /* THE CHAIN COUNTER WINS (owner, 24 September 2026). Called by the chain the
      moment it shows its own counter: the dogs-found flash and its list both go,
      so the two never share the corner. The chain effect is older than this
@@ -16706,7 +16735,7 @@ export default function BreedTree({
           {/* THE LIST, hung under the counter so it moves with it. Newest first:
               the dog just found is the one the player is looking for. */}
           {foundListOpen && (
-            <div className={styles.foundList} role="dialog" aria-label="Dogs found this run" onClick={(e) => e.stopPropagation()}>
+            <div ref={foundListRef} className={styles.foundList} role="dialog" aria-label="Dogs found this run" onClick={(e) => e.stopPropagation()}>
               <div className={styles.foundListHead}>
                 <span>Dogs found</span>
                 <button type="button" className={styles.foundListClose} aria-label="Close the list" onClick={() => setFoundListOpen(false)}>×</button>
