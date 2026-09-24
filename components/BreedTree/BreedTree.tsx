@@ -13760,6 +13760,40 @@ export default function BreedTree({
               pointer, or it would answer the hit test in a circle's place.
               It carries the swipe chain's own filter, not a second one. */}
           <g ref={twinGlowGRef} filter="url(#bt-chain-glow)" style={{ pointerEvents: "none" }} />
+          {/* UNDER THE CIRCLES, 24 September 2026 (owner: the dog should sit on
+              top of the chain line, so the line reads as coming OUT of the dog
+              rather than starting in the middle of its face).
+
+              IT USED TO BE LAST IN THE SVG, which is what the note below still
+              describes; that placement is the one thing that changed. SVG has no
+              z-index, so document order IS screen order and moving the group is
+              the whole fix.
+
+              WHAT IT COSTS: the line now passes behind every card and circle, not
+              only the dog being dragged, so on a crowded pit a link can go under
+              a card it crosses. The alternative was reordering the held circle in
+              the DOM every frame, which is a lot of machinery for the same look. */}
+          {/* The swipe chain path. Last in
+              the pit SVG so it draws over every card, a direct child of the SVG
+              like the chum cards so both share one coordinate space, and never
+              takes a pointer, or the hit test that finds the card under the
+              finger would find the line instead. Empty until a chain draws. The
+              blur region is in user space: an object bounding box region is
+              zero tall on a level line, which would switch the glow off. */}
+          <g ref={chainGRef} style={{ pointerEvents: "none" }}>
+            <defs>
+              <filter id="bt-chain-glow" filterUnits="userSpaceOnUse" x={-5000} y={-5000} width={10000} height={10000}>
+                <feGaussianBlur data-chain="blur" stdDeviation={4} />
+              </filter>
+            </defs>
+            {/* One line per link rather than a single polyline, so each link can
+                carry its own state: white, grey while strained, red and cut
+                open where it broke. The glow group blurs a copy of the same
+                lines. */}
+            <g data-chain="glow" filter="url(#bt-chain-glow)" />
+            <g data-chain="core" />
+            <g data-chain="dots" />
+          </g>
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
@@ -15695,27 +15729,6 @@ export default function BreedTree({
               </text>
             );
           })()}
-          {/* The swipe chain path. Last in
-              the pit SVG so it draws over every card, a direct child of the SVG
-              like the chum cards so both share one coordinate space, and never
-              takes a pointer, or the hit test that finds the card under the
-              finger would find the line instead. Empty until a chain draws. The
-              blur region is in user space: an object bounding box region is
-              zero tall on a level line, which would switch the glow off. */}
-          <g ref={chainGRef} style={{ pointerEvents: "none" }}>
-            <defs>
-              <filter id="bt-chain-glow" filterUnits="userSpaceOnUse" x={-5000} y={-5000} width={10000} height={10000}>
-                <feGaussianBlur data-chain="blur" stdDeviation={4} />
-              </filter>
-            </defs>
-            {/* One line per link rather than a single polyline, so each link can
-                carry its own state: white, grey while strained, red and cut
-                open where it broke. The glow group blurs a copy of the same
-                lines. */}
-            <g data-chain="glow" filter="url(#bt-chain-glow)" />
-            <g data-chain="core" />
-            <g data-chain="dots" />
-          </g>
         </svg>
         {/* J17: the canvas effects layer, above the SVG, never takes a pointer.
             displayOnly (chums2 static diagram) omits it: it is a raster bitmap sized
