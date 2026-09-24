@@ -3243,6 +3243,7 @@ export default function BreedTree({
   startInLearn = false,
   startImmediately = false,
   startDelayMs = 0,
+  startDifficulty,
   onRestartLevel,
   playLabel = "PLAY",
   onPlayPressed,
@@ -3430,6 +3431,8 @@ export default function BreedTree({
   startImmediately?: boolean;
   // With startImmediately, wait this long before the round starts. 0 is at once.
   startDelayMs?: number;
+  // Open the pit at this difficulty, 0 easiest to 10, instead of the saved one.
+  startDifficulty?: number;
   /* The pit menu's green square: restart THIS level. Owned by the host, because
      it costs a life and remounts the round, exactly like onBackToStart. */
   onRestartLevel?: () => void;
@@ -3475,7 +3478,14 @@ export default function BreedTree({
   // one level to the next.
   // Read in a lazy initialiser so it runs once per mount and never during a
   // server render, where there is no sessionStorage at all.
-  const [level, setLevel] = useState(() => readDiff());
+  /* startDifficulty, when given, wins over the saved value and is saved in its
+     place, so the levels after it carry it on like any slider change (owner, 24
+     September 2026: the ?play link starts on the easiest, the smallest circles). */
+  const [level, setLevel] = useState(() => {
+    if (startDifficulty === undefined) return readDiff();
+    writeDiff(startDifficulty);
+    return startDifficulty;
+  });
   // Set the instant before a difficulty change, and consumed by the entrance
   // effect so that re-pack resizes in place rather than replaying the drop-in.
   const resizeOnlyRef = useRef(false);
@@ -4463,6 +4473,8 @@ export default function BreedTree({
      runs before the sim has assigned runFallRef, so there would be nothing to
      call. See the arm block beside runFallRef. */
   const autoStartRef = useRef(startImmediately);
+  // True from the auto start until its drop has run. See the arm block.
+  const fallOwedRef = useRef(false);
   const backToStartScreen = () => {
     setHovered(null);
     setHoverHint("");
@@ -12255,10 +12267,20 @@ export default function BreedTree({
         onPlayPressed?.();
         setLearning(false);
         setStarted(true);
-        doFall();
+        fallOwedRef.current = true;
       };
-      if (startDelayMs > 0) autoStartTimer = window.setTimeout(go, startDelayMs);
-      else go();
+      go();
+    }
+    /* THE PLAY SCREEN AT ONCE, THE DROP AFTER startDelayMs (owner, 24 September
+       2026: the ?play link should land on the play screen itself, not on the start
+       screen with its PLAY and close icons). Everything PLAY does except the drop
+       runs the moment the pit is ready, above; only doFall waits. fallOwedRef
+       carries the owed drop across a re-run of this effect: the cleanup drops the
+       timer and the next run arms it again, so the drop cannot be lost. */
+    if (fallOwedRef.current) {
+      const fall = () => { fallOwedRef.current = false; doFall(); };
+      if (startDelayMs > 0) autoStartTimer = window.setTimeout(fall, startDelayMs);
+      else fall();
     }
     registerSlowmo?.(() => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); });
     registerShake?.(() => {

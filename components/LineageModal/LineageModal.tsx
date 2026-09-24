@@ -148,6 +148,8 @@ type Props = {
   startInPlay?: boolean;
   // With startInPlay, how long the pit waits before the round starts.
   startDelayMs?: number;
+  // Open the pit at this difficulty instead of the saved one.
+  startDifficulty?: number;
   /* OPEN IN THE LEARN AREA, 24 September 2026 (owner). The A to Z roller on the
      history page is meant to land the reader in learn: the chum rail, the blue
      write-up and the play and close controls. It had no way to say so, which is
@@ -249,7 +251,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay, startDelayMs = 0, startInLearn = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible, dogsFound, dogsTotal, dogsFoundList, onDogFound }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay, startDelayMs = 0, startDifficulty, startInLearn = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible, dogsFound, dogsTotal, dogsFoundList, onDogFound }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -805,6 +807,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           startInLearn={resumeInLearn}
           startImmediately={autoStart}
           startDelayMs={startDelayMs}
+          startDifficulty={startDifficulty}
           onRestartLevel={restartLevel}
           playLabel={outOfLives ? "PLAY AGAIN" : "PLAY"}
           onPlayPressed={() => {

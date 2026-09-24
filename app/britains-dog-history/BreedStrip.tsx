@@ -873,6 +873,10 @@ export default function BreedStrip({
       navFading={navFading}
       startInPlay={(!!autoPlay || !!playOnArrival) && active.name === initialLevel}
       startDelayMs={playOnArrival && active.name === initialLevel ? PLAY_ON_ARRIVAL_MS : 0}
+      /* The ?play link opens on the easiest difficulty, the smallest circles
+         (owner, 24 September 2026). The first level only; the slider's saved
+         value then carries it on, and the player can still change it. */
+      startDifficulty={playOnArrival && active.name === initialLevel ? 0 : undefined}
       /* The learn deep link, 24 September 2026 (owner): the roller lands here. */
       startInLearn={!!autoLearn && active.name === initialLevel}
       onClose={() => {
