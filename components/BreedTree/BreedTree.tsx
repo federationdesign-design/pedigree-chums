@@ -1205,7 +1205,10 @@ const MC_STIFFNESS = 0.2;
    and fade-in was tried next and rolled back. A heavier dog was also considered
    and does nothing: the finger end of the tether is the mouse, which has no body,
    so Matter moves the dog by the full correction whatever it weighs. */
-const TETHER_STIFFNESS = 0.01;
+/* Then 0.01, which was better but not enough (owner, 24 September 2026: longer
+   lag, less pull). 0.003 is about a third of that. Lower still and gravity starts
+   to win: the dog hangs further below the finger than it follows it. */
+const TETHER_STIFFNESS = 0.003;
 const TETHER_DAMPING = 0.02;
 /* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
    casing that was here, with the cost stated and chosen).
