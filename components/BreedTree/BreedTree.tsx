@@ -5935,7 +5935,9 @@ export default function BreedTree({
         // 8px down, not 18: the in-pit squares moved 15 up and about 24 right on
         // 1 September, and the digits stayed where they were, so they sat low
         // against the title and the portrait. This puts them back on that line.
-        ? "align-items:flex-start;justify-content:flex-end;padding:8px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
+        // 18px down, not 8 (owner, 24 September 2026): it sat a little over the
+        // score. 10px lower clears it.
+        ? "align-items:flex-start;justify-content:flex-end;padding:18px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
         : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
     st.appendChild(el);
     /* A SECOND SET OF DIGITS, IN THE MIDDLE. The corner pair keeps the count
