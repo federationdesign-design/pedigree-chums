@@ -907,6 +907,16 @@ const FACE_IDLE_MAX_MS = 9000;
    2026). Decided per circle from its index, not rolled each frame, so a dog keeps
    the way it faces for the whole round instead of flickering. */
 const FACE_FLIP_SHARE = 0.4;
+/* VERY COMMON COMES IN THREE SHADES OF YELLOW (owner, 24 September 2026: "if we
+   do have more than one instance of the very common rarity within the pit, it
+   takes a different colour shade"). Every very-common file has a B and a C twin,
+   the same face in another yellow, and each very-common circle is given one
+   shade for the round: the first plain, the next B, the next C, then round again.
+
+   APPLIED LAST, to the finished file name, so every state (resting, chained,
+   stand-down, bomb, shake, collect) keeps its shade without a table of its own.
+   The other four tiers are untouched. */
+const VERY_COMMON_SHADES = ["", "B", "C"] as const;
 const rnd = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
 /* ONLY THE TWO COMMON TIERS FALL AS WORDS, 24 September 2026 (owner). A dog rare
    enough to be worth spotting drops as its CIRCLE, with the tier art on it, so the
@@ -5920,6 +5930,21 @@ export default function BreedTree({
      change before its time is up. A circle with no entry simply picks a resting
      face on the next frame. */
   const faceHitRef = useRef<Map<Node, { src: string; until: number; evt: boolean }>>(new Map());
+  /* Each very-common circle's shade, handed out in turn the first time it is
+     drawn and kept for as long as the circle exists. See VERY_COMMON_SHADES. */
+  const faceShadeRef = useRef<{ of: WeakMap<Node, string>; next: number }>({ of: new WeakMap(), next: 0 });
+  // Called only from the face writer, never during render.
+  const shadeFace = (d: Node, src: string): string => {
+    if (!src.startsWith("/very-common")) return src;
+    const st = faceShadeRef.current;
+    let sh = st.of.get(d);
+    if (sh === undefined) {
+      sh = VERY_COMMON_SHADES[st.next % VERY_COMMON_SHADES.length];
+      st.next += 1;
+      st.of.set(d, sh);
+    }
+    return sh ? src.replace(/\.png$/, `${sh}.png`) : src;
+  };
   /* The sim's frame time, so the paint pass can expire a pulled face without
      reading the wall clock during render. Written wherever a face is set. */
   const faceClockRef = useRef(0);
@@ -7445,13 +7470,13 @@ export default function BreedTree({
                 `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${flip ? -lsc : lsc},${lsc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`,
               );
               const li = lf.firstElementChild;
-              if (li) li.setAttribute("href", chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src);
+              if (li) li.setAttribute("href", shadeFace(d, chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
             }
           }
           const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}:${face.src}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", otherBreed ? FACE_STANDDOWN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src);
+            qi.setAttribute("href", shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
             /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
                filter would flatten it to one hue. The question mark still is,
                because it is one flat file and its depth tint is what tells a
