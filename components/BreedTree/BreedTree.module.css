@@ -2592,18 +2592,24 @@
   max-height: 55vh;
   overflow-y: auto;
   padding: 10px 12px 12px;
-  border-radius: 18px;
-  /* LIGHT BLUE, 24 September 2026 (owner). The text goes navy with it: white on
-     #5cc4ee measures about 1.9, unreadable, navy about 6.5. The same pairing the
-     old chain counter used on this blue. */
-  background: var(--blue-sky, #5cc4ee);
-  color: var(--navy, #0a3a57);
-  text-shadow: none;
+  /* THE COOKIE PANEL'S GLASS, 24 September 2026 (owner), values copied from
+     CookieDrop.module.css .card: clear, a 10px blur of whatever is behind, a thin
+     white edge, the same corner and shadow. The text is white with the cookie
+     copy's navy shadow, scaled down to this type size, which is what holds it
+     over a busy pit. Replaces the light blue fill and navy text. */
+  border-radius: 26px;
+  background: transparent;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  text-shadow: 0 2px 0 rgba(10, 58, 87, 0.45), 0 0 12px rgba(10, 58, 87, 0.6);
   letter-spacing: 0;
   font-family: var(--font-body, Montserrat), system-ui, sans-serif;
-  font-size: 14px;
+  /* 2pt smaller, 24 September 2026 (owner). Was 14px. */
+  font-size: calc(14px - 2pt);
   line-height: 1.3;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 32px rgba(10, 58, 87, 0.32);
   cursor: default;
 }
 .foundListHead {
@@ -2611,13 +2617,13 @@
   align-items: center;
   justify-content: space-between;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 20px;
+  font-size: calc(20px - 2pt); /* 2pt smaller, 24 September 2026. Was 20px. */
   margin-bottom: 6px;
 }
 .foundListClose {
   background: none;
   border: 0;
-  color: var(--navy, #0a3a57);
+  color: #ffffff;
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
@@ -2631,11 +2637,13 @@
   grid-template-areas: "name tag";
   gap: 2px 8px;
   padding: 7px 0;
-  border-top: 1px solid rgba(10, 58, 87, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
 }
 .foundListName { grid-area: name; font-weight: 700; }
 .foundListTag {
   grid-area: tag;
+  /* The pill carries its own rarity colours, so no glass shadow on its text. */
+  text-shadow: none;
   align-self: center;
   font-size: 10px;
   font-weight: 800;
