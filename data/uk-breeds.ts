@@ -107,7 +107,9 @@ export const ukBreeds: UKBreed[] = [
      become playable levels under the game's own rule; the Chien-gris and the
      King's White Hounds have no parents recorded, so they are history cards. */
   { name: "Norman Hound", strip: "saxon", era: "Medieval", anchor: 1066, note: "Big, slow, deep-voiced Normandy hound, said to have come over with the Conquest.", image: "/history/breeds/artois-hounds.jpg", tag: "extinct" },
-  { name: "St Hubert Hound", strip: "saxon", era: "Medieval", anchor: 1080, note: "The monks' black scent hound of the Ardennes, said to have crossed with the Normans.", image: "/history/breeds/St-Hubert-Hound.jpg", tag: "extinct" },
+  // 1000, not 1080 (owner, 24 September 2026): the abbey hounds date from about
+  // AD 1000, and the Norman Hound (1066) was bred FROM them, so they come first.
+  { name: "St Hubert Hound", strip: "saxon", era: "Medieval", anchor: 1000, note: "The monks' black scent hound of the Ardennes, said to have crossed with the Normans.", image: "/history/breeds/St-Hubert-Hound.jpg", tag: "extinct" },
   { name: "Scottish Deerhound", strip: "saxon", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
 
   // The 1500s and 1600s
