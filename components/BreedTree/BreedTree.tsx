@@ -2504,6 +2504,22 @@ const BOMB_CHAIN_HOPS = Infinity;
 // ring inset and the label fitter all read d.r, so growing anything less than
 // all of them would put the picture out of step with the collisions.
 const POP_GROW = 1.5;
+/* THE BIG LEVELS' OPENING, 24 September 2026 (owner: from about 200 circles the
+   start drops its frame rate, the Poodle at 229 included).
+   WHY IT DROPS. A circle pops its children whenever it is hit hard, and in the
+   opening drop everything is hitting everything, so the nested layers cascade
+   out within a second or two and every one becomes a physics body at once. Each
+   collision also printed its own white score number, a new page element each,
+   throttled per circle rather than overall: thousands a second on a big level.
+   THE TWO CHANGES, only on a level with more than HEAVY_LEVEL_CIRCLES circles:
+   no floating collision numbers for the first QUIET_NUMBERS_MS (the score still
+   counts every hit), and circles DEEP_HOLD_DEPTH or more layers down do not pop
+   out for the first DEEP_HOLD_MS; then they all drop in from the top of the
+   screen, between the walls. */
+const HEAVY_LEVEL_CIRCLES = 200;
+const QUIET_NUMBERS_MS = 10000;
+const DEEP_HOLD_DEPTH = 5;
+const DEEP_HOLD_MS = 5000;
 // And a floor, in screen pixels across. Growth alone can never win: each
 // generation is a share of the last, so the shrinking compounds and any
 // multiplier is beaten one level further down. A floor ends it. 50 across is
@@ -8588,6 +8604,9 @@ export default function BreedTree({
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
+      // A big level (see HEAVY_LEVEL_CIRCLES), and when its drop began.
+      const heavyLevel = nodes.length - 1 > HEAVY_LEVEL_CIRCLES;
+      const dropT0 = performance.now();
       // ---- the words ----
       // Sized by the SAME fitter the circles use, so a name is the size it was
       // inside its circle, then 30% up because it has no ring or picture around
@@ -9303,12 +9322,55 @@ export default function BreedTree({
       // First solid hit pops a circle's direct children out as their own
       // bodies (their subtrees riding along), inheriting some momentum plus
       // an upward-outward burst; each child brings its yellow % badge.
+      /* THE LATE DROP (see DEEP_HOLD_MS). The deep circles held back from the
+         opening are grown and floored exactly as a pop would, placed just above
+         the top of the screen at a random spot between the walls (their nested
+         descendants moved with them), and given a gentle fall. Each gets its
+         chip the way a pop gives one. */
+      const deepHeld: Node[] = [];
+      if (heavyLevel) ghostTimers.push(window.setTimeout(() => {
+        const topPx = pL.y - stagePxH;
+        const newMbs: ReturnType<typeof mkCircle>[] = [];
+        for (const ch of deepHeld) {
+          if (owned.has(ch)) continue;
+          ch.r = Math.max(ch.r * POP_GROW, minCircleR);
+          const rPx = ch.r * pxPerWorld;
+          const px = pL.x + rPx + Math.random() * Math.max(1, pR.x - pL.x - 2 * rPx);
+          const py = topPx - rPx * 2 - Math.random() * rPx * 6;
+          const w = worldFromPx(px, py);
+          moveSubtree(ch, w.x - ch.x, w.y - ch.y);
+          const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
+          owned.add(ch);
+          all.push(nb);
+          const mb = mkCircle(nb, "circle", FREED_CIRCLE_OPTS);
+          MBody.setVelocity(mb, { x: (Math.random() - 0.5) * vps(0.4), y: vps(0.3) });
+          MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.8 / 60);
+          newMbs.push(mb);
+          const bl = badgeBodiesRef.current;
+          if (bl && !isFullShare(pctOf(ch))) {
+            const popBomb = rollBomb();
+            const popR = chipRof(pctOf(ch));
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: popR / k, rDraw: popR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
+            bl.push(bb);
+            all.push(bb);
+            const mbb = mkCircle(bb, "badge", BADGE_OPTS);
+            MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8, y: mb.velocity.y * 0.8 });
+            newMbs.push(mbb);
+            badgeSrcRef.current.push(ch);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: popR, bomb: popBomb, src: ch }]);
+          }
+        }
+        deepHeld.length = 0;
+        if (newMbs.length) { ghost(newMbs); wakePile(); }
+      }, DEEP_HOLD_MS));
       const popChildren = (b: Body) => {
         if (!b.n || b.popped) return;
         b.popped = true;
         const newMbs: any[] = b.mb ? [b.mb] : [];
         for (const ch of b.n.children ?? []) {
           if (isHiddenCopy(ch)) continue;
+          // On a big level a deep circle waits for the late drop. See DEEP_HOLD_MS.
+          if (heavyLevel && ch.depth >= DEEP_HOLD_DEPTH && performance.now() - dropT0 < DEEP_HOLD_MS) { deepHeld.push(ch); continue; }
           // Grown once, then floored. b.popped guards popChildren against a
           // second run, so this cannot compound down a deep tree. The floor is
           // given in screen pixels and converted here, because the packed radii
@@ -10342,6 +10404,9 @@ export default function BreedTree({
          ONLY THE CHAIN PASSES TRUE, because only the chain's numbers land on a
          circle rather than on the floor. */
       const numAt = (x: number, y: number, val: number, now: number, cased = false) => {
+        // A big level's opening: the score counts, the number is not drawn.
+        // See QUIET_NUMBERS_MS.
+        if (heavyLevel && performance.now() - dropT0 < QUIET_NUMBERS_MS) { onScore?.(val); return; }
         const fx = fxRef.current;
         if (!fx) return;
         const el = document.createElementNS("http://www.w3.org/2000/svg", "text");
