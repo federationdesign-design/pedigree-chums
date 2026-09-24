@@ -22,11 +22,16 @@ export const metadata: Metadata = {
     "Find your favourite dog breed and discover their family tree, history and personality. 54 illustrated breed cards for the on-the-go dog spotting game.",
 };
 
+// The chums the homepage slider leaves out for now. All of them show on /play.
+const HOME_HIDDEN_CHUMS = ["bichon-frise", "basset-hound", "bulldog", "beagle", "miniature-schnauzer", "yorkshire-terrier", "border-terrier"];
+
 export default function HomePage() {
   return (
     <main className={styles.page}>
       <Nav />
-      <HomeClient playRail={<PlayChumsRail />} />
+      {/* SEVEN HIDDEN ON THE HOMEPAGE FOR NOW (owner, 24 September 2026). Every
+          chum is still on the /play page. */}
+      <HomeClient playRail={<PlayChumsRail hide={HOME_HIDDEN_CHUMS} />} />
 
       {/* FAQ sits directly below the product area */}
       <div className={styles.divider} />

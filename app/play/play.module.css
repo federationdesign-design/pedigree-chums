@@ -1,0 +1,23 @@
+/* The /play page (owner, 24 September 2026). The page shell matches the
+   homepage's; the heading takes the homepage's display-font heading style. */
+.page {
+  min-height: 100svh;
+  background: transparent;
+  color: #fff;
+  font-family: var(--font-body, "Montserrat", system-ui);
+}
+.intro {
+  padding: clamp(110px, 16vw, 170px) clamp(18px, 4vw, 48px) clamp(20px, 3vw, 36px);
+  text-align: center;
+}
+.heading {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(38px, 6.5vw, 86px);
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  line-height: 0.95;
+  margin: 0 auto;
+  max-width: 16ch;
+  text-transform: uppercase;
+}
+.yellow { color: var(--yellow, #ffd23e); }

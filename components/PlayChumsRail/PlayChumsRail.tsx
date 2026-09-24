@@ -15,8 +15,11 @@ import styles from "./PlayChumsRail.module.css";
 // The still for a clip: the same name with -last.jpg in place of .mp4.
 const lastFrameOf = (clip: string) => clip.replace(/\.mp4$/, "-last.jpg");
 
-export default async function PlayChumsRail() {
+/* hide: chum slugs to leave off this copy of the slider (owner, 24 September
+   2026: the homepage hides seven for now, the /play page shows them all). */
+export default async function PlayChumsRail({ hide = [] }: { hide?: string[] } = {}) {
   const chums = Object.keys(INTRO_VIDEOS)
+    .filter((slug) => !hide.includes(slug))
     .map((slug) => breeds.find((b) => b.slug === slug))
     .filter((b): b is (typeof breeds)[number] => !!b)
     .map((b) => ({ b, circles: chumCircleCount(b.name) }))
