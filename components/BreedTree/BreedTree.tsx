@@ -16735,9 +16735,9 @@ export default function BreedTree({
           {/* THE LIST, hung under the counter so it moves with it. Newest first:
               the dog just found is the one the player is looking for. */}
           {foundListOpen && (
-            <div ref={foundListRef} className={styles.foundList} role="dialog" aria-label="Dogs found this run" onClick={(e) => e.stopPropagation()}>
+            <div ref={foundListRef} className={styles.foundList} role="dialog" aria-label="Ancestors discovered this run" onClick={(e) => e.stopPropagation()}>
               <div className={styles.foundListHead}>
-                <span>Dogs found</span>
+                <span>Ancestors discovered</span>
                 <button type="button" className={styles.foundListClose} aria-label="Close the list" onClick={() => setFoundListOpen(false)}>×</button>
               </div>
               {(dogsFoundList ?? []).length === 0 ? (
@@ -16749,8 +16749,10 @@ export default function BreedTree({
                     return (
                       <li key={d.name} className={styles.foundListRow}>
                         <span className={styles.foundListName}>{d.name}</span>
-                        <span className={styles.foundListTag} style={{ background: band.bg, color: band.fg }}>{band.label}</span>
-                        <span className={styles.foundListEra}>{d.era}</span>
+                        {/* THE ERA IN A PILL, filled with the dog's rarity colour
+                            (owner, 24 September 2026). It replaces the separate
+                            rarity pill, so the colour still says the rarity. */}
+                        <span className={styles.foundListTag} style={{ background: band.bg, color: band.fg }} title={band.label}>{d.era}</span>
                       </li>
                     );
                   })}

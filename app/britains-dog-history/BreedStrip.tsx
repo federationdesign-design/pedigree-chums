@@ -120,6 +120,24 @@ function allPitAncestors(): Set<string> {
   return names;
 }
 
+/* THE SHORT ERA NAMES for the dogs-found list's pills (owner, 24 September 2026:
+   "just 'ancient' rather than 'ancient times'"). Keyed like ERA_LABELS; an era
+   missing here falls back to its full label. */
+const ERA_SHORT: Record<string, string> = {
+  "ancient-medieval": "Ancient",
+  ancient: "Ancient",
+  saxon: "Saxon",
+  medieval: "Medieval",
+  c1500: "Tudor",
+  c1700: "1700s",
+  early1800: "Early 1800s",
+  spaniels: "Spaniels",
+  mid1800: "Mid 1800s",
+  late1800: "Late 1800s",
+  c1900: "1900s",
+  crosses: "Crossbreeds",
+};
+
 // How long the ?play link waits before the circles pop out and fall.
 const PLAY_ON_ARRIVAL_MS = 1000;
 
@@ -719,7 +737,7 @@ export default function BreedStrip({
         // Only a name the pit can actually hold counts, so the figure can
         // never pass its own total.
         if (!allPitAncestors().has(n)) return;
-        const era = curStrip ? ERA_LABELS[curStrip] ?? curStrip : "";
+        const era = curStrip ? ERA_SHORT[curStrip] ?? ERA_LABELS[curStrip] ?? curStrip : "";
         setDogsFound((m) => (m.has(n) ? m : new Map(m).set(n, era)));
       }}
       onChumCaught={(n) => setChumCounts((c) => ({ ...c, [n]: (c[n] ?? 0) + 1 }))}

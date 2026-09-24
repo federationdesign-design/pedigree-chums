@@ -2593,8 +2593,11 @@
   overflow-y: auto;
   padding: 10px 12px 12px;
   border-radius: 18px;
-  background: var(--navy, #0a3a57);
-  color: #ffffff;
+  /* LIGHT BLUE, 24 September 2026 (owner). The text goes navy with it: white on
+     #5cc4ee measures about 1.9, unreadable, navy about 6.5. The same pairing the
+     old chain counter used on this blue. */
+  background: var(--blue-sky, #5cc4ee);
+  color: var(--navy, #0a3a57);
   text-shadow: none;
   letter-spacing: 0;
   font-family: var(--font-body, Montserrat), system-ui, sans-serif;
@@ -2614,7 +2617,7 @@
 .foundListClose {
   background: none;
   border: 0;
-  color: #ffffff;
+  color: var(--navy, #0a3a57);
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
@@ -2625,10 +2628,10 @@
 .foundListRow {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-areas: "name tag" "era era";
+  grid-template-areas: "name tag";
   gap: 2px 8px;
   padding: 7px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(10, 58, 87, 0.2);
 }
 .foundListName { grid-area: name; font-weight: 700; }
 .foundListTag {
@@ -2641,5 +2644,4 @@
   border-radius: 999px;
   white-space: nowrap;
 }
-.foundListEra { grid-area: era; font-size: 12px; opacity: 0.8; }
 
