@@ -230,6 +230,11 @@ type Props = {
      score banks under. Shown on the win screen and on both end states. */
   runChumsFound?: number;
   runChumsPossible?: number;
+  /* THE DOGS-FOUND COUNTER, owned by BreedStrip for the run and drawn by the pit.
+     Passed straight through. */
+  dogsFound?: number;
+  dogsTotal?: number;
+  onDogFound?: (name: string) => void;
   /* Each catch as it happens, so the run can count which dog turns up most.
      A chum leaves this level's flood once taken, but the sets reset per level,
      so the same breed can be caught again in a later one. */
@@ -241,7 +246,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay, startInLearn = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, startInPlay, startInLearn = false, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible, dogsFound, dogsTotal, onDogFound }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -770,6 +775,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
       >
         <BreedTree
           key={runKey}
+          dogsFound={dogsFound}
+          dogsTotal={dogsTotal}
+          onDogFound={onDogFound}
           /* The pit needs the era by name as well as by theme: a thrown ball is
              retired for this era and returns in the next one. */
           era={era}

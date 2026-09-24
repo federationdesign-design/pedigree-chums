@@ -917,6 +917,8 @@ const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
 // Extra space above the counter, in screen px, on top of the measured placement.
 const CHAIN_COUNT_DROP_PX = 10;
+// The gap between the chain counter's slot and the dogs-found counter under it.
+const FOUND_COUNT_GAP_PX = 10;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
    (owner, 24 September 2026). It used to call the count off altogether. */
 const BOMB_ADDS_SECS = 10;
@@ -3193,6 +3195,9 @@ export default function BreedTree({
   collectedChums,
   onChumCollected,
   onChumsDropped,
+  dogsFound,
+  dogsTotal,
+  onDogFound,
   hideLabels = false,
   disableZoom = false,
   fill = false,
@@ -3279,6 +3284,12 @@ export default function BreedTree({
   levelNo?: number;
   collectedChums?: Set<string>;
   onChumCollected?: (name: string) => void;
+  /* THE DOGS-FOUND COUNTER (owner, 24 September 2026). BreedStrip owns the run's
+     set of unique dogs collected; the pit reports each collect through
+     onDogFound and draws dogsFound / dogsTotal. */
+  dogsFound?: number;
+  dogsTotal?: number;
+  onDogFound?: (name: string) => void;
   /* How many cards the flood actually tipped in, reported once when it runs.
      The win screen needs a denominator and this is the only place that knows
      it: the level list is filtered by what has already been taken, so nothing
@@ -5191,6 +5202,7 @@ export default function BreedTree({
      whole pit on every join. The lifted layer's own counters are plain DOM for
      the same reason. Written by paintChainCount below and by nothing else. */
   const chainCountRef = useRef<HTMLDivElement>(null);
+  const foundCountRef = useRef<HTMLDivElement>(null);
   /* THE SWIPE WINS OVER THE COLLECT (owner,
      17 September 2026). A second press on an armed card collects it on the
      PRESS, before anyone can know whether a swipe follows. Under the chain flag,
@@ -5925,6 +5937,31 @@ export default function BreedTree({
     };
     cdTickRef.current = window.setTimeout(step, cdStepMs());
   };
+  /* PLACES AND COLOURS THE DOGS-FOUND COUNTER. Same fill as the chain counter,
+     royal blue to green as the run's total climbs. Placed by measuring the close
+     X, like the chain counter, one pill's height plus a gap lower, so the two
+     stack in one column. Re-measured on a resize, and once a frame later in case
+     the squares had not been laid out yet. */
+  useEffect(() => {
+    const el = foundCountRef.current;
+    if (!el || !dogsTotal) return;
+    const t = Math.max(0, Math.min(1, (dogsFound ?? 0) / dogsTotal));
+    const hsl = CHAIN_COUNT_FROM.map((c, j) => c + (CHAIN_COUNT_TO[j] - c) * t);
+    el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
+    const place = () => {
+      const sq = stageRef.current?.querySelector('[data-ui-square="close"]');
+      const r = sq?.getBoundingClientRect();
+      if (!r || r.width <= 0 || !el.offsetHeight) return;
+      const h = el.offsetHeight;
+      const gap = r.width * 0.25;
+      el.style.top = `${Math.max(0, r.top + r.height / 2 - h / 2) + CHAIN_COUNT_DROP_PX + h + FOUND_COUNT_GAP_PX}px`;
+      el.style.right = `${window.innerWidth - (r.left - r.width - gap) + gap}px`;
+    };
+    place();
+    const raf = requestAnimationFrame(place);
+    window.addEventListener("resize", place);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", place); };
+  }, [dogsFound, dogsTotal, started, learning]);
   // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
   useEffect(() => () => clearCdTimers(), []);
@@ -16573,6 +16610,19 @@ export default function BreedTree({
           be a SIBLING of it. It now sits beside the pit tally below, which is
           fixed and lands where it says it will. */}
       <div ref={chainCountRef} className={styles.chainCount} style={{ display: "none" }} role="status" />
+      {/* THE DOGS-FOUND COUNTER, in the chain counter's pill, directly under its
+          slot. Placed and coloured by the effect that owns foundCountRef. */}
+      {dogsTotal ? (
+        <div
+          ref={foundCountRef}
+          className={styles.chainCount}
+          style={{ display: started && !learning ? "block" : "none" }}
+          role="status"
+          aria-label={`${dogsFound ?? 0} of ${dogsTotal} dogs found`}
+        >
+          {`${dogsFound ?? 0}/${dogsTotal}`}
+        </div>
+      ) : null}
       {dockAside && dropped && cornerShot > 0 && chumsCollected > 0 && (
         // eslint-disable-next-line @next/next/no-img-element -- a fixed-size decorative SVG, next/image buys nothing here
         <img key={`chumbox-${cornerShot}`} className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
@@ -16699,6 +16749,8 @@ export default function BreedTree({
               const soloLeafDog = !(learnNode.data.children && learnNode.data.children.length > 0);
               if (!soloLeafDog) onScore?.(LEARN_COST);
               removedNodesRef.current.add(learnNode);
+              // A collect: the run's dogs-found counter counts unique names.
+              onDogFound?.(learnNode.data.name);
               /* COMPLETING THE OPENED CIRCLE
                  CLOSES THE REST OF ITS CHAIN. This is the moment the chain was
                  remembered for: the player drew through a run of one breed, this
@@ -16754,6 +16806,7 @@ export default function BreedTree({
                 for (const other of dc.others) {
                   if (!pit?.has(other) || removedNodesRef.current.has(other)) continue;
                   removedNodesRef.current.add(other);
+                  onDogFound?.(other.data.name);
                   dogCloseRef.current?.(other, from);
                   shut++;
                 }

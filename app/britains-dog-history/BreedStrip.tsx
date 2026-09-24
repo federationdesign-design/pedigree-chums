@@ -98,6 +98,28 @@ export function stripMatches(rowStrip: string, era: string): boolean {
    instead costs a second render and trips react-hooks/set-state-in-effect.
    buildActive inside the component is now a one-line call to this, so the tap
    path and the deep link build the level identically. */
+/* EVERY DOG A PIT CAN HOLD (owner, 24 September 2026): the unique names below the
+   level dog, across every playable level, from the same getLineage expansion the
+   pit itself draws. The denominator of the dogs-found counter. Worked out once,
+   the first time it is asked for. 126 across 98 levels when written. */
+let pitAncestorNames: Set<string> | null = null;
+function allPitAncestors(): Set<string> {
+  if (pitAncestorNames) return pitAncestorNames;
+  const names = new Set<string>();
+  for (const b of ukBreeds) {
+    if (levelCardKind(b.name) !== "play") continue;
+    const lin = getLineage(resolveLineageName(b.name));
+    if (!lin) continue;
+    const walk = (n: LineageNode, depth: number) => {
+      if (depth > 0) names.add(n.name);
+      for (const c of n.children ?? []) walk(c, depth + 1);
+    };
+    walk(lin, 0);
+  }
+  pitAncestorNames = names;
+  return names;
+}
+
 function activeFor(name: string) {
   const pn = resolveLineageName(name);
   const lin = getLineage(pn);
@@ -238,6 +260,11 @@ export default function BreedStrip({
      is the same rule bankedScore advances under. Five retries of level one
      therefore cannot show 115 possible. */
   const [chumTallies, setChumTallies] = useState<{ found: number; possible: number }[]>([]);
+  /* THE DOGS FOUND THIS RUN (owner, 24 September 2026: "this visit only, as they
+     act the same as all the other parts of the levels"). Unique names collected
+     from the pit, carried level to level beside the score and the chum tallies,
+     and cleared with them on a fresh run. Nothing is saved to the browser. */
+  const [dogsFound, setDogsFound] = useState<ReadonlySet<string>>(() => new Set());
   /* How many times each dog has been caught this run, by name. The picture is
      resolved from the pack data rather than carried through two components,
      because the pack is already the source of truth for it here. */
@@ -675,6 +702,14 @@ export default function BreedStrip({
       bankedScore={bankedScore}
       onBankScore={setBankedScore}
       onLevelChums={(found, possible) => setChumTallies((t) => [...t, { found, possible }])}
+      dogsFound={dogsFound.size}
+      dogsTotal={allPitAncestors().size}
+      onDogFound={(n) => {
+        // Only a name the pit can actually hold counts, so the figure can
+        // never pass its own total.
+        if (!allPitAncestors().has(n)) return;
+        setDogsFound((s) => (s.has(n) ? s : new Set(s).add(n)));
+      }}
       onChumCaught={(n) => setChumCounts((c) => ({ ...c, [n]: (c[n] ?? 0) + 1 }))}
       topChum={topChum}
       /* Unchanged in meaning: still the mean of each completed level's own
@@ -749,6 +784,7 @@ export default function BreedStrip({
         setBankedScore(0); // a fresh run has nothing banked either
         setChumTallies([]);
         setChumCounts({});
+        setDogsFound(new Set());
         // A fresh run is a fresh set of toys. See resetToys in BreedTree: they
         // are spent by PROGRESS, and a game over is the opposite of progress.
         resetToys();
