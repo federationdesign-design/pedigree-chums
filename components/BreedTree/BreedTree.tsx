@@ -868,6 +868,9 @@ const FACE_COLLECT_MS = 600;
    was navy #0a3a57. One figure for both kinds of word: the names that fall as
    words, and the ones that latch into their name mid-round. */
 const PIT_WORD_OUTLINE = "#000000";
+// The longest an owed drop waits for the phone layout to settle before going
+// anyway. See layoutPending in the arm block.
+const LAYOUT_WAIT_MAX_MS = 1500;
 // How long the snail or jelly square stays inverted after a tap.
 const UI_HIT_MS = 250;
 /* THE JOIN FLASH (owner, 24 September 2026: "keep all twins on the chained face,
@@ -12385,9 +12388,21 @@ export default function BreedTree({
        runs the moment the pit is ready, above; only doFall waits. fallOwedRef
        carries the owed drop across a re-run of this effect: the cleanup drops the
        timer and the next run arms it again, so the drop cannot be lost. */
+    /* NOT BEFORE THE PHONE LAYOUT HAS SETTLED (owner, 24 September 2026). On a
+       phone the pit re-lays itself out a frame or two after opening, once the
+       screen has been measured (layoutAspect). A drop fired before that froze the
+       unsized layout into the physics, or was abandoned when the layout moved
+       under it, which is what the 0ms after the intro video hit. The owed drop now
+       waits: layoutAspect is in this effect's deps, so the run that sets it arms
+       the drop with the settled circles. Desktop never sets it and never waits. */
+    const layoutPending = !displayOnly && window.matchMedia("(max-width: 640px)").matches && layoutAspect === null;
     if (fallOwedRef.current) {
       const fall = () => { fallOwedRef.current = false; doFall(); };
-      if (startDelayMs > 0) autoStartTimer = window.setTimeout(fall, startDelayMs);
+      if (layoutPending) {
+        // Never strand the round: if the layout somehow never settles, drop
+        // anyway after LAYOUT_WAIT_MAX_MS. The settled run clears this timer.
+        autoStartTimer = window.setTimeout(fall, LAYOUT_WAIT_MAX_MS);
+      } else if (startDelayMs > 0) autoStartTimer = window.setTimeout(fall, startDelayMs);
       else fall();
     }
     registerSlowmo?.(() => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); });
@@ -12399,7 +12414,7 @@ export default function BreedTree({
     // No timer: the circles hang until the visitor presses START.
     return () => { window.clearTimeout(autoStartTimer); cancelAnimationFrame(fallRafRef.current); window.clearTimeout(fullPollRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gravity, entered, nodes]);
+  }, [gravity, entered, nodes, layoutAspect]);
 
   // Track the stage's real aspect ratio. This also catches the fullscreen
   // toggle (done via a class), so the canvas re-widens when it takes over the
