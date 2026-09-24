@@ -1853,6 +1853,25 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old Mastiffs of the East", note: "The mastiff-type guardian dogs the court lapdogs are likely to have been bred down from. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 25 }
     ]
   },
+  /* EASTERN LION DOGS, 24 September 2026 (owner, Group 1). The lion-dog family,
+     the Lhasa, Pekingese and Shih Tzu line, bred to look like the Buddhist lion.
+     The sources: Tibetan monks bred small lion-like dogs from about the 600s and
+     they reached the Chinese court around the Tang; there they were crossed with
+     the native short-faced lapdogs; the temple dogs came out of the same Tibetan
+     stock as the working dogs. The dogs travelled BOTH ways as gifts between the
+     Dalai Lama and the emperors for centuries. The temple dogs are the main line,
+     half; the court cross and the older working root a quarter each. Its own
+     picture (eastern-lion-dogs.jpg), so it no longer shares the temple dogs'. */
+  "Eastern Lion dogs": {
+    name: "Eastern Lion dogs",
+    note: "The wider family of small eastern companion dogs it shares its roots with. Now extinct.",
+    img: "/history/breeds/eastern-lion-dogs.jpg",
+    children: [
+      { name: "Tibetan temple dogs", note: "The small long-coated lion dogs the Tibetan monks bred from the 600s, gifted on to the Chinese court. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 50 },
+      { name: "Ancient Chinese toy dogs", note: "The short-faced court lapdogs they were crossed with in China. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 25 },
+      { name: "Tibetan village dogs", note: "The sturdy Tibetan working dogs the temple dogs came out of. Now extinct.", img: "/history/breeds/tibetan-village-dogs.jpg", value: 25 }
+    ]
+  },
   /* THE ANCIENT CHINESE COURT DOGS, 24 September 2026 (owner). A leaf: the Lo-sze of
      the Han court. Picture made for it, with the early imperial setting. */
   "Ancient Chinese court dogs": {
@@ -3462,7 +3481,7 @@ const LINEAGE: Record<string, LineageNode> = {
          replacing Ancient Chinese toy dogs would lose the broader stock, and
          replacing the Lo-sze with it is exactly what this edit does. */
       { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
-      { name: "Eastern Lion dogs", note: "The wider family of small eastern companion dogs it shares its roots with. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 40 }
+      { name: "Eastern Lion dogs", note: "The wider family of small eastern companion dogs it shares its roots with. Now extinct.", img: "/history/breeds/eastern-lion-dogs.jpg", value: 40 }
     ]
   },
 
