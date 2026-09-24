@@ -268,6 +268,13 @@ const SPREADN = Math.PI * 0.9;
    false: the old parent-relative clock layout, untouched. Lift only: the main pit
    and the chum tree never take this branch. */
 const LIFT_TIDY = true;
+/* AUTO SPEEDS UP AS IT GOES DEEPER, lifted layer only (owner, 24 September 2026:
+   it ran in stages rather than one smooth slide, because each layer down a big
+   tree holds more dogs and every dog had the same flat delay). Each dog's delay is
+   its old flat delay times AUTO_ACCEL for every layer below the first, never less
+   than AUTO_MIN_MS: 0.72 is 28% quicker a layer. The learn area keeps flat rates. */
+const AUTO_ACCEL = 0.72;
+const AUTO_MIN_MS = 8;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
@@ -2958,6 +2965,15 @@ export default function LineageMap({
      the two. The same trick the pit already uses to publish --pit-ui-size.
      setAttribute, not dataset: the linter treats a dataset write as writing to a
      read-only value. Cleared on unmount, above, so a fresh lift starts with PLAY. */
+  // Each node's layer below the root (1 = the root's own parents).
+  const depthIndex = (): Map<string, number> => {
+    const m = new Map<string, number>();
+    const mark = (n: Node, d: number) => (n.children as Node[] | undefined)?.forEach((k) => { m.set(k._id, d); mark(k, d + 1); });
+    if (root) mark(root, 1);
+    return m;
+  };
+  // The accelerating delay for one dog at layer d, from a flat base.
+  const autoStep = (base: number, d: number) => (circular ? Math.max(AUTO_MIN_MS, base * Math.pow(AUTO_ACCEL, Math.max(0, d - 1))) : base);
   const autoCollect = () => {
     if (typeof document !== "undefined") document.documentElement.setAttribute("data-pc-auto-used", "1");
     /* THE BRANCHES UNFOLD IN A WAVE, 16 September 2026 (owner: AUTO opens every
@@ -2977,26 +2993,36 @@ export default function LineageMap({
 
        90ms against the 45ms used below on purpose: the rungs are few and the nodes
        many, so the same step would make the unfolding outrun the ripple. */
-    const depthOf = new Map<string, number>();
-    const markDepth = (n: Node, d: number) => (n.children as Node[] | undefined)?.forEach((k) => { depthOf.set(k._id, d); markDepth(k, d + 1); });
-    if (root) markDepth(root, 1);
+    const depthOf = depthIndex();
     const branchIds = allNodes.filter((n) => n.hasKids).map((n) => n.id);
     const rungs = [...new Set(branchIds.map((id) => depthOf.get(id) ?? 1))].sort((a, b) => a - b);
     setOpen(new Set<string>(["0"]));
+    /* ONE CLOCK FOR THE WHOLE WAVE (24 September 2026). The dogs are taken layer
+       by layer, outward, and each is given its moment on a running clock whose
+       step shrinks with depth (autoStep): 45ms a dog on the first layer, 28%
+       quicker each layer down on the lift. A rung opens when its own first dog's
+       moment comes, so every layer appears just as the wave reaches it. The
+       learn area keeps the old flat 45ms and 90ms, since autoStep leaves it be. */
+    const order = allNodes.map((n, i) => ({ n, i, d: depthOf.get(n.id) ?? 1 })).sort((a, b) => a.d - b.d || a.i - b.i);
+    const at = new Map<string, number>();
+    let clock = 0;
+    for (const o of order) { at.set(o.n.id, clock); clock += autoStep(45, o.d); }
     rungs.forEach((d, i) => {
+      const first = order.find((o) => o.d === d);
+      const when = circular && first ? at.get(first.n.id) ?? 0 : i * 90;
       window.setTimeout(() => setOpen((prev) => {
         const s = new Set(prev);
         branchIds.forEach((id) => { if ((depthOf.get(id) ?? 1) === d) s.add(id); });
         return s;
-      }), i * 90);
+      }), when);
     });
     setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; });
     const imgNodes = allNodes.filter((n) => n.hasImg && !picked.has(n.id));
     // Ripple: each node turns blue and its card pops at the same moment
     allNodes.forEach((n, i) => {
-      window.setTimeout(() => setSeen((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45);
+      window.setTimeout(() => setSeen((prev) => { const s = new Set(prev); s.add(n.id); return s; }), circular ? at.get(n.id) ?? 0 : i * 45);
     });
-    imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); });
+    imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), circular ? at.get(n.id) ?? 0 : i * 45); });
     allNodes.forEach((n) => scoredRef.current.add(n.id));
     /* AND THEN PLACE THEM. Auto used to stop at popping every card out, leaving
        the last step, dropping each one into its frame, to be done by hand. It
@@ -3024,7 +3050,7 @@ export default function LineageMap({
        other does nothing. */
     autoPlaceRef.current = true;
     autoForceRef.current = false; // a fresh run waits for the ripple again
-    const rippleMs = allNodes.length * 45;
+    const rippleMs = circular ? clock : allNodes.length * 45;
     // Both guards nudge the SAME effect that already finishes the sequence rather
     // than calling the placement themselves: one caller, one place to reason about.
     // Nothing to pop means fire on the next tick; otherwise wait out the ripple.
@@ -3052,6 +3078,14 @@ export default function LineageMap({
     // Track claimed frame IDs locally so duplicate-breed cards don't all race to the same empty frame
     const claimedFilled = new Map(filled); // snapshot: frameId -> cardId
     const claimedStacked = new Map(stacked); // snapshot: frameId -> cardIds[]
+    /* The fly-in speeds up with depth too, on the lift (24 September 2026): cards
+       go in layer by layer, 80ms apart on the first and 28% quicker each layer
+       down. Elsewhere the flat 80ms stands. */
+    const cDepth = depthIndex();
+    const flyOrder = circular ? unplaced.map((c, i) => ({ c, i, d: cDepth.get(c.id) ?? 1 })).sort((a, b) => a.d - b.d || a.i - b.i) : [];
+    const flyAt = new Map<string, number>();
+    let flyClock = 0;
+    for (const f of flyOrder) { flyAt.set(f.c.id, flyClock); flyClock += autoStep(80, f.d); }
     unplaced.forEach((c, i) => {
       // Find target using local snapshot so each card claims a unique slot
       const emptyTarget = frames.find((f) => f.img === c.img && !claimedFilled.has(f.id));
@@ -3094,7 +3128,7 @@ export default function LineageMap({
           setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
           window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
         });
-      }, i * 80);
+      }, circular ? flyAt.get(c.id) ?? i * 80 : i * 80);
     });
     return true;
   };
