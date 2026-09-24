@@ -17,9 +17,18 @@
 //   Q     JPEG / WebP quality 1-100                 default 80
 //   SKIP  bytes under which a file is left alone     default 150000
 //   DRY   set to 1 to preview without writing
+//   EXCLUDE_FROM  comma list of source files; any picture of DIR named in them is
+//                 left alone (24 September 2026, for the pictures the history page
+//                 shows large)
+//   ONLY_FROM     comma list of source files; ONLY pictures named in them are touched
+//
+// The ancestor pictures, 24 September 2026 (owner: 500px wide, still sharp on a
+// phone), in two passes so the history page's large pictures keep their size:
+//   MAXW=500 SKIP=0 EXCLUDE_FROM=data/historySections.ts,app/britains-dog-history-2/sections.ts node scripts/optimize-images.mjs
+//   MAXW=1000 SKIP=0 ONLY_FROM=data/historySections.ts,app/britains-dog-history-2/sections.ts node scripts/optimize-images.mjs
 
-import { readdirSync, statSync, renameSync } from "node:fs";
-import { join, extname } from "node:path";
+import { readdirSync, statSync, renameSync, readFileSync } from "node:fs";
+import { join, extname, basename } from "node:path";
 import sharp from "sharp";
 
 const DIR = process.env.DIR || "public/history/breeds";
@@ -28,13 +37,28 @@ const Q = Number(process.env.Q || 80);
 const SKIP = Number(process.env.SKIP || 150000);
 const MATCH = process.env.MATCH || ""; // only touch filenames containing this substring
 const DRY = process.env.DRY === "1";
+// The picture names each listed source file mentions under DIR.
+const namesIn = (list) => {
+  const out = new Set();
+  const dirName = basename(DIR);
+  for (const f of (list || "").split(",").map((x) => x.trim()).filter(Boolean)) {
+    const text = readFileSync(f, "utf8");
+    const re = new RegExp(`/${dirName}/([^"'\\s)]+\\.(?:jpg|jpeg|png|webp|avif))`, "gi");
+    for (const m of text.matchAll(re)) out.add(decodeURI(m[1]));
+  }
+  return out;
+};
+const EXCLUDE = namesIn(process.env.EXCLUDE_FROM);
+const ONLY = process.env.ONLY_FROM ? namesIn(process.env.ONLY_FROM) : null;
 
 const kb = (b) => (b / 1024).toFixed(0).padStart(5) + "kb";
 const exts = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 
 const files = readdirSync(DIR)
   .filter((f) => exts.has(extname(f).toLowerCase()))
-  .filter((f) => !MATCH || f.includes(MATCH));
+  .filter((f) => !MATCH || f.includes(MATCH))
+  .filter((f) => !EXCLUDE.has(f))
+  .filter((f) => !ONLY || ONLY.has(f));
 let before = 0, after = 0, touched = 0, skipped = 0;
 const rows = [];
 
