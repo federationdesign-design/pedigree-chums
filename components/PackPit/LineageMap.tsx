@@ -262,6 +262,12 @@ const RSTEP = 128;
 const SPREAD1 = Math.PI * 1.5;
 // deeper generations fan in a tighter arc out along the branch
 const SPREADN = Math.PI * 0.9;
+/* THE LIFTED LAYER AS A RADIAL TIDY TREE, 24 September 2026 (owner, stage 1 of 3).
+   true: the lift lays its family tree out in rings, every branch owning a wedge
+   of the arc sized by how many dogs are behind it, so branches cannot cross.
+   false: the old parent-relative clock layout, untouched. Lift only: the main pit
+   and the chum tree never take this branch. */
+const LIFT_TIDY = true;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
@@ -1706,6 +1712,69 @@ export default function LineageMap({
     root._y = breed.y - (circular || strongBg ? 75 : 0);
     root._dir = -Math.PI / 2 + base;
     list.push(root);
+    /* THE RADIAL TIDY TREE, LIFT ONLY (stage 1). Why the lift was a mess: each dog
+       was placed just outside its PARENT at fixed slot angles, so a branch with
+       twenty dogs behind it got the same room as one with none, and big branches
+       ran into their neighbours.
+
+       Here every generation sits on its own RING round the lifted card, and each
+       dog owns a WEDGE of the arc in proportion to the dogs behind it (_leaves,
+       the whole subtree, whether open or not). A dog's ancestors are dealt out
+       inside its wedge only, so no two branches can cross, and because the wedges
+       come from the full tree a branch opening never moves anything already shown.
+
+       The arc is the lift's own 270 degrees, pointing up, so the bottom stays clear
+       for the Collect button exactly as before. Ring gaps are the same daylight the
+       clock layout left between circles (NODE_POKE, doubled for the first ring on
+       desktop, plus the desktop's extra 10 screen px), measured off the largest
+       circle on each ring. */
+    if (circular && LIFT_TIDY) {
+      const pokeBase = 18 * (isMobile ? PIT_NODE_SCALE * 0.9 : 1);
+      const liftExtra = !isMobile ? 10 * liftK : 0;
+      const poke = pokeBase + liftExtra;
+      const pokeFirst = (!isMobile ? pokeBase * 2 : pokeBase) + liftExtra;
+      const rOfT = (nd: Node): number => {
+        const p = nd._parent as Node | null;
+        return p ? nodeR(Math.round((nd._leaves / drawnLeaves(p)) * 100)) : liftR;
+      };
+      // The largest circle on each ring, over the WHOLE tree, so rings never move.
+      const maxR: number[] = [];
+      const scan = (n: Node, d: number) => {
+        for (const k of (n.children ?? []) as Node[]) {
+          maxR[d + 1] = Math.max(maxR[d + 1] ?? 0, rOfT(k));
+          scan(k, d + 1);
+        }
+      };
+      scan(root, 0);
+      const ringR: number[] = [0];
+      for (let d = 1; d < maxR.length; d++) {
+        ringR[d] = d === 1 ? liftR + pokeFirst + maxR[1] : ringR[d - 1] + maxR[d - 1] + maxR[d] + poke;
+      }
+      const place = (n: Node, depth: number, w0: number, w1: number) => {
+        const kids = open.has(n._id) && n.children && n.children.length ? (n.children as Node[]) : null;
+        if (!kids) return;
+        const all = n.children as Node[];
+        const tot = all.reduce((sum, k) => sum + Math.max(1, k._leaves), 0);
+        let at = w0;
+        for (const k of all) {
+          const f = (Math.max(1, k._leaves) / tot) * (w1 - w0);
+          if (kids.includes(k)) {
+            const a = at + f / 2;
+            const R = ringR[depth + 1];
+            k._x = root._x + Math.cos(a) * R;
+            k._y = root._y + Math.sin(a) * R;
+            k._dir = a;
+            k._tucked = false;
+            list.push(k);
+            place(k, depth + 1, at, at + f);
+          }
+          at += f;
+        }
+      };
+      const c0 = -Math.PI / 2;
+      place(root, 0, c0 - SPREAD1 / 2, c0 + SPREAD1 / 2);
+      return list;
+    }
     const walk = (n: Node, depth: number) => {
       // BOUNDED (/chums2): lay out the WHOLE tree every render, regardless of `open`.
       // The layout is deterministic per node (parent + fixed slot), so every node gets
