@@ -5731,11 +5731,13 @@ export default function BreedTree({
          still built here and still driven by the same ticker, so there is nothing
          to create late and no second clock: only its display changes, at the tick
          that reaches CD_MID_FROM. */
-      elMid.style.display = CD_FROM > CD_MID_FROM ? "none" : "flex";
       elMid.style.cssText =
         "position:absolute;inset:0;z-index:199;display:flex;align-items:center;justify-content:center;" +
         "font-family:var(--font-display,'Luckiest Guy',system-ui);color:#fff;pointer-events:none;" +
         "text-shadow:0 4px 40px rgba(0,0,0,0.6);opacity:0.5;font-size:clamp(6rem,34vw,16rem);";
+      // AFTER cssText, never before it: cssText replaces every inline style,
+      // so a display set first is wiped and the digits show for a frame.
+      elMid.style.display = CD_FROM > CD_MID_FROM ? "none" : "flex";
       st.appendChild(elMid);
     }
     /* 100 TO 0, 24 September 2026 (owner: raise the countdown from 10 seconds to
