@@ -1701,6 +1701,23 @@ const LINEAGE: Record<string, LineageNode> = {
      that a claim of Tartary, which is a medieval hunting writer's flourish rather
      than anything that can be authored as a parent. The edge of the data, like the
      Norse and continental Germanic leaves. */
+  /* THE NORMAN HOUND, added 24 September 2026 (owner). The large, slow,
+     deep-voiced scent hound of Normandy, said to have been bred from the St
+     Hubert and the local hounds there, and brought into England by the Normans
+     after 1066. The sources believe both the Talbot and the Bloodhound came from
+     it; it is written in as a parent of the Talbot and the Southern Hound.
+
+     A LEAF, deliberately. Its own parents are the St Hubert Hound and old
+     Normandy stock, both already in the trees it joins; giving it children would
+     have repeated them a layer lower in 21 chums. Its picture is the Artois
+     hounds painting, the old Normandy type. */
+  "Norman Hound": {
+    name: "Norman Hound",
+    note: "The big, slow, deep-voiced hunting hound of Normandy, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.",
+    img: "/history/breeds/artois-hounds.jpg",
+    children: []
+  },
+
   "Chien-gris": {
     name: "Chien-gris",
     note: "The Grey Hound of Saint Louis, a large grey and tan scent hound that held the French royal packs from about 1250 to 1470. Now extinct.",
@@ -2529,8 +2546,17 @@ const LINEAGE: Record<string, LineageNode> = {
   "Talbot": {
     name: "Talbot",
     note: "A white medieval scent hound, slow but sure-nosed, and an ancestor of the beagle, foxhound and bloodhound.",
+    /* THE NORMAN HOUND JOINS, 24 September 2026 (owner: the English and French
+       hounds look so alike there must have been crossing, from 1066 until the
+       wars). The sources name the Norman Hound as the root the Talbot came from,
+       brought over after the Conquest. Tradition rather than record, and its
+       note says so. HALF, under the split rule, for a plausible source; the old
+       60/40 is scaled into the other half, 30/20, and the Celtic Heeler pair
+       under Old scenting Hounds halves with it, 10 and 10. Owner accepted the
+       growth: it reaches 21 chums. */
     children: [
-      { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
+      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
+      { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 30 },
       {
         name: "Old scenting Hounds",
         note: "The tracking hounds of medieval lords.",
@@ -2541,8 +2567,8 @@ const LINEAGE: Record<string, LineageNode> = {
         // than filling it. Branch total stays 40; no displayed figure moves.
         // The self-duplicate must be kept in step with this node by hand.
         children: [
-          { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 20 },
-          { name: "Old scenting Hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 },
+          { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 10 },
+          { name: "Old scenting Hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 10 },
         ],
       }
     ]
@@ -2738,8 +2764,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Southern Hound",
     note: "A heavy, slow, deep-voiced scent hound of southern England, ancestor of the foxhound, beagle and harrier.",
     children: [
-      { name: "Talbot", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
-      { name: "St Hubert Hound", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 40 }
+      /* THE NORMAN HOUND JOINS, 24 September 2026 (owner). The sources give the
+         Southern Hound as developed from the Talbot AND the Norman Hound. Half
+         under the split rule; the old 60/40 scaled into the other half. */
+      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
+      { name: "Talbot", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-hound.jpg", value: 30 },
+      { name: "St Hubert Hound", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 20 }
     ]
   },
 
@@ -2767,9 +2797,15 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Otterhound",
     note: "A big, rough-coated, web-footed scent hound bred to hunt otter in cold rivers, with a magnificent nose.",
     children: [
-      { name: "Medieval Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 },
-      { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern-Hound.jpg", value: 30 },
-      { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work. Now extinct.", img: "/history/breeds/rough-water-dogs.jpg", value: 25 }
+      /* THE CHIEN-GRIS JOINS, 24 September 2026 (owner). The rough grey scent
+         hound of the French royal packs, about 1250 to 1470, and the one
+         rough-coated royal hound of the years English and French courts traded
+         hounds. SPECULATIVE, so a QUARTER under the split rule; the other three
+         scaled into the remaining 75 and rounded, 34/22/19. */
+      { name: "Medieval Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 34 },
+      { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern-Hound.jpg", value: 22 },
+      { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work. Now extinct.", img: "/history/breeds/rough-water-dogs.jpg", value: 19 },
+      { name: "Chien-gris", note: "The rough grey hounds of the French royal packs, perhaps the source of the rough coat through the hounds the two courts gave each other. A likely link rather than a recorded cross. Now extinct.", img: "/history/breeds/Chien-gris.jpg", value: 25 }
     ]
   },
 
