@@ -23,14 +23,17 @@ import styles from "./PlayLadder.module.css";
    and dealt out in order, the first columns taking one extra when the count does
    not divide by seven (54 chums: five columns of 8, two of 7). Inside each column
    the hardest is at the top. */
+/* SIX TABLES OF TEN (owner, 24 September 2026): "Very easy" is gone and each
+   table holds up to PER_TABLE chums, dealt out hardest first, so the last table
+   takes whatever is left. */
+const PER_TABLE = 10;
 const LEVELS: { title: string; colour: string }[] = [
-  { title: "Impossible", colour: "#a855f7" }, // was "Oober" (owner, 24 September 2026)
+  { title: "Impossible", colour: "#ffffff" }, // was "Oober"; white, was purple (owner, 24 September 2026)
   { title: "Extreme", colour: "#db2777" },
   { title: "Very hard", colour: "#ef4444" },
   { title: "Hard", colour: "#f97316" },
   { title: "Medium", colour: "#ffd23e" },
   { title: "Easy", colour: "#84cc16" },
-  { title: "Very easy", colour: "#22c55e" },
 ];
 
 // Different dogs in a chum's tree: every name below the chum, counted once.
@@ -95,6 +98,14 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
     <section className={styles.ladder} aria-label={`${title} levels`}>
       <header className={styles.head}>
         <h2 className={styles.title} style={{ color: colour }}>{title}</h2>
+        {/* THE TOP CHUM'S CARD (owner, 24 September 2026): the hardest dog in the
+            table, as its card, opening its game. */}
+        {rows[0] ? (
+          <Link href={`/play/${rows[0].slug}`} className={styles.topCard} aria-label={`Play the ${rows[0].name}, the top of ${title}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={encodeURI(rows[0].image)} alt="" loading="lazy" width={140} height={140} />
+          </Link>
+        ) : null}
       </header>
       <ol className={styles.list}>
         {rows.map((r, i) => (
@@ -128,12 +139,7 @@ export default function PlayLadder() {
     .map((b) => ({ slug: b.slug, name: b.name, image: b.image, circles: chumCircleCount(b.name), dogs: dogCount(b.name), era: eraOf(b.name, b.established), status: statusFor(b.name), rarity: rarityOf(b.name) }))
     .sort((a, b) => b.circles - a.circles || a.name.localeCompare(b.name));
   // Dealt out hardest first; the first (rows % 7) columns take one extra.
-  const base = Math.floor(rows.length / LEVELS.length);
-  const extra = rows.length % LEVELS.length;
-  const groups = LEVELS.map((lv, i) => {
-    const start = i * base + Math.min(i, extra);
-    return { ...lv, rows: rows.slice(start, start + base + (i < extra ? 1 : 0)) };
-  });
+  const groups = LEVELS.map((lv, i) => ({ ...lv, rows: rows.slice(i * PER_TABLE, (i + 1) * PER_TABLE) })).filter((g) => g.rows.length > 0);
   return (
     /* A HORIZONTAL SCROLL ON A PHONE, one ladder at a time, with the video
        slider's own scrollbar (owner, 24 September 2026); side by side on desktop,
