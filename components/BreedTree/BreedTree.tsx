@@ -30,6 +30,7 @@ import mapStyles from "../PackPit/LineageMap.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
 import { propsFor, toysForCircles, type LevelTheme } from "../../data/levelThemes";
+import { breeds as packBreeds } from "../../data/breeds";
 import { packArt } from "../../data/packArt";
 import BritainMessage from "../PackPit/BritainMessage";
 
@@ -9896,7 +9897,11 @@ export default function BreedTree({
            off TOY_BALL_DELAY even on a level with no ball, so the props and the
            flood land where they always did. */
         const circleCount = nodes.filter((d) => !(d.depth === 0 || isHiddenCopy(d))).length;
-        const armed = new Set(toysForCircles(circleCount));
+        /* A CHUM LEVEL is one of the 54 pack dogs, however it was opened (a
+           /play page, a chum page's strip). It takes the chum bands. See
+           CHUM_TOY_BANDS in data/levelThemes.ts. */
+        const chumLevel = !!levelName && packBreeds.some((pb) => pb.name === levelName);
+        const armed = new Set(toysForCircles(circleCount, chumLevel));
         if (armed.has("cookies")) toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
         /* The balls were made unconditional on 2026-08-12 when the old
            first-seven-levels `hideBalls` gate was removed. That reversal stands:

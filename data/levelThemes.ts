@@ -208,11 +208,30 @@ const TOY_BANDS: ToyBand[] = [
   { under: Infinity, toys: ["bone"] },
 ];
 
+/* THE CHUM LEVELS' OWN BANDS, 24 September 2026 (owner). The 54 pack chums run
+   from 2 circles to 598, and the era bands above gave all but 15 of them the bone
+   alone. These give a chum level every toy and take them away as it fills:
+     up to 50 circles     every toy
+     over 50              no bowl
+     over 100             no bowl or stick
+     over 200             no bowl, stick or slipper
+     over 300             no bowl, stick, slipper or tennis balls
+   The cookie bar, the flag and the bone are in every band (owner: the cookie
+   policy should always be there). The era levels keep TOY_BANDS, untouched. */
+const CHUM_TOY_BANDS: ToyBand[] = [
+  { under: 51,       toys: ALL_TOYS },
+  { under: 101,      toys: ALL_TOYS.filter((t) => t !== "bowl") },
+  { under: 201,      toys: ALL_TOYS.filter((t) => t !== "bowl" && t !== "stickBig") },
+  { under: 301,      toys: ALL_TOYS.filter((t) => t !== "bowl" && t !== "stickBig" && t !== "slipper") },
+  { under: Infinity, toys: ALL_TOYS.filter((t) => t !== "bowl" && t !== "stickBig" && t !== "slipper" && t !== "ball" && t !== "ballPink") },
+];
+
 /* The toys for a level holding `circles` drawn circles. Always returns a list:
    the last band has no ceiling, so every level is covered. A count that has not
    been measured yet falls to the smallest set rather than to the largest, so a
    pit can never arm the full eight by accident. */
-export function toysForCircles(circles?: number): string[] {
+export function toysForCircles(circles?: number, chum = false): string[] {
   if (circles === undefined || !Number.isFinite(circles) || circles < 0) return ["bone"];
-  return (TOY_BANDS.find((b) => circles < b.under) ?? TOY_BANDS[TOY_BANDS.length - 1]).toys;
+  const bands = chum ? CHUM_TOY_BANDS : TOY_BANDS;
+  return (bands.find((b) => circles < b.under) ?? bands[bands.length - 1]).toys;
 }

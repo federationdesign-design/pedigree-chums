@@ -3,6 +3,7 @@
 import { cloneElement, isValidElement, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import Nav from "../../../components/Nav/Nav";
 import heroBtn from "../../britains-dog-history-2/history2.module.css";
+import { resetToys } from "../../../components/BreedTree/BreedTree";
 
 /* THE CHUM'S INTRO VIDEO BEFORE ITS GAME, phones only (owner, 24 September 2026:
    a five second clip per chum, trialled on the Labrador first).
@@ -33,6 +34,13 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   /* LEARN INSTEAD (owner, 24 September 2026): the intro's Learn button opens the
      chum's level in its learn area rather than starting the round. */
   const [learn, setLearn] = useState(false);
+
+  /* A FRESH SET OF TOYS ON EVERY CHUM PLAY PAGE (owner, 24 September 2026). A toy
+     thrown clear of the pit is retired for the whole visit, so after a few levels
+     the small chum levels arrived with none. Arriving here un-retires them. The
+     flag's read message and a given cookie consent are permanent and stay so.
+     Runs before the game mounts, which waits at least a frame (see below). */
+  useEffect(() => { resetToys(); }, []);
 
   // Decided once, on the first frame after mounting, so a later resize can never
   // bring the clip back over a game already running.
