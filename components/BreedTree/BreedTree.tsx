@@ -849,6 +849,21 @@ const FACE_BOMB_SRC: Record<RarityTier, string> = {
   common: "/common3.png",
   veryCommon: "/very-common6.png",
 };
+/* AND WHAT EVERY DOG DOES WHEN A CHAIN IS COLLECTED, 24 September 2026 (owner's
+   casting). The whole pit pulls this face for FACE_COLLECT_MS and then goes back
+   to whatever it was wearing.
+
+   SHORTER AND FLATTER THAN A BOMB OR A SHAKE, on purpose: those roll a hold per
+   circle so the pit recovers raggedly, while a collect is one clean beat and
+   reads better if the pit does it together. See faceEventAll's `hold` argument. */
+const FACE_COLLECT_SRC: Record<RarityTier, string> = {
+  extremelyRare: "/extreme-rare2.png",
+  rare: "/rare2.png",
+  uncommon: "/uncommon6.png",
+  common: "/common4.png",
+  veryCommon: "/very-common2.png",
+};
+const FACE_COLLECT_MS = 600;
 const FACE_SHAKE_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare5.png",
   rare: "/rare2.png",
@@ -5863,6 +5878,10 @@ export default function BreedTree({
      reading the wall clock during render. Written wherever a face is set. */
   const faceClockRef = useRef(0);
 
+  /* Fires the collect face across the pit. Set inside the sim, called from the
+     chain's settle hook. */
+  const faceCollectRef = useRef<(() => void) | null>(null);
+
   const shakeInnerRef = useRef<(() => void) | null>(null);
   /* THE SHAKE IS DEAD FOR HALF A SECOND AFTER A DOG COMPLETES, 23 September 2026
      (owner). The auto button on the lifted layer sits on the shake button's exact
@@ -10461,16 +10480,22 @@ export default function BreedTree({
          casting of which face each tier wears). One roll per circle for HOW LONG,
          inside FACE_EVENT_MIN_MS to FACE_EVENT_MAX_MS, so they come out of it
          raggedly rather than together. */
-      const faceEventAll = (pick: Record<RarityTier, string>, now: number) => {
+      /* `hold` is optional: without one each circle rolls its own inside the event
+         range, which is what a bomb and a shake want. A collect passes a flat
+         figure so the whole pit pulls the face and drops it together. */
+      const faceEventAll = (pick: Record<RarityTier, string>, now: number, hold?: number) => {
         for (const bb of all) {
           if (!bb.n) continue;
           faceHitRef.current.set(bb.n, {
             src: pick[rarityTier(treesContaining(bb.n.data.name))],
-            until: now + rnd(FACE_EVENT_MIN_MS, FACE_EVENT_MAX_MS),
+            until: now + (hold ?? rnd(FACE_EVENT_MIN_MS, FACE_EVENT_MAX_MS)),
             evt: true,
           });
         }
       };
+      /* Reached from the chain's settle hook, which runs outside this closure, so
+         it goes on a ref like the shake and the slowmo do. */
+      faceCollectRef.current = () => faceEventAll(FACE_COLLECT_SRC, performance.now(), FACE_COLLECT_MS);
       const detonate = (b: Body, wasHeld: boolean) => {
         if (b.blown) return;
         b.blown = true;
@@ -12812,6 +12837,10 @@ export default function BreedTree({
         const ok = dogOpenRef.current?.(at) ?? false;
         if (!ok) return `could not open #${at}, ${opened.data.name}`;
         if (swept) chainSweepScoreRef.current?.(opened.x, opened.y, live.length * CHAIN_SWEEP_POINTS);
+        /* THE WHOLE PIT REACTS TO A COLLECT (owner, 24 September 2026). Fired
+           here, after the open has succeeded, so a chain that failed to open
+           anything never pulls the face. */
+        faceCollectRef.current?.();
         dogChainRef.current = { opened, others };
         return `OPENED ${opened.data.name}, ${others.length} more waiting on it${swept ? `, SWEPT all ${live.length} for ${live.length * CHAIN_SWEEP_POINTS}` : ""}`;
       },
