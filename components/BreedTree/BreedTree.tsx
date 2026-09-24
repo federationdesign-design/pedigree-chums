@@ -956,12 +956,10 @@ const FACE_FLIP_SHARE = 0.4;
    bright cyan instead. See paintChainCount. */
 const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
-// Extra space above the counter, in screen px, on top of the measured placement.
-const CHAIN_COUNT_DROP_PX = 10;
-// The gap between the chain counter and the dogs-found counter beside it.
-const FOUND_COUNT_GAP_PX = 10;
 // How long the dogs-found counter stays up after a new dog is found.
 const FOUND_FLASH_MS = 5000;
+// How long the ancestors list stays open before it closes itself.
+const FOUND_LIST_OPEN_MS = 5000;
 // The least space kept between the dogs-found list and any edge of the window.
 const FOUND_LIST_EDGE_PX = 10;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
@@ -5327,6 +5325,13 @@ export default function BreedTree({
      opens every dog found this run. The counter stays up while it is open. */
   const [foundListOpen, setFoundListOpen] = useState(false);
   const foundListRef = useRef<HTMLDivElement>(null);
+  /* THE LIST CLOSES ITSELF after FOUND_LIST_OPEN_MS (owner, 24 September 2026),
+     in place of the close X. A tap on the counter still opens and shuts it. */
+  useEffect(() => {
+    if (!foundListOpen) return;
+    const t = window.setTimeout(() => setFoundListOpen(false), FOUND_LIST_OPEN_MS);
+    return () => window.clearTimeout(t);
+  }, [foundListOpen]);
   /* THE LIST STAYS ON SCREEN (owner, 24 September 2026: it was running off the
      left edge). It hangs right-aligned under the counter, and the counter can sit
      near the left of a narrow pit, so the list could start off screen. Measured
@@ -6127,22 +6132,11 @@ export default function BreedTree({
     const t = Math.max(0, Math.min(1, (dogsFound ?? 0) / dogsTotal));
     const hsl = CHAIN_COUNT_FROM.map((c, j) => c + (CHAIN_COUNT_TO[j] - c) * t);
     el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
-    const place = () => {
-      const sq = stageRef.current?.querySelector('[data-ui-square="close"]');
-      const r = sq?.getBoundingClientRect();
-      if (!r || r.width <= 0 || !el.offsetHeight) return;
-      const h = el.offsetHeight;
-      const gap = r.width * 0.25;
-      el.style.top = `${Math.max(0, r.top + r.height / 2 - h / 2) + CHAIN_COUNT_DROP_PX}px`;
-      const chain = chainCountRef.current;
-      const chainW = chain && chain.offsetWidth > 0 ? chain.offsetWidth + FOUND_COUNT_GAP_PX : 0;
-      el.style.right = `${window.innerWidth - (r.left - r.width - gap) + gap + chainW}px`;
-    };
-    place();
-    const raf = requestAnimationFrame(place);
-    window.addEventListener("resize", place);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", place); };
-  }, [dogsFound, dogsTotal, started, learning, foundFlash, foundListOpen]);
+    /* NO LONGER MEASURED (owner, 24 September 2026: it sometimes appeared in the
+       wrong place, not pinned to the top). It was placed from the close X's
+       on-screen box, which is wrong mid-zoom or once that square has moved. It is
+       now pinned by CSS alone: see .chainCount. */
+  }, [dogsFound, dogsTotal]);
   // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
   useEffect(() => () => clearCdTimers(), []);
@@ -13120,21 +13114,7 @@ export default function BreedTree({
       const hsl = CHAIN_COUNT_FROM.map((c, j) => c + (CHAIN_COUNT_TO[j] - c) * t);
       el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
       el.style.display = "block";
-      /* TOP RIGHT, LEFT OF THE INFO SQUARE (owner, 24 September 2026). The
-         corner holds the close X, the info square to its left and the brain
-         under it, and on a phone the countdown digits sit over the close X. So
-         the counter goes one slot further left than the info square, level with
-         the row. MEASURED from the close X on screen every time it paints, not a
-         guessed figure: that square is sized off the measured stage and differs
-         on every device. The CSS keeps a fallback for the first paint. */
-      const sq = stageRef.current?.querySelector('[data-ui-square="close"]');
-      const r = sq?.getBoundingClientRect();
-      if (r && r.width > 0) {
-        const gap = r.width * 0.25;
-        // + CHAIN_COUNT_DROP_PX: 10px more air above it (owner, 24 September 2026).
-        el.style.top = `${Math.max(0, r.top + r.height / 2 - el.offsetHeight / 2) + CHAIN_COUNT_DROP_PX}px`;
-        el.style.right = `${window.innerWidth - (r.left - r.width - gap) + gap}px`;
-      }
+      // Pinned top right by CSS, not measured (owner, 24 September 2026). See .chainCount.
     };
     /* Named rather than inline, because the magnet measures with the SAME numbers
        the path and the crossing test use. Two spellings of a circle's geometry is
@@ -16954,7 +16934,6 @@ export default function BreedTree({
             <div ref={foundListRef} className={styles.foundList} role="dialog" aria-label="Ancestors discovered this run" onClick={(e) => e.stopPropagation()}>
               <div className={styles.foundListHead}>
                 <span>Ancestors discovered</span>
-                <button type="button" className={styles.foundListClose} aria-label="Close the list" onClick={() => setFoundListOpen(false)}>×</button>
               </div>
               {(dogsFoundList ?? []).length === 0 ? (
                 <p className={styles.foundListEmpty}>None yet</p>

@@ -2519,7 +2519,13 @@
   /* TOP RIGHT, 24 September 2026 (owner), left of the pit's corner squares.
      paintChainCount measures the close X and sets top and right exactly; these
      are only the first paint, roughly the same place. */
-  top: calc(22px + env(safe-area-inset-top, 0px)); /* 10px more air, 24 September 2026 */
+  /* PINNED BY CSS ALONE, 24 September 2026 (owner: it wandered). It used to be
+     measured from the pit's close X, which gave a wrong answer mid-zoom or once
+     that square had moved. Now fixed to the top right of the screen, clear of the
+     pit's two corner squares: --pit-ui-size is their measured size, published by
+     the pit, and 40px covers the corner margin and the gap between them. Both
+     counters, chain and ancestors, use this one rule, so they share a spot. */
+  top: calc(22px + env(safe-area-inset-top, 0px));
   right: calc(16px + 2 * var(--pit-ui-size, 60px) + 40px);
   z-index: 62;
   /* TWICE THE ORIGINAL, then 25% smaller, both 24 September 2026 (owner). Type,
@@ -2628,15 +2634,6 @@
      own lemon, and the cookie panel title's navy drop, scaled to this size. */
   color: var(--yellow-header, #ffed00);
   text-shadow: 0 2px 0 rgba(10, 58, 87, 0.7), 0 0 10px rgba(10, 58, 87, 0.5);
-}
-.foundListClose {
-  background: none;
-  border: 0;
-  color: #ffffff;
-  font-size: 26px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 4px;
 }
 .foundListEmpty { margin: 4px 0 0; opacity: 0.8; }
 .foundListRows { list-style: none; margin: 0; padding: 0; }
