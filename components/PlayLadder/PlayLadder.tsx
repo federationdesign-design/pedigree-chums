@@ -13,10 +13,21 @@ import styles from "./PlayLadder.module.css";
    far more than dogs). Counted on the server from the lineage data, so the lists
    follow every change to the trees by themselves.
 
-   THE CUT-OFFS split the 54 chums into near-even thirds on round numbers: 19, 18
-   and 17 when set. Change them here. */
-const EASY_MAX = 30;
-const MEDIUM_MAX = 150;
+   SEVEN LADDERS, HARDEST FIRST (owner, 24 September 2026, replacing the three
+   of Easy, Medium and Hard). Split by RANK rather than by fixed circle counts, so
+   the columns stay even as the trees grow: the chums are ranked hardest first
+   and dealt out in order, the first columns taking one extra when the count does
+   not divide by seven (54 chums: five columns of 8, two of 7). Inside each column
+   the hardest is at the top. */
+const LEVELS: { title: string; colour: string }[] = [
+  { title: "Oober", colour: "#a855f7" },
+  { title: "Extreme", colour: "#db2777" },
+  { title: "Very hard", colour: "#ef4444" },
+  { title: "Hard", colour: "#f97316" },
+  { title: "Medium", colour: "#ffd23e" },
+  { title: "Easy", colour: "#84cc16" },
+  { title: "Very easy", colour: "#22c55e" },
+];
 
 // Different dogs in a chum's tree: every name below the chum, counted once.
 function dogCount(name: string): number {
@@ -33,11 +44,11 @@ function dogCount(name: string): number {
 
 type Row = { slug: string; name: string; image: string; circles: number; dogs: number };
 
-function Ladder({ title, tone, sub, rows }: { title: string; tone: string; sub: string; rows: Row[] }) {
+function Ladder({ title, colour, sub, rows }: { title: string; colour: string; sub: string; rows: Row[] }) {
   return (
     <section className={styles.ladder} aria-label={`${title} levels`}>
       <header className={styles.head}>
-        <h2 className={`${styles.title} ${tone}`}>{title}</h2>
+        <h2 className={styles.title} style={{ color: colour }}>{title}</h2>
         <p className={styles.sub}>{sub}</p>
       </header>
       <ol className={styles.list}>
@@ -62,15 +73,21 @@ export default function PlayLadder() {
   const rows: Row[] = breeds
     .filter((b) => !!b.slug)
     .map((b) => ({ slug: b.slug, name: b.name, image: b.image, circles: chumCircleCount(b.name), dogs: dogCount(b.name) }))
-    .sort((a, b) => a.circles - b.circles || a.name.localeCompare(b.name));
-  const easy = rows.filter((r) => r.circles <= EASY_MAX);
-  const medium = rows.filter((r) => r.circles > EASY_MAX && r.circles <= MEDIUM_MAX);
-  const hard = rows.filter((r) => r.circles > MEDIUM_MAX);
+    .sort((a, b) => b.circles - a.circles || a.name.localeCompare(b.name));
+  // Dealt out hardest first; the first (rows % 7) columns take one extra.
+  const base = Math.floor(rows.length / LEVELS.length);
+  const extra = rows.length % LEVELS.length;
+  const groups = LEVELS.map((lv, i) => {
+    const start = i * base + Math.min(i, extra);
+    return { ...lv, rows: rows.slice(start, start + base + (i < extra ? 1 : 0)) };
+  });
   return (
     <div className={styles.wrap}>
-      <Ladder title="Easy" tone={styles.easy} sub={`Up to ${EASY_MAX} circles`} rows={easy} />
-      <Ladder title="Medium" tone={styles.medium} sub={`${EASY_MAX + 1} to ${MEDIUM_MAX} circles`} rows={medium} />
-      <Ladder title="Hard" tone={styles.hard} sub={`Over ${MEDIUM_MAX} circles`} rows={hard} />
+      {groups.map((g) => {
+        const hi = g.rows[0]?.circles ?? 0;
+        const lo = g.rows[g.rows.length - 1]?.circles ?? 0;
+        return <Ladder key={g.title} title={g.title} colour={g.colour} sub={hi === lo ? `${hi} circles` : `${lo} to ${hi} circles`} rows={g.rows} />;
+      })}
     </div>
   );
 }

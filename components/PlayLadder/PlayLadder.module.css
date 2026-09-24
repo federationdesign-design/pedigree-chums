@@ -2,14 +2,12 @@
    stacked on a phone. Glass panels in the site's navy, white type. */
 .wrap {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Seven ladders: as many side by side as fit at a readable width, then wrap. */
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   gap: clamp(14px, 2vw, 24px);
   padding: clamp(28px, 4vw, 56px) clamp(18px, 4vw, 48px) clamp(40px, 5vw, 72px);
   max-width: 1400px;
   margin: 0 auto;
-}
-@media (max-width: 900px) {
-  .wrap { grid-template-columns: 1fr; }
 }
 .ladder {
   background: rgba(10, 58, 87, 0.72);
@@ -27,9 +25,6 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.easy { color: #22c55e; }
-.medium { color: var(--yellow, #ffd23e); }
-.hard { color: #ef4444; }
 .sub {
   margin: 4px 0 0;
   font-size: 0.8rem;
