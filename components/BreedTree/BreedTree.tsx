@@ -976,6 +976,19 @@ const BOMB_ADDS_SECS = 10;
    stand-down, bomb, shake, collect) keeps its shade without a table of its own.
    The other four tiers are untouched. */
 const VERY_COMMON_SHADES = ["", "B", "C"] as const;
+/* A GLOW PER BREED FOR THE RARE DOGS, 24 September 2026 (owner: with several rare
+   or extremely rare dogs in the pit they all wear the same face, so there is no
+   telling which are the same dog, and so chainable, until you try). Each breed of
+   those two tiers takes its own glow shade, dealt in the order the breeds first
+   appear in the level, so TWINS SHARE A SHADE and different dogs differ. The
+   shades are close relations of the tier's own colour: blues for rare, purples
+   and pinks for extremely rare. More breeds than shades wrap round. */
+const RARE_GLOW: Record<"rare" | "extremelyRare", string[]> = {
+  rare: ["#60a5fa", "#22d3ee", "#818cf8", "#bfdbfe"],
+  extremelyRare: ["#c084fc", "#f472b6", "#a78bfa", "#f0abfc"],
+};
+// How far the glow spreads, in the face art's own units (QMARK_VB wide).
+const RARE_GLOW_BLUR = 26;
 const rnd = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
 /* ONLY THE TWO COMMON TIERS FALL AS WORDS, 24 September 2026 (owner). A dog rare
    enough to be worth spotting drops as its CIRCLE, with the tier art on it, so the
@@ -6159,6 +6172,22 @@ export default function BreedTree({
      take the first shades in order and cannot collide with one from an earlier
      level. See VERY_COMMON_SHADES. */
   const faceShadeRef = useRef<{ nodes: Node[] | null; of: Map<string, string> }>({ nodes: null, of: new Map() });
+  // The rare dogs' glow per breed, reset with the level exactly as the shades are.
+  const glowShadeRef = useRef<{ nodes: Node[] | null; of: Map<string, string>; n: Record<string, number> }>({ nodes: null, of: new Map(), n: {} });
+  const glowFor = (d: Node, tier: RarityTier): string => {
+    if (tier !== "rare" && tier !== "extremelyRare") return "";
+    const st = glowShadeRef.current;
+    if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); st.n = {}; }
+    const breed = d.data.name;
+    let id = st.of.get(breed);
+    if (id === undefined) {
+      const k = st.n[tier] ?? 0;
+      st.n[tier] = k + 1;
+      id = `bt-glow-${tier}-${k % RARE_GLOW[tier].length}`;
+      st.of.set(breed, id);
+    }
+    return id;
+  };
   // Called only from the face writer, never during render.
   const shadeFace = (d: Node, src: string): string => {
     if (!src.startsWith("/very-common")) return src;
@@ -7651,6 +7680,15 @@ export default function BreedTree({
              rarity ever differs from the last one written, the same guard the
              fill and the ring already use. */
           const faceTier = rarityTier(treesContaining(d.data.name));
+          // The rare dogs' glow: one shade per breed, twins alike. See RARE_GLOW.
+          {
+            const g = showQ ? glowFor(d, faceTier) : "";
+            const want = g ? `url(#${g})` : "";
+            if ((q.getAttribute("filter") ?? "") !== want) {
+              if (want) q.setAttribute("filter", want);
+              else q.removeAttribute("filter");
+            }
+          }
           /* TWO VALUES, ON PURPOSE, 24 September 2026. `chained` is the QUESTION,
              and `tap` is the KEY that decides whether anything is rewritten.
 
@@ -14341,6 +14379,15 @@ export default function BreedTree({
             <filter id="bt-ui-hit" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
               <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.8235 0 0 0 0 0.2431 0 0 0 1 0" />
             </filter>
+            {/* THE RARE DOGS' GLOWS, one filter per shade. See RARE_GLOW. Two soft
+                shadows in the shade, no offset, so the face sits in a halo of its
+                own colour; the region is widened so the halo is not clipped. */}
+            {(["rare", "extremelyRare"] as const).flatMap((tier) => RARE_GLOW[tier].map((hex, gi) => (
+              <filter key={`${tier}-${gi}`} id={`bt-glow-${tier}-${gi}`} x="-30%" y="-30%" width="160%" height="160%" colorInterpolationFilters="sRGB">
+                <feDropShadow dx="0" dy="0" stdDeviation={RARE_GLOW_BLUR} floodColor={hex} floodOpacity="1" />
+                <feDropShadow dx="0" dy="0" stdDeviation={RARE_GLOW_BLUR * 0.4} floodColor={hex} floodOpacity="0.9" />
+              </filter>
+            )))}
             <filter id="bt-qmark-hi" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
               <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
             </filter>
