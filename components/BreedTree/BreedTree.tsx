@@ -1434,6 +1434,11 @@ const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier
    has once the pit is declared full, on top of the grace before it may start at
    all: see PIT_FULL_GRACE_MS. */
 const CD_FROM = 100;
+/* AND WHERE THE BIG CENTRE DIGITS JOIN IN (owner, 24 September 2026: only in the
+   last ten). Below this figure the mid-screen number shows; above it only the
+   corner pair does. Mobile only either way: on desktop the corner set is already
+   centred. */
+const CD_MID_FROM = 10;
 
 const CHAIN_JOIN_POINTS = 10;
 /* THE JOIN NUMBER IS OUTLINED, NOT RECOLOURED (owner, 18 September 2026).
@@ -2526,7 +2531,10 @@ const PIT_DRAWS_WORDS = true;
    still applies on top of it, so a scattered chip is 0.85 of 0.8.
    THE BOMB BLAST DOES NOT MOVE: it reads BOMB_BLAST_R_PX, a fixed figure, for
    exactly this reason. */
-const CHIP_SIZE_K = 0.8;
+/* A FURTHER TENTH OFF, 24 September 2026 (owner). 0.8 to 0.72, so a chip is now
+   72% of the size it was before either cut. The scatter's own SCATTER_CHIP_K
+   still applies on top, as before. */
+const CHIP_SIZE_K = 0.72;
 const chipRadiusPx = (share: number, mobile: boolean) => liftNodeScreenR(share, mobile) * CHIP_SIZE_K;
 /* THE RADIUS A BOMB'S EXPLOSION IS BUILT FROM, fixed at the old chip size so a bigger
    bomb looks bigger but blasts exactly as it did (owner, 21 September 2026). */
@@ -5702,6 +5710,13 @@ export default function BreedTree({
        echo of the corner rather than competing with it. */
     const elMid = cdMobile ? document.createElement("div") : null;
     if (elMid) {
+      /* HIDDEN UNTIL THE LAST TEN, 24 September 2026 (owner). With the count
+         starting at 100 the big centre digits would sit over the pit for a minute
+         and a half; the corner pair carries it until it matters. The element is
+         still built here and still driven by the same ticker, so there is nothing
+         to create late and no second clock: only its display changes, at the tick
+         that reaches CD_MID_FROM. */
+      elMid.style.display = CD_FROM > CD_MID_FROM ? "none" : "flex";
       elMid.style.cssText =
         "position:absolute;inset:0;z-index:199;display:flex;align-items:center;justify-content:center;" +
         "font-family:var(--font-display,'Luckiest Guy',system-ui);color:#fff;pointer-events:none;" +
@@ -5770,7 +5785,14 @@ export default function BreedTree({
       i++;
       if (i < steps.length) {
         el.textContent = steps[i];
-        if (cdMidElRef.current) cdMidElRef.current.textContent = steps[i];
+        if (cdMidElRef.current) {
+          cdMidElRef.current.textContent = steps[i];
+          /* steps[i] is the number ON SCREEN, so this reads the count itself
+             rather than counting ticks, which keeps it right if the tick is ever
+             rescheduled or the sequence is built differently. */
+          const left = Number(steps[i]);
+          cdMidElRef.current.style.display = Number.isFinite(left) && left <= CD_MID_FROM ? "flex" : "none";
+        }
         setFullAlpha(i / 10);
         cdTickRef.current = window.setTimeout(step, cdStepMs());
         return;
