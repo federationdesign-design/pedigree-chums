@@ -65,10 +65,13 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   return (
     <>
     {/* THE SITE'S MENU AND ACCESSIBILITY SQUARES, top right, over the clip (owner,
-        24 September 2026). The logo stays off; only the two squares show. The
-        clip sits UNDER the nav bar (its z-index 300) so the squares stay on top,
-        and the menu itself still opens over everything. */}
-    <Nav hideLogo />
+        24 September 2026). The clip sits UNDER the nav bar (its z-index 300) so
+        the squares stay on top, and the menu itself still opens over everything.
+        NOT hideLogo: that removes the logo from the bar, which spaces its children
+        to both ends, so the squares fell to the LEFT. The default keeps the logo
+        in place but invisible until the page scrolls, as on the rest of the site,
+        and this screen never scrolls, so only the squares ever show, on the right. */}
+    <Nav />
     <div
       onClick={() => setPhase("game")}
       style={{ position: "fixed", inset: 0, zIndex: 250, background: "#0a3a57", cursor: "pointer" }}
