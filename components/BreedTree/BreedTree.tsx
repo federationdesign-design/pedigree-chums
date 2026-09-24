@@ -833,6 +833,29 @@ const RARITY_FACE_SRC: Record<RarityTier, string> = {
    breed, so held and available circles now say the tier as well as the state.
    The "2" files are the owner's own names and are kept verbatim so the file and
    the reference cannot drift apart. */
+/* THE HIT FACES, 24 September 2026 (owner's artwork). A dog that takes a knock
+   pulls a face for a moment and then goes back to its resting one.
+
+   FOUR EACH, THREE FOR EXTREMELY RARE, which has no sixth file. The count is read
+   from the array rather than assumed anywhere, so a tier can gain or lose an
+   expression by editing this table alone. An empty array would simply mean no
+   flash for that tier, which is how the set was built before all five were drawn.
+
+   NOT THE CHAINED STATE. A circle held in a chain, or one standing down because
+   the chain belongs to another breed, keeps the face that says so: a flash there
+   would be saying two things at once. See FACE_HIT_MS and the writer. */
+const RARITY_FACE_HIT_SRC: Record<RarityTier, readonly string[]> = {
+  extremelyRare: ["/extreme-rare3.png", "/extreme-rare4.png", "/extreme-rare5.png"],
+  rare: ["/rare3.png", "/rare4.png", "/rare5.png", "/rare6.png"],
+  uncommon: ["/uncommon3.png", "/uncommon4.png", "/uncommon5.png", "/uncommon6.png"],
+  common: ["/common3.png", "/common4.png", "/common5.png", "/common6.png"],
+  veryCommon: ["/very-common3.png", "/very-common4.png", "/very-common5.png", "/very-common6.png"],
+};
+/* HOW LONG A PULLED FACE HOLDS, in ms. Long enough to read on a bounce, short
+   enough that a busy pit is not a wall of gurning. A second knock during the hold
+   restarts it with a fresh expression. */
+const FACE_HIT_MS = 400;
+
 const RARITY_FACE_CHAINED_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare2.png",
   rare: "/rare2.png",
@@ -5739,6 +5762,16 @@ export default function BreedTree({
   // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
   useEffect(() => () => clearCdTimers(), []);
+  /* THE PULLED FACES, keyed by BREED rather than by circle (owner, 24 September
+     2026). Every copy of a breed reacts together, which is the same grammar the
+     chain already uses and is far cheaper than a per-node map the pit would have
+     to keep in step as circles pop and are removed. A miss simply means no
+     expression, so nothing has to be cleaned up when a level unmounts. */
+  const faceHitRef = useRef<Map<string, { src: string; until: number }>>(new Map());
+  /* The sim's frame time, so the paint pass can expire a pulled face without
+     reading the wall clock during render. Written wherever a face is set. */
+  const faceClockRef = useRef(0);
+
   const shakeInnerRef = useRef<(() => void) | null>(null);
   /* THE SHAKE IS DEAD FOR HALF A SECOND AFTER A DOG COMPLETES, 23 September 2026
      (owner). The auto button on the lifted layer sits on the shake button's exact
@@ -6630,6 +6663,12 @@ export default function BreedTree({
       // finished: a circle is navy when its own breed has a twin.
       for (const [nm, n2] of pitBreedCount) if (n2 > 1) { pitPlainCount += n2; everTwinRef.current.add(nm); }
     }
+    /* THE CLOCK FOR EXPIRING A PULLED FACE. It is the SIM's own frame time, kept
+       on a ref by the collision loop, rather than performance.now() here: this
+       pass runs during render, where reading the wall clock is impure and the
+       linter is right to say so. The sim writes that ref on every frame it steps,
+       which is every frame a face could be pulled on. */
+    const nowFx = faceClockRef.current;
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
       const ty = (d.y - v[1]) * k;
@@ -7151,10 +7190,17 @@ export default function BreedTree({
              NOTHING IS LOST when the chain ends: `want` is "0" again on the next
              frame, so every circle takes its tier face back. */
           const otherBreed = !!dogChainBreedRef.current && d.data.name !== dogChainBreedRef.current;
-          const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}`;
+          /* THE PULLED FACE, 24 September 2026. faceHitRef holds an expression and
+             the time it expires, written by the collision handler; this reads it.
+             It loses to both chain states on purpose: a chained circle and one
+             standing down are each saying something the player needs, and a
+             gurn on top would muddle it. */
+          const hit = faceHitRef.current.get(d.data.name);
+          const hitSrc = !otherBreed && !chained && hit && hit.until > nowFx ? hit.src : null;
+          const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}:${hitSrc ?? ""}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", otherBreed ? QMARK_SRC : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : RARITY_FACE_SRC[faceTier]);
+            qi.setAttribute("href", otherBreed ? QMARK_SRC : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : hitSrc ?? RARITY_FACE_SRC[faceTier]);
             /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
                filter would flatten it to one hue. The question mark still is,
                because it is one flat file and its depth tint is what tells a
@@ -10575,6 +10621,22 @@ export default function BreedTree({
                    worth far more relative to a hit, which is the point. */
                 numAt(w.x, w.y, 1, now);
                 if (spinDiagOn) spinScored++; // counted AT the award, not inferred
+                /* PULL A FACE, 24 September 2026 (owner). Hung off the SAME test
+                   that already awards a point, so it fires on a real hit in play
+                   and not on the idle jostling of a settled pile: the two guards
+                   above, the cooldown and the dead-partner check, were written
+                   for exactly that and are worth reusing rather than repeating.
+                   Only a dog does this. A chip has no face. */
+                faceClockRef.current = now;
+                if (b.n) {
+                  const faces = RARITY_FACE_HIT_SRC[rarityTier(treesContaining(b.n.data.name))];
+                  if (faces.length) {
+                    faceHitRef.current.set(b.n.data.name, {
+                      src: faces[(Math.random() * faces.length) | 0],
+                      until: now + FACE_HIT_MS,
+                    });
+                  }
+                }
                 b.lastFx = now;
                 flashed = true;
               }
@@ -10921,6 +10983,10 @@ export default function BreedTree({
            the world and the bond table are in scope. Everything here is behind
            the flag. See the block beside spinDiagRef for what the columns are
            for and which one settles the question. */
+        /* THE FACE CLOCK, advanced every stepped frame. Without this it would
+           only move when something was hit, and the last pulled face of a round
+           would sit there for good. */
+        faceClockRef.current = nowRaf;
         if (spinDiagOn && nowRaf - spinLastAt >= 500) {
           const elapsed = spinLastAt ? (nowRaf - spinLastAt) / 1000 : 0;
           type DB = { isStatic?: boolean; isSleeping?: boolean; mass?: number; angularVelocity?: number; velocity: { x: number; y: number }; plugin?: { kind?: string; bridge?: Body } };
