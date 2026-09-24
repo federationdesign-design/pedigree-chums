@@ -268,6 +268,12 @@ const SPREADN = Math.PI * 0.9;
    false: the old parent-relative clock layout, untouched. Lift only: the main pit
    and the chum tree never take this branch. */
 const LIFT_TIDY = true;
+/* WHICH SHAPE THE LIFT DRAWS, 24 September 2026 (owner, stage 2: try the balloon
+   tree too, and let the game pick whichever suits each tree).
+   "auto": lay the whole tree out BOTH ways, score each (overlapping circles
+   first, then how far it spreads), and draw the winner. "tidy" or "balloon":
+   force one, to compare them on a real dog. Only read while LIFT_TIDY is on. */
+const LIFT_LAYOUT: "auto" | "tidy" | "balloon" = "auto";
 /* AUTO SPEEDS UP AS IT GOES DEEPER, lifted layer only (owner, 24 September 2026:
    it ran in stages rather than one smooth slide, because each layer down a big
    tree holds more dogs and every dog had the same flat delay). Each dog's delay is
@@ -1706,6 +1712,127 @@ export default function LineageMap({
   const cardDeg = -(cardLean * 180) / Math.PI; // the exact tilt every popped card uses; frames match it
   const rootStatus = nodeStatus(breed.name, ""); // status dot for the main breed card
 
+  /* THE LIFT'S TWO SHAPES, AND THE PICK (owner, 24 September 2026).
+
+     RADIAL TIDY TREE: every generation on its own ring round the card, each dog
+     owning a wedge of the 270 degree arc sized by the dogs behind it.
+
+     BALLOON TREE: each dog's parents sit on a small circle round IT, and theirs
+     round them, circles within circles. A dog's circle is sized to fit what hangs
+     off it, and the parents share the arc facing away from the dog (270 degrees
+     up off the card, like the tidy tree, so the Collect button stays clear at the
+     start of it).
+
+     THE PICK, "auto": both are laid out over the whole tree and scored. Fewer
+     overlapping circles wins; on a tie the one that spreads less far wins, since
+     it can be drawn larger. Positions are relative to the card, laid out once per
+     lifted dog. Radii and gaps are the clock layout's own (NODE_POKE, doubled for
+     the first ring on desktop, plus the desktop's extra 10 screen px). */
+  const liftLayout = useMemo(() => {
+    if (!circular || !LIFT_TIDY || !root) return null;
+    const pokeBase = 18 * (isMobile ? PIT_NODE_SCALE * 0.9 : 1);
+    const liftExtra = !isMobile ? 10 * liftK : 0;
+    const poke = pokeBase + liftExtra;
+    const pokeFirst = (!isMobile ? pokeBase * 2 : pokeBase) + liftExtra;
+    const rOfT = (nd: Node): number => {
+      const p = nd._parent as Node | null;
+      return p ? nodeR(Math.round((nd._leaves / drawnLeaves(p)) * 100)) : liftR;
+    };
+    const kidsOf = (n: Node) => ((n.children ?? []) as Node[]);
+    type P = { x: number; y: number; a: number };
+    const c0 = -Math.PI / 2;
+
+    // Radial tidy tree.
+    const tidy = new Map<string, P>();
+    {
+      const maxR: number[] = [];
+      const scan = (n: Node, d: number) => { for (const k of kidsOf(n)) { maxR[d + 1] = Math.max(maxR[d + 1] ?? 0, rOfT(k)); scan(k, d + 1); } };
+      scan(root, 0);
+      const ringR: number[] = [0];
+      for (let d = 1; d < maxR.length; d++) ringR[d] = d === 1 ? liftR + pokeFirst + maxR[1] : ringR[d - 1] + maxR[d - 1] + maxR[d] + poke;
+      const place = (n: Node, d: number, w0: number, w1: number) => {
+        const all = kidsOf(n);
+        const tot = all.reduce((sum, k) => sum + Math.max(1, k._leaves), 0);
+        let at = w0;
+        for (const k of all) {
+          const f = (Math.max(1, k._leaves) / tot) * (w1 - w0);
+          const a = at + f / 2;
+          tidy.set(k._id, { x: Math.cos(a) * ringR[d + 1], y: Math.sin(a) * ringR[d + 1], a });
+          place(k, d + 1, at, at + f);
+          at += f;
+        }
+      };
+      place(root, 0, c0 - SPREAD1 / 2, c0 + SPREAD1 / 2);
+    }
+
+    // Balloon tree.
+    const balloon = new Map<string, P>();
+    {
+      const size = new Map<string, number>();
+      const ring = new Map<string, number>();
+      const measure = (n: Node): number => {
+        const ks = kidsOf(n);
+        const r = rOfT(n);
+        if (!ks.length) { size.set(n._id, r); return r; }
+        const sz = ks.map(measure);
+        const arc = n === root ? SPREAD1 : Math.PI * 1.5;
+        const need = sz.reduce((a, b) => a + 2 * b + poke, 0) / arc;
+        const R = Math.max(r + (n === root ? pokeFirst : poke) + Math.max(...ks.map(rOfT)), need);
+        ring.set(n._id, R);
+        const total = R + Math.max(...sz);
+        size.set(n._id, total);
+        return total;
+      };
+      measure(root);
+      const place = (n: Node, x: number, y: number, dir: number) => {
+        const ks = kidsOf(n);
+        if (!ks.length) return;
+        const arc = n === root ? SPREAD1 : Math.PI * 1.5;
+        const R = ring.get(n._id) ?? 0;
+        const tot = ks.reduce((a, k) => a + (size.get(k._id) ?? 1), 0);
+        let at = dir - arc / 2;
+        for (const k of ks) {
+          const f = ((size.get(k._id) ?? 1) / tot) * arc;
+          const a = at + f / 2;
+          const kx = x + Math.cos(a) * R, ky = y + Math.sin(a) * R;
+          balloon.set(k._id, { x: kx, y: ky, a });
+          place(k, kx, ky, a);
+          at += f;
+        }
+      };
+      place(root, 0, 0, c0);
+    }
+
+    // Score: overlapping pairs (the card included), then spread.
+    const nodes: Node[] = [];
+    const collect = (n: Node) => { for (const k of kidsOf(n)) { nodes.push(k); collect(k); } };
+    collect(root);
+    const score = (m: Map<string, P>) => {
+      const pts = nodes.map((n) => ({ p: m.get(n._id)!, r: rOfT(n) })).filter((q) => q.p);
+      pts.push({ p: { x: 0, y: 0, a: 0 }, r: liftR });
+      let overlaps = 0, spread = 0;
+      for (let i = 0; i < pts.length; i++) {
+        const A = pts[i];
+        spread = Math.max(spread, Math.hypot(A.p.x, A.p.y) + A.r);
+        for (let j = i + 1; j < pts.length; j++) {
+          const B = pts[j];
+          const dx = A.p.x - B.p.x, dy = A.p.y - B.p.y, rr = A.r + B.r;
+          if (dx * dx + dy * dy < rr * rr) overlaps++;
+        }
+      }
+      return { overlaps, spread };
+    };
+    let kind: "tidy" | "balloon" = LIFT_LAYOUT === "balloon" ? "balloon" : "tidy";
+    if (LIFT_LAYOUT === "auto") {
+      const t = score(tidy), b = score(balloon);
+      kind = b.overlaps < t.overlaps || (b.overlaps === t.overlaps && b.spread < t.spread) ? "balloon" : "tidy";
+    }
+    return { kind, pos: kind === "balloon" ? balloon : tidy };
+    // liftLayout depends on the tree and the screen; nodeR is re-made every render
+    // but reads only those same inputs, so it is left out on purpose.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [root, circular, liftR, isMobile, liftK]);
+
   const shown = useMemo(() => {
     if (!root) return [] as Node[];
     const list: Node[] = [];
@@ -1735,51 +1862,24 @@ export default function LineageMap({
        clock layout left between circles (NODE_POKE, doubled for the first ring on
        desktop, plus the desktop's extra 10 screen px), measured off the largest
        circle on each ring. */
-    if (circular && LIFT_TIDY) {
-      const pokeBase = 18 * (isMobile ? PIT_NODE_SCALE * 0.9 : 1);
-      const liftExtra = !isMobile ? 10 * liftK : 0;
-      const poke = pokeBase + liftExtra;
-      const pokeFirst = (!isMobile ? pokeBase * 2 : pokeBase) + liftExtra;
-      const rOfT = (nd: Node): number => {
-        const p = nd._parent as Node | null;
-        return p ? nodeR(Math.round((nd._leaves / drawnLeaves(p)) * 100)) : liftR;
-      };
-      // The largest circle on each ring, over the WHOLE tree, so rings never move.
-      const maxR: number[] = [];
-      const scan = (n: Node, d: number) => {
-        for (const k of (n.children ?? []) as Node[]) {
-          maxR[d + 1] = Math.max(maxR[d + 1] ?? 0, rOfT(k));
-          scan(k, d + 1);
-        }
-      };
-      scan(root, 0);
-      const ringR: number[] = [0];
-      for (let d = 1; d < maxR.length; d++) {
-        ringR[d] = d === 1 ? liftR + pokeFirst + maxR[1] : ringR[d - 1] + maxR[d - 1] + maxR[d] + poke;
-      }
-      const place = (n: Node, depth: number, w0: number, w1: number) => {
+    if (liftLayout) {
+      // Positions come from liftLayout, laid out once over the WHOLE tree, so a
+      // branch opening never moves anything; `open` only decides what is shown.
+      const place = (n: Node) => {
         const kids = open.has(n._id) && n.children && n.children.length ? (n.children as Node[]) : null;
         if (!kids) return;
-        const all = n.children as Node[];
-        const tot = all.reduce((sum, k) => sum + Math.max(1, k._leaves), 0);
-        let at = w0;
-        for (const k of all) {
-          const f = (Math.max(1, k._leaves) / tot) * (w1 - w0);
-          if (kids.includes(k)) {
-            const a = at + f / 2;
-            const R = ringR[depth + 1];
-            k._x = root._x + Math.cos(a) * R;
-            k._y = root._y + Math.sin(a) * R;
-            k._dir = a;
-            k._tucked = false;
-            list.push(k);
-            place(k, depth + 1, at, at + f);
-          }
-          at += f;
+        for (const k of kids) {
+          const p = liftLayout.pos.get(k._id);
+          if (!p) continue;
+          k._x = root._x + p.x;
+          k._y = root._y + p.y;
+          k._dir = p.a;
+          k._tucked = false;
+          list.push(k);
+          place(k);
         }
       };
-      const c0 = -Math.PI / 2;
-      place(root, 0, c0 - SPREAD1 / 2, c0 + SPREAD1 / 2);
+      place(root);
       return list;
     }
     const walk = (n: Node, depth: number) => {
@@ -2005,7 +2105,8 @@ export default function LineageMap({
     };
     walk(root, 0);
     return list;
-  }, [root, open, breed.x, breed.y, base]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [root, open, breed.x, breed.y, base, liftLayout]);
 
   // BOUNDED ONLY. The tree is laid out at pit scale (fixed RING1/RSTEP fanning up
   // 270deg), which the fullscreen pit has room for but a 1100x660 inline box does
