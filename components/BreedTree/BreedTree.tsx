@@ -1286,6 +1286,9 @@ const MC_STIFFNESS = 0.2;
    pulled weaker than the dog-to-dog links, so the dogs still in the pile anchored
    the chain and the newest dog never reached the finger. The finger must out-pull
    the links; tested headless in Matter before shipping. */
+// How much each chum card resting on the floor speeds the pit-full count: 2 is
+// double speed per card, so one card = 2x, two = 4x, three = 8x.
+const CD_FLOOR_SPEEDUP = 2;
 const TETHER_STIFFNESS = 0.003;
 const TETHER_DAMPING = 0;
 /* A REAL CHAIN (owner, 24 September 2026: "when the 2nd dog circle is connected,
@@ -5984,7 +5987,14 @@ export default function BreedTree({
 
        cdTickRef NOW HOLDS A TIMEOUT ID. clearCdTimers was changed to clear it
        with clearTimeout to match. */
-    const cdStepMs = () => (slowmoOnRef.current ? 4000 : 1000);
+    /* EVERY CHUM ON THE FLOOR DOUBLES THE COUNT'S SPEED (owner, 24 September
+       2026: a card turning red used to start the count, and now the count is
+       usually already running by then). One red card halves the tick, two
+       quarter it, and so on: the tick is the base divided by 2 to the power of
+       the cards resting on the floor. Read at every tick, so the pace follows
+       cards landing and being collected as it happens. */
+    const floorChums = () => chumBodiesRef.current.filter((pr) => pr.onFloor && !pr.dead).length;
+    const cdStepMs = () => (slowmoOnRef.current ? 4000 : 1000) / Math.pow(CD_FLOOR_SPEEDUP, floorChums());
     /* THE COUNT HOLDS WHILE A DOG IS LIFTED, 20 September 2026 (owner: the
        countdown timer is not pausing when the dog is lifted, I want this to
        happen).
