@@ -61,13 +61,15 @@
   bottom: 0;
   left: 0;
   right: 0;
-  transform: rotate(-3deg) translateY(2px);
+  /* 2 degrees more tilt than the Chum Finder's, and twice the type (owner,
+     24 September 2026). */
+  transform: rotate(-5deg) translateY(2px);
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 0.8rem;
+  font-size: 1.6rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border-radius: 0 0 10px 10px;
-  padding: 10px 10px;
+  padding: 15px 10px; /* half as deep again (owner) */
   text-align: center;
   white-space: nowrap;
 }
@@ -79,7 +81,7 @@
   font-size: min(clamp(5.4rem, 7.2vw, 7.2rem), calc(80cqi / (var(--chars, 6) * 0.66)));
   white-space: nowrap;
   line-height: 1;
-  margin: 0;
+  margin: 10px 0 0; /* 10px more air between the card and the title (owner) */
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-shadow: 0 2px 0 rgba(10, 58, 87, 0.5);
@@ -88,7 +90,8 @@
    heads and every row, so they line up. */
 .colHead, .row {
   display: grid;
-  grid-template-columns: 2.6em minmax(0, 1fr) 4.4em 3.8em;
+  /* The rank column half as wide (owner), the room given to Ancestors. */
+  grid-template-columns: 1.3em minmax(0, 1fr) 5.7em 3.8em;
   align-items: center;
   gap: 8px;
 }
@@ -102,7 +105,10 @@
   color: rgba(255, 255, 255, 0.85);
   border-bottom: 2px solid rgba(255, 255, 255, 0.35);
 }
-.colHead span:nth-child(3), .colHead span:nth-child(4) { text-align: center; }
+/* The two number headings right-aligned so they cannot run into each other, and
+   Ancestors nudged 20px left (owner, 24 September 2026). */
+.colHead span:nth-child(3), .colHead span:nth-child(4) { text-align: right; }
+.colHead span:nth-child(3) { transform: translateX(-20px); }
 .list { list-style: none; margin: 0; padding: 5px 0 0; } /* 5px more air above the line's far side */
 .list li + li { border-top: 1px solid rgba(255, 255, 255, 0.22); }
 .row {
