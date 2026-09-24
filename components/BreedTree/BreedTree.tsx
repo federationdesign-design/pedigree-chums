@@ -6545,7 +6545,20 @@ export default function BreedTree({
              shows its slot. Same set the body choice used, so a hidden word can
              never be a word-shaped collider. */
           const wTwin = !!wn && twinNamesRef.current.has(wn.data.name);
-          const wGone = wTwin || b.held || (!!wn && removedNodesRef.current.has(wn));
+          /* AND A RARE DOG HAS NO WORD EITHER, 24 September 2026 (owner). This is
+             the THIRD place the word rule lives and the one that was missed: the
+             other two decide the BODY a dog gets and whether a circle latches into
+             its name mid-round, while this one decides whether the name is DRAWN.
+
+             Without it a rare dog got a circle body from wordBreed, wore its tier
+             face, and still had its name painted over the top by this group. That
+             is the "name on the dog" the owner kept seeing, on Celtic Heeler and
+             on Rough northern sighthounds.
+
+             All three now ask wordTier, which is the one place to change if the
+             tiers that read as words ever move. */
+          const wRare = !!wn && !wordTier(rarityTier(treesContaining(wn.data.name)));
+          const wGone = wTwin || wRare || b.held || (!!wn && removedNodesRef.current.has(wn));
           el.setAttribute("display", wGone ? "none" : "inline");
           if (wGone) continue;
           // The pop. `now` is zero on every caller that is not the physics
