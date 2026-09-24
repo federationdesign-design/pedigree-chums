@@ -2875,7 +2875,19 @@ export default function LineageMap({
      would disable the popping check for every AUTO after the first. */
   const [autoPlaceTick, setAutoPlaceTick] = useState(0);
   const autoForceRef = useRef(false);
+  /* See autoCollect: the flag lives on the document, so it has to be cleared when
+     this map unmounts or PLAY would stay hidden on the next lift. */
+  useEffect(() => () => {
+    if (typeof document !== "undefined") document.documentElement.removeAttribute("data-pc-auto-used");
+  }, []);
+  /* AUTO RETIRES THE GREEN PLAY BUTTON, 24 September 2026 (owner). The flag goes
+     on the document rather than through props: PLAY is drawn by BreedTree, which
+     is not this component's parent or its child, so there is no prop path between
+     the two. The same trick the pit already uses to publish --pit-ui-size.
+     setAttribute, not dataset: the linter treats a dataset write as writing to a
+     read-only value. Cleared on unmount, above, so a fresh lift starts with PLAY. */
   const autoCollect = () => {
+    if (typeof document !== "undefined") document.documentElement.setAttribute("data-pc-auto-used", "1");
     /* THE BRANCHES UNFOLD IN A WAVE, 16 September 2026 (owner: AUTO opens every
        layer in one go and should ripple out a rung at a time, like the images
        already do).

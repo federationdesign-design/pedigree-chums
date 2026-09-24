@@ -2567,3 +2567,13 @@
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .learnPlayBtn { background: #000000 !important; border-color: #ffffff !important; }
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .learnPlayBtn .learnDockIcon { color: #ffffff !important; }
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .learnPlayBtn path { fill: #ffffff !important; stroke: #ffffff !important; }
+
+/* PLAY GOES WHEN AUTO IS USED, 24 September 2026 (owner). The lifted layer sets
+   data-pc-auto-used on the document when its AUTO button is pressed, and clears it
+   when that layer unmounts, so the next lift starts with PLAY back.
+   A data attribute because PLAY is drawn here and AUTO in LineageMap, and neither
+   is the other's parent. */
+:root[data-pc-auto-used="1"] .learnPlay {
+  display: none;
+}
+
