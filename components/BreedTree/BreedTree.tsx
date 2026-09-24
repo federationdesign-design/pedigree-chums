@@ -1232,7 +1232,9 @@ const TETHER_DAMPING = 0;
    to the new one by an elastic of its own. So dog 1 hangs off dog 2, dog 2 off dog
    3, and the newest is on the finger. Each link rests at this share of the gap
    between the two dogs when they joined: 1 keeps that gap, lower pulls them in. */
-const TETHER_LINK_STIFFNESS = 0.001;
+/* Was 0.001, too weak to move a dog out of the pile: two free dogs share the
+   pull, and resting dogs grip hard (frictionStatic 1.0). Owner, 24 September 2026. */
+const TETHER_LINK_STIFFNESS = 0.01;
 const TETHER_LINK_LEN_K = 1;
 /* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
    casing that was here, with the cost stated and chosen).
