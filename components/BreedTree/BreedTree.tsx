@@ -804,11 +804,11 @@ const FACE_FILL_K = 2.2;
 /* How far the face sits off the circle centre, in SCREEN pixels, negative
    up (owner, 23 September 2026). Zero is dead centre. */
 const FACE_NUDGE_Y = -5;
-/* IN USE AGAIN, 24 September 2026 (owner). It is no longer the resting face,
-   which is the tier art, but it is what a circle of ANOTHER breed wears while a
-   chain is live: the old navy disc and question mark, saying plainly that this
-   dog cannot join. See the chain branch in the face writer. */
-const QMARK_SRC = "/dogfacequestion.svg";
+/* OUT OF USE AGAIN, 24 September 2026 (owner). It was the resting face, then for
+   a few hours the stand-down face for a dog that cannot join a chain; that is the
+   owner's own art now, dimmed. Kept commented rather than deleted because it is
+   still the one-line way back if the tier art ever has to be pulled. */
+// const QMARK_SRC = "/dogfacequestion.svg";
 /* FIVE FACES, ONE PER RARITY TIER, 23 September 2026 (owner's own artwork). They
    replace the question-mark face on a resting circle: a dog that says which tier
    it is, instead of one grey mark tinted by depth.
@@ -856,6 +856,20 @@ const FACE_SHAKE_SRC: Record<RarityTier, string> = {
   common: "/common4.png",
   veryCommon: "/very-common5.png",
 };
+/* THE STAND-DOWN FACE, 24 September 2026 (owner's casting). A dog of another
+   breed, which cannot join the chain being drawn, wears this one.
+
+   IT REPLACES THE QUESTION MARK put there earlier the same day. That was the old
+   navy disc and SVG mark, which now looks like a different game beside the tier
+   art; the owner has cast a face per tier instead. The dimming stays: see the
+   note at the writer, where the circle is faded rather than swapped. */
+const FACE_STANDDOWN_SRC: Record<RarityTier, string> = {
+  extremelyRare: "/extreme-rare4.png",
+  rare: "/rare6.png",
+  uncommon: "/uncommon2.png",
+  common: "/common5.png",
+  veryCommon: "/very-common3.png",
+};
 const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
   extremelyRare: ["/extreme-rare.png", "/extreme-rare2.png"],
   rare: ["/rare.png", "/rare3.png", "/rare6.png"],
@@ -890,6 +904,9 @@ const rnd = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
    AN ORPHANED WORD IS UNTOUCHED. That is the latch a collected twin leaves behind
    and it is a different mechanism: see orphanSetRef. */
 const wordTier = (tier: RarityTier) => tier === "common" || tier === "veryCommon";
+/* How far back a stand-down dog is faded. Enough to drop it behind the chain's
+   own breed, not so far that the pit looks broken. */
+const FACE_STANDDOWN_OPACITY = 0.45;
 
 const RARITY_FACE_CHAINED_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare4.png",
@@ -7102,11 +7119,14 @@ export default function BreedTree({
            otherwise be a mark floating on the background. The same test as the
            face writer below, kept in step by the comment rather than shared,
            since the two run in different passes over the same node. */
-        const standDown = !!dogChainBreedRef.current && d.data.name !== dogChainBreedRef.current;
-        const faceOnly = `${showQ && !standDown ? 1 : 0}:${c?.dataset.chained ?? ""}`;
+        /* THE CIRCLE STAYS HIDDEN FOR THESE TOO, 24 September 2026. It was shown
+           again while they wore the question mark, which has no disc of its own;
+           they wear the tier art now, which does, so the circle underneath goes
+           back to being redundant. */
+        const faceOnly = `${showQ ? 1 : 0}:${c?.dataset.chained ?? ""}`;
         if (c && c.dataset.faceOnly !== faceOnly) {
           c.dataset.faceOnly = faceOnly;
-          if (showQ && !standDown) {
+          if (showQ) {
             c.style.fill = "transparent";
             c.style.stroke = "none";
           } else {
@@ -7289,12 +7309,18 @@ export default function BreedTree({
           const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}:${face.src}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", otherBreed ? QMARK_SRC : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src);
+            qi.setAttribute("href", otherBreed ? FACE_STANDDOWN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src);
             /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
                filter would flatten it to one hue. The question mark still is,
                because it is one flat file and its depth tint is what tells a
                nested circle from its parent. */
-            qi.setAttribute("filter", otherBreed ? `url(#bt-qmark-${(d.depth - 1 + 4) % 4})` : "none");
+            /* NO TINT ON ANY OF THEM NOW. All three states wear the owner's art,
+               which already carries its colour; the depth filters would flatten it
+               to one hue. The stand-down dog is separated by being DIMMED instead,
+               just below, which is what the owner asked for: the same cartoon,
+               greyed back. */
+            qi.setAttribute("filter", "none");
+            (qi as SVGElement).style.opacity = otherBreed ? String(FACE_STANDDOWN_OPACITY) : "";
           }
         }
       }
