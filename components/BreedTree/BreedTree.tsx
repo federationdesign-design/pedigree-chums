@@ -7014,6 +7014,13 @@ export default function BreedTree({
        linter is right to say so. The sim writes that ref on every frame it steps,
        which is every frame a face could be pulled on. */
     const nowFx = faceClockRef.current;
+    /* DOGS BEHIND THE ANCESTORS LIST GO SEE-THROUGH (owner, 24 September 2026),
+       at the same FACE_STANDDOWN_OPACITY as a dog that cannot join a chain. The
+       list's box and the SVG's screen transform are read once per pass, and each
+       circle is tested for overlap with the box in screen pixels. Null when the
+       list is shut, so the test costs nothing then. */
+    const listBox = foundListRef.current?.getBoundingClientRect() ?? null;
+    const listCtm = listBox ? cg?.ownerSVGElement?.getScreenCTM() ?? null : null;
     /* No chain, no lead face. Written once per pass rather than per circle, and
        before the loop, so a chain that ended between frames cannot leave the copy
        stranded on screen. */
@@ -7625,7 +7632,14 @@ export default function BreedTree({
             }
           }
           const resisting = resistNodeRef.current === d;
-          const tap = `${otherBreed ? "x" : chained ? 1 : resisting ? "r" : 0}:${faceTier}:${face.src}`;
+          let behindList = false;
+          if (listBox && listCtm) {
+            const cx = listCtm.a * tx + listCtm.e;
+            const cy = listCtm.d * ty + listCtm.f;
+            const rr = drawR(d, v, k) * listCtm.a;
+            behindList = cx + rr > listBox.left && cx - rr < listBox.right && cy + rr > listBox.top && cy - rr < listBox.bottom;
+          }
+          const tap = `${otherBreed ? "x" : chained ? 1 : resisting ? "r" : 0}:${faceTier}:${face.src}:${behindList ? "b" : ""}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
             qi.setAttribute("href", shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : resisting ? FACE_RESIST_SRC[faceTier] : face.src));
@@ -7639,7 +7653,7 @@ export default function BreedTree({
                just below, which is what the owner asked for: the same cartoon,
                greyed back. */
             qi.setAttribute("filter", "none");
-            (qi as SVGElement).style.opacity = otherBreed ? String(FACE_STANDDOWN_OPACITY) : "";
+            (qi as SVGElement).style.opacity = otherBreed || behindList ? String(FACE_STANDDOWN_OPACITY) : "";
           }
         }
       }
