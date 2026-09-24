@@ -1836,6 +1836,23 @@ const LINEAGE: Record<string, LineageNode> = {
      road, with the Cumans, and are cousins in coat rather than descendants. */
   /* THE SPANISH WATER DOG, 24 September 2026 (owner). A leaf, a parent of the
      Poodle only. */
+  /* THE PULI AND THE KOMONDOR, 24 September 2026 (owner: split them rather than
+     one "Hungarian corded dogs" record). Leaves, parents of the Poodle only. The
+     Bergamasco is left out: it is Italian, and only speculated to have come from
+     the same Cuman dogs. */
+  "Puli": {
+    name: "Puli",
+    note: "The small black corded herding dog of the Hungarian plain, sometimes called the Hungarian water dog, among the water dogs the Poodle is said to have been crossed from. A theory rather than a record.",
+    img: "/history/breeds/puli.jpg",
+    children: []
+  },
+  "Komondor": {
+    name: "Komondor",
+    note: "The great white corded flock guard of Hungary, brought west with the Cumans, named in the theory that the Poodle was crossed from several water dogs. A flock guard rather than a water dog, so the weakest of these links.",
+    img: "/history/breeds/komondor.jpg",
+    children: []
+  },
+
   "Spanish Water Dog": {
     name: "Spanish Water Dog",
     note: "An Iberian water and herding dog with a woolly, corded coat, one of the European water dogs the Poodle is said to have been crossed from. A theory rather than a record.",
@@ -3385,7 +3402,11 @@ const LINEAGE: Record<string, LineageNode> = {
          Hungarian pair lands, the three here are shown in proportion. */
       { name: "Old European water dogs", note: "The pan-European water dog, Germany's own Pudelhund, from which the Poodle takes its name. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 58.125 },
       { name: "Water Spaniels", note: "The British working water-spaniel branch crossed in alongside them, listed separately from the water dogs by Caius in 1576. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 16.875 },
-      { name: "Spanish Water Dog", note: "An Iberian water and herding dog with a woolly, corded coat, one of the European water dogs the Poodle is said to have been crossed from. A theory rather than a record.", img: "/history/breeds/spanish-water-dog.jpg", value: 12.5 }
+      { name: "Spanish Water Dog", note: "An Iberian water and herding dog with a woolly, corded coat, one of the European water dogs the Poodle is said to have been crossed from. A theory rather than a record.", img: "/history/breeds/spanish-water-dog.jpg", value: 12.5 },
+      // The Hungarian pair, split into two dogs at the owner's word (24 September
+      // 2026): 6.25 each, the other half of the incomers' quarter.
+      { name: "Puli", note: "The small black corded herding dog of the Hungarian plain, sometimes called the Hungarian water dog, among the water dogs the Poodle is said to have been crossed from. A theory rather than a record.", img: "/history/breeds/puli.jpg", value: 6.25 },
+      { name: "Komondor", note: "The great white corded flock guard of Hungary, brought west with the Cumans, named in the theory that the Poodle was crossed from several water dogs. A flock guard rather than a water dog, so the weakest of these links.", img: "/history/breeds/komondor.jpg", value: 6.25 }
     ]
   },
 
