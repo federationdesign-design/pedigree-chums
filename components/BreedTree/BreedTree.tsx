@@ -915,6 +915,8 @@ const FACE_FLIP_SHARE = 0.4;
    bright cyan instead. See paintChainCount. */
 const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
+// Extra space above the counter, in screen px, on top of the measured placement.
+const CHAIN_COUNT_DROP_PX = 10;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
    (owner, 24 September 2026). It used to call the count off altogether. */
 const BOMB_ADDS_SECS = 10;
@@ -12801,7 +12803,8 @@ export default function BreedTree({
       const r = sq?.getBoundingClientRect();
       if (r && r.width > 0) {
         const gap = r.width * 0.25;
-        el.style.top = `${Math.max(0, r.top + r.height / 2 - el.offsetHeight / 2)}px`;
+        // + CHAIN_COUNT_DROP_PX: 10px more air above it (owner, 24 September 2026).
+        el.style.top = `${Math.max(0, r.top + r.height / 2 - el.offsetHeight / 2) + CHAIN_COUNT_DROP_PX}px`;
         el.style.right = `${window.innerWidth - (r.left - r.width - gap) + gap}px`;
       }
     };

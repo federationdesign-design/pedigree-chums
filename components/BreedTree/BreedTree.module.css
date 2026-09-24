@@ -2519,13 +2519,13 @@
   /* TOP RIGHT, 24 September 2026 (owner), left of the pit's corner squares.
      paintChainCount measures the close X and sets top and right exactly; these
      are only the first paint, roughly the same place. */
-  top: calc(12px + env(safe-area-inset-top, 0px));
+  top: calc(22px + env(safe-area-inset-top, 0px)); /* 10px more air, 24 September 2026 */
   right: calc(16px + 2 * var(--pit-ui-size, 60px) + 40px);
   z-index: 62;
-  /* TWICE THE SIZE, 24 September 2026 (owner): type, padding, corner and shadow
-     all doubled together so the pill keeps its shape. */
-  padding: 20px 32px 12px 32px;
-  border-radius: 40px;
+  /* TWICE THE ORIGINAL, then 25% smaller, both 24 September 2026 (owner). Type,
+     padding, corner and shadow all scaled together so the pill keeps its shape. */
+  padding: 15px 24px 9px 24px;
+  border-radius: 30px;
   /* THE FILL IS SET INLINE, royal blue to green as the chain fills. See
      paintChainCount. This is only the first paint. */
   background: #2547c4;
@@ -2534,11 +2534,11 @@
   text-shadow: 0 2px 0 rgba(10, 58, 87, 0.6);
   transition: background 0.3s ease;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 48px;
+  font-size: 36px;
   line-height: 1.1;
-  letter-spacing: 1px;
+  letter-spacing: 0.75px;
   pointer-events: none;
-  box-shadow: 0 6px 0 rgba(10, 58, 87, 0.3);
+  box-shadow: 0 4.5px 0 rgba(10, 58, 87, 0.3);
 }
 
 /* ---- THE LEARN AREA IN THE ACCESSIBILITY VIEWS, 21 September 2026 (owner) -------------
