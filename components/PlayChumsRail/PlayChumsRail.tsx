@@ -2,6 +2,7 @@ import Link from "next/link";
 import { breeds } from "../../data/breeds";
 import { CHUM_VIMEO, INTRO_VIDEOS, chumCircleCount, vimeoSeconds } from "../../data/playIntros";
 import WatchVideoRow from "./WatchVideoRow";
+import ScrollRail from "./ScrollRail";
 import styles from "./PlayChumsRail.module.css";
 
 /* THE CHUM PLAY LINKS ON THE HOMEPAGE (owner, 24 September 2026): every chum with
@@ -32,7 +33,7 @@ export default async function PlayChumsRail() {
     // id: the anchor the learn area's back square returns to. ?from=home on the
     // links is how a /play page knows it was opened from here.
     <section id="play-chums" className={styles.wrap} aria-label="Play a chum">
-      <div className={styles.rail}>
+      <ScrollRail className={styles.rail}>
         {chums.map(({ b, circles }) => {
           const poster = lastFrameOf(INTRO_VIDEOS[b.slug]);
           const vimeoId = CHUM_VIMEO[b.slug];
@@ -62,7 +63,7 @@ export default async function PlayChumsRail() {
             </div>
           );
         })}
-      </div>
+      </ScrollRail>
     </section>
   );
 }

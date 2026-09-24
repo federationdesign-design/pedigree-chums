@@ -144,3 +144,29 @@
   cursor: pointer;
 }
 
+/* THE SCROLLBAR, copied from VideoGrid.module.css so the two sliders on the
+   homepage match (owner, 24 September 2026). Shown on desktop too, unlike the
+   video grid's, because this row scrolls at every width; ScrollRail hides the
+   track when there is nothing to scroll. */
+.scrollbar {
+  position: relative;
+  height: 10px;
+  margin: 16px 0 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: opacity 0.2s ease;
+}
+.thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+  cursor: grab;
+  touch-action: pinch-zoom;
+}
+.thumb:active { cursor: grabbing; }
+
