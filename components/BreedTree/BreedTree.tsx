@@ -907,6 +907,10 @@ const FACE_IDLE_MAX_MS = 9000;
    2026). Decided per circle from its index, not rolled each frame, so a dog keeps
    the way it faces for the whole round instead of flickering. */
 const FACE_FLIP_SHARE = 0.4;
+/* THE CHAIN COUNTER'S TWO ENDS, as RGB: navy at none joined, light green at all
+   of them (owner, 24 September 2026). See paintChainCount. */
+const CHAIN_COUNT_FROM = [10, 58, 87] as const;
+const CHAIN_COUNT_TO = [143, 227, 154] as const;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
    (owner, 24 September 2026). It used to call the count off altogether. */
 const BOMB_ADDS_SECS = 10;
@@ -12762,6 +12766,22 @@ export default function BreedTree({
       const held = dogChainNodesRef.current.size;
       el.textContent = `${held}/${total}`;
       el.setAttribute("aria-label", `${held} of ${total} joined`);
+      /* DARK BLUE TO LIGHT GREEN AS THE CHAIN FILLS (owner, 24 September 2026),
+         so the colour alone says how far there is to go. CHAIN_COUNT_FROM at none
+         joined, CHAIN_COUNT_TO at all of them, blended in between.
+         THE TEXT SWAPS WITH IT: white reads on the dark end and not on the light
+         one, navy the other way round, so it flips on the fill's own brightness. */
+      const t = Math.max(0, Math.min(1, held / total));
+      const rgb = CHAIN_COUNT_FROM.map((c, j) => Math.round(c + (CHAIN_COUNT_TO[j] - c) * t));
+      el.style.background = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+      // WCAG relative luminance, then whichever of white or navy has the higher
+      // contrast against this fill.
+      const lin = (c: number) => { const x = c / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
+      const L = (c: readonly number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+      const lf = L(rgb);
+      const onWhite = 1.05 / (lf + 0.05);
+      const onNavy = (lf + 0.05) / (L(CHAIN_COUNT_FROM) + 0.05);
+      el.style.color = onNavy > onWhite ? "var(--navy, #0a3a57)" : "#ffffff";
       el.style.display = "block";
     };
     /* Named rather than inline, because the magnet measures with the SAME numbers
