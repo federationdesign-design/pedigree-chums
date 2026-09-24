@@ -27,6 +27,12 @@
 //                 third of the size (the mini pit's dog faces, 24 September 2026:
 //                 6.3MB to 2.1MB, checked side by side). Not for photographs.
 //
+//   WEBP_OUT      set to 1 to write a .webp copy BESIDE each matched file (quality
+//                 Q, alpha at 90) instead of rewriting it. The original is left.
+//
+// The dog faces as WebP, 24 September 2026 (owner: 2.1MB of PNG to about 0.86MB):
+//   DIR=public Q=85 WEBP_OUT=1 MATCH_RE='^(very-common|common|uncommon|rare|extreme-rare)[0-9]*[BC]?[.]png$' node scripts/optimize-images.mjs
+//
 // The dog faces, 24 September 2026 (owner), same size, same names, squeezed:
 //   DIR=public MAXW=10000 SKIP=0 Q=90 PALETTE=1 MATCH_RE='^(very-common|common|uncommon|rare|extreme-rare)[0-9]*[BC]?[.]png$' node scripts/optimize-images.mjs
 //
@@ -46,6 +52,7 @@ const SKIP = Number(process.env.SKIP || 150000);
 const MATCH = process.env.MATCH || ""; // only touch filenames containing this substring
 const MATCH_RE = process.env.MATCH_RE ? new RegExp(process.env.MATCH_RE) : null;
 const PALETTE = process.env.PALETTE === "1";
+const WEBP_OUT = process.env.WEBP_OUT === "1";
 const DRY = process.env.DRY === "1";
 // The picture names each listed source file mentions under DIR.
 const namesIn = (list) => {
@@ -72,6 +79,20 @@ const files = readdirSync(DIR)
   .filter((f) => !ONLY || ONLY.has(f));
 let before = 0, after = 0, touched = 0, skipped = 0;
 const rows = [];
+
+if (WEBP_OUT) {
+  let a = 0, b = 0;
+  for (const name of files) {
+    const path = join(DIR, name);
+    const out = path.replace(/\.[a-z]+$/i, ".webp");
+    if (!DRY) await sharp(path).webp({ quality: Q, alphaQuality: 90, effort: 6 }).toFile(out);
+    const buf = DRY ? await sharp(path).webp({ quality: Q, alphaQuality: 90, effort: 6 }).toBuffer() : null;
+    a += statSync(path).size;
+    b += DRY ? buf.length : statSync(out).size;
+  }
+  console.log(`webp copies  ${files.length}  ${kb(a)} of originals -> ${kb(b)} of webp${DRY ? "  (DRY RUN)" : ""}`);
+  process.exit(0);
+}
 
 for (const name of files) {
   const path = join(DIR, name);

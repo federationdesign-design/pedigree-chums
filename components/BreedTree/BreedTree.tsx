@@ -850,11 +850,11 @@ const FACE_NUDGE_Y = -5;
    names were NOT renamed: they describe the artwork, not the tier. The tier
    colours swapped with them in RARITY_BAND (LineageMap.tsx). */
 const FACE_BOMB_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare3.png",
-  rare: "/rare4.png",
-  uncommon: "/uncommon3.png",
-  common: "/very-common6.png",
-  veryCommon: "/common3.png",
+  extremelyRare: "/extreme-rare3.webp",
+  rare: "/rare4.webp",
+  uncommon: "/uncommon3.webp",
+  common: "/very-common6.webp",
+  veryCommon: "/common3.webp",
 };
 /* AND WHAT EVERY DOG DOES WHEN A CHAIN IS COLLECTED, 24 September 2026 (owner's
    casting). The whole pit pulls this face for FACE_COLLECT_MS and then goes back
@@ -864,11 +864,11 @@ const FACE_BOMB_SRC: Record<RarityTier, string> = {
    circle so the pit recovers raggedly, while a collect is one clean beat and
    reads better if the pit does it together. See faceEventAll's `hold` argument. */
 const FACE_COLLECT_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare2.png",
-  rare: "/rare2.png",
-  uncommon: "/uncommon6.png",
-  common: "/very-common2.png",
-  veryCommon: "/common4.png",
+  extremelyRare: "/extreme-rare2.webp",
+  rare: "/rare2.webp",
+  uncommon: "/uncommon6.webp",
+  common: "/very-common2.webp",
+  veryCommon: "/common4.webp",
 };
 const FACE_COLLECT_MS = 600;
 /* THE OUTLINE ON EVERY DOG NAME IN THE PIT, black (owner, 24 September 2026),
@@ -891,11 +891,11 @@ const FACE_JOIN_MS = 3000;
    twin while the player tries to drag it. That dog is held, not refused, but on
    an elastic so weak it barely moves: see RESIST_STIFFNESS. */
 const FACE_RESIST_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare3.png",
-  rare: "/rare4.png",
-  uncommon: "/uncommon3.png",
-  common: "/very-common3.png",
-  veryCommon: "/common3.png",
+  extremelyRare: "/extreme-rare3.webp",
+  rare: "/rare4.webp",
+  uncommon: "/uncommon3.webp",
+  common: "/very-common3.webp",
+  veryCommon: "/common3.webp",
 };
 /* HOW HARD A SINGLE DOG RESISTS BEING DRAGGED (owner, 24 September 2026: "it
    becomes really heavy and there's lots of resistance"). The drag's own elastic,
@@ -906,11 +906,11 @@ const FACE_RESIST_SRC: Record<RarityTier, string> = {
 const RESIST_STIFFNESS = 0.0006;
 const RESIST_DAMPING = 0.2;
 const FACE_SHAKE_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare5.png",
-  rare: "/rare2.png",
-  uncommon: "/uncommon6.png",
-  common: "/very-common5.png",
-  veryCommon: "/common4.png",
+  extremelyRare: "/extreme-rare5.webp",
+  rare: "/rare2.webp",
+  uncommon: "/uncommon6.webp",
+  common: "/very-common5.webp",
+  veryCommon: "/common4.webp",
 };
 /* THE STAND-DOWN FACE, 24 September 2026 (owner's casting). A dog of another
    breed, which cannot join the chain being drawn, wears this one.
@@ -920,18 +920,18 @@ const FACE_SHAKE_SRC: Record<RarityTier, string> = {
    art; the owner has cast a face per tier instead. The dimming stays: see the
    note at the writer, where the circle is faded rather than swapped. */
 const FACE_STANDDOWN_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare4.png",
-  rare: "/rare6.png",
-  uncommon: "/uncommon2.png",
-  common: "/very-common3.png",
-  veryCommon: "/common5.png",
+  extremelyRare: "/extreme-rare4.webp",
+  rare: "/rare6.webp",
+  uncommon: "/uncommon2.webp",
+  common: "/very-common3.webp",
+  veryCommon: "/common5.webp",
 };
 const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
-  extremelyRare: ["/extreme-rare.png", "/extreme-rare2.png"],
-  rare: ["/rare.png", "/rare3.png", "/rare6.png"],
-  uncommon: ["/uncommon.png", "/uncommon2.png", "/uncommon4.png", "/uncommon5.png"],
-  common: ["/very-common2.png", "/very-common3.png", "/very-common4.png"],
-  veryCommon: ["/common.png", "/common2.png", "/common5.png"],
+  extremelyRare: ["/extreme-rare.webp", "/extreme-rare2.webp"],
+  rare: ["/rare.webp", "/rare3.webp", "/rare6.webp"],
+  uncommon: ["/uncommon.webp", "/uncommon2.webp", "/uncommon4.webp", "/uncommon5.webp"],
+  common: ["/very-common2.webp", "/very-common3.webp", "/very-common4.webp"],
+  veryCommon: ["/common.webp", "/common2.webp", "/common5.webp"],
 };
 /* HOW LONG A BOMB OR SHAKE FACE HOLDS, and how long a resting face is kept
    before the dog picks another.
@@ -993,11 +993,11 @@ const wordTier = (tier: RarityTier) => tier === "common" || tier === "veryCommon
 const FACE_STANDDOWN_OPACITY = 0.45;
 
 const RARITY_FACE_CHAINED_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare4.png",
-  rare: "/rare5.png",
-  uncommon: "/uncommon4.png",
-  common: "/very-common.png",
-  veryCommon: "/common6.png",
+  extremelyRare: "/extreme-rare4.webp",
+  rare: "/rare5.webp",
+  uncommon: "/uncommon4.webp",
+  common: "/very-common.webp",
+  veryCommon: "/common6.webp",
 };
 /* THE TAPPED FACE, worn by a circle that is
    actually HELD in a chain, in place of the resting mark. Not by a glowing twin
@@ -6170,7 +6170,9 @@ export default function BreedTree({
       sh = VERY_COMMON_SHADES[st.of.size % VERY_COMMON_SHADES.length];
       st.of.set(breed, sh);
     }
-    return sh ? src.replace(/\.png$/, `${sh}.png`) : src;
+    // WebP since 24 September 2026 (owner): the shade files sit beside their
+    // base face as <face>B.webp and <face>C.webp.
+    return sh ? src.replace(/\.webp$/, `${sh}.webp`) : src;
   };
   /* The sim's frame time, so the paint pass can expire a pulled face without
      reading the wall clock during render. Written wherever a face is set. */
