@@ -879,6 +879,17 @@ const FACE_IDLE_MAX_MS = 9000;
    the way it faces for the whole round instead of flickering. */
 const FACE_FLIP_SHARE = 0.4;
 const rnd = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
+/* ONLY THE TWO COMMON TIERS FALL AS WORDS, 24 September 2026 (owner). A dog rare
+   enough to be worth spotting drops as its CIRCLE, with the tier art on it, so the
+   rarity reads at a glance; common and very common keep the breed name.
+
+   IT SITS ALONGSIDE the existing word rules rather than replacing them: a dog is a
+   word only if PIT_DRAWS_WORDS is on, it is a depth-1 drop, it has no twin in the
+   layout, AND its tier passes this test. Every one of those still applies.
+
+   AN ORPHANED WORD IS UNTOUCHED. That is the latch a collected twin leaves behind
+   and it is a different mechanism: see orphanSetRef. */
+const wordTier = (tier: RarityTier) => tier === "common" || tier === "veryCommon";
 
 const RARITY_FACE_CHAINED_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare4.png",
@@ -5048,6 +5059,12 @@ export default function BreedTree({
   const [floorDiag, setFloorDiag] = useState<string | null>(null);
   // The swipe chain's path layer inside the pit SVG, written directly each frame.
   const chainGRef = useRef<SVGGElement>(null);
+  /* The copy of the chain's FIRST dog that is painted over the chain line. See
+     the group itself at the end of the SVG for why a copy is the only way. */
+  const leadFaceGRef = useRef<SVGGElement>(null);
+  /* Which circle that is. Set by the chain's `first` hook and cleared by `over`,
+     so the lead face lives exactly as long as the chain does. */
+  const chainFirstRef = useRef<Node | null>(null);
   /* THE CHAIN COUNTER, 20 September 2026 (owner: a counter for the chain, so
      picking a dog with eight twins reads 1/8 and climbs as each one joins).
 
@@ -6698,6 +6715,10 @@ export default function BreedTree({
        linter is right to say so. The sim writes that ref on every frame it steps,
        which is every frame a face could be pulled on. */
     const nowFx = faceClockRef.current;
+    /* No chain, no lead face. Written once per pass rather than per circle, and
+       before the loop, so a chain that ended between frames cannot leave the copy
+       stranded on screen. */
+    if (!chainFirstRef.current && leadFaceGRef.current) leadFaceGRef.current.style.display = "none";
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
       const ty = (d.y - v[1]) * k;
@@ -6715,7 +6736,7 @@ export default function BreedTree({
          and both make the node unpaintable, so everything downstream treats them
          alike without knowing which it is. */
       const orphanWord = orphanSetRef.current.has(d);
-      const isWordNode = orphanWord || (PIT_DRAWS_WORDS && fellRef.current && d.depth === 1 && !twinNamesRef.current.has(d.data.name));
+      const isWordNode = orphanWord || (PIT_DRAWS_WORDS && fellRef.current && d.depth === 1 && !twinNamesRef.current.has(d.data.name) && wordTier(rarityTier(treesContaining(d.data.name))));
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       /* A CIRCLE IN THE CHAIN IS INVERTED:
          light blue where it was navy, and navy where its outline was. It wore a
@@ -7049,6 +7070,11 @@ export default function BreedTree({
            here", and that stays true if the photograph rule is ever widened. */
         const hasPhoto = (c?.getAttribute("fill") ?? "").startsWith("url(") && !c?.style.fill;
         const showQ = fellRef.current && d.depth > 0 && paintable && !hasPhoto;
+        /* WHICH WAY THIS DOG FACES. A hash of the node's index, so it is fixed for
+           the round and costs nothing to recompute: rolling it per frame would
+           flip the dog on and off like a fault. Hoisted above the showQ block
+           because the lead-face copy further down reads it too. */
+        const flip = ((i * 2654435761) >>> 0) % 1000 < FACE_FLIP_SHARE * 1000;
         q.style.display = showQ ? "inline" : "none";
         /* THE FACE IS THE WHOLE DOG IN THE PIT, 23 September 2026 (owner: hide the
            circle completely, leaving only the PNG; the lifted layer keeps its
@@ -7107,7 +7133,6 @@ export default function BreedTree({
              would flip the dog on and off like a fault. Mirrored on the vertical
              axis, which is what "facing the other way" means for a face drawn
              head on. */
-          const flip = ((i * 2654435761) >>> 0) % 1000 < FACE_FLIP_SHARE * 1000;
           const sc = (drawR(d, v, k) * FACE_FILL_K) / QMARK_VB;
           q.setAttribute("transform", `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${flip ? -sc : sc},${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
         }
@@ -7244,6 +7269,22 @@ export default function BreedTree({
               evt: false,
             };
             faceHitRef.current.set(d, face);
+          }
+          /* THE LEAD DOG'S COPY, written from the same values the real circle is
+             about to take, so the two can never disagree about which face, where
+             or which way round. Cleared below when no chain is live. */
+          if (d === chainFirstRef.current) {
+            const lf = leadFaceGRef.current;
+            const lsc = (drawR(d, v, k) * FACE_FILL_K) / QMARK_VB;
+            if (lf) {
+              lf.style.display = showQ ? "inline" : "none";
+              lf.setAttribute(
+                "transform",
+                `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${flip ? -lsc : lsc},${lsc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`,
+              );
+              const li = lf.firstElementChild;
+              if (li) li.setAttribute("href", chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src);
+            }
           }
           const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}:${face.src}`;
           if (q.dataset.tapped !== tap) {
@@ -8248,7 +8289,11 @@ export default function BreedTree({
       /* ONE TEST, TWO CONSUMERS: this and isWordNode in the frame writer ask the
          same question of the same set, so what is drawn and what collides are the
          same decision. Do not let these two drift. */
-      const wordBreed = (b: Body) => PIT_DRAWS_WORDS && !!b.n && !twinNamesRef.current.has(b.n.data.name);
+      /* THE SAME TEST THE RENDERER USES, and it has to stay that way: this one
+         decides the physics body a dog gets, a name box rather than a circle, and
+         the two disagreeing would give a dog a word-shaped collider and a circular
+         drawing. See wordTier. */
+      const wordBreed = (b: Body) => PIT_DRAWS_WORDS && !!b.n && !twinNamesRef.current.has(b.n.data.name) && wordTier(rarityTier(treesContaining(b.n.data.name)));
       for (const b of bodies) { if (wordBreed(b)) mkWord(b, CIRCLE_OPTS); else mkCircle(b, "circle", CIRCLE_OPTS); }
       for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
       // The opening shove: up and out, the first name one way and the next the
@@ -11787,6 +11832,24 @@ export default function BreedTree({
       autoStartRef.current = false;
       setLearnPeek(false);
       setStartPeek(false);
+      /* THE SAME THING THE PLAY BUTTON DOES, 24 September 2026 (owner: the rewind
+         square used to just restart the pit with the circles falling, and should
+         again).
+
+         WHAT WAS MISSING. PLAY resets the focus and the view to the whole pit
+         before it drops, with its own note saying why: the drop routine BAILS if
+         it sees a zoomed-in focus, and the round then begins stuck inside one
+         circle. This path never did that, so pressing rewind while zoomed into a
+         dog left the round marked started with nothing fallen, which is the
+         half-and-half screen the owner has been landing on.
+
+         COPIED, NOT INVENTED. These four lines are PLAY's, in PLAY's order. */
+      cancelAnimationFrame(rafRef.current);
+      focusRef.current = nodes[0];
+      setFocus(nodes[0]);
+      const rootV = clampRootView(displayOnly ? displayRestView() : [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? 1 : PIT_SPAN)]);
+      homeWRef.current = rootV[2];
+      zoomTo(rootV);
       if (!hideCaption) onToggleCaption?.();
       onPlayPressed?.();
       setLearning(false);
@@ -12656,6 +12719,7 @@ export default function BreedTree({
          mark and the stroke colour it had. */
       first: (i) => {
         const n = dogNode(i);
+        chainFirstRef.current = n ?? null;
         dogChainBreedRef.current = n?.data.name ?? null;
         dogChainNodesRef.current = new Set(n ? [n] : []);
         /* THE TOTAL IS TAKEN ONCE, HERE, and held for the life of the chain.
@@ -12672,6 +12736,7 @@ export default function BreedTree({
         paintChainCount();
       },
       over: () => {
+        chainFirstRef.current = null;
         dogChainBreedRef.current = null;
         dogChainNodesRef.current = new Set();
         chainTotalRef.current = 0;
@@ -13832,40 +13897,6 @@ export default function BreedTree({
               pointer, or it would answer the hit test in a circle's place.
               It carries the swipe chain's own filter, not a second one. */}
           <g ref={twinGlowGRef} filter="url(#bt-chain-glow)" style={{ pointerEvents: "none" }} />
-          {/* UNDER THE CIRCLES, 24 September 2026 (owner: the dog should sit on
-              top of the chain line, so the line reads as coming OUT of the dog
-              rather than starting in the middle of its face).
-
-              IT USED TO BE LAST IN THE SVG, which is what the note below still
-              describes; that placement is the one thing that changed. SVG has no
-              z-index, so document order IS screen order and moving the group is
-              the whole fix.
-
-              WHAT IT COSTS: the line now passes behind every card and circle, not
-              only the dog being dragged, so on a crowded pit a link can go under
-              a card it crosses. The alternative was reordering the held circle in
-              the DOM every frame, which is a lot of machinery for the same look. */}
-          {/* The swipe chain path. Last in
-              the pit SVG so it draws over every card, a direct child of the SVG
-              like the chum cards so both share one coordinate space, and never
-              takes a pointer, or the hit test that finds the card under the
-              finger would find the line instead. Empty until a chain draws. The
-              blur region is in user space: an object bounding box region is
-              zero tall on a level line, which would switch the glow off. */}
-          <g ref={chainGRef} style={{ pointerEvents: "none" }}>
-            <defs>
-              <filter id="bt-chain-glow" filterUnits="userSpaceOnUse" x={-5000} y={-5000} width={10000} height={10000}>
-                <feGaussianBlur data-chain="blur" stdDeviation={4} />
-              </filter>
-            </defs>
-            {/* One line per link rather than a single polyline, so each link can
-                carry its own state: white, grey while strained, red and cut
-                open where it broke. The glow group blurs a copy of the same
-                lines. */}
-            <g data-chain="glow" filter="url(#bt-chain-glow)" />
-            <g data-chain="core" />
-            <g data-chain="dots" />
-          </g>
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
@@ -15804,6 +15835,35 @@ export default function BreedTree({
               </text>
             );
           })()}
+          {/* LAST AGAIN, AND ONE DOG SITS OVER IT, 24 September 2026 (owner). The
+              group was moved under the circles earlier today so the line would read
+              as coming out of the dog; that put it behind the whole pit and it all
+              but vanished. It is back on top, and the ONE circle that has to beat
+              it, the chain's first dog, is painted again above it by the lead-face
+              group below. */}
+          <g ref={chainGRef} style={{ pointerEvents: "none" }}>
+            <defs>
+              <filter id="bt-chain-glow" filterUnits="userSpaceOnUse" x={-5000} y={-5000} width={10000} height={10000}>
+                <feGaussianBlur data-chain="blur" stdDeviation={4} />
+              </filter>
+            </defs>
+            {/* One line per link rather than a single polyline, so each link can
+                carry its own state: white, grey while strained, red and cut
+                open where it broke. The glow group blurs a copy of the same
+                lines. */}
+            <g data-chain="glow" filter="url(#bt-chain-glow)" />
+            <g data-chain="core" />
+            <g data-chain="dots" />
+          </g>
+          {/* THE LEAD DOG, painted a second time over the chain line. SVG has no
+              z-index, so the only way one circle can sit above a later group is to
+              draw it again after that group. This is a copy of the first chained
+              circle's face, written by the same pass that writes the faces and
+              hidden whenever no chain is live. It never takes a pointer, so the real
+              circle underneath still answers every tap and drag. */}
+          <g ref={leadFaceGRef} style={{ pointerEvents: "none", display: "none" }} aria-hidden="true">
+            <image width={QMARK_VB} height={QMARK_VB} preserveAspectRatio="xMidYMid meet" />
+          </g>
         </svg>
         {/* J17: the canvas effects layer, above the SVG, never takes a pointer.
             displayOnly (chums2 static diagram) omits it: it is a raster bitmap sized
