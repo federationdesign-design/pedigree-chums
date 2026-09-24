@@ -864,6 +864,24 @@ const FACE_COLLECT_SRC: Record<RarityTier, string> = {
   veryCommon: "/very-common2.png",
 };
 const FACE_COLLECT_MS = 600;
+/* THE RESISTING FACE (owner's casting, 24 September 2026): worn by a dog with no
+   twin while the player tries to drag it. That dog is held, not refused, but on
+   an elastic so weak it barely moves: see RESIST_STIFFNESS. */
+const FACE_RESIST_SRC: Record<RarityTier, string> = {
+  extremelyRare: "/extreme-rare3.png",
+  rare: "/rare4.png",
+  uncommon: "/uncommon3.png",
+  common: "/common3.png",
+  veryCommon: "/very-common3.png",
+};
+/* HOW HARD A SINGLE DOG RESISTS BEING DRAGGED (owner, 24 September 2026: "it
+   becomes really heavy and there's lots of resistance"). The drag's own elastic,
+   cut to this while it holds a dog with no twin. Weight cannot do this: the
+   finger end has no body, so Matter moves a held dog the same whatever it weighs.
+   Lower resists harder; 0 would not move it at all. Heavy damping stops it
+   springing. Normal drag is MC_STIFFNESS, 0.2. */
+const RESIST_STIFFNESS = 0.0006;
+const RESIST_DAMPING = 0.2;
 const FACE_SHAKE_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare5.png",
   rare: "/rare2.png",
@@ -4475,6 +4493,8 @@ export default function BreedTree({
   const autoStartRef = useRef(startImmediately);
   // True from the auto start until its drop has run. See the arm block.
   const fallOwedRef = useRef(false);
+  // The single dog being held against its will, for the face writer. See RESIST.
+  const resistNodeRef = useRef<Node | null>(null);
   const backToStartScreen = () => {
     setHovered(null);
     setHoverHint("");
@@ -7604,10 +7624,11 @@ export default function BreedTree({
               if (li) li.setAttribute("href", shadeFace(d, chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
             }
           }
-          const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}:${face.src}`;
+          const resisting = resistNodeRef.current === d;
+          const tap = `${otherBreed ? "x" : chained ? 1 : resisting ? "r" : 0}:${faceTier}:${face.src}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
+            qi.setAttribute("href", shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : resisting ? FACE_RESIST_SRC[faceTier] : face.src));
             /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
                filter would flatten it to one hue. The question mark still is,
                because it is one flat file and its depth tint is what tells a
@@ -11808,7 +11829,7 @@ export default function BreedTree({
           linked.length = 0;
           tetherOn = false;
         };
-        const untether = () => { clearTethers(); mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
+        const untether = () => { clearTethers(); resistNodeRef.current = null; mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
         /* A DOG JOINS. Only while a tether is live, which means the press itself
            carried a dog circle. The dog on the finger now is tied to the new one,
            and the finger moves to the new one. Skips anything not in the world or
@@ -11883,9 +11904,16 @@ export default function BreedTree({
              on it opens the lifted layer instead, on release. See the circle's
              tapUp. "No twin" is the chain's own test, liveBreedNodesIn, so the
              two can never disagree about which dogs are single. */
+          /* HELD, BUT IT RESISTS (owner, 24 September 2026). Refusing the grab
+             outright left the mouse free, and Matter grabbed the NEXT dog the
+             finger slid onto. So the single dog is held on an elastic so weak it
+             barely moves, and wears its resisting face while held. Release still
+             opens the lift: see the circle's tapUp. */
           const n = pl?.kind === "circle" ? pl.bridge?.n : null;
           if (n && liveBreedNodesIn(pitBodiesRef.current?.owned, removedNodesRef.current, n.data.name).length <= 1) {
-            mc.constraint.bodyB = null; mc.body = null;
+            mc.constraint.stiffness = RESIST_STIFFNESS;
+            mc.constraint.damping = RESIST_DAMPING;
+            resistNodeRef.current = n;
           }
         };
         // A thrown toy retires itself once it is clear of the pit. The old path
@@ -11914,7 +11942,7 @@ export default function BreedTree({
         Events.on(mc, "enddrag", onEndDrag);
         // Clears the chain's links too: this path skips enddrag, and a lifted
         // dog must never be left on one.
-        mcReleaseRef.current = () => { clearTethers(); mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
+        mcReleaseRef.current = () => { clearTethers(); resistNodeRef.current = null; mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
 
         /* ---- THE LOGO AND BONE FUSE ----------------------------------------
            Ported from the main pit's onFuseMagnet, PackPit.tsx:1018. Owner
