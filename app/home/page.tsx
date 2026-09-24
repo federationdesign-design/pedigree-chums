@@ -23,7 +23,9 @@ export const metadata: Metadata = {
 };
 
 // The chums the homepage slider leaves out for now. All of them show on /play.
-const HOME_HIDDEN_CHUMS = ["bichon-frise", "basset-hound", "bulldog", "beagle", "miniature-schnauzer", "yorkshire-terrier", "border-terrier"];
+const HOME_HIDDEN_CHUMS = ["bichon-frise", "basset-hound", "bulldog", "beagle", "miniature-schnauzer", "yorkshire-terrier", "border-terrier",
+  // The Pug has its intro video for the /play page only (owner, 24 September 2026).
+  "pug"];
 
 export default function HomePage() {
   return (

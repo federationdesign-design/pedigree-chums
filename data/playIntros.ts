@@ -17,6 +17,7 @@ export const INTRO_VIDEOS: Record<string, string> = {
   bulldog: "/bulldog-cardjump_low-res.mp4",
   "border-collie": "/collie-cardjump_low-res.mp4", // added 24 September 2026
   cockapoo: "/cockapoo-cardjump_low-res.mp4",
+  pug: "/pug-cardjump_low-res.mp4", // added 24 September 2026
   "french-bulldog": "/french-bulldog-cardjump_low-res.mp4",
   labrador: "/labcardjump_low-res.mp4",
   "miniature-schnauzer": "/miniature-schnauzercardjump_low-res.mp4",
