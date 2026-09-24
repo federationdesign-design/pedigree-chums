@@ -864,6 +864,8 @@ const FACE_COLLECT_SRC: Record<RarityTier, string> = {
   veryCommon: "/very-common2.png",
 };
 const FACE_COLLECT_MS = 600;
+// How long the snail or jelly square stays inverted after a tap.
+const UI_HIT_MS = 250;
 /* THE JOIN FLASH (owner, 24 September 2026: "keep all twins on the chained face,
    but flash a different face on each join"). The moment a dog joins a chain it
    wears this face for FACE_JOIN_MS, then goes back to the chained face. It is the
@@ -4503,6 +4505,16 @@ export default function BreedTree({
   const autoStartRef = useRef(startImmediately);
   // True from the auto start until its drop has run. See the arm block.
   const fallOwedRef = useRef(false);
+  /* THE SNAIL AND JELLY HIT STATE (owner, 24 September 2026: they invert when
+     tapped). The kind just pressed, for UI_HIT_MS: its yellow tile goes navy and
+     its navy artwork goes yellow, then both come back. */
+  const [uiHit, setUiHit] = useState<string | null>(null);
+  const uiHitTimerRef = useRef(0);
+  const flashUiHit = (kind: string) => {
+    setUiHit(kind);
+    window.clearTimeout(uiHitTimerRef.current);
+    uiHitTimerRef.current = window.setTimeout(() => setUiHit(null), UI_HIT_MS);
+  };
   // When each dog's join flash ends, set by the chain's first and joined hooks.
   const joinFlashRef = useRef<Map<Node, number>>(new Map());
   // The single dog being held against its will, for the face writer. See RESIST.
@@ -14247,6 +14259,11 @@ export default function BreedTree({
                 for a circle holding the breed of the chain being drawn. White,
                 like the path, changed from the site yellow on 18 September 2026.
                 Same shape as the four above it, one colour. */}
+            {/* THE SNAIL AND JELLY HIT STATE: their navy artwork recoloured to the pit
+                yellow, #ffd23e, alpha untouched. See UI_HIT_MS. */}
+            <filter id="bt-ui-hit" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.8235 0 0 0 0 0.2431 0 0 0 1 0" />
+            </filter>
             <filter id="bt-qmark-hi" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
               <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
             </filter>
@@ -15727,6 +15744,8 @@ export default function BreedTree({
                 }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
+                  // The snail and the jelly invert on the press itself.
+                  if (d.kind === "slowmo" || d.kind === "shake") flashUiHit(d.kind);
                   const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
                   /* THE CORNER X DROPS A PAIR DURING A ROUND. Each tap spawns
                      another red-leave + green-restart pair into the pit, up to
@@ -15799,6 +15818,7 @@ export default function BreedTree({
                            stays the pit's yellow, because there it opens the menu
                            rather than backing out. */
                         : d.kind === "close" && (learning || !started) ? "#ef4444"
+                        : (d.kind === "slowmo" || d.kind === "shake") && uiHit === d.kind ? "var(--navy, #0a3a57)"
                         : "var(--yellow, #ffd23e)",
                     /* NO OUTLINE ON THE SNAIL OR THE JELLY, 19 September 2026
                        (owner). Every other square in this set carries a 5px rim,
@@ -15835,6 +15855,7 @@ export default function BreedTree({
                     width={uSz * (d.kind === "slowmo" ? 0.615 : 0.764)}
                     height={uSz * (d.kind === "slowmo" ? 0.615 : 0.764)}
                     preserveAspectRatio="xMidYMid meet"
+                    filter={uiHit === d.kind ? "url(#bt-ui-hit)" : undefined}
                     style={{ pointerEvents: "none" }}
                   />
                 ) : d.kind === "leave" ? (
