@@ -821,47 +821,71 @@ const QMARK_SRC = "/dogfacequestion.svg";
 
    KEYED BY TIER, not by breed, so a new dog needs no new art: rarityTier reads
    how many trees the breed appears in and the face follows. */
-const RARITY_FACE_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare.png",
-  rare: "/rare.png",
-  uncommon: "/uncommon.png",
-  common: "/common.png",
-  veryCommon: "/very-common.png",
-};
 /* THE CHAINED FACE, one per tier as well (owner, 23 September 2026). It replaces
    QMARK_TAPPED_SRC, the single shared mark every chained circle wore whatever its
    breed, so held and available circles now say the tier as well as the state.
    The "2" files are the owner's own names and are kept verbatim so the file and
    the reference cannot drift apart. */
-/* THE HIT FACES, 24 September 2026 (owner's artwork). A dog that takes a knock
-   pulls a face for a moment and then goes back to its resting one.
+/* THE FACE SETS, 24 September 2026 (owner's own casting, file by file). Four
+   states, and a dog is only ever in one of them:
 
-   FOUR EACH, THREE FOR EXTREMELY RARE, which has no sixth file. The count is read
-   from the array rather than assumed anywhere, so a tier can gain or lose an
-   expression by editing this table alone. An empty array would simply mean no
-   flash for that tier, which is how the set was built before all five were drawn.
+     BOMB    a blast has gone off. One face per tier, always that one.
+     SHAKE   the jelly has been pressed. One face per tier, always that one.
+     CHAIN   the dog is in a chain or could join it. One face per tier.
+     RESTING everything else, drawn at random from that tier's set and changed
+             again on its own schedule. See FACE_IDLE_MIN_MS.
 
-   NOT THE CHAINED STATE. A circle held in a chain, or one standing down because
-   the chain belongs to another breed, keeps the face that says so: a flash there
-   would be saying two things at once. See FACE_HIT_MS and the writer. */
-const RARITY_FACE_HIT_SRC: Record<RarityTier, readonly string[]> = {
-  extremelyRare: ["/extreme-rare3.png", "/extreme-rare4.png", "/extreme-rare5.png"],
-  rare: ["/rare3.png", "/rare4.png", "/rare5.png", "/rare6.png"],
-  uncommon: ["/uncommon3.png", "/uncommon4.png", "/uncommon5.png", "/uncommon6.png"],
-  common: ["/common3.png", "/common4.png", "/common5.png", "/common6.png"],
-  veryCommon: ["/very-common3.png", "/very-common4.png", "/very-common5.png", "/very-common6.png"],
+   VERY COMMON'S RESTING SET is the three files the owner's four lists left over,
+   very-common2 to very-common4: the resting list named sets for the other four
+   tiers and not for this one. If that is wrong it is one line here.
+
+   UNCOMMON4 IS IN TWO OF THE LISTS, chain and resting, exactly as given. Nothing
+   stops that: the state decides which table is read, so the file simply appears
+   in both. */
+const FACE_BOMB_SRC: Record<RarityTier, string> = {
+  extremelyRare: "/extreme-rare3.png",
+  rare: "/rare4.png",
+  uncommon: "/uncommon3.png",
+  common: "/common3.png",
+  veryCommon: "/very-common6.png",
 };
-/* HOW LONG A PULLED FACE HOLDS, in ms. Long enough to read on a bounce, short
-   enough that a busy pit is not a wall of gurning. A second knock during the hold
-   restarts it with a fresh expression. */
-const FACE_HIT_MS = 400;
+const FACE_SHAKE_SRC: Record<RarityTier, string> = {
+  extremelyRare: "/extreme-rare5.png",
+  rare: "/rare2.png",
+  uncommon: "/uncommon6.png",
+  common: "/common4.png",
+  veryCommon: "/very-common5.png",
+};
+const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
+  extremelyRare: ["/extreme-rare.png", "/extreme-rare2.png"],
+  rare: ["/rare.png", "/rare3.png", "/rare6.png"],
+  uncommon: ["/uncommon.png", "/uncommon2.png", "/uncommon4.png", "/uncommon5.png"],
+  common: ["/common.png", "/common2.png", "/common5.png"],
+  veryCommon: ["/very-common2.png", "/very-common3.png", "/very-common4.png"],
+};
+/* HOW LONG A BOMB OR SHAKE FACE HOLDS, and how long a resting face is kept
+   before the dog picks another.
+
+   EVERY DOG ON ITS OWN CLOCK, which is the point (owner: they should not act in
+   unison). Each circle rolls its own hold inside these ranges, so a pit hit by
+   one blast goes back to normal raggedly, and a still pit is always changing
+   somewhere rather than all at once. */
+const FACE_EVENT_MIN_MS = 500;
+const FACE_EVENT_MAX_MS = 1400;
+const FACE_IDLE_MIN_MS = 2500;
+const FACE_IDLE_MAX_MS = 9000;
+/* HOW MANY DOGS FACE THE OTHER WAY, as a share of the pit (owner, 24 September
+   2026). Decided per circle from its index, not rolled each frame, so a dog keeps
+   the way it faces for the whole round instead of flickering. */
+const FACE_FLIP_SHARE = 0.4;
+const rnd = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
 
 const RARITY_FACE_CHAINED_SRC: Record<RarityTier, string> = {
-  extremelyRare: "/extreme-rare2.png",
-  rare: "/rare2.png",
-  uncommon: "/uncommon2.png",
-  common: "/common2.png",
-  veryCommon: "/very-common2.png",
+  extremelyRare: "/extreme-rare4.png",
+  rare: "/rare5.png",
+  uncommon: "/uncommon4.png",
+  common: "/common6.png",
+  veryCommon: "/very-common.png",
 };
 /* THE TAPPED FACE, worn by a circle that is
    actually HELD in a chain, in place of the resting mark. Not by a glowing twin
@@ -5767,7 +5791,12 @@ export default function BreedTree({
      chain already uses and is far cheaper than a per-node map the pit would have
      to keep in step as circles pop and are removed. A miss simply means no
      expression, so nothing has to be cleaned up when a level unmounts. */
-  const faceHitRef = useRef<Map<string, { src: string; until: number }>>(new Map());
+  /* WHAT EVERY CIRCLE'S FACE IS DOING, keyed by the circle itself so two copies
+     of one dog are independent. `src` is the file, `until` is when it expires and
+     `evt` marks a bomb or shake face, which must not be replaced by an idle
+     change before its time is up. A circle with no entry simply picks a resting
+     face on the next frame. */
+  const faceHitRef = useRef<Map<Node, { src: string; until: number; evt: boolean }>>(new Map());
   /* The sim's frame time, so the paint pass can expire a pulled face without
      reading the wall clock during render. Written wherever a face is set. */
   const faceClockRef = useRef(0);
@@ -7073,8 +7102,14 @@ export default function BreedTree({
              the circle's own radius, so what sticks out past the rim is drawing
              only: an ear cannot be grabbed and does not collide. That is the
              owner's ask, and it is the reason the art may overhang at all. */
+          /* WHICH WAY THIS DOG FACES. A hash of the node's index, so it is fixed
+             for the round and costs nothing to recompute: rolling it per frame
+             would flip the dog on and off like a fault. Mirrored on the vertical
+             axis, which is what "facing the other way" means for a face drawn
+             head on. */
+          const flip = ((i * 2654435761) >>> 0) % 1000 < FACE_FLIP_SHARE * 1000;
           const sc = (drawR(d, v, k) * FACE_FILL_K) / QMARK_VB;
-          q.setAttribute("transform", `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
+          q.setAttribute("transform", `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${flip ? -sc : sc},${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
         }
         /* THE MARK IS THE HIGHLIGHT. While a
            dog chain is being drawn, every circle holding its breed turns its
@@ -7195,12 +7230,25 @@ export default function BreedTree({
              It loses to both chain states on purpose: a chained circle and one
              standing down are each saying something the player needs, and a
              gurn on top would muddle it. */
-          const hit = faceHitRef.current.get(d.data.name);
-          const hitSrc = !otherBreed && !chained && hit && hit.until > nowFx ? hit.src : null;
-          const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}:${hitSrc ?? ""}`;
+          /* THE RESTING FACE IS PICKED HERE and kept on the same store the bomb,
+             the shake and a knock write to, so one place decides what a circle is
+             wearing. An expired entry is replaced with a fresh resting face and a
+             fresh hold, which is what keeps a still pit quietly changing without
+             every dog moving together. */
+          let face = faceHitRef.current.get(d);
+          if (!face || face.until <= nowFx) {
+            const rest = FACE_REST_SRC[faceTier];
+            face = {
+              src: rest[(Math.random() * rest.length) | 0],
+              until: nowFx + rnd(FACE_IDLE_MIN_MS, FACE_IDLE_MAX_MS),
+              evt: false,
+            };
+            faceHitRef.current.set(d, face);
+          }
+          const tap = `${otherBreed ? "x" : chained ? 1 : 0}:${faceTier}:${face.src}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", otherBreed ? QMARK_SRC : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : hitSrc ?? RARITY_FACE_SRC[faceTier]);
+            qi.setAttribute("href", otherBreed ? QMARK_SRC : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src);
             /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
                filter would flatten it to one hue. The question mark still is,
                because it is one flat file and its depth tint is what tells a
@@ -10261,9 +10309,24 @@ export default function BreedTree({
       // is actually touching the bomb, then what touches that, and so on, so
       // anything cut off by a gap is spared. Everything else in range is shoved.
       // The pop-art blast itself is stage 5, on the canvas.
+      /* EVERY DOG REACTS TO A BLAST OR A SHAKE, 24 September 2026 (owner's own
+         casting of which face each tier wears). One roll per circle for HOW LONG,
+         inside FACE_EVENT_MIN_MS to FACE_EVENT_MAX_MS, so they come out of it
+         raggedly rather than together. */
+      const faceEventAll = (pick: Record<RarityTier, string>, now: number) => {
+        for (const bb of all) {
+          if (!bb.n) continue;
+          faceHitRef.current.set(bb.n, {
+            src: pick[rarityTier(treesContaining(bb.n.data.name))],
+            until: now + rnd(FACE_EVENT_MIN_MS, FACE_EVENT_MAX_MS),
+            evt: true,
+          });
+        }
+      };
       const detonate = (b: Body, wasHeld: boolean) => {
         if (b.blown) return;
         b.blown = true;
+        faceEventAll(FACE_BOMB_SRC, performance.now());
         b.bursting = performance.now();
         if (pressedBombRef.current === b) pressedBombRef.current = null;
         const bombMb = b.mb as MB;
@@ -10628,13 +10691,21 @@ export default function BreedTree({
                    for exactly that and are worth reusing rather than repeating.
                    Only a dog does this. A chip has no face. */
                 faceClockRef.current = now;
+                /* A KNOCK MAKES A DOG CHANGE ITS FACE EARLY. It picks from the
+                   RESTING set, not a set of its own: the owner's four lists cast
+                   bomb, shake and chain explicitly, and a hit is just the dog
+                   reacting. An event face in progress is left alone. */
                 if (b.n) {
-                  const faces = RARITY_FACE_HIT_SRC[rarityTier(treesContaining(b.n.data.name))];
-                  if (faces.length) {
-                    faceHitRef.current.set(b.n.data.name, {
-                      src: faces[(Math.random() * faces.length) | 0],
-                      until: now + FACE_HIT_MS,
-                    });
+                  const cur = faceHitRef.current.get(b.n);
+                  if (!cur?.evt || cur.until <= now) {
+                    const faces = FACE_REST_SRC[rarityTier(treesContaining(b.n.data.name))];
+                    if (faces.length) {
+                      faceHitRef.current.set(b.n, {
+                        src: faces[(Math.random() * faces.length) | 0],
+                        until: now + rnd(FACE_IDLE_MIN_MS, FACE_IDLE_MAX_MS),
+                        evt: false,
+                      });
+                    }
                   }
                 }
                 b.lastFx = now;
@@ -11297,6 +11368,7 @@ export default function BreedTree({
       fullPollRef.current = window.setTimeout(fullPoll, FULL_POLL_MS);
       // Shake: pit-style jolt of everything in the mini pit (pit velocities, verbatim px/step).
       shakeInnerRef.current = () => {
+        faceEventAll(FACE_SHAKE_SRC, performance.now());
         // A shake almost always lands on a pit that has come to rest, which is
         // exactly the state where every body is asleep, so each one is woken
         // before it is jolted or the jolt does nothing at all.
@@ -14321,7 +14393,10 @@ export default function BreedTree({
                   {/* The rarity face, as the writer will set it on the first
                       frame; drawn here too so a circle never flashes the old
                       tinted mark (owner, 23 September 2026). */}
-                  <image href={RARITY_FACE_SRC[rarityTier(treesContaining(d.data.name))]} width={QMARK_VB} height={QMARK_VB}
+                  {/* The first paint, before the writer has run: the tier's first
+                      resting face. The writer replaces it on the next frame with
+                      whatever that circle's own schedule says. */}
+                  <image href={FACE_REST_SRC[rarityTier(treesContaining(d.data.name))][0]} width={QMARK_VB} height={QMARK_VB}
                     preserveAspectRatio="xMidYMid meet" />
                 </g>
               );
