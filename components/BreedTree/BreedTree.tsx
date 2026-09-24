@@ -11834,10 +11834,18 @@ export default function BreedTree({
            The close X, the brain and the description square stay undraggable.
            The comment above still stands for them: a control you can drag into
            the pack is a worse control. */
-        const onStartDrag = (ev: { body?: { plugin?: { kind?: string; ui?: { kind?: string; fixed?: boolean } } } }) => {
+        const onStartDrag = (ev: { body?: { plugin?: { kind?: string; bridge?: { n?: Node | null }; ui?: { kind?: string; fixed?: boolean } } } }) => {
           const pl = ev?.body?.plugin;
           if (pl?.ui?.kind === "logo" && pl.ui.fixed === false) return;
-          if (!MC_KINDS.has(pl?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; }
+          if (!MC_KINDS.has(pl?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; return; }
+          /* A DOG WITH NO TWIN IS NOT DRAGGED (owner, 24 September 2026): a press
+             on it opens the lifted layer instead, on release. See the circle's
+             tapUp. "No twin" is the chain's own test, liveBreedNodesIn, so the
+             two can never disagree about which dogs are single. */
+          const n = pl?.kind === "circle" ? pl.bridge?.n : null;
+          if (n && liveBreedNodesIn(pitBodiesRef.current?.owned, removedNodesRef.current, n.data.name).length <= 1) {
+            mc.constraint.bodyB = null; mc.body = null;
+          }
         };
         // A thrown toy retires itself once it is clear of the pit. The old path
         // fired this from startDrag's pointer up; the constraint has its own
@@ -14604,11 +14612,18 @@ export default function BreedTree({
                           // the stage listener that feeds the mouse. All that is
                           // left is the tap.
                           const p0 = { x: e.clientX, y: e.clientY, t: performance.now() };
+                          /* A DOG WITH NO TWIN opens on release however long or
+                             far the press went (owner, 24 September 2026): it
+                             cannot be dragged or chained, so every press on it
+                             means "open". Same test as the drag refusal. */
+                          const single = liveBreedNodesIn(pb?.owned, removedNodesRef.current, liftNode.data.name).length <= 1;
                           const tapUp = (ev: PointerEvent) => {
                             window.removeEventListener("pointerup", tapUp);
                             window.removeEventListener("pointercancel", tapUp);
-                            if (performance.now() - p0.t >= 350) return;
-                            if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
+                            // A cancelled press on a single dog is not an "open".
+                            if (single && ev.type === "pointercancel") return;
+                            if (!single && performance.now() - p0.t >= 350) return;
+                            if (!single && Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
                             mcReleaseRef.current?.(); // let go before the lift freezes the body
                             liftToLearn(el, liftNode);
                           };
