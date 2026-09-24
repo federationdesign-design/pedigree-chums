@@ -1197,11 +1197,24 @@ const DOG_CHAIN_ARM_PX = 14;
    DOG CIRCLES ONLY. The constraint grabs whatever lies under the press in physics
    space. A chip, bomb, toy or prop is released exactly as before (see the takeover).
 
-   THE TWO DIALS. Lower stiffness means a longer, lazier lag. Lower damping means
-   more overshoot and wobble; 0 is Matter's own default and wobbles most. The drag
-   before takeover keeps MC_STIFFNESS, and every drag starts from it again. */
+   THE FOUR DIALS (owner, 24 September 2026: the pull was too strong and too
+   quick, and there should be a long delay before the dog moves).
+     TETHER_DELAY_MS  no pull at all for this long after the chain starts
+     TETHER_RAMP_MS   then the pull fades in over this long
+     TETHER_STIFFNESS the pull it fades up to: lower is weaker and slower
+     TETHER_DAMPING   lower is more overshoot and wobble
+   A spring cannot delay on its own, it pulls the instant it is attached, so the
+   delay is a timer and the fade is applied every step (see tetherTick).
+
+   NOT MASS. A heavier dog was considered and does nothing here: the finger end of
+   the tether is the mouse, which has no body, and Matter then moves the dog by the
+   full correction whatever it weighs (Constraint.js, share = 1).
+
+   The drag before takeover keeps MC_STIFFNESS, and every drag starts from it. */
 const MC_STIFFNESS = 0.2;
-const TETHER_STIFFNESS = 0.05;
+const TETHER_DELAY_MS = 800;
+const TETHER_RAMP_MS = 1000;
+const TETHER_STIFFNESS = 0.01;
 const TETHER_DAMPING = 0.02;
 /* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
    casing that was here, with the cost stated and chosen).
@@ -11617,7 +11630,23 @@ export default function BreedTree({
         Composite.add(world, mc);
         // Every grab starts on the ordinary drag feel. The tether only ever
         // softens it mid press, at the takeover, and this puts it back.
-        const untether = () => { mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
+        // tetherFrom is when the chain took a dog, or 0 when nothing is tethered.
+        let tetherFrom = 0;
+        const untether = () => { tetherFrom = 0; mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
+        /* THE DELAY AND THE FADE, every step while a dog is tethered. Zero pull
+           and zero damping through the delay, so the dog neither moves toward the
+           finger nor is braked along the line; then a smoothstep up to the
+           tether's own figures. */
+        const tetherTick = () => {
+          if (!tetherFrom) return;
+          const t = performance.now() - tetherFrom - TETHER_DELAY_MS;
+          if (t <= 0) { mc.constraint.stiffness = 0; mc.constraint.damping = 0; return; }
+          const u = Math.min(1, t / TETHER_RAMP_MS);
+          const k = u * u * (3 - 2 * u);
+          mc.constraint.stiffness = TETHER_STIFFNESS * k;
+          mc.constraint.damping = TETHER_DAMPING * k;
+        };
+        Events.on(engine, "beforeUpdate", tetherTick);
           // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
         // FLICK_FLOOR is the tap floor in Matter px/step. flickBuf is the pointer
         // path in physics px, read on release to set the toy's velocity.
@@ -11907,8 +11936,8 @@ export default function BreedTree({
              untether. Anything else lets go here, exactly as it always has. */
           const carried = mc.body as { plugin?: { kind?: string } } | null;
           if (carried?.plugin?.kind === "circle") {
-            mc.constraint.stiffness = TETHER_STIFFNESS;
-            mc.constraint.damping = TETHER_DAMPING;
+            tetherFrom = performance.now();
+            tetherTick(); // no pull from this very step, not one step late
           } else {
             mouse.button = -1;
           }
@@ -11950,6 +11979,7 @@ export default function BreedTree({
           window.removeEventListener("blur", clearGate);
           document.removeEventListener("visibilitychange", clearGate);
           Events.off(mc, "startdrag", onStartDrag);
+          Events.off(engine, "beforeUpdate", tetherTick);
           Events.off(mc, "enddrag", onEndDrag);
           // The fuse rides on the ENGINE, not the constraint, so it has to come
           // off here too: without this a level change leaves a listener holding
