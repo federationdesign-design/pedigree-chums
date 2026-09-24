@@ -132,8 +132,9 @@ export default function PlayIntro({ video, children }: { video?: string; childre
             pointerEvents: "none",
           }}
         >
-          <div style={{ fontSize: 22 }}>Game starts in...</div>
-          <div style={{ fontSize: 64, color: "var(--yellow, #ffd23e)", marginTop: 4 }}>{secsLeft}</div>
+          {/* ONE LINE, WHITE, ONE SIZE (owner, 24 September 2026): the number sits
+              on the same line as the words, in their colour and size. */}
+          <div style={{ fontSize: 22, whiteSpace: "nowrap" }}>Game starts in... {secsLeft}</div>
         </div>
       ) : null}
       {/* TWO BUTTONS IN THE HISTORY HERO'S STYLE (owner, 24 September 2026),
