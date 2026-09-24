@@ -910,8 +910,9 @@ const FACE_FLIP_SHARE = 0.4;
 /* VERY COMMON COMES IN THREE SHADES OF YELLOW (owner, 24 September 2026: "if we
    do have more than one instance of the very common rarity within the pit, it
    takes a different colour shade"). Every very-common file has a B and a C twin,
-   the same face in another yellow, and each very-common circle is given one
-   shade for the round: the first plain, the next B, the next C, then round again.
+   the same face in another yellow. Each very-common BREED is given one shade for
+   the level, so all its circles match: the first breed plain, the next B, the
+   next C, then round again.
 
    APPLIED LAST, to the finished file name, so every state (resting, chained,
    stand-down, bomb, shake, collect) keeps its shade without a table of its own.
@@ -5930,18 +5931,24 @@ export default function BreedTree({
      change before its time is up. A circle with no entry simply picks a resting
      face on the next frame. */
   const faceHitRef = useRef<Map<Node, { src: string; until: number; evt: boolean }>>(new Map());
-  /* Each very-common circle's shade, handed out in turn the first time it is
-     drawn and kept for as long as the circle exists. See VERY_COMMON_SHADES. */
-  const faceShadeRef = useRef<{ of: WeakMap<Node, string>; next: number }>({ of: new WeakMap(), next: 0 });
+  /* Each very-common BREED's shade (owner, 24 September 2026: "the Celtic hound
+     is all one colour and the Celtic heeler is all another"). Keyed by breed
+     name, so every circle of one dog wears the same yellow, handed out in turn to
+     each breed the first time it is drawn. Started afresh whenever the pit's node
+     list changes, which is a new level, so the breeds on screen together always
+     take the first shades in order and cannot collide with one from an earlier
+     level. See VERY_COMMON_SHADES. */
+  const faceShadeRef = useRef<{ nodes: Node[] | null; of: Map<string, string> }>({ nodes: null, of: new Map() });
   // Called only from the face writer, never during render.
   const shadeFace = (d: Node, src: string): string => {
     if (!src.startsWith("/very-common")) return src;
     const st = faceShadeRef.current;
-    let sh = st.of.get(d);
+    if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); }
+    const breed = d.data.name;
+    let sh = st.of.get(breed);
     if (sh === undefined) {
-      sh = VERY_COMMON_SHADES[st.next % VERY_COMMON_SHADES.length];
-      st.next += 1;
-      st.of.set(d, sh);
+      sh = VERY_COMMON_SHADES[st.of.size % VERY_COMMON_SHADES.length];
+      st.of.set(breed, sh);
     }
     return sh ? src.replace(/\.png$/, `${sh}.png`) : src;
   };
