@@ -1881,6 +1881,161 @@ const LINEAGE: Record<string, LineageNode> = {
     children: []
   },
 
+  /* MOUNTAIN COURSING HOUNDS, 24 September 2026 (owner, Group 1). The Afghan's mountain hounds come from the Central Asian sighthounds, the Tazi, and the older eastern sighthound stock. Picture made for the Tazi. */
+  "Mountain coursing Hounds": {
+    name: "Mountain coursing Hounds",
+    note: "The high-country coursing hounds of Afghanistan and Central Asia, heavy-coated against the cold. Now extinct.",
+    img: "/history/breeds/Mountain-coursing-hounds.jpg",
+    children: [
+      { name: "Central Asian Tazi hounds", note: "The feathered steppe sighthounds of Central Asia the mountain hounds were bred up from. Now extinct.", img: "/history/breeds/central-asian-tazi-hounds.jpg", value: 60 },
+      { name: "Ancient eastern sighthounds", note: "The slender coursing dogs of the Near East behind every sighthound. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 40 }
+    ]
+  },
+  /* MEDITERRANEAN MINIATURE SIGHTHOUNDS, 24 September 2026 (owner, Group 1). Bred down from the eastern sighthounds. One parent: nothing else is claimed. */
+  "Mediterranean miniature sighthounds": {
+    name: "Mediterranean miniature sighthounds",
+    note: "The small coursing dogs bred down as companions across Greece and Rome. Now extinct.",
+    img: "/history/breeds/Mediterranean-miniature-sighthounds.jpg",
+    children: [
+      { name: "Ancient eastern sighthounds", note: "The eastern sighthounds they were bred down from. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 100 }
+    ]
+  },
+  /* MEDITERRANEAN BICHON LAPDOGS, 24 September 2026 (owner, Group 1). The bichons: the ancient Melitaean lapdog, with the Barbet (Barbichon) link the Bichon Frise Club of America cites. Picture made for the Melitaean. */
+  "Mediterranean Bichon lapdogs": {
+    name: "Mediterranean Bichon lapdogs",
+    note: "The old white bichon-family lapdogs spread around the Mediterranean by sailors and traders. Now extinct.",
+    img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg",
+    children: [
+      { name: "Ancient Melitaean dogs", note: "The little white dogs of ancient Malta and the Greek islands, the Maltese's forerunner. Now extinct.", img: "/history/breeds/ancient-melitaean-dogs.jpg", value: 60 },
+      { name: "Old European water dogs", note: "The Barbet, the water dog the Barbichon is said to be named from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 40 }
+    ]
+  },
+  /* ANCIENT SPITZ DOGS, 24 September 2026 (owner, Group 1). One parent, the Arctic spitz stock. */
+  "Ancient Spitz dogs": {
+    name: "Ancient Spitz dogs",
+    note: "The small spitz-type dogs of northern Europe, pricked-eared and curl-tailed. Now extinct.",
+    img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg",
+    children: [
+      { name: "Ancient Arctic Spitz", note: "The northern spitz family they spread south from. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 100 }
+    ]
+  },
+  /* OLD EUROPEAN LAPDOGS, 24 September 2026 (owner, Group 1). Europe's lapdogs from the two ancient companion lines, the bichons and the miniature sighthounds. */
+  "Old European lapdogs": {
+    name: "Old European lapdogs",
+    note: "The small companion dogs of Europe's courts and houses from the Middle Ages on. Now extinct.",
+    img: "/history/breeds/Old-European-lapdogs.jpg",
+    children: [
+      { name: "Mediterranean Bichon lapdogs", note: "The white bichon lapdogs of the Mediterranean. Now extinct.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 60 },
+      { name: "Mediterranean miniature sighthounds", note: "The little Greek and Roman sighthounds kept as companions. Now extinct.", img: "/history/breeds/Mediterranean-miniature-sighthounds.jpg", value: 40 }
+    ]
+  },
+  /* CONTINENTAL TOY SPANIELS, 24 September 2026 (owner, Group 1). Dwarf spaniels: spaniel stock bred down with the lapdogs. Half each. */
+  "Continental toy Spaniels": {
+    name: "Continental toy Spaniels",
+    note: "The dwarf spaniels of France, Spain and Italy painted on noble laps. Now extinct.",
+    img: "/history/breeds/Continental-toy-spaniels.jpg",
+    children: [
+      { name: "Land Spaniels", note: "The spaniel stock they were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Old European lapdogs", note: "The court lapdogs they were crossed with to make them small. Now extinct.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 50 }
+    ]
+  },
+  /* ARCTIC SLED SPITZ, 24 September 2026 (owner, Group 1). One parent. */
+  "Arctic sled Spitz": {
+    name: "Arctic sled Spitz",
+    note: "The large Nordic sled, hunting and herding spitz of the far north. Now extinct.",
+    img: "/history/breeds/Ancient-Arctic-spitz.jpg",
+    children: [
+      { name: "Ancient Arctic Spitz", note: "The ancient northern spitz family. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 100 }
+    ]
+  },
+  /* GERMAN FARM SPITZ, 24 September 2026 (owner, Group 1). Spitz stock kept on the farms. */
+  "German farm Spitz": {
+    name: "German farm Spitz",
+    note: "The German Wolfspitz and farm spitz, watchdogs of the farmyard. Now extinct.",
+    img: "/history/breeds/Continental-European-farm-watch-spitz.jpg",
+    children: [
+      { name: "Ancient Spitz dogs", note: "The old northern spitz stock they come from. Now extinct.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg", value: 70 },
+      { name: "Old German farm guards", note: "The farm dogs they worked among. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 30 }
+    ]
+  },
+  /* CHUKCHI SLED DOGS, 24 September 2026 (owner, Group 1). One parent. */
+  "Chukchi sled dogs": {
+    name: "Chukchi sled dogs",
+    note: "The endurance team dogs of the Siberian Arctic. Now extinct.",
+    img: "/history/breeds/Chukchi-sled-dogs.jpg",
+    children: [
+      { name: "Ancient Arctic Spitz", note: "The ancient Arctic sled-dog line, thousands of years old. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 100 }
+    ]
+  },
+  /* ANCIENT TECHICHI DOGS, 24 September 2026 (owner, Group 1). One parent. Picture made for the Mesoamerican dogs. */
+  "Ancient Techichi dogs": {
+    name: "Ancient Techichi dogs",
+    note: "The small sacred companion dogs of the Toltec and Aztec. Now extinct.",
+    img: "/history/breeds/Ancient-Techichi-dogs.jpg",
+    children: [
+      { name: "Early Mesoamerican dogs", note: "The lean early dogs of ancient Mexico the Techichi was bred from. Now extinct.", img: "/history/breeds/early-mesoamerican-dogs.jpg", value: 100 }
+    ]
+  },
+  /* SMALL IMPORTED DOGS, 24 September 2026 (owner, Group 1). Mostly European lapdogs; the Chinese toy dog is speculative, a quarter. */
+  "Small imported dogs": {
+    name: "Small imported dogs",
+    note: "Tiny dogs brought to Mexico by later traders and settlers. Now extinct.",
+    img: "/history/breeds/small-imported-dogs.jpg",
+    children: [
+      { name: "Old European lapdogs", note: "The Spanish and European lapdogs the settlers brought. Now extinct.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 75 },
+      { name: "Ancient Chinese toy dogs", note: "The Chinese toy dogs some say came by the Pacific trade, a theory rather than a record. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 25 }
+    ]
+  },
+  /* OLD GERMAN FARM GUARDS, 24 September 2026 (owner, Group 1). Half each. */
+  "Old German farm guards": {
+    name: "Old German farm guards",
+    note: "The mastiff-type farm and cattle guards of the German lands. Now extinct.",
+    img: "/history/breeds/Old-German-farm-guards.jpg",
+    children: [
+      { name: "Roman drover dogs", note: "The Roman cattle dogs left along the Rhine and Danube. Now extinct.", img: "/history/breeds/Roman-drover-dog.jpg", value: 50 },
+      { name: "Old Mastiffs of the East", note: "The older mastiff stock behind them. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 50 }
+    ]
+  },
+  /* THURINGIAN HERDING DOGS, 24 September 2026 (owner, Group 1). Herding stock, with some farm-guard weight. */
+  "Thuringian herding dogs": {
+    name: "Thuringian herding dogs",
+    note: "The pricked-ear, curl-tailed herders of central Germany. Now extinct.",
+    img: "/history/breeds/Thuringian-herding-dogs.jpg",
+    children: [
+      { name: "Continental Germanic herding dogs", note: "The old Germanic herding stock. Now extinct.", img: "/history/breeds/Continental-Germanic-herding-dogs.jpg", value: 70 },
+      { name: "Old German farm guards", note: "The farm guards they worked beside. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 30 }
+    ]
+  },
+  /* WURTTEMBERG SHEEPDOGS, 24 September 2026 (owner, Group 1). Half each: the size came from the guard dogs. */
+  "Wurttemberg Sheepdogs": {
+    name: "Wurttemberg Sheepdogs",
+    note: "The larger, steadier herding dogs of south-west Germany. Now extinct.",
+    img: "/history/breeds/Wurttemberg-sheepdogs.jpg",
+    children: [
+      { name: "Continental Germanic herding dogs", note: "The old Germanic herding stock. Now extinct.", img: "/history/breeds/Continental-Germanic-herding-dogs.jpg", value: 50 },
+      { name: "Old German farm guards", note: "The heavier farm-guard blood that gave them size. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 50 }
+    ]
+  },
+  /* TIBETAN TEMPLE DOGS, 24 September 2026 (owner, Group 1). Mostly the Tibetan working stock; the Chinese court dogs, exchanged as gifts both ways, a quarter. */
+  "Tibetan temple dogs": {
+    name: "Tibetan temple dogs",
+    note: "The small long-coated lion dogs the Tibetan monks bred from the 600s. Now extinct.",
+    img: "/history/breeds/Tibetan-temple-dogs.jpg",
+    children: [
+      { name: "Tibetan village dogs", note: "The sturdy Tibetan working dogs the temple dogs came out of. Now extinct.", img: "/history/breeds/tibetan-village-dogs.jpg", value: 75 },
+      { name: "Ancient Chinese court dogs", note: "The Chinese court dogs sent to Tibet as gifts in return. Now extinct.", img: "/history/breeds/ancient-chinese-court-dogs.jpg", value: 25 }
+    ]
+  },
+  /* PORTUGUESE FISHING DOGS, 24 September 2026 (owner, Group 1). The Portuguese Water Dog's Moorish theory. One parent. */
+  "Portuguese fishing dogs": {
+    name: "Portuguese fishing dogs",
+    note: "The fishing crews' water dogs of the Atlantic coast. Now extinct.",
+    img: "/history/breeds/Portuguese-fishing-dogs.jpg",
+    children: [
+      { name: "Corded herding dogs", note: "The corded herding dogs the Moors are said to have brought into Iberia, a theory rather than a record. Now extinct.", img: "/history/breeds/corded-herding-dogs.jpg", value: 100 }
+    ]
+  },
+
   /* THE PULI AND THE KOMONDOR, 24 September 2026 (owner: split them rather than
      one "Hungarian corded dogs" record). Leaves, parents of the Poodle only. The
      Bergamasco is left out: it is Italian, and only speculated to have come from
