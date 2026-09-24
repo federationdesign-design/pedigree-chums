@@ -10,6 +10,9 @@ import styles from "./PlayChumsRail.module.css";
    games lead. Counted on the server at build (see chumCircleCount), never on the
    phone. A chum is on the rail exactly when it has a clip in INTRO_VIDEOS, the
    same list the /play pages read, so the two cannot disagree. */
+// The still for a clip: the same name with -last.jpg in place of .mp4.
+const lastFrameOf = (clip: string) => clip.replace(/\.mp4$/, "-last.jpg");
+
 export default function PlayChumsRail() {
   const chums = Object.keys(INTRO_VIDEOS)
     .map((slug) => breeds.find((b) => b.slug === slug))
@@ -24,10 +27,12 @@ export default function PlayChumsRail() {
       <div className={styles.rail}>
         {chums.map(({ b }) => (
           <Link key={b.slug} href={`/play/${b.slug}`} className={styles.card} aria-label={`Play the ${b.name}`}>
+            {/* THE LAST FRAME OF THE CHUM'S OWN INTRO CLIP (owner, 24 September
+                2026), in place of the card built from its square photo. The frame
+                already carries the dog's name, so nothing is drawn over it. Each
+                sits beside its clip in public/ as <clip>-last.jpg, 480px wide. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className={styles.img} src={encodeURI(b.image)} alt="" loading="lazy" />
-            <span className={styles.name}>{b.name}</span>
-            <span className={styles.play}>Play</span>
+            <img className={styles.img} src={lastFrameOf(INTRO_VIDEOS[b.slug])} alt="" loading="lazy" width={480} height={682} />
           </Link>
         ))}
       </div>

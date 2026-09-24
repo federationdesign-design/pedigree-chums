@@ -22,42 +22,17 @@
   padding-bottom: 6px;
 }
 .rail::-webkit-scrollbar { display: none; }
+/* Each item is the clip's last frame and nothing else (owner, 24 September 2026). */
 .card {
   flex: 0 0 clamp(140px, 40vw, 200px);
   scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 10px 12px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  text-decoration: none;
-  color: #ffffff;
+  display: block;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(10, 58, 87, 0.3);
 }
 .img {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 16px;
+  height: auto;
   display: block;
-}
-.name {
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 1.05rem;
-  line-height: 1.1;
-  text-align: center;
-}
-/* The history hero's green button, scaled to a card. */
-.play {
-  display: inline-block;
-  padding: 9px 22px 6px;
-  border-radius: 14px;
-  background: #22c55e;
-  box-shadow: 0 4px 0 #16a34a;
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 1rem;
-  letter-spacing: 0.04em;
-  color: #ffffff;
 }
