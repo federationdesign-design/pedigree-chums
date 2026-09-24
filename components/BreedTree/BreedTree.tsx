@@ -1183,6 +1183,26 @@ const DOG_CHAIN_SLACK = Infinity;
    this for circles and 0 for chum cards, whose press claims the gate outright as
    it always has. */
 const DOG_CHAIN_ARM_PX = 14;
+/* THE CHAIN TETHER, J18 job 1 (owner, 24 September 2026: "as soon as the user
+   starts to chain the first dog, there should be a delay before the dog moves
+   back to where the cursor is").
+
+   WHAT IT IS. The drag used to let go of the first dog at DOG_CHAIN_ARM_PX, the
+   moment the chain took the pointer. It now keeps hold, on a softer and springier
+   constraint, until the finger lifts. The dog trails the finger like a yo-yo on a
+   tether: it overshoots and wobbles, and because it never leaves the world it
+   barges the pit as it goes. The overshoot comes from the constraint, not from
+   animation, so the art and the collider cannot drift apart.
+
+   DOG CIRCLES ONLY. The constraint grabs whatever lies under the press in physics
+   space. A chip, bomb, toy or prop is released exactly as before (see the takeover).
+
+   THE TWO DIALS. Lower stiffness means a longer, lazier lag. Lower damping means
+   more overshoot and wobble; 0 is Matter's own default and wobbles most. The drag
+   before takeover keeps MC_STIFFNESS, and every drag starts from it again. */
+const MC_STIFFNESS = 0.2;
+const TETHER_STIFFNESS = 0.05;
+const TETHER_DAMPING = 0.02;
 /* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
    casing that was here, with the cost stated and chosen).
 
@@ -11592,9 +11612,12 @@ export default function BreedTree({
           // Its own category, so a body can opt out of being grabbed without
           // opting out of colliding. See MC_CAT.
           collisionFilter: { category: MC_CAT, mask: 0xFFFFFFFF, group: 0 },
-          constraint: { stiffness: 0.2, render: { visible: false } },
+          constraint: { stiffness: MC_STIFFNESS, render: { visible: false } },
         });
         Composite.add(world, mc);
+        // Every grab starts on the ordinary drag feel. The tether only ever
+        // softens it mid press, at the takeover, and this puts it back.
+        const untether = () => { mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
           // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
         // FLICK_FLOOR is the tap floor in Matter px/step. flickBuf is the pointer
         // path in physics px, read on release to set the toy's velocity.
@@ -11636,6 +11659,7 @@ export default function BreedTree({
         // fired this from startDrag's pointer up; the constraint has its own
         // release event, so it hangs off that instead.
         const onEndDrag = (ev: { body?: { circleRadius?: number; plugin?: { prop?: unknown; kind?: string } } }) => {
+          untether();
           const b = ev?.body;
           if (b && b.plugin?.kind === "toy") {
             const n = flickBuf.length;
@@ -11833,6 +11857,7 @@ export default function BreedTree({
              it later, through dogChainTakeoverRef, only once the finger has
              actually travelled DOG_CHAIN_ARM_PX. Nothing is decided here. */
           setPos(e.clientX, e.clientY);
+          untether();
           mouse.button = 0;
           flickBuf.length = 0;
           flickBuf.push({ t: performance.now(), x: mouse.position.x, y: mouse.position.y });
@@ -11876,7 +11901,17 @@ export default function BreedTree({
           const br = pressedBombRef.current as Body | null;
           if (br) br.clickPending = false;
           flickBuf.length = 0;
-          mouse.button = -1;
+          /* THE TETHER. A dog circle is kept on the constraint, softened, and the
+             button stays down so onMove keeps feeding it the finger. It lets go on
+             pointerup through the button like any drag, which runs enddrag and
+             untether. Anything else lets go here, exactly as it always has. */
+          const carried = mc.body as { plugin?: { kind?: string } } | null;
+          if (carried?.plugin?.kind === "circle") {
+            mc.constraint.stiffness = TETHER_STIFFNESS;
+            mc.constraint.damping = TETHER_DAMPING;
+          } else {
+            mouse.button = -1;
+          }
           chumGateRef.current = pointerId;
           wake();
           return true;
