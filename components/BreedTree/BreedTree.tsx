@@ -1213,6 +1213,16 @@ const MC_STIFFNESS = 0.2;
    comes from these two figures alone. */
 const TETHER_STIFFNESS = 0.001;
 const TETHER_DAMPING = 0;
+/* A REAL CHAIN (owner, 24 September 2026: "when the 2nd dog circle is connected,
+   it should be that one that follows the drag, and the previous dog circle then
+   tethered to that newly connected dog circle").
+
+   The finger's elastic hops to each dog as it joins, and the dog it leaves is tied
+   to the new one by an elastic of its own. So dog 1 hangs off dog 2, dog 2 off dog
+   3, and the newest is on the finger. Each link rests at this share of the gap
+   between the two dogs when they joined: 1 keeps that gap, lower pulls them in. */
+const TETHER_LINK_STIFFNESS = 0.001;
+const TETHER_LINK_LEN_K = 1;
 /* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
    casing that was here, with the cost stated and chosen).
 
@@ -5231,6 +5241,10 @@ export default function BreedTree({
      ours to take, and the chain is dropped rather than drawn on a pointer
      something else is already holding. See the note where it is written. */
   const dogChainTakeoverRef = useRef<((pointerId: number) => boolean) | null>(null);
+  /* THE TETHER MOVES ALONG THE CHAIN (owner, 24 September 2026). The chain's
+     joined hook lives in a different effect from the mouse constraint, so it
+     reaches the sim through this. Null outside a live pit. */
+  const dogTetherJoinRef = useRef<((n: Node) => void) | null>(null);
   const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
   const dogCloseRef = useRef<((n: Node, from?: { x: number; y: number }) => void) | null>(null);
   // The last pair reported by the counter, so the callback fires on a CHANGE and
@@ -11627,7 +11641,51 @@ export default function BreedTree({
         Composite.add(world, mc);
         // Every grab starts on the ordinary drag feel. The tether only ever
         // softens it mid press, at the takeover, and this puts it back.
-        const untether = () => { mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
+        /* THE CHAIN'S LINKS, dog to dog, and every dog on them. Cleared on any
+           release, so nothing outlives the gesture. */
+        const links: object[] = [];
+        const linked: object[] = [];
+        let tetherOn = false;
+        const clearTethers = () => {
+          for (const c of links) Composite.remove(world, c as never);
+          links.length = 0;
+          linked.length = 0;
+          tetherOn = false;
+        };
+        const untether = () => { clearTethers(); mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
+        /* A DOG JOINS. Only while a tether is live, which means the press itself
+           carried a dog circle. The dog on the finger now is tied to the new one,
+           and the finger moves to the new one. Skips anything not in the world or
+           lifted, and the dog already on the finger. */
+        dogTetherJoinRef.current = (n: Node) => {
+          if (!tetherOn) return;
+          const head = mc.body as { position: { x: number; y: number } } | null;
+          const b = pitBodiesRef.current?.find(n);
+          const mb = b?.mb as { position: { x: number; y: number }; angle: number } | undefined;
+          if (!head || !b || !mb || !b.mbIn || b.held || mb === head) return;
+          const gap = Math.hypot(mb.position.x - head.position.x, mb.position.y - head.position.y);
+          const link = Constraint.create({
+            bodyA: head as never, bodyB: mb as never,
+            pointA: { x: 0, y: 0 }, pointB: { x: 0, y: 0 },
+            length: Math.max(0.01, gap * TETHER_LINK_LEN_K),
+            stiffness: TETHER_LINK_STIFFNESS, damping: 0,
+            render: { visible: false },
+          } as never);
+          Composite.add(world, link as never);
+          links.push(link);
+          if (!linked.includes(head)) linked.push(head);
+          linked.push(mb);
+          // The finger's elastic hops to the new dog, held by its centre.
+          mc.body = mb as never;
+          mc.constraint.bodyB = mb as never;
+          mc.constraint.pointB = { x: 0, y: 0 };
+          mc.constraint.angleB = mb.angle;
+          wake();
+        };
+        // A sleeping body ignores its constraints, so every linked dog is kept
+        // awake. The mouse constraint already does this for the dog it holds.
+        const tetherWake = () => { for (const mb of linked) wakeBody(mb as never); };
+        Events.on(engine, "beforeUpdate", tetherWake);
           // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
         // FLICK_FLOOR is the tap floor in Matter px/step. flickBuf is the pointer
         // path in physics px, read on release to set the toy's velocity.
@@ -11689,7 +11747,9 @@ export default function BreedTree({
           if (prop && b?.circleRadius) throwWatchRef.current?.(prop);
         };
         Events.on(mc, "enddrag", onEndDrag);
-        mcReleaseRef.current = () => { mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
+        // Clears the chain's links too: this path skips enddrag, and a lifted
+        // dog must never be left on one.
+        mcReleaseRef.current = () => { clearTethers(); mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
 
         /* ---- THE LOGO AND BONE FUSE ----------------------------------------
            Ported from the main pit's onFuseMagnet, PackPit.tsx:1018. Owner
@@ -11919,6 +11979,7 @@ export default function BreedTree({
           if (carried?.plugin?.kind === "circle") {
             mc.constraint.stiffness = TETHER_STIFFNESS;
             mc.constraint.damping = TETHER_DAMPING;
+            tetherOn = true;
           } else {
             mouse.button = -1;
           }
@@ -11936,6 +11997,8 @@ export default function BreedTree({
           }
         };
         const onUp = (e: PointerEvent) => {
+          // The links let go with the finger, not a step later.
+          clearTethers();
           // Only the pointer that opened the gate may close it.
           if (chumGateRef.current === e.pointerId) chumGateRef.current = null;
           // Release always goes through the button, never mcReleaseRef: that
@@ -11956,6 +12019,9 @@ export default function BreedTree({
           // It closes over this world's mouse and flick buffer, so it must not
           // outlive them.
           dogChainTakeoverRef.current = null;
+          dogTetherJoinRef.current = null;
+          clearTethers();
+          Events.off(engine, "beforeUpdate", tetherWake);
           chumGateRef.current = null;
           window.removeEventListener("blur", clearGate);
           document.removeEventListener("visibilitychange", clearGate);
@@ -12912,6 +12978,7 @@ export default function BreedTree({
       joined: (i) => {
         const n = dogNode(i);
         if (n) dogChainNodesRef.current.add(n);
+        if (n) dogTetherJoinRef.current?.(n);
         paintChainCount();
       },
       over: () => {
