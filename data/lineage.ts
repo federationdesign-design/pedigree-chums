@@ -3702,7 +3702,11 @@ const LINEAGE: Record<string, LineageNode> = {
    EVERY PERCENTAGE MOVES WITH THIS NUMBER. The progenitor totals stay at exactly
    100% at any cap, because that is leaf-sum arithmetic and not a property of
    where the tree is cut. */
-const MAX_LINEAGE_DEPTH = 7;
+/* 7 -> 10, 24 September 2026 (owner). Measured before the change: the same 21
+   chums grow and the other 33 never reach seven generations; across all 54 the
+   circles go from 7,193 to 13,156, the biggest level from 770 (Golden Retriever)
+   to 1,774, and 15 chums cross a toy band. No cap at all would be 14,432. */
+const MAX_LINEAGE_DEPTH = 10;
 
 // Some circles are labelled with a common name; map it to its lineage key so
 // the same history is grafted in wherever the name appears.

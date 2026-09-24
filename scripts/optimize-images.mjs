@@ -21,6 +21,14 @@
 //                 left alone (24 September 2026, for the pictures the history page
 //                 shows large)
 //   ONLY_FROM     comma list of source files; ONLY pictures named in them are touched
+//   MATCH_RE      a regular expression; only file names it matches are touched
+//   PALETTE       set to 1 to squeeze PNGs to a reduced colour palette (quality Q),
+//                 not lossless. For flat cartoon art it is invisible and about a
+//                 third of the size (the mini pit's dog faces, 24 September 2026:
+//                 6.3MB to 2.1MB, checked side by side). Not for photographs.
+//
+// The dog faces, 24 September 2026 (owner), same size, same names, squeezed:
+//   DIR=public MAXW=10000 SKIP=0 Q=90 PALETTE=1 MATCH_RE='^(very-common|common|uncommon|rare|extreme-rare)[0-9]*[BC]?[.]png$' node scripts/optimize-images.mjs
 //
 // The ancestor pictures, 24 September 2026 (owner: 500px wide, still sharp on a
 // phone), in two passes so the history page's large pictures keep their size:
@@ -36,6 +44,8 @@ const MAXW = Number(process.env.MAXW || 700);
 const Q = Number(process.env.Q || 80);
 const SKIP = Number(process.env.SKIP || 150000);
 const MATCH = process.env.MATCH || ""; // only touch filenames containing this substring
+const MATCH_RE = process.env.MATCH_RE ? new RegExp(process.env.MATCH_RE) : null;
+const PALETTE = process.env.PALETTE === "1";
 const DRY = process.env.DRY === "1";
 // The picture names each listed source file mentions under DIR.
 const namesIn = (list) => {
@@ -57,6 +67,7 @@ const exts = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 const files = readdirSync(DIR)
   .filter((f) => exts.has(extname(f).toLowerCase()))
   .filter((f) => !MATCH || f.includes(MATCH))
+  .filter((f) => !MATCH_RE || MATCH_RE.test(f))
   .filter((f) => !EXCLUDE.has(f))
   .filter((f) => !ONLY || ONLY.has(f));
 let before = 0, after = 0, touched = 0, skipped = 0;
@@ -91,7 +102,9 @@ for (const name of files) {
   if (ext === ".png") {
     // Sprites carry transparency and flat illustration colour; keep them lossless
     // (no palette quantisation, which can band). The resize alone is the win here.
-    pipeline = pipeline.png({ compressionLevel: 9, effort: 10 });
+    pipeline = PALETTE
+      ? pipeline.png({ palette: true, quality: Q, compressionLevel: 9, effort: 10 })
+      : pipeline.png({ compressionLevel: 9, effort: 10 });
   } else if (ext === ".webp") {
     pipeline = pipeline.webp({ quality: Q });
   } else if (ext === ".avif") {
