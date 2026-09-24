@@ -49,7 +49,7 @@ export default async function PlayChumsRail() {
                   every card, and WATCH VIDEO with the film's length above it on
                   the chums that have a film. */}
               <div className={styles.actions}>
-                {vimeoId ? <WatchVideoRow name={b.name} vimeoId={vimeoId} poster={poster} seconds={secs.get(b.slug) ?? null} /> : null}
+                {vimeoId ? <WatchVideoRow name={b.name} slug={b.slug} vimeoId={vimeoId} poster={poster} seconds={secs.get(b.slug) ?? null} /> : null}
                 <Link href={`/play/${b.slug}?from=home`} className={styles.row} aria-label={`Play the ${b.name} game, ${circles} dogs`}>
                   <span className={styles.rowLabel}>Play game</span>
                   <span className={`${styles.dot} ${styles.dotPlay}`} aria-hidden="true">🕹️</span>
