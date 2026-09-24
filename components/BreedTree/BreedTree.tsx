@@ -3240,6 +3240,7 @@ export default function BreedTree({
   onRelativeTap,
   startInLearn = false,
   startImmediately = false,
+  startDelayMs = 0,
   onRestartLevel,
   playLabel = "PLAY",
   onPlayPressed,
@@ -3425,6 +3426,8 @@ export default function BreedTree({
      sets this on the remount it makes for that square, and clears it again for
      every other remount, or every level would arm itself. */
   startImmediately?: boolean;
+  // With startImmediately, wait this long before the round starts. 0 is at once.
+  startDelayMs?: number;
   /* The pit menu's green square: restart THIS level. Owned by the host, because
      it costs a life and remounts the round, exactly like onBackToStart. */
   onRestartLevel?: () => void;
@@ -12182,33 +12185,43 @@ export default function BreedTree({
        doFall is called directly rather than through the ref, and the flag is
        cleared first, so this can only ever fire once per mount. Everything else
        here is exactly what the PLAY button does. */
+    /* HELD FOR startDelayMs FIRST when one is given (owner, 24 September 2026:
+       the ?play link on a learn page starts the round a second after arrival).
+       The flag is only cleared when the start actually runs, so if this effect
+       re-runs before the timer fires, the cleanup drops the timer and the next
+       run arms it again, rather than losing the start altogether. */
+    let autoStartTimer = 0;
     if (autoStartRef.current) {
-      autoStartRef.current = false;
-      setLearnPeek(false);
-      setStartPeek(false);
-      /* THE SAME THING THE PLAY BUTTON DOES, 24 September 2026 (owner: the rewind
-         square used to just restart the pit with the circles falling, and should
-         again).
+      const go = () => {
+        autoStartRef.current = false;
+        setLearnPeek(false);
+        setStartPeek(false);
+        /* THE SAME THING THE PLAY BUTTON DOES, 24 September 2026 (owner: the rewind
+           square used to just restart the pit with the circles falling, and should
+           again).
 
-         WHAT WAS MISSING. PLAY resets the focus and the view to the whole pit
-         before it drops, with its own note saying why: the drop routine BAILS if
-         it sees a zoomed-in focus, and the round then begins stuck inside one
-         circle. This path never did that, so pressing rewind while zoomed into a
-         dog left the round marked started with nothing fallen, which is the
-         half-and-half screen the owner has been landing on.
+           WHAT WAS MISSING. PLAY resets the focus and the view to the whole pit
+           before it drops, with its own note saying why: the drop routine BAILS if
+           it sees a zoomed-in focus, and the round then begins stuck inside one
+           circle. This path never did that, so pressing rewind while zoomed into a
+           dog left the round marked started with nothing fallen, which is the
+           half-and-half screen the owner has been landing on.
 
-         COPIED, NOT INVENTED. These four lines are PLAY's, in PLAY's order. */
-      cancelAnimationFrame(rafRef.current);
-      focusRef.current = nodes[0];
-      setFocus(nodes[0]);
-      const rootV = clampRootView(displayOnly ? displayRestView() : [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? 1 : PIT_SPAN)]);
-      homeWRef.current = rootV[2];
-      zoomTo(rootV);
-      if (!hideCaption) onToggleCaption?.();
-      onPlayPressed?.();
-      setLearning(false);
-      setStarted(true);
-      doFall();
+           COPIED, NOT INVENTED. These four lines are PLAY's, in PLAY's order. */
+        cancelAnimationFrame(rafRef.current);
+        focusRef.current = nodes[0];
+        setFocus(nodes[0]);
+        const rootV = clampRootView(displayOnly ? displayRestView() : [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? 1 : PIT_SPAN)]);
+        homeWRef.current = rootV[2];
+        zoomTo(rootV);
+        if (!hideCaption) onToggleCaption?.();
+        onPlayPressed?.();
+        setLearning(false);
+        setStarted(true);
+        doFall();
+      };
+      if (startDelayMs > 0) autoStartTimer = window.setTimeout(go, startDelayMs);
+      else go();
     }
     registerSlowmo?.(() => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); });
     registerShake?.(() => {
@@ -12217,7 +12230,7 @@ export default function BreedTree({
       shakeInnerRef.current?.();
     });
     // No timer: the circles hang until the visitor presses START.
-    return () => { cancelAnimationFrame(fallRafRef.current); window.clearTimeout(fullPollRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
+    return () => { window.clearTimeout(autoStartTimer); cancelAnimationFrame(fallRafRef.current); window.clearTimeout(fullPollRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gravity, entered, nodes]);
 

@@ -120,6 +120,9 @@ function allPitAncestors(): Set<string> {
   return names;
 }
 
+// How long the ?play link waits before the circles pop out and fall.
+const PLAY_ON_ARRIVAL_MS = 1000;
+
 function activeFor(name: string) {
   const pn = resolveLineageName(name);
   const lin = getLineage(pn);
@@ -141,6 +144,7 @@ export default function BreedStrip({
   initialLevel,
   autoPlay,
   autoLearn,
+  playOnArrival,
   closeHref,
   only,
   label,
@@ -161,6 +165,9 @@ export default function BreedStrip({
   /* With initialLevel, open the level in its LEARN area rather than its start
      screen or a running round (owner, 24 September 2026). */
   autoLearn?: boolean;
+  /* With initialLevel, start the round PLAY_ON_ARRIVAL_MS after the page opens,
+     with no time tunnel (owner, 24 September 2026). The learn page's ?play link. */
+  playOnArrival?: boolean;
   /* WHERE CLOSING THE LEVEL GOES, and the signal that this is a per-level page
      showing the GAME ONLY (owner, 20 September 2026: no text underneath, no strip,
      close goes to that dog's era page). When set, nothing but the level is
@@ -846,7 +853,8 @@ export default function BreedStrip({
       diver={active.diver}
       quiet={active.quiet}
       navFading={navFading}
-      startInPlay={!!autoPlay && active.name === initialLevel}
+      startInPlay={(!!autoPlay || !!playOnArrival) && active.name === initialLevel}
+      startDelayMs={playOnArrival && active.name === initialLevel ? PLAY_ON_ARRIVAL_MS : 0}
       /* The learn deep link, 24 September 2026 (owner): the roller lands here. */
       startInLearn={!!autoLearn && active.name === initialLevel}
       onClose={() => {

@@ -30,7 +30,10 @@ import styles from "../../[era]/era.module.css";
    a fresh run, and the heading kept for screen readers and search engines.
    Statically generated for the 98 known levels; anything else 404s. */
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export function generateStaticParams(): { slug: string }[] {
   return levelBreeds().map((b) => ({ slug: levelSlug(b.name) }));
@@ -52,14 +55,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PlayLevelPage({ params }: Props) {
+export default async function PlayLevelPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const b = levelBySlug(slug);
   if (!b) notFound();
+  /* ?play (owner, 24 September 2026): skip the learn area and start the round a
+     second after arrival, with no time tunnel. Any value, or none, counts.
+     READING searchParams MAKES THIS PAGE RENDER PER REQUEST instead of being
+     built ahead of time. The 98 slugs are still the only ones allowed. */
+  const play = (await searchParams).play !== undefined;
   return (
     <main>
       <h1 className={styles.srOnly}>{b.name}</h1>
-      <BreedStrip era={b.strip} initialLevel={b.name} autoLearn closeHref="/britains-dog-history" />
+      <BreedStrip era={b.strip} initialLevel={b.name} autoLearn={!play} playOnArrival={play} closeHref="/britains-dog-history" />
     </main>
   );
 }
