@@ -22,6 +22,8 @@ import { resetToys } from "../../../components/BreedTree/BreedTree";
    phone autoplay at all. */
 
 const MOBILE_QUERY = "(max-width: 640px)";
+// How many seconds before the clip ends the "Game starts in..." countdown shows.
+const INTRO_COUNTDOWN_S = 3;
 
 export default function PlayIntro({ video, children }: { video?: string; children: ReactNode }) {
   // Unknown until the browser has been asked, so nothing is drawn for that frame.
@@ -36,6 +38,10 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   const [learn, setLearn] = useState(false);
   // True when this page was opened from the homepage play slider (?from=home).
   const [fromHome, setFromHome] = useState(false);
+  /* THE COUNTDOWN TO THE GAME (owner, 24 September 2026): for the last
+     INTRO_COUNTDOWN_S seconds of the clip, top left, "Game starts in... 3, 2, 1".
+     Read off the clip's own clock as it plays, so it lands on the real end. */
+  const [secsLeft, setSecsLeft] = useState<number | null>(null);
 
   /* A FRESH SET OF TOYS ON EVERY CHUM PLAY PAGE (owner, 24 September 2026). A toy
      thrown clear of the pit is retired for the whole visit, so after a few levels
@@ -102,9 +108,34 @@ export default function PlayIntro({ video, children }: { video?: string; childre
         autoPlay
         preload="auto"
         onEnded={() => { setWatched(true); setPhase("game"); }}
+        onTimeUpdate={(e) => {
+          const v = e.currentTarget;
+          if (!Number.isFinite(v.duration) || v.duration <= 0) return;
+          const left = Math.ceil(v.duration - v.currentTime);
+          const show = left >= 1 && left <= INTRO_COUNTDOWN_S ? left : null;
+          setSecsLeft((cur) => (cur === show ? cur : show));
+        }}
         onError={() => setPhase("game")}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
+      {secsLeft !== null ? (
+        <div
+          aria-live="polite"
+          style={{
+            position: "absolute",
+            top: "calc(22px + env(safe-area-inset-top, 0px))",
+            left: 18,
+            color: "#ffffff",
+            fontFamily: "var(--font-display), system-ui, sans-serif",
+            lineHeight: 1,
+            textShadow: "0 3px 0 rgba(10, 58, 87, 0.7), 0 0 14px rgba(10, 58, 87, 0.6)",
+            pointerEvents: "none",
+          }}
+        >
+          <div style={{ fontSize: 22 }}>Game starts in...</div>
+          <div style={{ fontSize: 64, color: "var(--yellow, #ffd23e)", marginTop: 4 }}>{secsLeft}</div>
+        </div>
+      ) : null}
       {/* TWO BUTTONS IN THE HISTORY HERO'S STYLE (owner, 24 September 2026),
           the same classes as its First dog and First era, so they cannot drift:
           green SKIP VIDEO starts the round, blue LEARN opens the learn area.
