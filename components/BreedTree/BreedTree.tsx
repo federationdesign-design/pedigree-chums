@@ -8569,7 +8569,8 @@ export default function BreedTree({
         });
         MBody.setVelocity(nb, { x: old.velocity.x, y: old.velocity.y });
         MBody.setAngularVelocity(nb, old.angularVelocity);
-        nb.plugin = { bridge: b, kind: "circle" };
+        // A mid-round word is a word too: exempt from the single-dog drag rule.
+        nb.plugin = { bridge: b, kind: "circle", word: true };
         b.mb = nb;
         if (wasIn) { Composite.add(world, nb); ghost([nb]); }
       };
@@ -8693,7 +8694,9 @@ export default function BreedTree({
         const wpx = Math.max(8, ((f ? f.wv : b.r * 2 * k) / k) * pxPerWorld);
         const hpx = Math.max(8, ((f ? f.hv : b.r * k) / k) * pxPerWorld);
         const mb = Bodies.rectangle(p.x, p.y, wpx, hpx, { ...opts, chamfer: { radius: Math.min(wpx, hpx) * 0.18 } });
-        mb.plugin = { bridge: b, kind: "circle" };
+        // `word` marks the name version of a dog, which the single-dog drag rule
+        // leaves alone. See onStartDrag.
+        mb.plugin = { bridge: b, kind: "circle", word: true };
         b.mb = mb; b.mbIn = true;
         Composite.add(world, mb);
         return mb;
@@ -11989,7 +11992,7 @@ export default function BreedTree({
            The close X, the brain and the description square stay undraggable.
            The comment above still stands for them: a control you can drag into
            the pack is a worse control. */
-        const onStartDrag = (ev: { body?: { plugin?: { kind?: string; bridge?: { n?: Node | null }; ui?: { kind?: string; fixed?: boolean } } } }) => {
+        const onStartDrag = (ev: { body?: { plugin?: { kind?: string; word?: boolean; bridge?: { n?: Node | null }; ui?: { kind?: string; fixed?: boolean } } } }) => {
           const pl = ev?.body?.plugin;
           if (pl?.ui?.kind === "logo" && pl.ui.fixed === false) return;
           if (!MC_KINDS.has(pl?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; return; }
@@ -12002,7 +12005,11 @@ export default function BreedTree({
              finger slid onto. So the single dog is held on an elastic so weak it
              barely moves, and wears its resisting face while held. Release still
              opens the lift: see the circle's tapUp. */
-          const n = pl?.kind === "circle" ? pl.bridge?.n : null;
+          /* A DOG DRAWN AS ITS NAME IS EXEMPT (owner, 24 September 2026). Only the
+             common and very common tiers fall as words, and a word never has a
+             twin by definition, so the rule caught every one of them. They drag
+             freely, as they did before it. */
+          const n = pl?.kind === "circle" && !pl.word ? pl.bridge?.n : null;
           if (n && liveBreedNodesIn(pitBodiesRef.current?.owned, removedNodesRef.current, n.data.name).length <= 1) {
             mc.constraint.stiffness = RESIST_STIFFNESS;
             mc.constraint.damping = RESIST_DAMPING;
