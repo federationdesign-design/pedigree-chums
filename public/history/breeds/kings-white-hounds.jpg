@@ -1,0 +1,41 @@
+diff --git a/data/lineage.ts b/data/lineage.ts
+index 87a6d5f8..432491bf 100644
+--- a/data/lineage.ts
++++ b/data/lineage.ts
+@@ -1711,6 +1711,17 @@ const LINEAGE: Record<string, LineageNode> = {
+      Normandy stock, both already in the trees it joins; giving it children would
+      have repeated them a layer lower in 21 chums. Its picture is the Artois
+      hounds painting, the old Normandy type. */
++  /* THE KING'S WHITE HOUNDS, added 24 September 2026 (owner). The Chiens blancs
++     du Roi, the white scent hounds of the French royal packs, said to be the hound
++     the English Staghound most resembled. A LEAF, like the Chien-gris beside it:
++     its own origin is the royal packs' tradition, not a parent to author. */
++  "King's White Hounds": {
++    name: "King's White Hounds",
++    note: "The white scent hounds of the French kings' own packs, the hound the English Staghound is said to have looked most like, from the centuries the two courts gave each other hounds. A likely link rather than a recorded cross. Now extinct.",
++    img: "/history/breeds/kings-white-hounds.jpg",
++    children: []
++  },
++
+   "Norman Hound": {
+     name: "Norman Hound",
+     note: "The big, slow, deep-voiced hunting hound of Normandy, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.",
+@@ -2822,9 +2833,15 @@ const LINEAGE: Record<string, LineageNode> = {
+     name: "Staghound",
+     note: "A large hound kept to hunt red deer, built up from the old scenting hounds and later from the foxhound packs.",
+     children: [
+-      { name: "Southern Hound", note: "The heavy deer-hunting scent hound at its base.", img: "/history/breeds/Southern-Hound.jpg", value: 45 },
+-      { name: "English Foxhound", note: "Pack-hound blood for pace and a long day's work.", img: "/history/breeds/english-foxhound.jpg", value: 35 },
+-      { name: "Buckhound", note: "The royal deer hound in its background.", img: "/history/breeds/Buckhound-illustration.jpg", value: 20 }
++      /* THE KING'S WHITE HOUNDS JOIN, 24 September 2026 (owner). The claim is
++         only that the Staghound most closely resembled the French kings' white
++         hounds, with hound gifts between the courts as the route: SPECULATIVE,
++         so a QUARTER under the split rule. The other three are scaled into the
++         remaining 75 and rounded, 34/26/15. */
++      { name: "Southern Hound", note: "The heavy deer-hunting scent hound at its base.", img: "/history/breeds/Southern-Hound.jpg", value: 34 },
++      { name: "English Foxhound", note: "Pack-hound blood for pace and a long day's work.", img: "/history/breeds/english-foxhound.jpg", value: 26 },
++      { name: "Buckhound", note: "The royal deer hound in its background.", img: "/history/breeds/Buckhound-illustration.jpg", value: 15 },
++      { name: "King's White Hounds", note: "The white scent hounds of the French kings' own packs, the hound the English Staghound is said to have looked most like, from the centuries the two courts gave each other hounds. A likely link rather than a recorded cross. Now extinct.", img: "/history/breeds/kings-white-hounds.jpg", value: 25 }
+     ]
+   },
+ 
