@@ -1197,9 +1197,29 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                      buttons, the pair the /play intro uses. Home goes to the
                      homepage, Learn to this dog's own chum page. Any other last
                      level keeps Close, below. */
-                  <div className={heroBtn.introBtnRow}>
-                    <a href="/home" className={heroBtn.introBtn} style={{ textAlign: "center", textDecoration: "none" }}>Home</a>
-                    <a href={`/chums/${chumSlug}`} className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} style={{ textAlign: "center", textDecoration: "none" }}>Learn</a>
+                  /* THE SAME WIDTH AS THE INTRO SCREEN'S ROW (owner, 24 September
+                     2026: too little room either side). The foot shrinks to fit
+                     its contents, so on its own each button was only its word
+                     wide; this gives the rows the intro row's width, the screen
+                     less 18px each side, capped on desktop. Then a second pair:
+                     RANDOM opens another chum's game (never this one), BACK goes
+                     back where the player came from, or to /play if nowhere. */
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "min(calc(100vw - 36px), 560px)" }}>
+                    <div className={heroBtn.introBtnRow} style={{ marginTop: 0 }}>
+                      <a href="/home" className={heroBtn.introBtn} style={{ textAlign: "center", textDecoration: "none" }}>Home</a>
+                      <a href={`/chums/${chumSlug}`} className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} style={{ textAlign: "center", textDecoration: "none" }}>Learn</a>
+                    </div>
+                    <div className={heroBtn.introBtnRow} style={{ marginTop: 0 }}>
+                      <button type="button" className={heroBtn.introBtn} onClick={() => {
+                        const others = packBreeds.filter((b) => b.slug && b.slug !== chumSlug);
+                        const pick = others[Math.floor(Math.random() * others.length)];
+                        if (pick) window.location.assign(`/play/${pick.slug}`);
+                      }}>Random</button>
+                      <button type="button" className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} onClick={() => {
+                        if (window.history.length > 1) window.history.back();
+                        else window.location.assign("/play");
+                      }}>Back</button>
+                    </div>
                   </div>
                 ) : (
                   // Last level, so there is nothing to go on to. The way out has
