@@ -1,0 +1,89 @@
+/* The play ladders (owner, 24 September 2026). Three columns on a wide screen,
+   stacked on a phone. Glass panels in the site's navy, white type. */
+.wrap {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 24px);
+  padding: clamp(28px, 4vw, 56px) clamp(18px, 4vw, 48px) clamp(40px, 5vw, 72px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: 1fr; }
+}
+.ladder {
+  background: rgba(10, 58, 87, 0.72);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 16px 14px 12px;
+  box-shadow: 0 8px 24px rgba(10, 58, 87, 0.3);
+}
+.head { text-align: center; margin-bottom: 10px; }
+.title {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  line-height: 1;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.easy { color: #22c55e; }
+.medium { color: var(--yellow, #ffd23e); }
+.hard { color: #ef4444; }
+.sub {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+}
+.list { list-style: none; margin: 0; padding: 0; }
+.row {
+  display: grid;
+  grid-template-columns: 1.6em 48px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 6px;
+  border-radius: 12px;
+  color: #ffffff;
+  text-decoration: none;
+}
+.row:hover, .row:focus-visible { background: rgba(255, 255, 255, 0.1); }
+.rank {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: right;
+}
+.thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+}
+.name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.15;
+  min-width: 0;
+}
+.stat {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 3.2em;
+  line-height: 1;
+}
+.num {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.15rem;
+}
+.unit {
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 2px;
+}

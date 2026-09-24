@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PlayChumsRail from "../../components/PlayChumsRail/PlayChumsRail";
+import PlayLadder from "../../components/PlayLadder/PlayLadder";
 import styles from "./play.module.css";
 
 /* THE PLAY PAGE (owner, 24 September 2026): the homepage's chum slider on its
@@ -25,6 +26,9 @@ export default function PlayPage() {
       <PlayChumsRail films="with" anchorId="play-chums-films" label="Chums with a film to watch" />
       <div className={styles.rowGap} />
       <PlayChumsRail films="without" anchorId="play-chums-more" label="More chums to play" />
+      {/* THE LADDERS (owner, 24 September 2026): every chum's game in Easy,
+          Medium and Hard, fewest circles first. */}
+      <PlayLadder />
       <Footer />
     </main>
   );
