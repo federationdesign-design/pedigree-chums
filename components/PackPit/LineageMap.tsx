@@ -3861,7 +3861,12 @@ export default function LineageMap({
             green Complete, not the blue Learn). A one-circle dog has no tree to
             step through, so Learn had nothing to do on it; it was simply the only
             button this layer rendered before framesDone. */}
-        {!bounded && !packed && !collecting && !framesDone && !soloLeaf ? (() => {
+        {/* GONE WHILE AUTO RUNS, on the lifted circle (owner, 24 September 2026).
+            Once AUTO is pressed it does every job Learn would, so Learn has no
+            action left and a press on it does nothing. autoArmed is false from
+            that press until the next lift. The green Complete below still appears
+            on framesDone as it always has. The main pit is untouched. */}
+        {!bounded && !packed && !collecting && !framesDone && !soloLeaf && !(circular && !autoArmed) ? (() => {
           /* THE STEP COUNT IS GONE WITH ITS LABEL, 16 September 2026 (owner: the
              progress bar says the same thing now).
 
