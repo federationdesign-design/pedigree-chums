@@ -1310,6 +1310,15 @@ const TETHER_DAMPING = 0;
    every dog in the chain followed. */
 const TETHER_LINK_STIFFNESS = 0.001;
 const TETHER_LINK_LEN_K = 1.15;
+/* A CHAINED DOG'S FRICTION while the chain is held (owner, 24 September 2026: in a
+   full pit the first dog stretched on its elastic but could not move, because
+   everything round it held it fast). Matter takes the SMALLER of the two
+   bodies' frictions for every contact, so lowering the chained dogs' own
+   friction makes every contact they touch slippery: the pile around them is
+   left exactly as it was and slides aside only where a chained dog pushes
+   through it. Friction plays no part in the elastic, which is the constraint's
+   stiffness and length, so the pull feels the same. Restored on release. */
+const CHAIN_SLIP_FRICTION = 0.01;
 /* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
    casing that was here, with the cost stated and chosen).
 
@@ -11934,11 +11943,24 @@ export default function BreedTree({
         const links: object[] = [];
         const linked: object[] = [];
         let tetherOn = false;
+        // Each chained dog's own friction, kept so release puts it back exactly.
+        const slipped = new Map<object, { friction: number; frictionStatic: number }>();
+        const slip = (b: { friction: number; frictionStatic: number } | null | undefined) => {
+          if (!b || slipped.has(b)) return;
+          slipped.set(b, { friction: b.friction, frictionStatic: b.frictionStatic });
+          b.friction = CHAIN_SLIP_FRICTION;
+          b.frictionStatic = 0;
+        };
+        const unslip = () => {
+          for (const [b, f] of slipped) Object.assign(b, f);
+          slipped.clear();
+        };
         const clearTethers = () => {
           for (const c of links) Composite.remove(world, c as never);
           links.length = 0;
           linked.length = 0;
           tetherOn = false;
+          unslip();
         };
         const untether = () => { clearTethers(); resistNodeRef.current = null; mc.constraint.stiffness = MC_STIFFNESS; mc.constraint.damping = 0; };
         /* A DOG JOINS. Only while a tether is live, which means the press itself
@@ -11964,6 +11986,7 @@ export default function BreedTree({
           links.push(link);
           if (!linked.includes(head)) linked.push(head);
           linked.push(mb);
+          slip(mb as never);
           // The finger's elastic hops to the new dog, held by its centre.
           mc.body = mb as never;
           mc.constraint.bodyB = mb as never;
@@ -12289,6 +12312,7 @@ export default function BreedTree({
             mc.constraint.stiffness = TETHER_STIFFNESS;
             mc.constraint.damping = TETHER_DAMPING;
             tetherOn = true;
+            slip(mc.body as never);
           } else {
             mouse.button = -1;
           }
