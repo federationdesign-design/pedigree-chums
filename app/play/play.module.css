@@ -21,3 +21,6 @@
   text-transform: uppercase;
 }
 .yellow { color: var(--yellow, #ffd23e); }
+/* Air between the two rows. */
+.rowGap { height: clamp(18px, 3vw, 36px); }
+

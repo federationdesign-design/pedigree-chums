@@ -17,9 +17,14 @@ const lastFrameOf = (clip: string) => clip.replace(/\.mp4$/, "-last.jpg");
 
 /* hide: chum slugs to leave off this copy of the slider (owner, 24 September
    2026: the homepage hides seven for now, the /play page shows them all). */
-export default async function PlayChumsRail({ hide = [] }: { hide?: string[] } = {}) {
+/* films: "with" keeps only the chums that have a Watch video film, "without" only
+   the rest (owner, 24 September 2026: the /play page splits them into two rows,
+   films on top). anchorId: the section's id; only the homepage copy carries the
+   one the learn area's back button returns to, so two rows never share an id. */
+export default async function PlayChumsRail({ hide = [], films, anchorId = "play-chums", label = "Play a chum" }: { hide?: string[]; films?: "with" | "without"; anchorId?: string; label?: string } = {}) {
   const chums = Object.keys(INTRO_VIDEOS)
     .filter((slug) => !hide.includes(slug))
+    .filter((slug) => !films || (films === "with") === !!CHUM_VIMEO[slug])
     .map((slug) => breeds.find((b) => b.slug === slug))
     .filter((b): b is (typeof breeds)[number] => !!b)
     .map((b) => ({ b, circles: chumCircleCount(b.name) }))
@@ -35,7 +40,7 @@ export default async function PlayChumsRail({ hide = [] }: { hide?: string[] } =
        removed). A screen reader still hears what the row is, from the label. */
     // id: the anchor the learn area's back square returns to. ?from=home on the
     // links is how a /play page knows it was opened from here.
-    <section id="play-chums" className={styles.wrap} aria-label="Play a chum">
+    <section id={anchorId} className={styles.wrap} aria-label={label}>
       <ScrollRail className={styles.rail}>
         {chums.map(({ b, circles }) => {
           const poster = lastFrameOf(INTRO_VIDEOS[b.slug]);

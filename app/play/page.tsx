@@ -20,7 +20,11 @@ export default function PlayPage() {
           Come play and learn about some of your <span className={styles.yellow}>chums</span>
         </h1>
       </section>
-      <PlayChumsRail />
+      {/* TWO ROWS (owner, 24 September 2026): the chums with a film to watch on
+          top, the rest below. */}
+      <PlayChumsRail films="with" anchorId="play-chums-films" label="Chums with a film to watch" />
+      <div className={styles.rowGap} />
+      <PlayChumsRail films="without" anchorId="play-chums-more" label="More chums to play" />
       <Footer />
     </main>
   );
