@@ -7095,6 +7095,18 @@ export default function BreedTree({
            here", and that stays true if the photograph rule is ever widened. */
         const hasPhoto = (c?.getAttribute("fill") ?? "").startsWith("url(") && !c?.style.fill;
         const showQ = fellRef.current && d.depth > 0 && paintable && !hasPhoto;
+        /* THE NAME COMES OFF A CIRCLE WEARING A FACE, 24 September 2026 (owner).
+           The label was written to sit inside a flat disc; the tier art now fills
+           that disc, so the two were being printed over each other.
+
+           HIDDEN, NOT REMOVED: the element keeps its text, so a circle gets its
+           name back the moment the face comes down, which is every circle before
+           the drop and every one showing a photograph. The WORD dogs are
+           untouched: a word IS the name and never carries a face. */
+        {
+          const nameEl = wrap?.children[1] as SVGTextElement | undefined;
+          if (nameEl) nameEl.style.display = showQ ? "none" : "";
+        }
         /* WHICH WAY THIS DOG FACES. A hash of the node's index, so it is fixed for
            the round and costs nothing to recompute: rolling it per frame would
            flip the dog on and off like a fault. Hoisted above the showQ block
@@ -15027,6 +15039,28 @@ export default function BreedTree({
             // built, so the spacing between the X and the square under it stays
             // proportional. The two must be changed together.
             const uSz = 84 * pitScale * 1.2 * upp * 0.75; // main pit: BIG * 1.2
+            /* PUBLISHED FOR THE LIFT, 24 September 2026 (owner: the auto button on
+               the lifted layer must match this square exactly, on every device).
+
+               WHY A CSS VARIABLE. This size is not a fixed number of pixels and it
+               is not a share of the viewport: it comes off the MEASURED stage, so
+               a phone, a rotated phone and a desktop all give different answers.
+               Two earlier attempts guessed at it, once with a flat 60.5px and once
+               with 7.56vw, and both drifted on mobile for that reason. The only
+               figure that can be right is this one, so it is written where CSS can
+               read it and the lifted layer's button is sized from it.
+
+               ON :root, not on the stage: the lift is a fixed overlay and is not a
+               descendant of the pit, so a variable set on the stage would not
+               reach it. Written only when it changes, which is a resize or a
+               rotate, so a still pit costs nothing. */
+            if (typeof document !== "undefined") {
+              const px = `${(uSz / upp).toFixed(2)}px`;
+              const root = document.documentElement;
+              if (root.style.getPropertyValue("--pit-ui-size") !== px) {
+                root.style.setProperty("--pit-ui-size", px);
+              }
+            }
             const m = 16 * upp;
             const vbWr = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;

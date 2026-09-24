@@ -709,14 +709,21 @@
 
      THE POSITION ALREADY MATCHED and is untouched: .autoWrap sits on the same
      right and bottom insets. */
-  width: clamp(44px, 7.56vw, 75.6px);
-  height: clamp(44px, 7.56vw, 75.6px);
+  /* THE PIT'S OWN FIGURE, 24 September 2026 (owner: they must be the same size).
+     --pit-ui-size is published by the pit every time it measures its stage, so
+     this button is the shake square's size by definition rather than by estimate.
+     The clamp is only the fallback for the instant before the pit has measured,
+     and on any surface that shows this button without a pit behind it. */
+  width: var(--pit-ui-size, clamp(44px, 7.56vw, 75.6px));
+  height: var(--pit-ui-size, clamp(44px, 7.56vw, 75.6px));
   box-sizing: border-box;
   /* The padding is the same ninth of the box it was at 60.5. */
-  padding: clamp(5.2px, 0.9vw, 9px);
+  /* The same ninth of the box, whatever the box turns out to be. */
+  padding: calc(var(--pit-ui-size, 60.5px) / 8.4);
   background: var(--yellow);
   /* The same three-tenths of the box the square uses for its rx. */
-  border-radius: clamp(13.2px, 2.27vw, 22.7px);
+  /* And the same three-tenths for the corner, which is the square's own rx. */
+  border-radius: calc(var(--pit-ui-size, 60.5px) * 0.3);
   object-fit: contain;
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
   transition: transform 0.15s ease;
