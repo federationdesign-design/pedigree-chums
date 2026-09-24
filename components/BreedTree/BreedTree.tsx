@@ -2513,13 +2513,19 @@ const POP_GROW = 1.5;
    throttled per circle rather than overall: thousands a second on a big level.
    THE TWO CHANGES, only on a level with more than HEAVY_LEVEL_CIRCLES circles:
    no floating collision numbers for the first QUIET_NUMBERS_MS (the score still
-   counts every hit), and circles DEEP_HOLD_DEPTH or more layers down do not pop
-   out for the first DEEP_HOLD_MS; then they all drop in from the top of the
-   screen, between the walls. */
+   counts every hit), and the LAST HOLD_LAST_LAYERS layers of the dog's tree do
+   not pop out for the first DEEP_HOLD_MS.
+   CHANGED THE SAME DAY (owner: keep the pit's own mechanics, just delay them).
+   The held circles no longer drop in from the top: at DEEP_HOLD_MS they pop out
+   of their own parents, wherever those have landed, exactly as a pop does, one
+   after another over about HOLD_RELEASE_MS so it keeps the popping look. And the
+   hold counts from the BOTTOM of the tree (its deepest layers), not from a fixed
+   depth, so every big level keeps its top layers' opening cascade. */
 const HEAVY_LEVEL_CIRCLES = 200;
 const QUIET_NUMBERS_MS = 10000;
-const DEEP_HOLD_DEPTH = 5;
+const HOLD_LAST_LAYERS = 5;
 const DEEP_HOLD_MS = 5000;
+const HOLD_RELEASE_MS = 1500;
 // And a floor, in screen pixels across. Growth alone can never win: each
 // generation is a share of the last, so the shrinking compounds and any
 // multiplier is beaten one level further down. A floor ends it. 50 across is
@@ -8607,6 +8613,9 @@ export default function BreedTree({
       // A big level (see HEAVY_LEVEL_CIRCLES), and when its drop began.
       const heavyLevel = nodes.length - 1 > HEAVY_LEVEL_CIRCLES;
       const dropT0 = performance.now();
+      // The first layer held back: the last HOLD_LAST_LAYERS of this tree, never
+      // the top two, so the opening cascade always plays.
+      const holdFrom = Math.max(3, nodes.reduce((m, n) => Math.max(m, n.depth), 0) - HOLD_LAST_LAYERS + 1);
       // ---- the words ----
       // Sized by the SAME fitter the circles use, so a name is the size it was
       // inside its circle, then 30% up because it has no ring or picture around
@@ -9322,46 +9331,45 @@ export default function BreedTree({
       // First solid hit pops a circle's direct children out as their own
       // bodies (their subtrees riding along), inheriting some momentum plus
       // an upward-outward burst; each child brings its yellow % badge.
-      /* THE LATE DROP (see DEEP_HOLD_MS). The deep circles held back from the
-         opening are grown and floored exactly as a pop would, placed just above
-         the top of the screen at a random spot between the walls (their nested
-         descendants moved with them), and given a gentle fall. Each gets its
-         chip the way a pop gives one. */
-      const deepHeld: Node[] = [];
-      if (heavyLevel) ghostTimers.push(window.setTimeout(() => {
-        const topPx = pL.y - stagePxH;
-        const newMbs: ReturnType<typeof mkCircle>[] = [];
-        for (const ch of deepHeld) {
-          if (owned.has(ch)) continue;
-          ch.r = Math.max(ch.r * POP_GROW, minCircleR);
-          const rPx = ch.r * pxPerWorld;
-          const px = pL.x + rPx + Math.random() * Math.max(1, pR.x - pL.x - 2 * rPx);
-          const py = topPx - rPx * 2 - Math.random() * rPx * 6;
-          const w = worldFromPx(px, py);
-          moveSubtree(ch, w.x - ch.x, w.y - ch.y);
-          const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
-          owned.add(ch);
-          all.push(nb);
-          const mb = mkCircle(nb, "circle", FREED_CIRCLE_OPTS);
-          MBody.setVelocity(mb, { x: (Math.random() - 0.5) * vps(0.4), y: vps(0.3) });
-          MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.8 / 60);
-          newMbs.push(mb);
-          const bl = badgeBodiesRef.current;
-          if (bl && !isFullShare(pctOf(ch))) {
-            const popBomb = rollBomb();
-            const popR = chipRof(pctOf(ch));
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: popR / k, rDraw: popR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
-            bl.push(bb);
-            all.push(bb);
-            const mbb = mkCircle(bb, "badge", BADGE_OPTS);
-            MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8, y: mb.velocity.y * 0.8 });
-            newMbs.push(mbb);
-            badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: popR, bomb: popBomb, src: ch }]);
-          }
+      /* THE LATE POP (see DEEP_HOLD_MS). The circles held back from the opening
+         pop out of their own parents, where those now are, with the same grow,
+         floor, kick and chip a pop gives, one after another over HOLD_RELEASE_MS,
+         shallowest first. */
+      const deepHeld: { ch: Node; from: Body }[] = [];
+      const popOneHeld = (ch: Node, from: Body) => {
+        if (owned.has(ch)) return;
+        ch.r = Math.max(ch.r * POP_GROW, minCircleR);
+        const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
+        owned.add(ch);
+        all.push(nb);
+        const mb = mkCircle(nb, "circle", FREED_CIRCLE_OPTS);
+        MBody.setVelocity(mb, {
+          x: (from.mb ? from.mb.velocity.x * 0.4 : 0) + (Math.random() - 0.5) * vps(0.7),
+          y: (from.mb ? from.mb.velocity.y * 0.3 : 0) - vps(0.45 + Math.random() * 0.35),
+        });
+        MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.8 / 60);
+        const newMbs: ReturnType<typeof mkCircle>[] = from.mb ? [from.mb, mb] : [mb];
+        const bl = badgeBodiesRef.current;
+        if (bl && !isFullShare(pctOf(ch))) {
+          const popBomb = rollBomb();
+          const popR = chipRof(pctOf(ch));
+          const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: popR / k, rDraw: popR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
+          bl.push(bb);
+          all.push(bb);
+          const mbb = mkCircle(bb, "badge", BADGE_OPTS);
+          MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
+          newMbs.push(mbb);
+          badgeSrcRef.current.push(ch);
+          setBadgePcts((l) => [...l, { pct: bb.pct, r: popR, bomb: popBomb, src: ch }]);
         }
+        ghost(newMbs);
+        wakeBody(mb);
+      };
+      if (heavyLevel) ghostTimers.push(window.setTimeout(() => {
+        const queue = [...deepHeld].sort((a, b) => a.ch.depth - b.ch.depth);
         deepHeld.length = 0;
-        if (newMbs.length) { ghost(newMbs); wakePile(); }
+        const step = queue.length ? Math.min(20, HOLD_RELEASE_MS / queue.length) : 0;
+        queue.forEach((h, i) => ghostTimers.push(window.setTimeout(() => popOneHeld(h.ch, h.from), i * step)));
       }, DEEP_HOLD_MS));
       const popChildren = (b: Body) => {
         if (!b.n || b.popped) return;
@@ -9370,7 +9378,7 @@ export default function BreedTree({
         for (const ch of b.n.children ?? []) {
           if (isHiddenCopy(ch)) continue;
           // On a big level a deep circle waits for the late drop. See DEEP_HOLD_MS.
-          if (heavyLevel && ch.depth >= DEEP_HOLD_DEPTH && performance.now() - dropT0 < DEEP_HOLD_MS) { deepHeld.push(ch); continue; }
+          if (heavyLevel && ch.depth >= holdFrom && performance.now() - dropT0 < DEEP_HOLD_MS) { deepHeld.push({ ch, from: b }); continue; }
           // Grown once, then floored. b.popped guards popChildren against a
           // second run, so this cannot compound down a deep tree. The floor is
           // given in screen pixels and converted here, because the packed radii
