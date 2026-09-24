@@ -26,10 +26,13 @@ import styles from "./PlayLadder.module.css";
 /* SIX TABLES OF TEN (owner, 24 September 2026): "Very easy" is gone and each
    table holds up to PER_TABLE chums, dealt out hardest first, so the last table
    takes whatever is left. */
-const PER_TABLE = 10;
+/* FIVE TABLES OF ELEVEN, 24 September 2026 (owner): one table fewer, one more
+   dog in each, and Impossible moved to the END, alone on the last row, so the
+   top row reads down through the difficulties and finishes on Easy. The tables
+   are still dealt hardest first; only the order they are SHOWN in changes. */
+const PER_TABLE = 11;
 const LEVELS: { title: string; colour: string }[] = [
   { title: "Impossible", colour: "#ffffff" }, // was "Oober"; white, was purple (owner, 24 September 2026)
-  { title: "Extreme", colour: "#db2777" },
   { title: "Very hard", colour: "#ef4444" },
   { title: "Hard", colour: "#f97316" },
   { title: "Medium", colour: "#ffd23e" },
@@ -139,7 +142,9 @@ export default function PlayLadder() {
     .map((b) => ({ slug: b.slug, name: b.name, image: b.image, circles: chumCircleCount(b.name), dogs: dogCount(b.name), era: eraOf(b.name, b.established), status: statusFor(b.name), rarity: rarityOf(b.name) }))
     .sort((a, b) => b.circles - a.circles || a.name.localeCompare(b.name));
   // Dealt out hardest first; the first (rows % 7) columns take one extra.
-  const groups = LEVELS.map((lv, i) => ({ ...lv, rows: rows.slice(i * PER_TABLE, (i + 1) * PER_TABLE) })).filter((g) => g.rows.length > 0);
+  const dealt = LEVELS.map((lv, i) => ({ ...lv, rows: rows.slice(i * PER_TABLE, (i + 1) * PER_TABLE) })).filter((g) => g.rows.length > 0);
+  // Shown with Impossible (the first dealt) moved to the end.
+  const groups = [...dealt.slice(1), ...dealt.slice(0, 1)];
   return (
     /* A HORIZONTAL SCROLL ON A PHONE, one ladder at a time, with the video
        slider's own scrollbar (owner, 24 September 2026); side by side on desktop,
