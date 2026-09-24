@@ -10,6 +10,8 @@ import ShareCard from "../ShareCard/ShareCard";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
+import heroBtn from "../../app/britains-dog-history-2/history2.module.css";
+import { breeds as packBreeds } from "../../data/breeds";
 import { TAG_STYLE, nodeStatus, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { useRouter } from "next/navigation";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
@@ -358,6 +360,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
   }, [portraitEl]);
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
+  // This level's chum page slug, when the level is one of the 54 pack chums.
+  const chumSlug = packBreeds.find((b) => b.name === name)?.slug ?? null;
   useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
   // Score-milestone celebration, ported from the main pit (shared ../Milestone).
   // The mini pit's score is a CAMPAIGN total that rides in via initialScore, and
@@ -1186,6 +1190,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                     const r = e.currentTarget.getBoundingClientRect();
                     onNextLevel?.({ x: r.x, y: r.y, w: r.width, h: r.height });
                   }}>Next Level</button>
+                ) : chumSlug ? (
+                  /* A CHUM LEVEL ENDS ON HOME AND LEARN (owner, 24 September 2026),
+                     in place of Close: the history hero's own green and blue
+                     buttons, the pair the /play intro uses. Home goes to the
+                     homepage, Learn to this dog's own chum page. Any other last
+                     level keeps Close, below. */
+                  <div className={heroBtn.introBtnRow}>
+                    <a href="/home" className={heroBtn.introBtn} style={{ textAlign: "center", textDecoration: "none" }}>Home</a>
+                    <a href={`/chums/${chumSlug}`} className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} style={{ textAlign: "center", textDecoration: "none" }}>Learn</a>
+                  </div>
                 ) : (
                   // Last level, so there is nothing to go on to. The way out has
                   // to come back, or the player is stuck on this screen.
