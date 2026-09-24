@@ -8613,6 +8613,19 @@ export default function BreedTree({
          speed while not moving at all. Every place in this file that drives a
          body by hand therefore wakes it first. */
       const wakeBody = (mb: unknown) => { if (mb) Sleeping.set(mb as never, false); };
+      /* WAKE THE PILE AFTER ANY REMOVAL (owner, 24 September 2026, option 2).
+         Matter does not tell the bodies resting on something that it has gone,
+         and with enableSleeping they are asleep, so they hung over the gap. The
+         chum cards got this fix on 14 September (removeChumBodyRef); every other
+         way a body leaves the pit now does the same. Every body, not a radius:
+         a pile is often held up through two or three others. It costs a short
+         burst of solving before the pit settles and sleeps again. Measured: a
+         settled pit with sleeping OFF is about 40x the cost of this. */
+      const wakePile = () => {
+        for (const o of Composite.allBodies(world) as { isStatic?: boolean }[]) {
+          if (!o.isStatic) wakeBody(o);
+        }
+      };
       const CIRCLE_OPTS = { restitution: 0.78, friction: 0.1, frictionAir: 0.01, density: 0.001 }; // tennis-ball lively floor bounce
       // The freed dog circles use these instead of CIRCLE_OPTS. Job A frees every
       // circle at the drop, up to about 50 a level where it used to be 2 to 4, and
@@ -9252,7 +9265,7 @@ export default function BreedTree({
       const killProp = (pr: any, kind: string, now2: number) => {
         pr.dead = true;
         poofAt(pr.x, pr.y, now2);
-        if (pr.mb) Composite.remove(world, pr.mb);
+        if (pr.mb) { Composite.remove(world, pr.mb); wakePile(); }
         (kind === "rod" ? setDeadRods : kind === "toy" ? setDeadToys : setDeadPills)((prev) => new Set(prev).add(pr.idx));
       };
       // ROUND WON chain: every remaining prop explodes nearest-first from the
@@ -9270,13 +9283,13 @@ export default function BreedTree({
              step: invisible, solid, and holding its space open for the rest of the
              round. detonate and killChained both set it for exactly this reason
              and this one path did not. */
-          targets.push({ x: b.x, y: b.y, go: () => { poofAt(b.x, b.y, performance.now()); Composite.remove(world, b.mb); b.mbIn = false; b.blown = true; setDeadBadges((p) => new Set(p).add(b.idx)); } });
+          targets.push({ x: b.x, y: b.y, go: () => { poofAt(b.x, b.y, performance.now()); Composite.remove(world, b.mb); b.mbIn = false; b.blown = true; wakePile(); setDeadBadges((p) => new Set(p).add(b.idx)); } });
         }
         for (const [list, kind] of [[rodBodiesRef.current, "rod"], [pillBodiesRef.current, "pill"], [toyBodiesRef.current, "toy"]] as any[]) {
           for (const pr of list) if (!pr.dead && pr.mb) targets.push({ x: pr.x, y: pr.y, go: () => killProp(pr, kind, performance.now()) });
         }
         const du = (uiBodiesRef.current as any[] | null)?.find((u) => u.kind === "desc");
-        if (du && du.mb) targets.push({ x: du.x, y: du.y, go: () => { poofAt(du.x, du.y, performance.now()); Composite.remove(world, du.mb); setDescGone(true); } });
+        if (du && du.mb) targets.push({ x: du.x, y: du.y, go: () => { poofAt(du.x, du.y, performance.now()); Composite.remove(world, du.mb); wakePile(); setDescGone(true); } });
         targets.sort((a, b2) => Math.hypot(a.x - ox, a.y - oy) - Math.hypot(b2.x - ox, b2.y - oy));
         targets.forEach((t, i) => window.setTimeout(t.go, i * WON_CHAIN_STEP_MS));
         wake();
@@ -9815,7 +9828,7 @@ export default function BreedTree({
         if (b) {
           b.held = true;
           b.blown = true; // see above: the re-add branch must never take it back
-          if (b.mb && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; }
+          if (b.mb && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; wakePile(); }
         } else if (spinOnRef.current) {
           /* THE ONE SILENT FAILURE, NOW AUDIBLE. `find` is an identity match on the
              node; if it misses, nothing was ever marked and nothing removed, and
@@ -10004,6 +10017,7 @@ export default function BreedTree({
         btnBodiesRef.current.forEach((b, j) => {
           if (!b?.mb) return;
           Composite.remove(world, b.mb);
+          wakePile();
           gone.add(j);
         });
         if (gone.size) setDeadBtns((p) => new Set([...p, ...gone]));
@@ -10606,6 +10620,7 @@ export default function BreedTree({
         // A no-op under ?nobonds=1, where the constraint was never added: matter
         // filters its list, so removing something absent costs nothing.
         Composite.remove(world, rec.c);
+        wakePile(); // a released bond can leave a chip unsupported
         if (spinDiagOn) spinCut++;
         bondedPairs.delete(rec.key);
         for (const id of [rec.a, rec.b]) {
@@ -10747,7 +10762,7 @@ export default function BreedTree({
           br.blown = true;
           dropBonds(br.idx); // before the body goes: see the bond block above
           poofAt(br.x, br.y, now2);
-          if (br.mb && br.mbIn) { Composite.remove(world, br.mb); br.mbIn = false; }
+          if (br.mb && br.mbIn) { Composite.remove(world, br.mb); br.mbIn = false; wakePile(); }
           deadOut.push(br.idx);
           return 12; // flat score per chip, the main pit's figure
         }
@@ -10811,7 +10826,7 @@ export default function BreedTree({
           fxKickRef.current?.();
           numAt(b.x, b.y, 250, now2);
           if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(wasHeld ? [25, 20, 200] : [20, 15, 120]);
-          if (b.mbIn) { dropBonds(b.idx); Composite.remove(world, bombMb); b.mbIn = false; }
+          if (b.mbIn) { dropBonds(b.idx); Composite.remove(world, bombMb); b.mbIn = false; wakePile(); }
           setDeadBadges((q) => new Set(q).add(b.idx));
           const live = (Composite.allBodies(world) as MB[]).filter((o) => !o.isStatic && o !== bombMb);
           const touch = (m1: MB, m2: MB) =>
@@ -11494,6 +11509,7 @@ export default function BreedTree({
             // drop, so there is nothing to cut loose here. The word just leaves
             // the world; its circles carry on under their own physics.
             Composite.remove(world, b.mb); b.mbIn = false;
+            wakePile(); // the lifted dog leaves a gap; see wakePile
           }
           else if (!b.held && !b.mbIn && !b.blown) {
             // A blown bomb, or a chip killed in a bomb chain, has left the world
@@ -12110,6 +12126,7 @@ export default function BreedTree({
           // and its artwork leaves the screen.
           Composite.remove(world, logoB as never);
           lu.mbIn = false;
+          wakePile();
           const lg = uiLogoRef.current;
           if (lg) lg.style.display = "none";
           wake();
