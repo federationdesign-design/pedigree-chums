@@ -26,7 +26,7 @@ import styles from "./LevelSlider.module.css";
 
    `mobile` only adds room at the foot, because the phone page pins its icon rail
    over the bottom of the screen and the strip would sit under it. */
-export default function LevelSlider({ chum, mobile = false }: { chum: string; mobile?: boolean }) {
+export default function LevelSlider({ chum, mobile = false, play = false }: { chum: string; mobile?: boolean; play?: boolean }) {
   /* Foreign progenitors first, deepest first, then the levels and chum ancestors in
      era order, then the page's own dog last. See foreignCardsWithin. */
   const self = stripCardFor(chum);
@@ -48,6 +48,10 @@ export default function LevelSlider({ chum, mobile = false }: { chum: string; mo
         label="Learn more about the dogs that went into making the"
         labelName={chum}
         playName={chum}
+        /* The chum page's ?play link: open the chum's own level straight into
+           play, as the learn page's ?play does. See BreedStrip playOnArrival. */
+        initialLevel={play ? chum : undefined}
+        playOnArrival={play}
       />
     </section>
   );

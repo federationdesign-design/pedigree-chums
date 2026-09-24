@@ -14,7 +14,10 @@ import { getLineage } from "../../../data/lineage";
 import { resolveLineageName } from "../../../data/lineageNames";
 import breedInfo from "../../../data/breed-info.json";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +34,13 @@ function isMobileUA(ua: string): boolean {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua);
 }
 
-export default async function BreedPage({ params }: Props) {
+export default async function BreedPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  /* ?play (owner, 24 September 2026): open this chum's own level on arrival, on
+     the play screen at the easiest difficulty, circles falling a second later.
+     The same as /britains-dog-history/learn/<slug>?play. This page already renders
+     per request, so reading it costs nothing extra. */
+  const play = (await searchParams).play !== undefined;
   const breed = breeds.find((b) => b.slug === slug);
   if (!breed) return <h1 style={{color:"white",background:"#0a3a57",padding:40}}>Not found: {slug}</h1>;
 
@@ -82,7 +90,7 @@ export default async function BreedPage({ params }: Props) {
       )}
       {/* The levels that went into making this dog, as links to their own pages.
           Renders nothing for a chum with no British ancestry recorded. */}
-      <LevelSlider chum={breed.name} mobile={mobile} />
+      <LevelSlider chum={breed.name} mobile={mobile} play={play} />
       </main>
     </>
   );
