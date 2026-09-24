@@ -1836,6 +1836,32 @@ const LINEAGE: Record<string, LineageNode> = {
      road, with the Cumans, and are cousins in coat rather than descendants. */
   /* THE SPANISH WATER DOG, 24 September 2026 (owner). A leaf, a parent of the
      Poodle only. */
+  /* ANCIENT CHINESE TOY DOGS, 24 September 2026 (owner, Group 1). Behind the Pug
+     and eleven other chums. The sources put the Pug's line in the Han court, where
+     the Lo-sze was kept from about 200 BC, and say it LIKELY descended from
+     mastiff-type guardian dogs bred down for companionship, with one account of
+     the emperor taking such dogs as tribute from the north-west. The court dogs are
+     the main line; the mastiff root is "likely", so SPECULATIVE, a QUARTER under
+     the split rule. How they got small: the small-size gene is far older than the
+     breed (arising early in domestic dogs) and the court selected them further. */
+  "Ancient Chinese toy dogs": {
+    name: "Ancient Chinese toy dogs",
+    note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.",
+    img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg",
+    children: [
+      { name: "Ancient Chinese court dogs", note: "The little flat-faced lapdogs of the Han court, the Lo-sze, bred for the laps and sleeves of the nobility from about 200 BC. Now extinct.", img: "/history/breeds/ancient-chinese-court-dogs.jpg", value: 75 },
+      { name: "Old Mastiffs of the East", note: "The mastiff-type guardian dogs the court lapdogs are likely to have been bred down from. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 25 }
+    ]
+  },
+  /* THE ANCIENT CHINESE COURT DOGS, 24 September 2026 (owner). A leaf: the Lo-sze of
+     the Han court. Picture made for it, with the early imperial setting. */
+  "Ancient Chinese court dogs": {
+    name: "Ancient Chinese court dogs",
+    note: "The little flat-faced lapdogs of the Han court, the Lo-sze, bred for the laps and sleeves of the nobility from about 200 BC. Now extinct.",
+    img: "/history/breeds/ancient-chinese-court-dogs.jpg",
+    children: []
+  },
+
   /* THE PULI AND THE KOMONDOR, 24 September 2026 (owner: split them rather than
      one "Hungarian corded dogs" record). Leaves, parents of the Poodle only. The
      Bergamasco is left out: it is Italian, and only speculated to have come from
