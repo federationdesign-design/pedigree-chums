@@ -24,7 +24,10 @@
 .rail::-webkit-scrollbar { display: none; }
 /* Each item is the clip's last frame and nothing else (owner, 24 September 2026). */
 .card {
-  flex: 0 0 clamp(140px, 40vw, 200px);
+  /* FOUR IN VIEW, ONE ON A PHONE (owner, 24 September 2026). Sized from the
+     rail's own width less the three gaps between four items, so exactly four fit
+     and the rest scroll. The phone rule below makes it one at a time. */
+  flex: 0 0 calc((100% - 3 * 14px) / 4);
   scroll-snap-align: start;
   display: block;
   border-radius: 18px;
@@ -35,4 +38,10 @@
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* One at a time on a phone: each item is the rail's full width, and the snap
+   brings the next one in whole. 640px is the site's phone line, as in the pit. */
+@media (max-width: 640px) {
+  .card { flex-basis: 100%; }
 }
