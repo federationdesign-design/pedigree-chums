@@ -2036,6 +2036,31 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* ANCIENT ARCTIC SPITZ, 24 September 2026 (owner: the Husky's story). Genome
+     studies: modern sled dogs, the Siberian Husky among them, share most of their
+     genome with Zhokhov, a 9,500-year-old Siberian sled dog, and northern breeds
+     carry part of their ancestry from the 35,000-year-old Taimyr wolf. The wolf is
+     a part, so a quarter. */
+  "Ancient Arctic Spitz": {
+    name: "Ancient Arctic Spitz",
+    note: "The wider northern spitz family behind the pricked ears, curled tail and thick coat. Now extinct.",
+    img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg",
+    children: [
+      { name: "Zhokhov Island sled dogs", note: "The 9,500-year-old sled dogs of Zhokhov Island in Arctic Siberia, whose genome modern huskies still largely share. Now extinct.", img: "/history/breeds/zhokhov-sled-dogs.jpg", value: 75 },
+      { name: "Taimyr wolf", note: "The Ice Age wolf of Siberia's Taimyr Peninsula, about 35,000 years ago, a part of whose ancestry northern breeds still carry. Now extinct.", img: "/history/breeds/taimyr-wolf.jpg", value: 25 }
+    ]
+  },
+  /* CENTRAL ASIAN TAZI HOUNDS, 24 September 2026 (owner: one deeper for the Afghan).
+     The steppe coursing hounds of the ancient horse nomads, a likely line. */
+  "Central Asian Tazi hounds": {
+    name: "Central Asian Tazi hounds",
+    note: "The feathered steppe sighthounds of Central Asia the mountain hounds were bred up from. Now extinct.",
+    img: "/history/breeds/central-asian-tazi-hounds.jpg",
+    children: [
+      { name: "Scythian steppe dogs", note: "The rough-coated coursing hounds of the ancient steppe horse nomads, a likely line rather than a recorded one. Now extinct.", img: "/history/breeds/scythian-steppe-dog.jpg", value: 100 }
+    ]
+  },
+
   /* THE PULI AND THE KOMONDOR, 24 September 2026 (owner: split them rather than
      one "Hungarian corded dogs" record). Leaves, parents of the Poodle only. The
      Bergamasco is left out: it is Italian, and only speculated to have come from
@@ -2926,8 +2951,24 @@ const LINEAGE: Record<string, LineageNode> = {
   "Greyhound": {
     name: "Greyhound",
     note: "The fastest of all dogs, a sighthound that has hunted in Britain since antiquity.",
+    /* THE MEDIEVAL GREYHOUND, 24 September 2026 (owner: the modern Greyhound was
+       fixed in the 1700s yet has medieval and ancient forebears, as the Mastiff
+       does). Its old parents move up a generation into the Medieval Greyhound,
+       unchanged, so the balance is as before with the missing stage in between.
+       Lord Orford's 1770s bulldog cross is LEFT OUT at the owner's word: the
+       sources doubt any of it survived. */
     children: [
-      { name: "Celtic Hound", note: "The old running hounds the Celts brought west.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
+      { name: "Medieval Greyhound", note: "The noble hunting greyhound of Norman and Plantagenet England, so prized that Canute's Forest Laws of 1016 kept it from commoners and King John took greyhounds in payment of fines. Now extinct.", img: "/history/breeds/medieval-greyhound.jpg", value: 100 }
+    ]
+  },
+  /* THE MEDIEVAL GREYHOUND, 24 September 2026 (owner). Carries the Greyhound's old
+     ancient parents, moved up unchanged. */
+  "Medieval Greyhound": {
+    name: "Medieval Greyhound",
+    note: "The noble hunting greyhound of Norman and Plantagenet England, so prized that Canute's Forest Laws of 1016 kept it from commoners and King John took greyhounds in payment of fines. Now extinct.",
+    img: "/history/breeds/medieval-greyhound.jpg",
+    children: [
+      { name: "Celtic Coursing Hound", note: "The swift coursing hound of the Celts, the vertragus the Romans wrote about, the greyhound's ancient forebear. An extinct historical type.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 60 },
       { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 40 }
     ]
   },
@@ -3056,13 +3097,12 @@ const LINEAGE: Record<string, LineageNode> = {
   "Bloodhound": {
     name: "Bloodhound",
     note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
+    /* THROUGH THE MEDIEVAL BLOODHOUND, 24 September 2026 (owner): the same shape as
+       the Mastiff and now the Greyhound, a medieval stage before the modern breed.
+       The Medieval Bloodhound record already carries exactly the parents this
+       record had, so the balance is unchanged. */
     children: [
-      /* THE NORMAN HOUND JOINS, 24 September 2026 (owner). The sources believe the
-         Bloodhound, like the Talbot, came from the Norman Hound. Half under the
-         split rule; the old 60/40 scaled into the other half, 30/20. */
-      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, bred from the St Hubert and the local hounds of the region, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
-      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 30 },
-      { name: "Old scenting Hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 }
+      { name: "Medieval Bloodhound", note: "The heavy trailing hound of the medieval hunt, deep-nosed and slow, before the breed took its modern shape. Now extinct.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 100 }
     ]
   },
 
@@ -3739,9 +3779,12 @@ const LINEAGE: Record<string, LineageNode> = {
   "Italian Greyhound": {
     name: "Italian Greyhound",
     note: "A sighthound shrunk to a lapdog in ancient Italy, all the speed in miniature, kept for warmth and company.",
+    /* The Medieval Greyhound added at a quarter, 24 September 2026 (owner):
+       speculative. The other two scaled to three quarters, 41.25 and 33.75. */
     children: [
-      { name: "Ancient eastern sighthounds", note: "The desert coursing hounds of Egypt and the Near East, the Saluki-like deep root found mummified in the pharaohs' tombs. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
-      { name: "Mediterranean miniature sighthounds", note: "The small coursing dogs bred down as companions across Greece, Rome and Renaissance Italy. Now extinct.", img: "/history/breeds/Mediterranean-miniature-sighthounds.jpg", value: 45 }
+      { name: "Ancient eastern sighthounds", note: "The desert coursing hounds of Egypt and the Near East, the Saluki-like deep root found mummified in the pharaohs' tombs. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 41.25 },
+      { name: "Mediterranean miniature sighthounds", note: "The small coursing dogs bred down as companions across Greece, Rome and Renaissance Italy. Now extinct.", img: "/history/breeds/Mediterranean-miniature-sighthounds.jpg", value: 33.75 },
+      { name: "Medieval Greyhound", note: "The greyhounds of the medieval courts, bred down alongside the little Mediterranean hounds, a likely link rather than a recorded cross. Now extinct.", img: "/history/breeds/medieval-greyhound.jpg", value: 25 }
     ]
   },
   "Papillon": {
