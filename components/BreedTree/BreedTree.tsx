@@ -1229,7 +1229,11 @@ const MC_STIFFNESS = 0.2;
 /* Then 0.003. Now 0.001 with no damping, for a pendulum (owner, 24 September
    2026). Tested in Matter: 10x the dog's weight changes nothing here, the swing
    comes from these two figures alone. */
-const TETHER_STIFFNESS = 0.001;
+/* 0.003 since the chain landed (owner, 24 September 2026). At 0.001 the finger
+   pulled weaker than the dog-to-dog links, so the dogs still in the pile anchored
+   the chain and the newest dog never reached the finger. The finger must out-pull
+   the links; tested headless in Matter before shipping. */
+const TETHER_STIFFNESS = 0.003;
 const TETHER_DAMPING = 0;
 /* A REAL CHAIN (owner, 24 September 2026: "when the 2nd dog circle is connected,
    it should be that one that follows the drag, and the previous dog circle then
@@ -1237,12 +1241,19 @@ const TETHER_DAMPING = 0;
 
    The finger's elastic hops to each dog as it joins, and the dog it leaves is tied
    to the new one by an elastic of its own. So dog 1 hangs off dog 2, dog 2 off dog
-   3, and the newest is on the finger. Each link rests at this share of the gap
-   between the two dogs when they joined: 1 keeps that gap, lower pulls them in. */
-/* Was 0.001, too weak to move a dog out of the pile: two free dogs share the
-   pull, and resting dogs grip hard (frictionStatic 1.0). Owner, 24 September 2026. */
-const TETHER_LINK_STIFFNESS = 0.01;
-const TETHER_LINK_LEN_K = 1;
+   3, and the newest is on the finger.
+
+   NEARLY TOUCHING (owner, 24 September 2026). A link rests at the two dogs'
+   radii added together, times TETHER_LINK_LEN_K, so it is always under tension
+   and actually tows the dog behind. It used to rest at the gap the two dogs had
+   when they joined, which left it slack: it pulled nothing until stretched.
+
+   WEAKER THAN THE FINGER, ON PURPOSE. 0.01 here against 0.001 on the finger let
+   the pile hold the whole chain still. Headless test, four dogs in a pile, one
+   sweep: 0.003 finger with 0.001 links lagged about 90px and then caught up, and
+   every dog in the chain followed. */
+const TETHER_LINK_STIFFNESS = 0.001;
+const TETHER_LINK_LEN_K = 1.15;
 /* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
    casing that was here, with the cost stated and chosen).
 
@@ -11682,15 +11693,16 @@ export default function BreedTree({
            lifted, and the dog already on the finger. */
         dogTetherJoinRef.current = (n: Node) => {
           if (!tetherOn) return;
-          const head = mc.body as { position: { x: number; y: number } } | null;
+          const head = mc.body as { position: { x: number; y: number }; circleRadius?: number } | null;
           const b = pitBodiesRef.current?.find(n);
-          const mb = b?.mb as { position: { x: number; y: number }; angle: number } | undefined;
+          const mb = b?.mb as { position: { x: number; y: number }; angle: number; circleRadius?: number } | undefined;
           if (!head || !b || !mb || !b.mbIn || b.held || mb === head) return;
-          const gap = Math.hypot(mb.position.x - head.position.x, mb.position.y - head.position.y);
+          // Resting at nearly touching, so the link is under tension from the start.
+          const touch = (head.circleRadius ?? 0) + (mb.circleRadius ?? 0);
           const link = Constraint.create({
             bodyA: head as never, bodyB: mb as never,
             pointA: { x: 0, y: 0 }, pointB: { x: 0, y: 0 },
-            length: Math.max(0.01, gap * TETHER_LINK_LEN_K),
+            length: Math.max(0.01, touch * TETHER_LINK_LEN_K),
             stiffness: TETHER_LINK_STIFFNESS, damping: 0,
             render: { visible: false },
           } as never);
