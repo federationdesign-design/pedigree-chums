@@ -134,6 +134,14 @@ body {
 body[data-pc-chums2] {
   min-width: 2244px;
 }
+/* SUSPENDED WHILE THE GAME IS OPEN, 24 September 2026 (owner). The chum page's
+   ?play opens the pit over this page, and the 2244px floor made a phone widen its
+   viewport to fit, so the pit laid itself out for a desktop and showed one corner.
+   LineageModal sets data-pc-game-open for as long as it is mounted; the page gets
+   its width back the moment the game closes. */
+body[data-pc-chums2][data-pc-game-open] {
+  min-width: 0;
+}
 /* ?diag=1 isolation rig (D46): strip ALL shared chrome so only the diagram shows on
    the empty 3000px canvas. Scoped to the diag attribute, so the normal route and
    every other page are untouched. */

@@ -316,6 +316,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
      browser does that now. The state, its setter and the listener are all gone
      rather than left dangling. */
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
+  /* THE GAME IS OPEN, said on <body> for as long as this window is mounted (owner,
+     24 September 2026). The desktop chum page makes the whole page 2244px wide for
+     its sideways diagram; a phone, or a phone preview, then widens its viewport to
+     fit, and the pit measures a desktop and lays itself out for one. globals.css
+     suspends that rule while this attribute is set. A remount between levels
+     removes and re-adds it in one commit, so it never drops out mid-game. */
+  useEffect(() => {
+    document.body.setAttribute("data-pc-game-open", "");
+    return () => document.body.removeAttribute("data-pc-game-open");
+  }, []);
   // Publish the top-left level portrait's live screen position to BreedTree, so its
   // cluster connector points at the real image on every width, not a fixed guess.
   // A ResizeObserver is the primary trigger: it fires on mount for the first measure
