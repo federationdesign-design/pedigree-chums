@@ -1834,6 +1834,15 @@ const LINEAGE: Record<string, LineageNode> = {
      generally accepted theory for the root of the Barbet and the European water
      dogs. A LEAF. The Hungarian corded dogs (Komondor, Puli) came west by another
      road, with the Cumans, and are cousins in coat rather than descendants. */
+  /* THE SPANISH WATER DOG, 24 September 2026 (owner). A leaf, a parent of the
+     Poodle only. */
+  "Spanish Water Dog": {
+    name: "Spanish Water Dog",
+    note: "An Iberian water and herding dog with a woolly, corded coat, one of the European water dogs the Poodle is said to have been crossed from. A theory rather than a record.",
+    img: "/history/breeds/spanish-water-dog.jpg",
+    children: []
+  },
+
   "Corded herding dogs": {
     name: "Corded herding dogs",
     note: "The corded North African herding dogs the Moors are said to have brought into Iberia in the 700s, the generally accepted root of the European water dogs. A theory rather than a record. Now extinct.",
@@ -3367,8 +3376,16 @@ const LINEAGE: Record<string, LineageNode> = {
          the same animal. They are one dog under two local names, so the two shares
          are added rather than one being dropped: nothing is lost, it is just no
          longer double-counted. */
-      { name: "Old European water dogs", note: "The pan-European water dog, Germany's own Pudelhund, from which the Poodle takes its name. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 77.5 },
-      { name: "Water Spaniels", note: "The British working water-spaniel branch crossed in alongside them, listed separately from the water dogs by Caius in 1576. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 22.5 }
+      /* THE SPANISH WATER DOG JOINS, 24 September 2026 (owner). One theory has
+         the Poodle crossed from several European water dogs, Spanish and
+         Hungarian among them. SPECULATIVE, so the incomers share a QUARTER: the
+         Spanish Water Dog 12.5 now, the Puli and the Komondor 6.25 each when
+         their pictures are ready. The old two are scaled exactly to three
+         quarters, 58.125 and 16.875, so their ratio is unchanged. Until the
+         Hungarian pair lands, the three here are shown in proportion. */
+      { name: "Old European water dogs", note: "The pan-European water dog, Germany's own Pudelhund, from which the Poodle takes its name. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 58.125 },
+      { name: "Water Spaniels", note: "The British working water-spaniel branch crossed in alongside them, listed separately from the water dogs by Caius in 1576. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 16.875 },
+      { name: "Spanish Water Dog", note: "An Iberian water and herding dog with a woolly, corded coat, one of the European water dogs the Poodle is said to have been crossed from. A theory rather than a record.", img: "/history/breeds/spanish-water-dog.jpg", value: 12.5 }
     ]
   },
 
