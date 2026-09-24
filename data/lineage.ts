@@ -1714,6 +1714,140 @@ const LINEAGE: Record<string, LineageNode> = {
      this knowing the cost: the Norman Hound sits in about 300 places, so its
      parents add close to 1,000 circles across 24 chums. Its picture is the
      Artois hounds painting, the old Normandy type. */
+  /* SCHNAUZER FARM DOGS, 24 September 2026 (owner, Group 2). The rough-coated pinscher stock of southern German farms, later crossed with the grey Wolfspitz and the black German Poodle (the Standard Schnauzer club histories). The Poodle is written as Old European water dogs, the German Pudelhund, NOT as the Poodle record, which would pull its whole tree in. Also answers for Schnauzer-type farm dogs: see LINEAGE_ALIASES. */
+  "Schnauzer farm dogs": {
+    name: "Schnauzer farm dogs",
+    note: "The wiry German yard and stable dogs it was bred down from.",
+    img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg",
+    children: [
+      { name: "Old German Ratters", note: "The rough little pinscher rat-catchers of the southern German farms, the main line. Now extinct.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 50 },
+      { name: "Old German farm guards", note: "The old farm and herding guard dogs underneath. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 20 },
+      { name: "German farm Spitz", note: "The grey Wolfspitz, said to have been crossed in during the 1800s for the pepper-and-salt coat.", img: "/history/breeds/Continental-European-farm-watch-spitz.jpg", value: 15 },
+      { name: "Old European water dogs", note: "The black German Pudel, said to have been crossed in for the solid black coat. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 15 }
+    ]
+  },
+  /* AFFENPINSCHER, 24 September 2026 (owner, Group 2). A 1600s German stable and kitchen ratter bred down to a lapdog, with Pug crosses around 1900 (AKC; Affenpinscher Club of America; Canine Chronicle). English terriers and the Paris dogs were checked and are NOT in its history. */
+  "Affenpinscher": {
+    name: "Affenpinscher",
+    note: "A rough little German monkey faced ratter crossed in to take the size down. Now endangered.",
+    img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg",
+    children: [
+      { name: "Old German Ratters", note: "The small rough stable and kitchen ratters of 1600s Germany, the main line. Now extinct.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 70 },
+      { name: "Pug", note: "The later Pug crosses that shortened the nose, around 1900.", img: "/history/breeds/pug-type-toy-dog.jpg", value: 15 },
+      { name: "Old European lapdogs", note: "The German lapdog breeding that took it down to toy size. Now extinct.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 15 }
+    ]
+  },
+  /* GERMAN BRACKES, 24 September 2026 (owner, Group 2). The German trail hounds, held to descend from the Celtic hounds. 50/50. */
+  "German bracke scenthounds": {
+    name: "German bracke scenthounds",
+    note: "The trailing hounds it descends from, dwarfed in the leg to work underground. Now extinct.",
+    img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg",
+    children: [
+      { name: "Segusian tracking Hounds", note: "The Celtic trail hounds the German brackes are held to descend from. Now extinct.", img: "/history/breeds/segusian-hounds.jpg", value: 50 },
+      { name: "Old scenting Hounds", note: "The continental tracking-hound stock of the medieval hunt. Now extinct.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 50 }
+    ]
+  },
+  /* OLD GERMAN HUNTING DOGS, 24 September 2026 (owner, Group 2). The Weimar estates' all-round hunters, from the German trailing hounds and the heavier tracking stock. */
+  "Old German hunting dogs": {
+    name: "Old German hunting dogs",
+    note: "The all round hunters of the Weimar estates that the courtiers refined into one type. Now extinct.",
+    img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg",
+    children: [
+      { name: "German bracke scenthounds", note: "The German trailing hounds at its base. Now extinct.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 60 },
+      { name: "Old scenting Hounds", note: "The heavy tracking hounds of the old hunt. Now extinct.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
+    ]
+  },
+  /* OLD GERMAN RATTERS, 24 September 2026 (owner, Group 2). Speculative: the farm ratters grew out of the earth and vermin dogs and the farm stock. NOT the German Pinscher, which descends from these and would make a loop. */
+  "Old German Ratters": {
+    name: "Old German Ratters",
+    note: "Quick vermin dogs of the German farms. Now extinct.",
+    img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg",
+    children: [
+      { name: "Early Badger hunting dogs", note: "The old European earth and vermin dogs they grew from. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 50 },
+      { name: "Old German farm guards", note: "The farm dogs they worked beside and were bred among. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 50 }
+    ]
+  },
+  /* LOCAL GERMAN CATTLE DOGS, 24 September 2026 (owner, Group 2). The Rottweil butchers' dogs, the Roman drover tradition plus local stock. */
+  "Local German cattle dogs": {
+    name: "Local German cattle dogs",
+    note: "The butchers' dogs of the town of Rottweil. Now extinct.",
+    img: "/history/breeds/Local-German-cattle-dogs.jpg",
+    children: [
+      { name: "Roman drover dogs", note: "The drover dogs said to have come to Rottweil with the Roman legions. Now extinct.", img: "/history/breeds/Roman-drover-dog.jpg", value: 60 },
+      { name: "Old German farm guards", note: "The local farm and guard dogs they were crossed with. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 40 }
+    ]
+  },
+  /* OLD GERMAN BOARHOUNDS, 24 September 2026 (owner, Group 2). The boarhound is a mastiff and sighthound cross: Alaunt catch dogs for the hold, sighthound blood for the pace. */
+  "Old German boarhounds": {
+    name: "Old German boarhounds",
+    note: "The regional hunting packs that did the real boar work before the breed was fixed. Now extinct.",
+    img: "/history/breeds/Old-German-boarhounds.jpg",
+    children: [
+      { name: "Alaunt war dogs", note: "The heavy Alaunt catch dogs that held the boar. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 50 },
+      { name: "Old Mastiffs of the East", note: "The old mastiff weight behind them. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 25 },
+      { name: "Ancient eastern sighthounds", note: "The sighthound speed crossed in to run the boar down. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 25 }
+    ]
+  },
+  /* PARISIAN RATTERS, 24 September 2026 (owner, Group 2). Speculative: the working ratting dogs of Paris stables and streets. The toy bulldog is NOT here: the owner's reconstruction keeps it a separate, purely British line. */
+  "Parisian Ratters": {
+    name: "Parisian Ratters",
+    note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears. Now extinct.",
+    img: "/history/breeds/Parisian-ratters-and-terriers.jpg",
+    children: [
+      { name: "Old British ratting Terriers", note: "Ratting terriers of English stock, some said to have gone to France with the lace workers. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 50 },
+      { name: "Old German Ratters", note: "The continental pinscher-type ratters of the stables. Now extinct.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 25 },
+      { name: "Old European lapdogs", note: "The small companion dogs of the city. Now extinct.", img: "/history/breeds/Old-European-lapdogs.jpg", value: 25 }
+    ]
+  },
+  /* ROMAN MOLOSSERS, 24 September 2026 (owner, Group 2). A leaf: the Roman mastiffs themselves, the parent of the Alpine valley dogs. Picture made for it. */
+  "Roman Molossers": {
+    name: "Roman Molossers",
+    note: "The heavy Roman guard and war mastiffs, carried over the Alps by the legions. Now extinct.",
+    img: "/history/breeds/roman-molossers.jpg",
+    children: [
+
+    ]
+  },
+  /* ALPINE MASTIFF FARM DOGS, 24 September 2026 (owner, Group 2). The Swiss valley dogs, held to descend from the Roman mastiffs brought over the Alps. */
+  "Alpine Mastiff farm dogs": {
+    name: "Alpine Mastiff farm dogs",
+    note: "The heavy Roman descended valley dogs, the Sennenhund stock, kept for farm and guard work.",
+    img: "/history/breeds/Alpine-mastiff-farm-dogs.jpg",
+    children: [
+      { name: "Roman Molossers", note: "The Roman guard mastiffs brought over the Alps. Now extinct.", img: "/history/breeds/roman-molossers.jpg", value: 60 },
+      { name: "Old Mastiffs of the East", note: "The old mastiff stock further back. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 40 }
+    ]
+  },
+  /* BASSET ARTESIEN NORMAND, 24 September 2026 (owner, Group 2). The low French hound, dwarfed from the Norman and Artois packs. The Artois picture was briefed for 'Old Norman / Artois hounds'; that dog IS the Norman Hound here, so one dog keeps one picture. */
+  "Basset Artesien Normand": {
+    name: "Basset Artesien Normand",
+    note: "The French basset breed behind it, later crossed with Bloodhound to make the heavier English Basset. Now endangered.",
+    img: "/history/breeds/Basset-Artesien-Normand.jpg",
+    children: [
+      { name: "Norman Hound", note: "The big Normandy hounds of Artois and Normandy it was dwarfed from. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
+      { name: "St Hubert Hound", note: "The abbey scent hound behind the French packs.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 50 }
+    ]
+  },
+  /* OLD BALKAN SPOTTED HOUNDS, 24 September 2026 (owner, Group 2). A leaf. Picture made for it. */
+  "Old Balkan spotted hounds": {
+    name: "Old Balkan spotted hounds",
+    note: "Lean, patched hounds of the inland Balkans, said to lie behind the spotted dogs of Dalmatia. Now extinct.",
+    img: "/history/breeds/old-Balkan-spotted-hounds.jpg",
+    children: [
+
+    ]
+  },
+  /* ANCIENT SPOTTED HOUNDS, 24 September 2026 (owner, Group 2). Reaches 4 chums, the Dalmatian's 55% among them. */
+  "Ancient spotted Hounds": {
+    name: "Ancient spotted Hounds",
+    note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries.",
+    img: "/history/breeds/Ancient-spotted-hounds.jpg",
+    children: [
+      { name: "Old Balkan spotted hounds", note: "The patched hounds of the inland Balkans. Now extinct.", img: "/history/breeds/old-Balkan-spotted-hounds.jpg", value: 60 },
+      { name: "Ancient eastern sighthounds", note: "The lean eastern hound blood further back. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 40 }
+    ]
+  },
+
   /* THE KING'S WHITE HOUNDS, added 24 September 2026 (owner). The Chiens blancs
      du Roi, the white scent hounds of the French royal packs, said to be the hound
      the English Staghound most resembled. A LEAF, like the Chien-gris beside it:
@@ -3158,6 +3292,14 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old European water dogs": {
     name: "Old European water dogs",
     note: "The pan-European water dog: England's Great Water Dog, Germany's Pudelhund, France's Barbet. Most likely an old shaggy herding stock that took to the water, though where it first came from is still argued over. Now extinct.",
+    /* ITS PARENTS, 24 September 2026 (owner, Group 2). Its own note already says
+       it: an old shaggy herding stock that took to the water. That stock is the
+       main line. The Portuguese fishing dogs take a QUARTER, speculative, because
+       which way the water dogs travelled is itself disputed. Reaches 15 chums. */
+    children: [
+      { name: "Shaggy upland herders", note: "The old shaggy herding stock its note says took to the water. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 75 },
+      { name: "Portuguese fishing dogs", note: "The fishing crews' water dogs of the Atlantic coast. Now extinct.", img: "/history/breeds/Portuguese-fishing-dogs.jpg", value: 25 }
+    ]
   },
   "Fishermen's water dogs": {
     name: "Fishermen's water dogs",
@@ -3468,6 +3610,9 @@ const MAX_LINEAGE_DEPTH = 7;
 const LINEAGE_ALIASES: Record<string, string> = {
   "Jack Russell": "Jack Russell Terrier",
   "Mastiff": "English Mastiff",
+  // One dog, two names: the Doberman's spelling of the Miniature Schnauzer's farm
+  // stock takes its record (24 September 2026, owner, Group 2).
+  "Schnauzer-type farm dogs": "Schnauzer farm dogs",
   /* ONE DOG, FIVE NAMES (18 September 2026). "Old English Black and Tan Terrier"
      had its own root for a month and was a duplicate of Black and Tan Terrier:
      identical children, the same image, a note describing the same dog. The root
