@@ -917,8 +917,10 @@ const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
 // Extra space above the counter, in screen px, on top of the measured placement.
 const CHAIN_COUNT_DROP_PX = 10;
-// The gap between the chain counter's slot and the dogs-found counter under it.
+// The gap between the chain counter and the dogs-found counter beside it.
 const FOUND_COUNT_GAP_PX = 10;
+// How long the dogs-found counter stays up after a new dog is found.
+const FOUND_FLASH_MS = 5000;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
    (owner, 24 September 2026). It used to call the count off altogether. */
 const BOMB_ADDS_SECS = 10;
@@ -5203,6 +5205,11 @@ export default function BreedTree({
      the same reason. Written by paintChainCount below and by nothing else. */
   const chainCountRef = useRef<HTMLDivElement>(null);
   const foundCountRef = useRef<HTMLDivElement>(null);
+  /* THE DOGS-FOUND COUNTER ONLY FLASHES (owner, 24 September 2026): it shows for
+     FOUND_FLASH_MS when the run's figure goes UP, then goes. prevFoundRef starts
+     at the figure the pit mounted with, so opening a level never flashes it. */
+  const [foundFlash, setFoundFlash] = useState(false);
+  const prevFoundRef = useRef(dogsFound ?? 0);
   /* THE SWIPE WINS OVER THE COLLECT (owner,
      17 September 2026). A second press on an armed card collects it on the
      PRESS, before anyone can know whether a swipe follows. Under the chain flag,
@@ -5937,11 +5944,25 @@ export default function BreedTree({
     };
     cdTickRef.current = window.setTimeout(step, cdStepMs());
   };
+  // The flash itself: up on a rise, down FOUND_FLASH_MS later. A later find
+  // restarts the five seconds.
+  useEffect(() => {
+    const now = dogsFound ?? 0;
+    const was = prevFoundRef.current;
+    prevFoundRef.current = now;
+    // A fresh run takes the figure back down: never leave a flash stranded.
+    if (now <= was) { setFoundFlash(false); return; }
+    setFoundFlash(true);
+    const t = window.setTimeout(() => setFoundFlash(false), FOUND_FLASH_MS);
+    return () => window.clearTimeout(t);
+  }, [dogsFound]);
   /* PLACES AND COLOURS THE DOGS-FOUND COUNTER. Same fill as the chain counter,
-     royal blue to green as the run's total climbs. Placed by measuring the close
-     X, like the chain counter, one pill's height plus a gap lower, so the two
-     stack in one column. Re-measured on a resize, and once a frame later in case
-     the squares had not been laid out yet. */
+     royal blue to green as the run's total climbs.
+     ON THE CHAIN COUNTER'S ROW (owner, 24 September 2026), not under it: level
+     with it and to its LEFT when the chain counter is up, or in the chain
+     counter's own slot when it is not. Placed by measuring the close X, like the
+     chain counter. Re-measured on a resize, and a frame later in case the squares
+     had not been laid out yet. */
   useEffect(() => {
     const el = foundCountRef.current;
     if (!el || !dogsTotal) return;
@@ -5954,14 +5975,16 @@ export default function BreedTree({
       if (!r || r.width <= 0 || !el.offsetHeight) return;
       const h = el.offsetHeight;
       const gap = r.width * 0.25;
-      el.style.top = `${Math.max(0, r.top + r.height / 2 - h / 2) + CHAIN_COUNT_DROP_PX + h + FOUND_COUNT_GAP_PX}px`;
-      el.style.right = `${window.innerWidth - (r.left - r.width - gap) + gap}px`;
+      el.style.top = `${Math.max(0, r.top + r.height / 2 - h / 2) + CHAIN_COUNT_DROP_PX}px`;
+      const chain = chainCountRef.current;
+      const chainW = chain && chain.offsetWidth > 0 ? chain.offsetWidth + FOUND_COUNT_GAP_PX : 0;
+      el.style.right = `${window.innerWidth - (r.left - r.width - gap) + gap + chainW}px`;
     };
     place();
     const raf = requestAnimationFrame(place);
     window.addEventListener("resize", place);
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", place); };
-  }, [dogsFound, dogsTotal, started, learning]);
+  }, [dogsFound, dogsTotal, started, learning, foundFlash]);
   // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
   useEffect(() => () => clearCdTimers(), []);
@@ -16616,7 +16639,7 @@ export default function BreedTree({
         <div
           ref={foundCountRef}
           className={styles.chainCount}
-          style={{ display: started && !learning ? "block" : "none" }}
+          style={{ display: foundFlash && !learning ? "block" : "none" }}
           role="status"
           aria-label={`${dogsFound ?? 0} of ${dogsTotal} dogs found`}
         >
