@@ -2650,7 +2650,10 @@ const PIT_DRAWS_WORDS = true;
 /* A FURTHER TENTH OFF, 24 September 2026 (owner). 0.8 to 0.72, so a chip is now
    72% of the size it was before either cut. The scatter's own SCATTER_CHIP_K
    still applies on top, as before. */
-const CHIP_SIZE_K = 0.72;
+/* AND 15% SMALLER AGAIN, 24 September 2026 (owner: every token dropped into the
+   pit). 0.72 x 0.85 = 0.612. Bombs are chips and shrink with them; their blast
+   still reads BOMB_BLAST_R_PX and does not change. */
+const CHIP_SIZE_K = 0.612;
 const chipRadiusPx = (share: number, mobile: boolean) => liftNodeScreenR(share, mobile) * CHIP_SIZE_K;
 /* THE RADIUS A BOMB'S EXPLOSION IS BUILT FROM, fixed at the old chip size so a bigger
    bomb looks bigger but blasts exactly as it did (owner, 21 September 2026). */
