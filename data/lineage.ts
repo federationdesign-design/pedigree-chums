@@ -1707,10 +1707,13 @@ const LINEAGE: Record<string, LineageNode> = {
      after 1066. The sources believe both the Talbot and the Bloodhound came from
      it; it is written in as a parent of the Talbot and the Southern Hound.
 
-     A LEAF, deliberately. Its own parents are the St Hubert Hound and old
-     Normandy stock, both already in the trees it joins; giving it children would
-     have repeated them a layer lower in 21 chums. Its picture is the Artois
-     hounds painting, the old Normandy type. */
+     ITS OWN PARENTS, added the same day (owner: it did not come from nowhere).
+     Bred, the sources say, from the St Hubert Hound and the local hounds of
+     Normandy; the local stock is written as the Segusian hounds, the Gaulish
+     trail hounds of that part of France. 50/50, both plausible. The owner chose
+     this knowing the cost: the Norman Hound sits in about 300 places, so its
+     parents add close to 1,000 circles across 24 chums. Its picture is the
+     Artois hounds painting, the old Normandy type. */
   /* THE KING'S WHITE HOUNDS, added 24 September 2026 (owner). The Chiens blancs
      du Roi, the white scent hounds of the French royal packs, said to be the hound
      the English Staghound most resembled. A LEAF, like the Chien-gris beside it:
@@ -1724,9 +1727,12 @@ const LINEAGE: Record<string, LineageNode> = {
 
   "Norman Hound": {
     name: "Norman Hound",
-    note: "The big, slow, deep-voiced hunting hound of Normandy, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.",
+    note: "The big, slow, deep-voiced hunting hound of Normandy, bred from the St Hubert and the local hounds of the region, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.",
     img: "/history/breeds/artois-hounds.jpg",
-    children: []
+    children: [
+      { name: "St Hubert Hound", note: "The abbey scent hound of the Ardennes it was bred from.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 50 },
+      { name: "Segusian tracking Hounds", note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.", img: "/history/breeds/segusian-hounds.jpg", value: 50 }
+    ]
   },
 
   "Chien-gris": {
@@ -2566,7 +2572,7 @@ const LINEAGE: Record<string, LineageNode> = {
        under Old scenting Hounds halves with it, 10 and 10. Owner accepted the
        growth: it reaches 21 chums. */
     children: [
-      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
+      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, bred from the St Hubert and the local hounds of the region, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
       { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 30 },
       {
         name: "Old scenting Hounds",
@@ -2667,16 +2673,24 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The heavy trailing hound of the medieval hunt, deep-nosed and slow, before the breed took its modern shape. Now extinct.",
     img: "/history/breeds/Medieval-Bloodhound.jpg",
     children: [
-      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting Hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 },
+      /* THE NORMAN HOUND JOINS, 24 September 2026 (owner). The sources believe the
+         Bloodhound, like the Talbot, came from the Norman Hound. Half under the
+         split rule; the old 60/40 scaled into the other half, 30/20. */
+      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, bred from the St Hubert and the local hounds of the region, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
+      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 30 },
+      { name: "Old scenting Hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 },
     ],
   },
   "Bloodhound": {
     name: "Bloodhound",
     note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
     children: [
-      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting Hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
+      /* THE NORMAN HOUND JOINS, 24 September 2026 (owner). The sources believe the
+         Bloodhound, like the Talbot, came from the Norman Hound. Half under the
+         split rule; the old 60/40 scaled into the other half, 30/20. */
+      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, bred from the St Hubert and the local hounds of the region, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
+      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 30 },
+      { name: "Old scenting Hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 }
     ]
   },
 
@@ -2778,7 +2792,7 @@ const LINEAGE: Record<string, LineageNode> = {
       /* THE NORMAN HOUND JOINS, 24 September 2026 (owner). The sources give the
          Southern Hound as developed from the Talbot AND the Norman Hound. Half
          under the split rule; the old 60/40 scaled into the other half. */
-      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
+      { name: "Norman Hound", note: "The big, slow, deep-voiced hunting hound of Normandy, bred from the St Hubert and the local hounds of the region, said to have come to England with the Normans after 1066 and believed to stand behind the Talbot and the Bloodhound. Now extinct.", img: "/history/breeds/artois-hounds.jpg", value: 50 },
       { name: "Talbot", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-hound.jpg", value: 30 },
       { name: "St Hubert Hound", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 20 }
     ]
