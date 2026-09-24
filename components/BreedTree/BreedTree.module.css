@@ -2602,8 +2602,11 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-  text-shadow: 0 2px 0 rgba(10, 58, 87, 0.45), 0 0 12px rgba(10, 58, 87, 0.6);
+  /* NAVY, 24 September 2026 (owner: the white was hard to read over the pit).
+     The navy shadow the white text wore would smear navy text, so it becomes a
+     soft white halo instead, which lifts the navy off a busy pit behind the glass. */
+  color: var(--navy, #0a3a57);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.85), 0 0 2px rgba(255, 255, 255, 0.9);
   letter-spacing: 0;
   font-family: var(--font-body, Montserrat), system-ui, sans-serif;
   /* 2pt smaller, 24 September 2026 (owner). Was 14px. */
@@ -2619,11 +2622,15 @@
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: calc(20px - 2pt); /* 2pt smaller, 24 September 2026. Was 20px. */
   margin-bottom: 6px;
+  /* THE TITLE IN LEMON WITH A DROP SHADOW, 24 September 2026 (owner). The site's
+     own lemon, and the cookie panel title's navy drop, scaled to this size. */
+  color: var(--yellow-header, #ffed00);
+  text-shadow: 0 2px 0 rgba(10, 58, 87, 0.7), 0 0 10px rgba(10, 58, 87, 0.5);
 }
 .foundListClose {
   background: none;
   border: 0;
-  color: #ffffff;
+  color: var(--navy, #0a3a57);
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
