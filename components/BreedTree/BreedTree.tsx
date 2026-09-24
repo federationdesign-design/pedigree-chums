@@ -1252,11 +1252,6 @@ const DOG_SINGLE_INK = "#ffffff";
    circle changes as a consequence of a DIFFERENT circle being collected. An
    instant flip on a circle the player never touched reads as a glitch; 150ms
    reads as a response. It softens the paint, never the timing of the answer. */
-/* HOW MANY CIRCLES ONE BREED MAY HAVE IN A PIT, 23 September 2026 (owner).
-   Counted across the whole tree, not per level, and applied in the node pass
-   below. See the note there for why the cap is at draw time rather than in the
-   lineage data. */
-const MAX_COPIES_PER_BREED = 20;
 /* NO 100% TOKEN EVER REACHES THE PIT, 23 September 2026 (owner). The first pass
    put this test inside spawnBadge, which covers the learn-layer scatter and
    dogClose but NOT the two pop paths or the opening badge list: those three build
@@ -1434,6 +1429,12 @@ const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier
    THE ONE THING A FAILED CHAIN KEEPS. Every other part of a failure pays
    nothing, but these are banked as they are made, so a chain that dies has
    still paid for the connections the player actually made. Deliberate. */
+/* WHERE THE PIT-FULL COUNTDOWN STARTS, in seconds (owner, 24 September 2026:
+   from 10 to 100). One tick a second, so this is the number of seconds a player
+   has once the pit is declared full, on top of the grace before it may start at
+   all: see PIT_FULL_GRACE_MS. */
+const CD_FROM = 100;
+
 const CHAIN_JOIN_POINTS = 10;
 /* THE JOIN NUMBER IS OUTLINED, NOT RECOLOURED (owner, 18 September 2026).
 
@@ -1513,12 +1514,30 @@ const FX_NUM_CASING_K = 3;     // casing width, in the same units as the 15px ty
    Element cost: peak alive goes from about 176 to about 246. Against a blast's
    ~1,400 poof circles the combined worst case moves about 5%, so the bomb remains
    the term that would cost frames, not this. */
-const SPARK_MAX = 56;          // hard cap, reached exactly at the sixth connection
-const SPARK_BASE = 8;          // the first connection, and the completing one
-const SPARK_STEP = 8;          // more per link after it
+/* DOUBLED, 24 September 2026 (owner: it does not feel like enough). Every figure
+   that governs how much there is has been doubled; the ones that govern how the
+   burst GROWS per link are untouched, so a sixth connection is still bigger than
+   a first by the same proportion, just twice the size throughout.
+
+     was            now
+     1st   16       32 sparks
+     3rd   32       64
+     6th   56      112 at the cap
+
+   WHAT IT COSTS, in the terms the note above already uses: peak alive goes from
+   about 246 to about 490. That is still well under a bomb's blast, which is the
+   term that would cost frames, but it is the figure to look at first if a chain
+   on a busy level starts to stutter.
+
+   THE LIFE IS DOUBLED TOO, 340 to 680ms, which is what makes them read as more
+   intense rather than merely more numerous: twice as many streaks, each on screen
+   twice as long. */
+const SPARK_MAX = 112;         // hard cap, reached exactly at the sixth connection
+const SPARK_BASE = 16;         // the first connection, and the completing one
+const SPARK_STEP = 16;         // more per link after it
 const SPARK_GROW_K = 0.2;      // how much further a later link throws, per link
 const SPARK_WIDTH_K = 0.14;    // and how much thicker, per link. Free: no new elements
-const SPARK_LIFE_MS = 340;
+const SPARK_LIFE_MS = 680;
 /* THE LAST CONNECTION THROWS WHAT THE FIRST ONE DID (owner, 18 September 2026).
 
    THE CLASH. Sparks grow with the chain, so the connection that COMPLETES it was
@@ -3399,36 +3418,18 @@ export default function BreedTree({
        SOLO_CHILD_K. These two changes only make sense together, and shipping this
        one alone leaves 68 ancestors drawn as an 8px hairline round a circle that
        fills them, which is worse than deleting them. */
-    /* TWENTY COPIES OF A BREED, AND NO MORE, 23 September 2026 (owner: if more
-       than 20 instances of the same dog circle appear in the pit, the 21st does
-       not drop).
+    /* NO CAP ON COPIES, 24 September 2026 (owner: roll it back). A cap of twenty
+       per breed was added earlier the same day and is withdrawn: every copy the
+       lineage lists is drawn again, which on the worst levels is the difference
+       between 160 circles and 330.
 
-       CAPPED AT DRAW TIME, which is what was chosen over trimming the lineage
-       data. The data still says what it says, so the learn layer, the share
-       percentages and ancestorShareOf are all untouched; this only decides how
-       many circles the pack is asked to lay out. A dog that genuinely descends
-       from an ancestor forty times over still reads as forty in the numbers, and
-       draws as twenty.
-
-       THE WHOLE SUBTREE GOES WITH THE 21st, not the node alone: a circle cannot
-       be removed and its children left parentless, and the copies past twenty are
-       overwhelmingly leaves anyway.
-
-       ORDER IS THE TREE'S OWN. The walk is depth-first in the order the children
-       are already in, so the twenty that survive are the first twenty the lineage
-       lists, not a random pick, and the same twenty every time the pit is built. */
-    const seenCount = new Map<string, number>();
-    const collapse = (n: LineageNode): LineageNode | null => {
-      const name = n.name;
-      const n2 = (seenCount.get(name) ?? 0) + 1;
-      seenCount.set(name, n2);
-      if (n2 > MAX_COPIES_PER_BREED) return null;
-      return { ...n, children: (n.children ?? []).map(collapse).filter((c): c is LineageNode => c !== null) };
-    };
-    const collapsed: LineageNode = {
-      ...root,
-      children: (root.children ?? []).map(collapse).filter((c): c is LineageNode => c !== null),
-    };
+       WHAT IT LOOKED LIKE, so it is not re-argued from scratch: the cap was drawn
+       at draw time, left the lineage data untouched, and bit on about a dozen
+       levels, English Setter hardest. If crowding needs solving again, the other
+       two routes considered were trimming the lineage data itself and capping the
+       total circles per level rather than per breed. */
+    const collapse = (n: LineageNode): LineageNode => ({ ...n, children: (n.children ?? []).map(collapse) });
+    const collapsed: LineageNode = { ...root, children: (root.children ?? []).map(collapse) };
     const h = hierarchy<LineageNode>(collapsed)
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
@@ -5707,7 +5708,12 @@ export default function BreedTree({
         "text-shadow:0 4px 40px rgba(0,0,0,0.6);opacity:0.5;font-size:clamp(6rem,34vw,16rem);";
       st.appendChild(elMid);
     }
-    const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
+    /* 100 TO 0, 24 September 2026 (owner: raise the countdown from 10 seconds to
+       100). Built rather than typed out: a hundred literals would be a hundred
+       chances to fumble one, and the length is now a figure to change in one
+       place. Everything downstream reads steps.length, the tick is still one
+       second (four in slow motion), and the "0" still ends it. */
+    const steps = Array.from({ length: CD_FROM + 1 }, (_, n) => String(CD_FROM - n));
     let i = 0;
     el.textContent = steps[i];
     if (elMid) elMid.textContent = steps[i];
@@ -7106,8 +7112,24 @@ export default function BreedTree({
            IT IS NOT SPELLED "SOLO LEAF" ON PURPOSE. The population is identical
            today, but the question the mark should ask is "is there a picture
            here", and that stays true if the photograph rule is ever widened. */
-        const hasPhoto = (c?.getAttribute("fill") ?? "").startsWith("url(") && !c?.style.fill;
-        const showQ = fellRef.current && d.depth > 0 && paintable && !hasPhoto;
+        /* THE TIER FACE WINS OVER A PHOTOGRAPH IN THE PIT, 24 September 2026
+           (owner: it should show the cartoon). hasPhoto is still read, because the
+           photo fill is what a circle goes back to when the face comes down, but
+           it no longer blocks the face.
+
+           WHY IT USED TO. The rule was written for the QUESTION MARK, which said
+           "there is something to open here" and would have been nonsense over a
+           picture. The tier art says something different, what the dog IS, and the
+           owner wants it on every circle in the pit. Grand Bleu de Gascogne was
+           the case that showed it: one tree, extremely rare, and it drew as a
+           photograph while every dog around it wore its face.
+
+           THE LIFT AND THE CARDS ARE UNTOUCHED: this is the pit writer only, so a
+           lifted dog still shows its picture, and the photo fill is still on the
+           circle underneath: the face simply covers it, exactly as it covers the
+           navy disc on every other dog. The old test read the fill to find out
+           whether there was a picture; nothing needs to ask that now. */
+        const showQ = fellRef.current && d.depth > 0 && paintable;
         /* THE NAME COMES OFF A CIRCLE WEARING A FACE, 24 September 2026 (owner).
            The label was written to sit inside a flat disc; the tier art now fills
            that disc, so the two were being printed over each other.
