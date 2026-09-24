@@ -5206,6 +5206,24 @@ export default function BreedTree({
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   // Mirrored for the frame writer, which cannot read state safely. See onPitBusy.
   useEffect(() => { learnOpenRef.current = !!learnNode; }, [learnNode]);
+  /* THE PIT STANDS DOWN UNDER THE LIFTED LAYER (owner, 24 September 2026). While
+     a dog is lifted, every dog face left in the pit takes the same see-through as
+     a dog that cannot join a chain, FACE_STANDDOWN_OPACITY, and returns when the
+     lifted dog is completed or put back. Done with an attribute and a variable on
+     the circles group, read by globals.css, so it never touches the per-face
+     opacity the chain and the ancestors list write. A face the chain has already
+     dimmed keeps its own inline value, which is the same figure. */
+  useEffect(() => {
+    const cg = circlesRef.current;
+    if (!cg) return;
+    if (learnNode) {
+      cg.setAttribute("data-pc-lift-dim", "");
+      cg.style.setProperty("--pc-lift-dim", String(FACE_STANDDOWN_OPACITY));
+    } else {
+      cg.removeAttribute("data-pc-lift-dim");
+      cg.style.removeProperty("--pc-lift-dim");
+    }
+  }, [learnNode]);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number; ringPx: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean; name?: string }) => void) | null>(null);

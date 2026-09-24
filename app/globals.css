@@ -414,3 +414,11 @@ body.boxer-wrong-transfer::before {
 ) {
   color: var(--navy, #0a3a57);
 }
+
+/* THE MINI PIT'S DOGS GO SEE-THROUGH UNDER THE LIFTED LAYER, 24 September 2026
+   (owner). BreedTree sets data-pc-lift-dim and --pc-lift-dim (its
+   FACE_STANDDOWN_OPACITY) on the circles group while a dog is lifted. Global
+   because a CSS module needs a class of its own and this is keyed on attributes. */
+g[data-pc-lift-dim] g[data-qmark] > image {
+  opacity: var(--pc-lift-dim, 1);
+}
