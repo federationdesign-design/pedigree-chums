@@ -4,6 +4,10 @@ import { chumCircleCount } from "../../data/playIntros";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { resolveLineageName } from "../../data/lineageNames";
 import { isEchoName } from "../../data/lineageShape";
+import { treesContaining } from "../../data/lineageArchive";
+import { ukBreeds } from "../../data/uk-breeds";
+import { statusFor, STATUS_LABEL, type BreedStatus } from "../../data/breedStatus";
+import ScrollRail from "../PlayChumsRail/ScrollRail";
 import styles from "./PlayLadder.module.css";
 
 /* THE PLAY LADDERS (owner, 24 September 2026): every chum's game, ranked from
@@ -42,14 +46,55 @@ function dogCount(name: string): number {
   return names.size;
 }
 
-type Row = { slug: string; name: string; image: string; circles: number; dogs: number };
+/* THE ERA PILL, THE STATUS COLOUR AND THE RARITY DOT (owner, 24 September 2026).
 
-function Ladder({ title, colour, sub, rows }: { title: string; colour: string; sub: string; rows: Row[] }) {
+   ERA: the dog's own era from the timelines where it has one; the four pack
+   names that differ from the timeline's are mapped the same way breedStatus.ts
+   maps them. The imports have no timeline row, so theirs is read from the
+   decade they were established. No figure, no pill.
+
+   STATUS COLOUR fills the pill: the colours the Know Your Chums page gives
+   the same five statuses, so a chum reads the same on both pages.
+
+   RARITY DOT: the rarity the game gives a dog, from how many family trees it
+   appears in. The thresholds and colours are the game's own (rarityTier in
+   BreedTree.tsx, RARITY_BAND in LineageMap.tsx), copied because those files are
+   client code this server list cannot borrow from. Change them together. */
+const UK_ALIAS: Record<string, string> = {
+  Corgi: "Pembroke Welsh Corgi",
+  "Springer Spaniel": "English Springer Spaniel",
+  Labrador: "Labrador Retriever",
+  "West Highland Terrier": "West Highland White Terrier",
+};
+function eraOf(name: string, established: string): string | null {
+  const row = ukBreeds.find((u) => u.name === (UK_ALIAS[name] ?? name)) ?? ukBreeds.find((u) => u.name === name);
+  if (row?.era) return row.era;
+  const m = established.match(/(\d{4})/);
+  return m ? `${Math.floor(Number(m[1]) / 10) * 10}s` : null;
+}
+const STATUS_COLOUR: Record<BreedStatus, { bg: string; fg: string }> = {
+  trending: { bg: "#22c55e", fg: "#ffffff" },
+  popular: { bg: "#2e9e5b", fg: "#ffffff" },
+  "in-decline": { bg: "#ffed00", fg: "#0a3a57" },
+  endangered: { bg: "#e08a1e", fg: "#ffffff" },
+  rare: { bg: "#f0a437", fg: "#ffffff" },
+};
+const RARITY: { min: number; colour: string; label: string }[] = [
+  { min: 60, colour: "#f47421", label: "Very common" },
+  { min: 20, colour: "#ffd23e", label: "Common" },
+  { min: 10, colour: "#5dbf86", label: "Uncommon" },
+  { min: 4, colour: "#2547c4", label: "Rare" },
+  { min: 0, colour: "#4d2e91", label: "Extremely rare" },
+];
+const rarityOf = (name: string) => RARITY.find((r) => treesContaining(name) >= r.min) ?? RARITY[RARITY.length - 1];
+
+type Row = { slug: string; name: string; image: string; circles: number; dogs: number; era: string | null; status: BreedStatus | undefined; rarity: { colour: string; label: string } };
+
+function Ladder({ title, colour, rows }: { title: string; colour: string; rows: Row[] }) {
   return (
     <section className={styles.ladder} aria-label={`${title} levels`}>
       <header className={styles.head}>
         <h2 className={styles.title} style={{ color: colour }}>{title}</h2>
-        <p className={styles.sub}>{sub}</p>
       </header>
       <ol className={styles.list}>
         {rows.map((r, i) => (
@@ -58,7 +103,15 @@ function Ladder({ title, colour, sub, rows }: { title: string; colour: string; s
               <span className={styles.rank}>{i + 1}</span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className={styles.thumb} src={encodeURI(r.image)} alt="" loading="lazy" width={48} height={48} />
-              <span className={styles.name}>{r.name}</span>
+              <span className={styles.nameBlock}>
+                <span className={styles.name}>{r.name}</span>
+                <span className={styles.meta}>
+                  <span className={styles.dot} style={{ background: r.rarity.colour }} title={r.rarity.label} aria-label={r.rarity.label} />
+                  {r.era ? (
+                    <span className={styles.pill} style={r.status ? { background: STATUS_COLOUR[r.status].bg, color: STATUS_COLOUR[r.status].fg } : undefined} title={r.status ? STATUS_LABEL[r.status] : undefined}>{r.era}</span>
+                  ) : null}
+                </span>
+              </span>
               <span className={styles.stat}><span className={styles.num}>{r.dogs}</span><span className={styles.unit}>dogs</span></span>
               <span className={styles.stat}><span className={styles.num}>{r.circles}</span><span className={styles.unit}>circles</span></span>
             </Link>
@@ -72,7 +125,7 @@ function Ladder({ title, colour, sub, rows }: { title: string; colour: string; s
 export default function PlayLadder() {
   const rows: Row[] = breeds
     .filter((b) => !!b.slug)
-    .map((b) => ({ slug: b.slug, name: b.name, image: b.image, circles: chumCircleCount(b.name), dogs: dogCount(b.name) }))
+    .map((b) => ({ slug: b.slug, name: b.name, image: b.image, circles: chumCircleCount(b.name), dogs: dogCount(b.name), era: eraOf(b.name, b.established), status: statusFor(b.name), rarity: rarityOf(b.name) }))
     .sort((a, b) => b.circles - a.circles || a.name.localeCompare(b.name));
   // Dealt out hardest first; the first (rows % 7) columns take one extra.
   const base = Math.floor(rows.length / LEVELS.length);
@@ -82,12 +135,15 @@ export default function PlayLadder() {
     return { ...lv, rows: rows.slice(start, start + base + (i < extra ? 1 : 0)) };
   });
   return (
-    <div className={styles.wrap}>
-      {groups.map((g) => {
-        const hi = g.rows[0]?.circles ?? 0;
-        const lo = g.rows[g.rows.length - 1]?.circles ?? 0;
-        return <Ladder key={g.title} title={g.title} colour={g.colour} sub={hi === lo ? `${hi} circles` : `${lo} to ${hi} circles`} rows={g.rows} />;
-      })}
+    /* A HORIZONTAL SCROLL ON A PHONE, one ladder at a time, with the video
+       slider's own scrollbar (owner, 24 September 2026); side by side on desktop,
+       where the scrollbar hides itself because nothing overflows. */
+    <div className={styles.outer}>
+      <ScrollRail className={styles.wrap}>
+        {groups.map((g) => (
+          <Ladder key={g.title} title={g.title} colour={g.colour} rows={g.rows} />
+        ))}
+      </ScrollRail>
     </div>
   );
 }
