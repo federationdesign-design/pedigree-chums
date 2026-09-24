@@ -3,14 +3,6 @@
 .wrap {
   padding: 24px clamp(18px, 4vw, 48px) 8px;
 }
-.heading {
-  margin: 0 0 14px;
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.6rem, 5vw, 2.4rem);
-  color: #ffffff;
-  line-height: 1.05;
-}
-.headingYellow { color: var(--yellow, #ffd23e); }
 .rail {
   display: flex;
   gap: 14px;

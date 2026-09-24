@@ -20,10 +20,9 @@ export default function PlayChumsRail() {
     .map((b) => ({ b, circles: chumCircleCount(b.name) }))
     .sort((x, y) => x.circles - y.circles);
   return (
-    <section className={styles.wrap} aria-labelledby="play-chums-heading">
-      <h2 id="play-chums-heading" className={styles.heading}>
-        Play a <span className={styles.headingYellow}>chum</span>
-      </h2>
+    /* NO VISIBLE TITLE (owner, 24 September 2026: the "Play a chum" heading is
+       removed). A screen reader still hears what the row is, from the label. */
+    <section className={styles.wrap} aria-label="Play a chum">
       <div className={styles.rail}>
         {chums.map(({ b }) => (
           <Link key={b.slug} href={`/play/${b.slug}`} className={styles.card} aria-label={`Play the ${b.name}`}>
