@@ -13111,6 +13111,8 @@ export default function BreedTree({
            under their finger. The numerator climbs, the total does not move. */
         chainTotalRef.current = n ? liveBreed(n.data.name).length : 0;
         paintChainCount();
+        // Tokens cannot join a dog chain, so they stand down like the other dogs.
+        if (badgesRef.current) badgesRef.current.style.opacity = String(FACE_STANDDOWN_OPACITY);
       },
       joined: (i) => {
         const n = dogNode(i);
@@ -13124,6 +13126,7 @@ export default function BreedTree({
         dogChainNodesRef.current = new Set();
         chainTotalRef.current = 0;
         paintChainCount();
+        if (badgesRef.current) badgesRef.current.style.opacity = "";
       },
       needsHit: true,
     };
@@ -14832,7 +14835,16 @@ export default function BreedTree({
               and to the left), then snapped it to the rim. They now fade in with
               the labels, already at their resting spot on the lower-right rim,
               which is exactly where the physics bodies spawn. */}
-          <g ref={badgesRef} style={{ display: dockAside && !learning && !displayOnly ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
+          <g style={{ display: dockAside && !learning && !displayOnly ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
+            {/* THE STAND-DOWN DIM FOR TOKENS (owner, 24 September 2026). While a
+                dog chain is live, every token drops to FACE_STANDDOWN_OPACITY,
+                the same 45% a dog that cannot join is faded to. Set on this inner
+                group by the chain itself, never by React, so it cannot fight the
+                outer group's own fade-in opacity.
+                badgesRef MOVED HERE from the outer group, deliberately: three
+                readers reach a token as badgesRef.children[i], and these are the
+                tokens themselves, so the index still lands on the right one. */}
+            <g ref={badgesRef}>
             {badgePcts.map((item, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];
@@ -14973,6 +14985,7 @@ export default function BreedTree({
               </g>
               );
             })}
+            </g>
           </g>
 
           {/* The elements knocked off the logo. Debris, so pointer events are
