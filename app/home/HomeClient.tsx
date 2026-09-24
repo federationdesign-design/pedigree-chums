@@ -49,7 +49,9 @@ function ProductBlock({
   );
 }
 
-export default function HomeClient() {
+/* playRail is the homepage chum play slider, built on the server and handed in
+   here so the lineage data it sorts by is never shipped to the browser. */
+export default function HomeClient({ playRail }: { playRail?: ReactNode }) {
   return (
     <>
       {/* Hero image */}
@@ -68,6 +70,10 @@ export default function HomeClient() {
         <VideoGrid />
         <AnubisFeature />
       </div>
+
+      {/* The chum play slider, straight after the Anubis tile (owner, 24 September
+          2026: below the Good Dog Bad Dog feature). */}
+      {playRail}
 
       {/* Article text toggle: switches the white content below the hero to navy.
           Anchored above the H1 that follows the video grid (Steve, 17 Aug 2026).

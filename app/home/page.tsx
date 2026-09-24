@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import HomeClient from "./HomeClient";
+import PlayChumsRail from "../../components/PlayChumsRail/PlayChumsRail";
 import VideoSection from "./VideoSection";
 import FAQ from "../../components/FAQ/FAQ";
 import HowItPlays from "../../components/HowItPlays/HowItPlays";
@@ -25,7 +26,7 @@ export default function HomePage() {
   return (
     <main className={styles.page}>
       <Nav />
-      <HomeClient />
+      <HomeClient playRail={<PlayChumsRail />} />
 
       {/* FAQ sits directly below the product area */}
       <div className={styles.divider} />
