@@ -67,11 +67,11 @@
      24 September 2026). */
   transform: translateY(2px);
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.6rem;
+  font-size: 1.44rem; /* 10% smaller (owner, 25 September 2026) */
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border-radius: 0 0 10px 10px;
-  padding: 15px 10px; /* half as deep again (owner) */
+  padding: 10px 10px; /* the band 20% shallower with the smaller type (owner, 25 September 2026) */
   text-align: center;
   white-space: nowrap;
 }
@@ -83,7 +83,7 @@
   font-size: min(clamp(5.4rem, 7.2vw, 7.2rem), calc(80cqi / (var(--chars, 6) * 0.66)));
   white-space: nowrap;
   line-height: 1;
-  margin: 10px 0 0; /* 10px more air between the card and the title (owner) */
+  margin: 20px 0 0; /* more air between the card and the title (owner; 10px, then 20px on 25 September 2026) */
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-shadow: 0 2px 0 rgba(10, 58, 87, 0.5);

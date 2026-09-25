@@ -125,8 +125,8 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
       <div className={styles.colHead} aria-hidden="true">
         <span />
         <span>Chum history</span>
-        <span>Ancestors</span>
-        <span>Instances</span>
+        <span>Anc</span>
+        <span>Ins</span>
       </div>
       <ol className={styles.list}>
         {rows.map((r, i) => (
@@ -134,13 +134,8 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
             <Link href={`/play/${r.slug}`} className={styles.row} aria-label={`Play the ${r.name}: ${r.dogs} ancestors, ${r.circles} instances`}>
               <span className={styles.rank}>{i + 1}</span>
               <span className={styles.chum}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className={styles.thumb} src={encodeURI(r.image)} alt="" loading="lazy" width={36} height={36} />
                 <span className={styles.nameLine}>
                   <span className={styles.name}>{r.name}</span>
-                  {r.era ? (
-                    <span className={styles.pill} style={r.status ? { background: STATUS_COLOUR[r.status].bg, color: STATUS_COLOUR[r.status].fg } : undefined} title={r.status ? STATUS_LABEL[r.status] : undefined}>{r.era}</span>
-                  ) : null}
                   <span className={styles.dot} style={{ background: r.rarity.colour }} title={r.rarity.label} aria-label={r.rarity.label} />
                 </span>
               </span>
@@ -162,7 +157,9 @@ export default function PlayLadder() {
   // Dealt out hardest first; the first (rows % 7) columns take one extra.
   const dealt = LEVELS.map((lv, i) => ({ ...lv, rows: rows.slice(i * PER_TABLE, (i + 1) * PER_TABLE) })).filter((g) => g.rows.length > 0);
   // Shown with Impossible (the first dealt) moved to the end.
-  const groups = [...dealt.slice(1), ...dealt.slice(0, 1)];
+  // Easiest first, 25 September 2026 (owner): Easy, Medium, Hard, Very hard,
+  // then Impossible alone at the end.
+  const groups = [...dealt.slice(1).reverse(), ...dealt.slice(0, 1)];
   return (
     /* A HORIZONTAL SCROLL ON A PHONE, one ladder at a time, with the video
        slider's own scrollbar (owner, 24 September 2026); side by side on desktop,
