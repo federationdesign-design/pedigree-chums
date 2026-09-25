@@ -78,16 +78,23 @@ export async function vimeoSeconds(id: string): Promise<number | null> {
    PER_TABLE and the LEVELS list in PlayLadder. */
 export const LADDER_PER_TABLE = 11;
 export const LADDER_TABLES = 5;
-let simpleChums: Set<string> | null = null;
-export function isSimpleChum(name: string | undefined): boolean {
-  if (!name) return false;
-  if (!simpleChums) {
+/* WHICH /play TABLE A CHUM IS IN, 25 September 2026: 0 Impossible, 1 Extreme,
+   2 Hard, 3 Medium, 4 Simple (the order they are dealt, hardest first). null for
+   anything that is not a chum level, an era level for instance. */
+export const LADDER_IMPOSSIBLE = 0, LADDER_EXTREME = 1, LADDER_HARD = 2, LADDER_MEDIUM = 3, LADDER_SIMPLE = 4;
+let ladderTable: Map<string, number> | null = null;
+export function ladderTableOf(name: string | undefined): number | null {
+  if (!name) return null;
+  if (!ladderTable) {
     const ranked = breeds
       .filter((b) => !!b.slug)
       .map((b) => ({ name: b.name, circles: chumCircleCount(b.name) }))
       .sort((a, b) => b.circles - a.circles || a.name.localeCompare(b.name));
-    simpleChums = new Set(ranked.slice((LADDER_TABLES - 1) * LADDER_PER_TABLE).map((r) => r.name));
+    ladderTable = new Map(ranked.map((r, i) => [r.name, Math.min(LADDER_TABLES - 1, Math.floor(i / LADDER_PER_TABLE))]));
   }
-  return simpleChums.has(name);
+  return ladderTable.get(name) ?? null;
+}
+export function isSimpleChum(name: string | undefined): boolean {
+  return ladderTableOf(name) === LADDER_SIMPLE;
 }
 

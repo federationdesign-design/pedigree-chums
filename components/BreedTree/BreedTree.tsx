@@ -30,7 +30,7 @@ import mapStyles from "../PackPit/LineageMap.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
 import { propsFor, toysForCircles, type LevelTheme } from "../../data/levelThemes";
-import { isSimpleChum } from "../../data/playIntros";
+import { isSimpleChum, ladderTableOf, LADDER_EXTREME, LADDER_SIMPLE } from "../../data/playIntros";
 import { breeds as packBreeds } from "../../data/breeds";
 import { packArt } from "../../data/packArt";
 import BritainMessage from "../PackPit/BritainMessage";
@@ -2400,13 +2400,21 @@ const PIT_FULL_GRACE_PER_CIRCLE_MS = 2500;
    Cockapoo, the smallest dog in the Impossible table today (Border Terrier, the
    next one down, is 444). */
 const NO_GRACE_FROM_CIRCLES = 475;
-function pitFullGraceMs(ns: Node[]): number {
+/* HALF THE GRACE ON TWO TABLES, 25 September 2026 (owner): Extreme and Simple
+   levels get 50% of the usual grace. The table is the /play page's own, read
+   through ladderTableOf, so the pit and the page cannot disagree. Era levels are
+   in no table and keep the full grace. */
+const GRACE_HALF_TABLES = [LADDER_EXTREME, LADDER_SIMPLE];
+const GRACE_HALF = 0.5;
+function pitFullGraceMs(ns: Node[], levelName?: string): number {
   let all = 0;
   for (const d of ns) if (d.depth > 0 && !isHiddenCopy(d)) all++;
   if (all >= NO_GRACE_FROM_CIRCLES) return 0;
   let n = 0;
   for (const d of ns) if (d.depth > 0 && d.depth <= 2 && !isHiddenCopy(d)) n++;
-  return PIT_FULL_GRACE_MS + Math.max(0, n - PIT_FULL_GRACE_FREE) * PIT_FULL_GRACE_PER_CIRCLE_MS;
+  const full = PIT_FULL_GRACE_MS + Math.max(0, n - PIT_FULL_GRACE_FREE) * PIT_FULL_GRACE_PER_CIRCLE_MS;
+  const table = ladderTableOf(levelName);
+  return table !== null && GRACE_HALF_TABLES.includes(table) ? full * GRACE_HALF : full;
 }
 /* THE ONE YELLOW EVERY LIVE PERCENTAGE CHIP WEARS (owner, 18 September 2026,
    seen on Kerry Blue Terrier: two different yellows side by side in one pit).
@@ -10148,7 +10156,7 @@ export default function BreedTree({
         // THE DROP HAS ARRIVED, so the countdown's grace runs from here rather
         // than from the round starting: see PIT_FULL_GRACE_MS. Behind the same
         // first-landing guard as the toys, so it is set once per level.
-        cdGraceRef.current = performance.now() + pitFullGraceMs(nodes);
+        cdGraceRef.current = performance.now() + pitFullGraceMs(nodes, levelName);
         /* WHICH TOYS THIS LEVEL GETS, 19 September 2026 (owner). Every toy now
            comes from the band table in data/levelThemes.ts, keyed on how many
            circles the level's tree draws. Before this, five of the eight were
@@ -11577,7 +11585,7 @@ export default function BreedTree({
       // fairer start; this seeds it so a level whose drop never reaches the floor
       // is still covered. Set here rather than in a mount effect so it resets with
       // the level, on a retry as on a new one: this effect re-runs for each.
-      cdGraceRef.current = fullClock + pitFullGraceMs(nodes);
+      cdGraceRef.current = fullClock + pitFullGraceMs(nodes, levelName);
       pitEndedRef.current = false; // fresh sim, the poll is live again
       let stillFrames = 0;
       const SETTLE_PS = vps(0.012);
