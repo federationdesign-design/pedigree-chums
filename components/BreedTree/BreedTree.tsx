@@ -2561,6 +2561,12 @@ const POP_GROW = 1.5;
    hold counts from the BOTTOM of the tree (its deepest layers), not from a fixed
    depth, so every big level keeps its top layers' opening cascade. */
 const HEAVY_LEVEL_CIRCLES = 200;
+/* NO SCORE NUMBERS IN A CROWDED PIT, 25 September 2026 (owner). While the pit
+   holds more than this many objects, the white collision numbers are not drawn;
+   the score still counts every hit, and the numbers return as soon as the pit
+   drops back under it. Read off the physics world's own list, so it costs
+   nothing to check. */
+const NUMBERS_OFF_ABOVE_BODIES = 500;
 const QUIET_NUMBERS_MS = 10000;
 const HOLD_LAST_LAYERS = 3; // was 5 (owner, 25 September 2026)
 /* ONE MORE LAYER FROM THE CAVACHON UP (owner, 25 September 2026: the Poodle is
@@ -10483,6 +10489,7 @@ export default function BreedTree({
         // A big level's opening: the score counts, the number is not drawn.
         // See QUIET_NUMBERS_MS.
         if (heavyLevel && performance.now() - dropT0 < QUIET_NUMBERS_MS) { onScore?.(val); return; }
+        if (world.bodies.length > NUMBERS_OFF_ABOVE_BODIES) { onScore?.(val); return; }
         const fx = fxRef.current;
         if (!fx) return;
         const el = document.createElementNS("http://www.w3.org/2000/svg", "text");
