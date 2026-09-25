@@ -974,6 +974,9 @@ const FOUND_LIST_EDGE_PX = 10;
 /* WHAT A BOMB ADDS TO A RUNNING COUNTDOWN, in seconds, per blast, with no cap
    (owner, 24 September 2026). It used to call the count off altogether. */
 const BOMB_ADDS_SECS = 10;
+/* HALF ON THE EXTREME LEVELS, 25 September 2026 (owner): a bomb adds 5 seconds
+   there, not 10. The table is the /play page's own, via ladderTableOf. */
+const BOMB_ADDS_SECS_EXTREME = 5;
 /* VERY COMMON COMES IN THREE SHADES OF YELLOW (owner, 24 September 2026: "if we
    do have more than one instance of the very common rarity within the pit, it
    takes a different colour shade"). Every very-common file has a B and a C twin,
@@ -11257,7 +11260,7 @@ export default function BreedTree({
              countdown off. It adds BOMB_ADDS_SECS to a running count instead,
              uncapped, once per blast, so a chain of bombs adds once for each. The
              note above is kept for the history of the old rule. */
-          if (fullTriggeredRef.current) cdAddRef.current?.(BOMB_ADDS_SECS);
+          if (fullTriggeredRef.current) cdAddRef.current?.(ladderTableOf(levelName) === LADDER_EXTREME ? BOMB_ADDS_SECS_EXTREME : BOMB_ADDS_SECS);
           // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
           // once, near takes two hits, far takes one and only if already lit.
           const SHOVE_R = bsz * 5.5;
