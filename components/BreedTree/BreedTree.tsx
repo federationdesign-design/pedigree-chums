@@ -2732,7 +2732,7 @@ const HOLD_MS_BANDS: { from: number; under: number; ms: number; stageMs?: number
      come out of a parent that is already out, so it joins the second's wave. */
   { from: 630, under: 800, ms: 700, stageMs: 500, stageTimes: [700, 1600, 1400, 2000, 2700, 3000, 3500] },
   // New times for 800 and up, 25 September 2026 (owner).
-  { from: 800, under: 1200, ms: 500, stageMs: 500, stageTimes: [500, 1600, 2500, 3200, 3700, 4500, 5500, 6000] },
+  { from: 800, under: 1200, ms: 500, stageMs: 500, stageTimes: [500, 1200, 2200, 3000, 3600, 4400, 5300, 6000] }, // retimed 25 Sept 2026 (owner)
   { from: 1200, under: Infinity, ms: 500, stageMs: 500, stageTimes: [500, 1800, 2800, 3700, 4500, 4900, 5800, 6300] },
 ];
 const holdBandFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under);
