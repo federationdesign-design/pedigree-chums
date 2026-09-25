@@ -2821,3 +2821,36 @@
   @keyframes factFade { 0% { opacity: 0; } 5%, 92% { opacity: 1; } 100% { opacity: 0; } }
 }
 
+/* THE FACT CARD'S TIME BAR AND SKIP, 25 September 2026 (owner). The bar empties
+   over the fact's own duration (inline animation-duration); the skip button is the
+   only part of the card that takes taps. */
+.factFoot { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.factBar { flex: 1 1 auto; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
+.factBarFill {
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: #ffed00;
+  transform-origin: left center;
+  animation: factBarDrain linear forwards;
+}
+@keyframes factBarDrain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.factSkip {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: rgba(10, 58, 87, 0.55);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  text-shadow: none;
+}
+.factSkip:hover, .factSkip:focus-visible { background: rgba(10, 58, 87, 0.8); }
+@media (prefers-reduced-motion: reduce) { .factBarFill { animation-timing-function: linear; } }
+

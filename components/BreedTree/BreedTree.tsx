@@ -975,10 +975,11 @@ const BOMB_STRING_GAP_MS = 300;
    its short lineage note if it has one, else the first sentence of its write-up
    (breedInfo). Long facts stay on screen longer: FACT_BASE_MS plus
    FACT_MS_PER_CHAR, within FACT_MIN_MS and FACT_MAX_MS. */
-const FACT_BASE_MS = 2200;
-const FACT_MS_PER_CHAR = 45;
-const FACT_MIN_MS = 4000;
-const FACT_MAX_MS = 9000;
+// Twice as long on screen, 25 September 2026 (owner): was 2200 + 45 a character, 4 to 9s.
+const FACT_BASE_MS = 4400;
+const FACT_MS_PER_CHAR = 90;
+const FACT_MIN_MS = 8000;
+const FACT_MAX_MS = 18000;
 const FACT_WORD_MS = 60; // each word arrives this long after the one before
 const firstSentence = (t: string): string => {
   const m = t.match(/^[\s\S]*?[.!?](?=\s|$)/);
@@ -5723,10 +5724,33 @@ export default function BreedTree({
       body.appendChild(document.createTextNode(" "));
     });
     el.appendChild(body);
+    /* THE TIME LEFT AND A SKIP, 25 September 2026 (owner). A bar along the foot
+       empties over exactly the time the fact is on screen, and a skip button
+       beside it takes the fact away at once. The button is the card's only
+       tappable part, so the card still never blocks the pit. */
+    const foot = document.createElement("div");
+    foot.className = styles.factFoot;
+    const track = document.createElement("div");
+    track.className = styles.factBar;
+    const fill = document.createElement("div");
+    fill.className = styles.factBarFill;
+    fill.style.animationDuration = `${ms}ms`;
+    track.appendChild(fill);
+    foot.appendChild(track);
+    const skip = document.createElement("button");
+    skip.type = "button";
+    skip.className = styles.factSkip;
+    skip.setAttribute("aria-label", "Skip this fact");
+    skip.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 5l9 7-9 7z" fill="currentColor"/><rect x="16" y="5" width="3" height="14" rx="1" fill="currentColor"/></svg>';
+    foot.appendChild(skip);
+    el.appendChild(foot);
     el.style.animationDuration = `${ms}ms`;
     host.appendChild(el);
     factElRef.current = el;
-    window.setTimeout(() => { el.remove(); if (factElRef.current === el) factElRef.current = null; }, ms + 50);
+    const done = () => { el.remove(); if (factElRef.current === el) factElRef.current = null; };
+    const timer = window.setTimeout(done, ms + 50);
+    skip.addEventListener("pointerdown", (e) => e.stopPropagation());
+    skip.addEventListener("click", (e) => { e.stopPropagation(); window.clearTimeout(timer); done(); });
   };
   // Whether a dog may be drawn as its name here: the rarity rule, unless this
   // level is one of NO_WORD_LEVELS.
