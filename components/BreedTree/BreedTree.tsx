@@ -984,6 +984,12 @@ const VERY_COMMON_SHADES = ["", "B", "C"] as const;
    The files are public/faces/uncommon/{expression}_{accessory}.webp, made by
    scripts/green-faces.mjs from the owner's cut-outs. */
 const GREEN_ACC = ["plain", "glasses", "eyepatch", "bandana", "moustache_bowtie", "headband", "monocle", "blue_neckerchief", "red_collar", "green_collar", "flower", "earring_plaster"] as const;
+// A fresh random order of the accessories (a Fisher-Yates shuffle).
+const shuffledGreenAcc = (): string[] => {
+  const o: string[] = [...GREEN_ACC];
+  for (let i = o.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [o[i], o[j]] = [o[j], o[i]]; }
+  return o;
+};
 // Which of the owner's seven expression sheets each game face is.
 const GREEN_EXPR: Record<string, number> = {
   "/uncommon.webp": 1, "/uncommon2.webp": 2, "/uncommon4.webp": 3, "/uncommon7.webp": 4,
@@ -6257,15 +6263,23 @@ export default function BreedTree({
   };
   // Called only from the face writer, never during render.
   // The green breeds' accessories, reset with the level exactly as the shades are.
-  const greenAccRef = useRef<{ nodes: Node[] | null; of: Map<string, string> }>({ nodes: null, of: new Map() });
+  const greenAccRef = useRef<{ nodes: Node[] | null; of: Map<string, string>; order: string[] }>({ nodes: null, of: new Map(), order: [] });
   const shadeFace = (d: Node, src: string): string => {
     const expr = GREEN_EXPR[src];
     if (expr) {
       const st = greenAccRef.current;
-      if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); }
+      /* SHUFFLED EVERY ROUND, 25 September 2026 (owner: so a player does not
+         always see the same dog in the bandana). A fresh random order each time
+         the level's tree is built, which is every level start and every refresh;
+         within the round twins still match and different breeds still differ. */
+      if (st.nodes !== nodesRef.current) {
+        st.nodes = nodesRef.current;
+        st.of = new Map();
+        st.order = shuffledGreenAcc();
+      }
       const breed = d.data.name;
       let acc = st.of.get(breed);
-      if (acc === undefined) { acc = GREEN_ACC[st.of.size % GREEN_ACC.length]; st.of.set(breed, acc); }
+      if (acc === undefined) { acc = st.order[st.of.size % st.order.length]; st.of.set(breed, acc); }
       return `/faces/uncommon/${expr}_${acc}.webp`;
     }
     if (!src.startsWith("/very-common")) return src;
