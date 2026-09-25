@@ -5723,7 +5723,9 @@ export default function BreedTree({
     const lvl = factNodesRef.current;
     if (fd.nodes !== lvl) { fd.nodes = lvl; fd.deck = []; }
     if (!fd.deck.length) {
-      const notes = lvl.map((n) => (n.data.note ?? "").trim()).filter((t) => t.length > 20);
+      /* The level's own notes, but not the bare "Now extinct." ones: those are in
+         the pool already, rewritten to stand on their own (EXTINCT_REWRITES). */
+      const notes = lvl.map((n) => (n.data.note ?? "").trim()).filter((t) => t.length > 20 && !/now extinct\.?$/i.test(t));
       fd.deck = shuffledFacts([...allDogFacts(), ...notes]);
     }
     const fact = fd.deck.pop();
