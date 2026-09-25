@@ -35,7 +35,10 @@
   background: transparent;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  /* See-through, 25 September 2026 (owner): the fading ring below (.ladder::after)
+     is now the only outline, so the top is fully clear. Kept at 2px so the ring's
+     inset still lines up. Was rgba(255, 255, 255, 0.4) all round. */
+  border: 2px solid transparent;
   border-radius: 26px;
   box-shadow: 0 12px 32px rgba(10, 58, 87, 0.32);
   padding: 16px 14px 12px;
