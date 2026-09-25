@@ -2236,8 +2236,14 @@ type RarityTier = "extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon
    only thing that would genuinely put more rare dogs in front of a player is
    changing what the pit drops, which is a different job. */
 function rarityTier(count: number): RarityTier {
-  if (count >= 60) return "veryCommon";   // 60+   VERY COMMON     (orange since 24 Sept 2026)
-  if (count >= 20) return "common";       // 20-59 COMMON          (yellow since 24 Sept 2026)
+  /* VERY COMMON FROM 79, 25 September 2026 (owner: far more orange than yellow).
+     It was 60. The very common types bunch between 60 and 79 trees, so moving the
+     line to 79 takes orange from 83% of all circles to 57% and yellow from 14% to
+     40%. Eight hound types move to yellow: Celtic Hound, the Celtic earth dogs,
+     Early Badger dogs, Talbot, eastern sighthounds, Norman Hound, St Hubert and
+     Old scenting Hounds. PlayLadder's RARITY list carries the same line. */
+  if (count >= 79) return "veryCommon";   // 79+   VERY COMMON     (orange since 24 Sept 2026)
+  if (count >= 20) return "common";       // 20-78 COMMON          (yellow since 24 Sept 2026)
   if (count >= 10) return "uncommon";     // 10-19 UNCOMMON        (green)
   if (count >= 4) return "rare";          // 4-9   RARE            (royal blue)
   return "extremelyRare";                 // 1-3   EXTREMELY RARE  (purple)

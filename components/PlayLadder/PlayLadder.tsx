@@ -88,7 +88,7 @@ const STATUS_COLOUR: Record<BreedStatus, { bg: string; fg: string }> = {
   rare: { bg: "#f0a437", fg: "#ffffff" },
 };
 const RARITY: { min: number; colour: string; label: string }[] = [
-  { min: 60, colour: "#f47421", label: "Very common" },
+  { min: 79, colour: "#f47421", label: "Very common" }, // was 60, 25 September 2026 (owner), matching BreedTree's rarityTier
   { min: 20, colour: "#ffd23e", label: "Common" },
   { min: 10, colour: "#5dbf86", label: "Uncommon" },
   { min: 4, colour: "#2547c4", label: "Rare" },
