@@ -9,7 +9,9 @@
   display: grid;
   /* FOUR COLUMNS on desktop, the spare tables left-aligned underneath (owner,
      24 September 2026); two on a tablet. */
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* Three across on desktop, so each table is wider (owner, 25 September 2026;
+     was four). */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(14px, 1.6vw, 22px);
 }
 @media (max-width: 1100px) and (min-width: 641px) {
@@ -124,7 +126,10 @@
      heading can read "Ancestors" in full: 5.7em to 8.55em, 3.8em to 5.7em. */
   /* No rank column since 25 September 2026 (owner): name, Ancestors, Instances. */
   /* Chums, a share of the 54, added after the name (owner, 25 September 2026). */
-  grid-template-columns: minmax(0, 1fr) 4.4em 8.55em 5.7em;
+  /* In rem, not em (25 September 2026): the headings use smaller type than the
+     rows, so em columns came out narrower on the heading row and every heading
+     sat to the right of its numbers. rem is the same on both, so they line up. */
+  grid-template-columns: minmax(0, 1fr) 4.4rem 8.55rem 5.7rem;
   align-items: center;
   gap: 8px;
 }
