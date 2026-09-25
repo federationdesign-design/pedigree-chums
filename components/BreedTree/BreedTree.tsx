@@ -2663,7 +2663,16 @@ const HOLD_LAST_LAYERS_BIG = 4;
 /* AND ONE MORE RING AT EACH OF THESE (owner, 25 September 2026): five layers
    from 350 circles, six from 400. Read by holdLayersFor, largest first. */
 // Seven from 630 and eight from 800 (owner, 25 September 2026).
-const HOLD_STEPS: [number, number][] = [[800, 8], [630, 7], [400, 6], [350, 5], [HOLD_MORE_FROM, HOLD_LAST_LAYERS_BIG]];
+// Nine from 1200 (owner, 25 September 2026).
+const HOLD_STEPS: [number, number][] = [[1200, 9], [800, 8], [630, 7], [400, 6], [350, 5], [HOLD_MORE_FROM, HOLD_LAST_LAYERS_BIG]];
+/* THE HELD CIRCLES DRIP IN FROM 630, 25 September 2026 (owner: rather than all at
+   once, stage them in three-second periods). On a level this big the circles
+   waiting at DEEP_HOLD_MS are split into HOLD_DRIP_WAVES waves, HOLD_DRIP_PERIOD_MS
+   apart, shallowest first; each wave pops out over HOLD_RELEASE_MS and then
+   pauses, so the stages read as stages. Smaller levels release as before. */
+const HOLD_DRIP_FROM = 630;
+const HOLD_DRIP_WAVES = 3;
+const HOLD_DRIP_PERIOD_MS = 3000;
 const holdLayersFor = (circles: number) => HOLD_STEPS.find(([from]) => circles >= from)?.[1] ?? HOLD_LAST_LAYERS;
 const DEEP_HOLD_MS = 5000;
 const HOLD_RELEASE_MS = 1500;
@@ -9543,6 +9552,16 @@ export default function BreedTree({
       if (heavyLevel) ghostTimers.push(window.setTimeout(() => {
         const queue = [...deepHeld].sort((a, b) => a.ch.depth - b.ch.depth);
         deepHeld.length = 0;
+        if (nodes.length - 1 >= HOLD_DRIP_FROM) {
+          // Staged: HOLD_DRIP_WAVES waves, HOLD_DRIP_PERIOD_MS apart. See HOLD_DRIP_FROM.
+          const per = Math.max(1, Math.ceil(queue.length / HOLD_DRIP_WAVES));
+          const wStep = Math.min(20, HOLD_RELEASE_MS / per);
+          queue.forEach((h, i) => {
+            const at = Math.floor(i / per) * HOLD_DRIP_PERIOD_MS + (i % per) * wStep;
+            ghostTimers.push(window.setTimeout(() => popOneHeld(h.ch, h.from), at));
+          });
+          return;
+        }
         const step = queue.length ? Math.min(20, HOLD_RELEASE_MS / queue.length) : 0;
         queue.forEach((h, i) => ghostTimers.push(window.setTimeout(() => popOneHeld(h.ch, h.from), i * step)));
       }, DEEP_HOLD_MS));
