@@ -5764,6 +5764,18 @@ export default function BreedTree({
     fill.style.animationDuration = `${ms}ms`;
     track.appendChild(fill);
     foot.appendChild(track);
+    /* PAUSE, 25 September 2026 (owner). Beside the skip: stops the fact, its time
+       bar and its countdown together, and carries on from the same point when
+       tapped again. The icon swaps between pause and play. */
+    const PAUSE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>';
+    const PLAY_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 5l12 7-12 7z" fill="currentColor"/></svg>';
+    const pause = document.createElement("button");
+    pause.type = "button";
+    pause.className = styles.factSkip;
+    pause.setAttribute("aria-label", "Pause this fact");
+    pause.setAttribute("aria-pressed", "false");
+    pause.innerHTML = PAUSE_ICON;
+    foot.appendChild(pause);
     const skip = document.createElement("button");
     skip.type = "button";
     skip.className = styles.factSkip;
@@ -5775,7 +5787,28 @@ export default function BreedTree({
     host.appendChild(el);
     factElRef.current = el;
     const done = () => { el.remove(); if (factElRef.current === el) factElRef.current = null; };
-    const timer = window.setTimeout(done, ms + 50);
+    // The countdown, kept so a pause can stop it and a resume carry on from there.
+    let remaining = ms + 50;
+    let startedAt = performance.now();
+    let timer = window.setTimeout(done, remaining);
+    let paused = false;
+    const moving = () => [el, fill, ...Array.from(body.children)] as HTMLElement[];
+    pause.addEventListener("pointerdown", (e) => e.stopPropagation());
+    pause.addEventListener("click", (e) => {
+      e.stopPropagation();
+      paused = !paused;
+      if (paused) {
+        window.clearTimeout(timer);
+        remaining = Math.max(0, remaining - (performance.now() - startedAt));
+      } else {
+        startedAt = performance.now();
+        timer = window.setTimeout(done, remaining);
+      }
+      for (const m of moving()) m.style.animationPlayState = paused ? "paused" : "running";
+      pause.innerHTML = paused ? PLAY_ICON : PAUSE_ICON;
+      pause.setAttribute("aria-label", paused ? "Carry on" : "Pause this fact");
+      pause.setAttribute("aria-pressed", paused ? "true" : "false");
+    });
     skip.addEventListener("pointerdown", (e) => e.stopPropagation());
     skip.addEventListener("click", (e) => { e.stopPropagation(); window.clearTimeout(timer); done(); });
   };
