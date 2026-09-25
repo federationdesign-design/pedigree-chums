@@ -17,7 +17,7 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
 import { breedInfo, breedInfoLong } from "../../data/breedInfo";
-import { allDogFacts } from "../../data/dogFacts";
+import { allDogFacts, factHeadFor } from "../../data/dogFacts";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 /* The pit's own stylesheet, imported so the learn area's collect flourish IS the
@@ -986,6 +986,24 @@ const FACT_WORD_MS = 60; // each word arrives this long after the one before
    (data/dogFacts.ts: the history page's facts, the chatbot's breed lines, the
    famous dogs and the breed write-ups) plus the current level's lineage notes,
    dealt from a shuffled deck so every fact shows before any comes round again. */
+/* NO REPEATS IN A VISIT, 25 September 2026 (owner: a second or third level should
+   bring new facts). The facts already shown are remembered in sessionStorage,
+   which lasts until the tab is closed, as short hashes. Each new deck leaves them
+   out; only when every fact has been seen does the list start again. */
+const FACTS_SEEN_KEY = "pc-facts-seen";
+const factHash = (t: string): string => {
+  let h = 5381;
+  for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+};
+const loadFactsSeen = (): Set<string> => {
+  try { return new Set<string>(JSON.parse(window.sessionStorage.getItem(FACTS_SEEN_KEY) ?? "[]")); } catch { return new Set<string>(); }
+};
+const saveFactsSeen = (seen: Set<string>) => {
+  try { window.sessionStorage.setItem(FACTS_SEEN_KEY, JSON.stringify([...seen])); } catch { /* private mode: repeats are allowed */ }
+};
+// A bare lineage note ending "Now extinct." (the fact card uses its rewrite instead).
+const BARE_EXTINCT = /now extinct\.?$/i;
 const shuffledFacts = (pool: string[]): string[] => {
   const o = [...new Set(pool)];
   for (let i = o.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [o[i], o[j]] = [o[j], o[i]]; }
@@ -5731,23 +5749,33 @@ export default function BreedTree({
     const fd = factDeckRef.current;
     const lvl = factNodesRef.current;
     if (fd.nodes !== lvl) { fd.nodes = lvl; fd.deck = []; }
+    const seen = loadFactsSeen();
     if (!fd.deck.length) {
       /* The level's own notes, but not the bare "Now extinct." ones: those are in
          the pool already, rewritten to stand on their own (EXTINCT_REWRITES). */
-      const notes = lvl.map((n) => (n.data.note ?? "").trim()).filter((t) => t.length > 20 && !/now extinct\.?$/i.test(t));
-      fd.deck = shuffledFacts([...allDogFacts(), ...notes]);
+      const notes = lvl.map((n) => (n.data.note ?? "").trim()).filter((t) => t.length > 20 && !BARE_EXTINCT.test(t));
+      const pool = [...allDogFacts(), ...notes];
+      let fresh = pool.filter((t) => !seen.has(factHash(t)));
+      // Every fact seen this visit: start the list again.
+      if (!fresh.length) { seen.clear(); fresh = pool; }
+      fd.deck = shuffledFacts(fresh);
     }
-    const fact = fd.deck.pop();
+    // A fact seen on another level since this deck was dealt is skipped.
+    let fact = fd.deck.pop();
+    while (fact && seen.has(factHash(fact)) && fd.deck.length) fact = fd.deck.pop();
     if (!fact) return;
+    seen.add(factHash(fact));
+    saveFactsSeen(seen);
     factElRef.current?.remove();
     const ms = Math.max(FACT_MIN_MS, Math.min(FACT_MAX_MS, FACT_BASE_MS + fact.length * FACT_MS_PER_CHAR));
     const el = document.createElement("div");
     el.className = styles.factPop;
     el.setAttribute("role", "status");
-    el.setAttribute("aria-label", `Did you know? ${fact}`);
+    const headText = factHeadFor(fact);
+    el.setAttribute("aria-label", `${headText} ${fact}`);
     const head = document.createElement("div");
     head.className = styles.factHead;
-    head.textContent = "Did you know?";
+    head.textContent = headText;
     head.setAttribute("aria-hidden", "true");
     el.appendChild(head);
     const body = document.createElement("div");
