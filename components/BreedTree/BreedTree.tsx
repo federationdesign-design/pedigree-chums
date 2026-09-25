@@ -1134,9 +1134,14 @@ const accTierOf = (src: string): string | null => {
 // Pale added the same day (owner): five tones, the most distinct of them pale.
 const ACC_TONES: Record<string, string[]> = { common: ["", "bright", "sunshine", "lemon", "pale"] };
 // A tone for this accessory that no other breed on the level has with it yet.
+/* LAST-RESORT TONES, 25 September 2026 (owner: the pale yellow only when the
+   others are used). A tone listed here is only picked when no other tone is
+   still free for that accessory on the level. */
+const TONES_LAST = new Set<string>(["pale"]);
 const pickTone = (tones: string[], used: Set<string>, acc: string): string => {
   const free = tones.filter((t) => !used.has(acc + "|" + t));
-  const pool = free.length ? free : tones;
+  const preferred = free.filter((t) => !TONES_LAST.has(t));
+  const pool = preferred.length ? preferred : free.length ? free : tones.filter((t) => !TONES_LAST.has(t));
   return pool[Math.floor(Math.random() * pool.length)];
 };
 // A fresh random order of a tier's accessories (a Fisher-Yates shuffle).
