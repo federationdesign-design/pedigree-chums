@@ -982,7 +982,9 @@ const PRAISE_POOLS = {
 const PRAISE_GAP_MS = 1200;
 // Bombs going off this close together count as one string. See onRoundStats.
 const BOMB_STRING_GAP_MS = 300;
-const PRAISE_SHOW_MS = 1400;
+const PRAISE_SHOW_MS = 1700;
+// Each letter drops in this long after the one before. See praise().
+const PRAISE_LETTER_MS = 35;
 // A line from a pool, never the one just used.
 const pickPraise = (pool: readonly string[], last: string): string => {
   const options = pool.filter((l) => l !== last);
@@ -5676,8 +5678,20 @@ export default function BreedTree({
     st.last = line;
     const el = document.createElement("div");
     el.className = `${styles.praisePop} ${pool === "big" ? styles.praiseBig : ""}`;
-    el.textContent = line;
+    /* LETTER BY LETTER, 25 September 2026 (owner: an arrival and an exit). Each
+       letter is its own span dropping in PRAISE_LETTER_MS after the last; the
+       whole line then lifts and fades (the container's own animation). The line
+       is read out once, whole, by the aria-label. */
     el.setAttribute("role", "status");
+    el.setAttribute("aria-label", line);
+    [...line].forEach((ch, i) => {
+      const sp = document.createElement("span");
+      sp.className = styles.praiseLetter;
+      sp.textContent = ch === " " ? "\u00a0" : ch;
+      sp.setAttribute("aria-hidden", "true");
+      sp.style.animationDelay = `${i * PRAISE_LETTER_MS}ms`;
+      el.appendChild(sp);
+    });
     el.style.animationDuration = `${PRAISE_SHOW_MS}ms`;
     host.appendChild(el);
     window.setTimeout(() => el.remove(), PRAISE_SHOW_MS + 50);

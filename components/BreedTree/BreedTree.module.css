@@ -2759,41 +2759,50 @@
 .foundDetailMix { list-style: none; margin: 0; padding: 0; }
 .foundDetailMix li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-top: 1px solid rgba(255, 255, 255, 0.2); }
 
-/* PRAISE, 25 September 2026 (owner). A line near the top of the pit that pops in,
-   holds and pops out over the inline animation-duration (PRAISE_SHOW_MS). In the
-   game's overlay beside the chain counter, under the lifted layer (59 and 60). */
+/* PRAISE, 25 September 2026 (owner). A line near the top of the pit. Bigger
+   and with a softer shadow, and ABOVE the lifted layer (its overlay is 60, its
+   parts up to 70): a completed dog chain opens the lift at once, and the praise
+   for it was hidden underneath. The letters drop in one by one (praiseLetter),
+   the line holds, then lifts and fades (praiseHold, the inline
+   animation-duration, PRAISE_SHOW_MS). */
 .praisePop {
   position: fixed;
   left: 50%;
-  top: 26%;
-  z-index: 58;
-  transform: translate(-50%, 0) scale(0.4) rotate(-4deg);
-  opacity: 0;
+  top: 24%;
+  z-index: 80;
+  transform: translate(-50%, 0) rotate(-4deg);
   pointer-events: none;
   white-space: nowrap;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.8rem, 7vw, 3rem);
+  font-size: clamp(2.6rem, 10vw, 4.4rem);
   letter-spacing: 0.02em;
   color: #ffed00;
-  -webkit-text-stroke: 2px #0a3a57;
+  -webkit-text-stroke: 1.5px #0a3a57;
   paint-order: stroke fill;
-  text-shadow: 0 4px 0 rgba(10, 58, 87, 0.55);
-  animation: praiseInOut 1400ms ease-out forwards;
+  text-shadow: 0 3px 10px rgba(10, 58, 87, 0.3);
+  animation: praiseHold 1700ms ease-in forwards;
 }
-.praiseBig { font-size: clamp(2.4rem, 10vw, 4.2rem); color: #ffffff; }
-@keyframes praiseInOut {
-  0% { opacity: 0; transform: translate(-50%, 0) scale(0.4) rotate(-4deg); }
-  14% { opacity: 1; transform: translate(-50%, 0) scale(1.12) rotate(-4deg); }
-  24% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(-4deg); }
-  78% { opacity: 1; transform: translate(-50%, -6px) scale(1) rotate(-4deg); }
-  100% { opacity: 0; transform: translate(-50%, -20px) scale(0.9) rotate(-4deg); }
+.praiseBig { font-size: clamp(3.2rem, 13vw, 5.8rem); color: #ffffff; }
+.praiseLetter {
+  display: inline-block;
+  opacity: 0;
+  animation: praiseLetter 420ms cubic-bezier(0.25, 1.4, 0.5, 1) forwards;
+}
+@keyframes praiseLetter {
+  0% { opacity: 0; transform: translateY(-60%) scale(0.5); }
+  60% { opacity: 1; transform: translateY(8%) scale(1.12); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes praiseHold {
+  0%, 72% { opacity: 1; transform: translate(-50%, 0) rotate(-4deg) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -40px) rotate(-4deg) scale(1.08); }
 }
 @media (prefers-reduced-motion: reduce) {
+  .praiseLetter { animation: none; opacity: 1; }
   .praisePop { animation-name: praiseFade; }
   @keyframes praiseFade {
-    0% { opacity: 0; transform: translate(-50%, 0) rotate(-4deg); }
-    15%, 80% { opacity: 1; transform: translate(-50%, 0) rotate(-4deg); }
-    100% { opacity: 0; transform: translate(-50%, 0) rotate(-4deg); }
+    0%, 80% { opacity: 1; }
+    100% { opacity: 0; }
   }
 }
 
