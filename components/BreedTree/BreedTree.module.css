@@ -2665,7 +2665,11 @@
    and pops out, over the inline animation-duration (CHAIN_POP_MS). */
 .chainPop {
   position: fixed;
-  z-index: 62;
+  /* UNDER THE LIFTED LAYER, 25 September 2026 (owner: the last link opens the
+     lift at once, and its counter sat on top of the lifted dog). The lift's
+     overlay is 60 and its washes 59 (LineageMap.module.css), so 58 keeps every
+     mini counter beneath it while still above the pit. */
+  z-index: 58;
   transform: translate(-50%, 0) scale(0.3);
   transform-origin: 50% 0;
   opacity: 0;
