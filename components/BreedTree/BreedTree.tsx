@@ -1213,7 +1213,10 @@ const PERMANENT_TOYS: string[] = ["flag", "cookies"];
    checkEscapeRef when it passes the top of the stage.
    "stickBig" is in it and was the omission that started this: see the note at
    the watch itself. */
-const THROWABLE_TOYS = new Set<ToyKind>(["ball", "ballPink", "stickBig", "rock"]);
+/* THE SLIPPER JOINS, 25 September 2026 (owner). THE BONE is throwable too, but
+   ONLY once it has fused with the logo: see the fuse, which marks it, and the
+   throw watch, which reads the mark. Until then a bone thrown up falls back in. */
+const THROWABLE_TOYS = new Set<ToyKind>(["ball", "ballPink", "stickBig", "rock", "slipper"]);
 
 /* GIVE THE TOYS BACK, 2 September 2026 (owner).
 
@@ -9922,7 +9925,7 @@ export default function BreedTree({
            the ones that can leave by being thrown, which is not the same list
            (the flag leaves by having its message read). Add a throwable toy here
            and to nowhere else. */
-        if (!THROWABLE_TOYS.has(pr?.toyKind as ToyKind)) return;
+        if (!THROWABLE_TOYS.has(pr?.toyKind as ToyKind) && !(pr?.toyKind === "bone" && pr?.fused)) return;
         if (pr.mb && pr.mb.velocity.y < -4) thrownBall = pr; // pit threshold
         else if (thrownBall === pr) thrownBall = null;
       };
@@ -12400,6 +12403,8 @@ export default function BreedTree({
           MBody.applyForce(pulled as never, pulled.position, { x: (tx / dist) * f * pulled.mass, y: (ty / dist) * f * pulled.mass });
           if (dist > snap) return;
           fused = true;
+          // Marked, so the bone can now be thrown clear: see THROWABLE_TOYS.
+          (bonePr as { fused?: boolean }).fused = true;
           // The BONE always ends up on the logo, whichever one was being held,
           // so the join looks the same either way. The main pit's own order.
           MBody.setPosition(boneB as never, { x: logoB.position.x, y: logoB.position.y });
