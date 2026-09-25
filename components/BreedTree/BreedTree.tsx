@@ -929,7 +929,7 @@ const FACE_STANDDOWN_SRC: Record<RarityTier, string> = {
 const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
   extremelyRare: ["/extreme-rare.webp", "/extreme-rare2.webp"],
   rare: ["/rare.webp", "/rare3.webp", "/rare6.webp"],
-  uncommon: ["/uncommon.webp", "/uncommon2.webp", "/uncommon4.webp", "/uncommon5.webp"],
+  uncommon: ["/uncommon.webp", "/uncommon2.webp", "/uncommon4.webp", "/uncommon5.webp", "/uncommon7.webp"], // + the laughing face, 25 Sept 2026
   common: ["/very-common2.webp", "/very-common3.webp", "/very-common4.webp"],
   veryCommon: ["/common.webp", "/common2.webp", "/common5.webp"],
 };
@@ -976,6 +976,39 @@ const BOMB_ADDS_SECS = 10;
    stand-down, bomb, shake, collect) keeps its shade without a table of its own.
    The other four tiers are untouched. */
 const VERY_COMMON_SHADES = ["", "B", "C"] as const;
+/* THE GREEN DOGS' ACCESSORIES, 25 September 2026 (owner). Each green (uncommon)
+   breed wears its own accessory, dealt in the order the breeds first appear in
+   the level, so TWINS MATCH and different dogs differ, the same way the yellow
+   shades are dealt. The order is most readable first, so a level with only a few
+   green breeds gets the clearest ones. More breeds than accessories wrap round.
+   The files are public/faces/uncommon/{expression}_{accessory}.webp, made by
+   scripts/green-faces.mjs from the owner's cut-outs. */
+const GREEN_ACC = ["plain", "glasses", "eyepatch", "bandana", "moustache_bowtie", "headband", "monocle", "blue_neckerchief", "red_collar", "green_collar", "flower", "earring_plaster"] as const;
+// Which of the owner's seven expression sheets each game face is.
+const GREEN_EXPR: Record<string, number> = {
+  "/uncommon.webp": 1, "/uncommon2.webp": 2, "/uncommon4.webp": 3, "/uncommon7.webp": 4,
+  "/uncommon5.webp": 5, "/uncommon6.webp": 6, "/uncommon3.webp": 7,
+};
+/* THE ACCESSORY FACES HAVE ROOM ROUND THE HEAD for tails, tags and flowers; the
+   old faces are cropped tight. Measured on the cut-outs: the head fills 0.806 of
+   the canvas height with its centre at 0.515 down, so an accessory face is drawn
+   1/0.806 as big and nudged up, and every head stays the size it was. */
+const ACC_FACE_HEAD = 0.806;
+const ACC_FACE_CY = 0.515;
+/* Sets a face image and, for an accessory face, the bigger box it needs. */
+const setFaceHref = (el: SVGImageElement | Element, href: string) => {
+  if (el.getAttribute("href") !== href) el.setAttribute("href", href);
+  const acc = href.startsWith("/faces/");
+  const size = acc ? QMARK_VB / ACC_FACE_HEAD : QMARK_VB;
+  const x = acc ? QMARK_VB / 2 - size / 2 : 0;
+  const y = acc ? QMARK_VB / 2 - size * ACC_FACE_CY : 0;
+  if (el.getAttribute("width") !== String(size)) {
+    el.setAttribute("width", String(size));
+    el.setAttribute("height", String(size));
+    el.setAttribute("x", String(x));
+    el.setAttribute("y", String(y));
+  }
+};
 /* A GLOW PER BREED FOR THE RARE DOGS, 24 September 2026 (owner: with several rare
    or extremely rare dogs in the pit they all wear the same face, so there is no
    telling which are the same dog, and so chainable, until you try). Each breed of
@@ -6223,7 +6256,18 @@ export default function BreedTree({
     return id;
   };
   // Called only from the face writer, never during render.
+  // The green breeds' accessories, reset with the level exactly as the shades are.
+  const greenAccRef = useRef<{ nodes: Node[] | null; of: Map<string, string> }>({ nodes: null, of: new Map() });
   const shadeFace = (d: Node, src: string): string => {
+    const expr = GREEN_EXPR[src];
+    if (expr) {
+      const st = greenAccRef.current;
+      if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); }
+      const breed = d.data.name;
+      let acc = st.of.get(breed);
+      if (acc === undefined) { acc = GREEN_ACC[st.of.size % GREEN_ACC.length]; st.of.set(breed, acc); }
+      return `/faces/uncommon/${expr}_${acc}.webp`;
+    }
     if (!src.startsWith("/very-common")) return src;
     const st = faceShadeRef.current;
     if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); }
@@ -7792,7 +7836,7 @@ export default function BreedTree({
               );
               const li = lf.firstElementChild;
               const liJoin = (joinFlashRef.current.get(d) ?? 0) > nowFx;
-              if (li) li.setAttribute("href", shadeFace(d, liJoin ? FACE_JOIN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
+              if (li) setFaceHref(li, shadeFace(d, liJoin ? FACE_JOIN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : face.src));
             }
           }
           const resisting = resistNodeRef.current === d;
@@ -7808,7 +7852,7 @@ export default function BreedTree({
           const tap = `${otherBreed ? "x" : joinFlash ? "j" : chained ? 1 : resisting ? "r" : 0}:${faceTier}:${face.src}:${behindList ? "b" : ""}`;
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
-            qi.setAttribute("href", shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : joinFlash ? FACE_JOIN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : resisting ? FACE_RESIST_SRC[faceTier] : face.src));
+            setFaceHref(qi, shadeFace(d, otherBreed ? FACE_STANDDOWN_SRC[faceTier] : joinFlash ? FACE_JOIN_SRC[faceTier] : chained ? RARITY_FACE_CHAINED_SRC[faceTier] : resisting ? FACE_RESIST_SRC[faceTier] : face.src));
             /* THE TIER ART IS NEVER TINTED: it already carries its colour, and a
                filter would flatten it to one hue. The question mark still is,
                because it is one flat file and its depth tint is what tells a
