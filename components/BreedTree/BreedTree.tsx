@@ -921,14 +921,14 @@ const FACE_SHAKE_SRC: Record<RarityTier, string> = {
    note at the writer, where the circle is faded rather than swapped. */
 const FACE_STANDDOWN_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare4.webp",
-  rare: "/rare6.webp",
+  rare: "/rare2.webp", // side-eye, 25 Sept 2026: the blue set has no worried face
   uncommon: "/uncommon2.webp",
   common: "/very-common3.webp",
   veryCommon: "/common5.webp",
 };
 const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
   extremelyRare: ["/extreme-rare.webp", "/extreme-rare2.webp"],
-  rare: ["/rare.webp", "/rare3.webp", "/rare6.webp"],
+  rare: ["/rare.webp", "/rare3.webp", "/rare7.webp"], // the new squint in place of the worried face, 25 Sept 2026
   uncommon: ["/uncommon.webp", "/uncommon2.webp", "/uncommon4.webp", "/uncommon5.webp", "/uncommon7.webp"], // + the laughing face, 25 Sept 2026
   common: ["/very-common2.webp", "/very-common3.webp", "/very-common4.webp"],
   veryCommon: ["/common.webp", "/common2.webp", "/common5.webp"],
@@ -984,30 +984,45 @@ const VERY_COMMON_SHADES = ["", "B", "C"] as const;
    The files are public/faces/uncommon/{expression}_{accessory}.webp, made by
    scripts/green-faces.mjs from the owner's cut-outs. */
 const GREEN_ACC = ["plain", "glasses", "eyepatch", "bandana", "moustache_bowtie", "headband", "monocle", "blue_neckerchief", "red_collar", "green_collar", "flower", "earring_plaster"] as const;
-// A fresh random order of the accessories (a Fisher-Yates shuffle).
-const shuffledGreenAcc = (): string[] => {
-  const o: string[] = [...GREEN_ACC];
+/* THE BLUE (RARE) DOGS JOIN IN, 25 September 2026 (owner). Same idea and same
+   twelve looks, except the blue set's last is a bow tie on its own. The owner's
+   blue sheets are numbered 2 to 7. */
+const BLUE_ACC = ["plain", "glasses", "eyepatch", "bandana", "bowtie", "headband", "monocle", "blue_neckerchief", "red_collar", "green_collar", "flower", "earring_plaster"] as const;
+/* Per tier: which of the owner's sheets each game face is, the accessories, and
+   how the head sits on the cut-out canvas. THE ACCESSORY FACES HAVE ROOM ROUND
+   THE HEAD for tails, tags and flowers, and the old faces are cropped tight, so
+   an accessory face is drawn 1/head as big and nudged to cy, measured on the
+   cut-outs (head = the head's share of the canvas height, cy = its centre), and
+   every head stays the size it was. Files: public/faces/{tier}/{sheet}_{acc}.webp. */
+const ACC_TIERS: Record<string, { expr: Record<string, number>; list: readonly string[]; head: number; cy: number }> = {
+  uncommon: {
+    expr: { "/uncommon.webp": 1, "/uncommon2.webp": 2, "/uncommon4.webp": 3, "/uncommon7.webp": 4, "/uncommon5.webp": 5, "/uncommon6.webp": 6, "/uncommon3.webp": 7 },
+    list: GREEN_ACC, head: 0.806, cy: 0.515,
+  },
+  rare: {
+    expr: { "/rare.webp": 2, "/rare2.webp": 3, "/rare7.webp": 4, "/rare3.webp": 5, "/rare4.webp": 6, "/rare5.webp": 7 },
+    list: BLUE_ACC, head: 0.795, cy: 0.512,
+  },
+};
+// Which tier a game face belongs to, if it has accessories.
+const accTierOf = (src: string): string | null => {
+  for (const t in ACC_TIERS) if (ACC_TIERS[t].expr[src]) return t;
+  return null;
+};
+// A fresh random order of a tier's accessories (a Fisher-Yates shuffle).
+const shuffledAcc = (list: readonly string[]): string[] => {
+  const o: string[] = [...list];
   for (let i = o.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [o[i], o[j]] = [o[j], o[i]]; }
   return o;
 };
-// Which of the owner's seven expression sheets each game face is.
-const GREEN_EXPR: Record<string, number> = {
-  "/uncommon.webp": 1, "/uncommon2.webp": 2, "/uncommon4.webp": 3, "/uncommon7.webp": 4,
-  "/uncommon5.webp": 5, "/uncommon6.webp": 6, "/uncommon3.webp": 7,
-};
-/* THE ACCESSORY FACES HAVE ROOM ROUND THE HEAD for tails, tags and flowers; the
-   old faces are cropped tight. Measured on the cut-outs: the head fills 0.806 of
-   the canvas height with its centre at 0.515 down, so an accessory face is drawn
-   1/0.806 as big and nudged up, and every head stays the size it was. */
-const ACC_FACE_HEAD = 0.806;
-const ACC_FACE_CY = 0.515;
 /* Sets a face image and, for an accessory face, the bigger box it needs. */
 const setFaceHref = (el: SVGImageElement | Element, href: string) => {
   if (el.getAttribute("href") !== href) el.setAttribute("href", href);
-  const acc = href.startsWith("/faces/");
-  const size = acc ? QMARK_VB / ACC_FACE_HEAD : QMARK_VB;
-  const x = acc ? QMARK_VB / 2 - size / 2 : 0;
-  const y = acc ? QMARK_VB / 2 - size * ACC_FACE_CY : 0;
+  const tier = href.startsWith("/faces/") ? href.split("/")[2] : null;
+  const fit = tier ? ACC_TIERS[tier] : null;
+  const size = fit ? QMARK_VB / fit.head : QMARK_VB;
+  const x = fit ? QMARK_VB / 2 - size / 2 : 0;
+  const y = fit ? QMARK_VB / 2 - size * fit.cy : 0;
   if (el.getAttribute("width") !== String(size)) {
     el.setAttribute("width", String(size));
     el.setAttribute("height", String(size));
@@ -6269,24 +6284,26 @@ export default function BreedTree({
   };
   // Called only from the face writer, never during render.
   // The green breeds' accessories, reset with the level exactly as the shades are.
-  const greenAccRef = useRef<{ nodes: Node[] | null; of: Map<string, string>; order: string[] }>({ nodes: null, of: new Map(), order: [] });
+  const greenAccRef = useRef<{ nodes: Node[] | null; of: Map<string, string>; order: Record<string, string[]>; seen: Record<string, number> }>({ nodes: null, of: new Map(), order: {}, seen: {} });
   const shadeFace = (d: Node, src: string): string => {
-    const expr = GREEN_EXPR[src];
-    if (expr) {
+    const tier = accTierOf(src);
+    if (tier) {
       const st = greenAccRef.current;
       /* SHUFFLED EVERY ROUND, 25 September 2026 (owner: so a player does not
-         always see the same dog in the bandana). A fresh random order each time
-         the level's tree is built, which is every level start and every refresh;
-         within the round twins still match and different breeds still differ. */
-      if (st.nodes !== nodesRef.current) {
-        st.nodes = nodesRef.current;
-        st.of = new Map();
-        st.order = shuffledGreenAcc();
+         always see the same dog in the bandana). A fresh random order per tier
+         each time the level's tree is built, which is every level start and
+         every refresh; within the round twins match and different breeds differ. */
+      if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); st.order = {}; st.seen = {}; }
+      const key = tier + ":" + d.data.name;
+      let acc = st.of.get(key);
+      if (acc === undefined) {
+        const order = (st.order[tier] ??= shuffledAcc(ACC_TIERS[tier].list));
+        const n = st.seen[tier] ?? 0;
+        st.seen[tier] = n + 1;
+        acc = order[n % order.length];
+        st.of.set(key, acc);
       }
-      const breed = d.data.name;
-      let acc = st.of.get(breed);
-      if (acc === undefined) { acc = st.order[st.of.size % st.order.length]; st.of.set(breed, acc); }
-      return `/faces/uncommon/${expr}_${acc}.webp`;
+      return `/faces/${tier}/${ACC_TIERS[tier].expr[src]}_${acc}.webp`;
     }
     if (!src.startsWith("/very-common")) return src;
     const st = faceShadeRef.current;
