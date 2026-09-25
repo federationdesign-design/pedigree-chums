@@ -38,7 +38,7 @@ const LEVELS: { title: string; colour: string }[] = [
   { title: "Extreme", colour: "#ef4444" }, // was "Very hard" (owner, 25 September 2026)
   { title: "Hard", colour: "#f97316" },
   { title: "Medium", colour: "#ffd23e" },
-  { title: "Simple", colour: "#84cc16" }, // was "Easy" (owner, 25 September 2026)
+  { title: "Simple", colour: "#22c55e" }, // was "Easy"; the buttons' green, was #84cc16 (owner, 25 September 2026)
 ];
 
 // Different dogs in a chum's tree: every name below the chum, counted once.
@@ -125,7 +125,7 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
       <div className={styles.colHead} aria-hidden="true">
         <span />
         <span>Chum history</span>
-        <span>Anc</span>
+        <span>Ancestors</span>
         <span>Ins</span>
       </div>
       <ol className={styles.list}>
@@ -158,7 +158,11 @@ export default function PlayLadder() {
   // Shown with Impossible (the first dealt) moved to the end.
   // Easiest first, 25 September 2026 (owner): Easy, Medium, Hard, Very hard,
   // then Impossible alone at the end.
-  const groups = [...dealt.slice(1).reverse(), ...dealt.slice(0, 1)];
+  /* SIMPLE READS EASIEST FIRST, 25 September 2026 (owner): fewest circles at the
+     top (Irish Wolfhound) and most at the bottom, so its top card is the easiest
+     dog. The other tables stay hardest first. */
+  const shown = dealt.map((g) => (g.title === "Simple" ? { ...g, rows: [...g.rows].reverse() } : g));
+  const groups = [...shown.slice(1).reverse(), ...shown.slice(0, 1)];
   return (
     /* A HORIZONTAL SCROLL ON A PHONE, one ladder at a time, with the video
        slider's own scrollbar (owner, 24 September 2026); side by side on desktop,

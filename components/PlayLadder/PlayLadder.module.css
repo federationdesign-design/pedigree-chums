@@ -83,7 +83,7 @@
   font-size: min(clamp(5.4rem, 7.2vw, 7.2rem), calc(80cqi / (var(--chars, 6) * 0.66)));
   white-space: nowrap;
   line-height: 1;
-  margin: 20px 0 0; /* more air between the card and the title (owner; 10px, then 20px on 25 September 2026) */
+  margin: 30px 0 0; /* more air between the card and the title (owner; 10px, 20px, then 30px on 25 September 2026) */
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-shadow: 0 2px 0 rgba(10, 58, 87, 0.5);
@@ -93,7 +93,9 @@
 .colHead, .row {
   display: grid;
   /* The rank column half as wide (owner), the room given to Ancestors. */
-  grid-template-columns: 1.3em minmax(0, 1fr) 5.7em 3.8em;
+  /* Ancestors and Instances half as wide again (owner, 25 September 2026), so the
+     heading can read "Ancestors" in full: 5.7em to 8.55em, 3.8em to 5.7em. */
+  grid-template-columns: 1.3em minmax(0, 1fr) 8.55em 5.7em;
   align-items: center;
   gap: 8px;
 }
