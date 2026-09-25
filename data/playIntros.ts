@@ -1,6 +1,7 @@
 import { getLineage, type LineageNode } from "./lineage";
 import { resolveLineageName } from "./lineageNames";
 import { isEchoName } from "./lineageShape";
+import { breeds } from "./breeds";
 
 /* THE CHUMS WITH AN INTRO CLIP, by slug, played full screen on a phone before the
    game (owner, 24 September 2026). The Labrador was the trial; thirteen more
@@ -66,5 +67,27 @@ export async function vimeoSeconds(id: string): Promise<number | null> {
   } catch {
     return null;
   }
+}
+
+/* THE SIMPLE LEVELS, 25 September 2026 (owner: the toys come in earlier there).
+   The last table on /play, ranked EXACTLY as PlayLadder ranks it: every chum with
+   a slug, most circles first, ties by name, dealt LADDER_PER_TABLE to a table, the
+   last table being Simple. Asking here rather than by circle count keeps the pit
+   and the page from ever disagreeing (Mastiff and Italian Greyhound both have 13;
+   the name decides which table each is in). Keep these two numbers in step with
+   PER_TABLE and the LEVELS list in PlayLadder. */
+export const LADDER_PER_TABLE = 11;
+export const LADDER_TABLES = 5;
+let simpleChums: Set<string> | null = null;
+export function isSimpleChum(name: string | undefined): boolean {
+  if (!name) return false;
+  if (!simpleChums) {
+    const ranked = breeds
+      .filter((b) => !!b.slug)
+      .map((b) => ({ name: b.name, circles: chumCircleCount(b.name) }))
+      .sort((a, b) => b.circles - a.circles || a.name.localeCompare(b.name));
+    simpleChums = new Set(ranked.slice((LADDER_TABLES - 1) * LADDER_PER_TABLE).map((r) => r.name));
+  }
+  return simpleChums.has(name);
 }
 

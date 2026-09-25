@@ -30,6 +30,7 @@ import mapStyles from "../PackPit/LineageMap.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
 import { propsFor, toysForCircles, type LevelTheme } from "../../data/levelThemes";
+import { isSimpleChum } from "../../data/playIntros";
 import { breeds as packBreeds } from "../../data/breeds";
 import { packArt } from "../../data/packArt";
 import BritainMessage from "../PackPit/BritainMessage";
@@ -714,7 +715,15 @@ const TOY_ROCK_GONE_KEY = "pc-minipit-rock-gone";
 const TOY_BALL_PINK_GONE_KEY = "pc-minipit-ballpink-gone";
 const TOY_BALL_PINK_THROWS_KEY = "pc-minipit-ballpink-throws";
 const BALL_PINK_LIVES = 3;
-const BALL_PINK_GAP = 1400;   // after the yellow ball, so they arrive separately
+const BALL_PINK_GAP = 1400;
+/* THE SIMPLE LEVELS' TOY TIMES, 25 September 2026 (owner: the toys come in
+   earlier on the easiest levels). Milliseconds from the first circle landing,
+   the same clock every toy already times off. The pink ball keeps its
+   BALL_PINK_GAP after the yellow, so the two still land separately. Anything not
+   named here keeps the usual time: the cookie panel (2s), the flag (6s), the
+   chum cards, and the bowl, which still lands halfway through the chum cards'
+   fall. Which levels are Simple: isSimpleChum. */
+const SIMPLE_TOY_AT = { ball: 1000, slipper: 2000, bone: 2500, stickBig: 3500 } as const;   // after the yellow ball, so they arrive separately
 const BALL_PINK_BACK = 900;   // pause before it is tipped back in
 // Pink first, then the pink drains out of it: same hue, less and less of it,
 // until the third throw leaves it almost grey.
@@ -10159,12 +10168,15 @@ export default function BreedTree({
            CHUM_TOY_BANDS in data/levelThemes.ts. */
         const chumLevel = !!levelName && packBreeds.some((pb) => pb.name === levelName);
         const armed = new Set(toysForCircles(circleCount, chumLevel));
+        // The Simple levels bring their toys in earlier: see SIMPLE_TOY_AT.
+        const simple = chumLevel && isSimpleChum(levelName);
         if (armed.has("cookies")) toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
         /* The balls were made unconditional on 2026-08-12 when the old
            first-seven-levels `hideBalls` gate was removed. That reversal stands:
            what gates them now is the band, not a level number. */
-        if (armed.has("ball")) toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
-        if (armed.has("ballPink")) toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
+        const ballAt = simple ? SIMPLE_TOY_AT.ball : TOY_BALL_DELAY;
+        if (armed.has("ball")) toyTimers.push(window.setTimeout(() => spawnToy("ball"), ballAt));
+        if (armed.has("ballPink")) toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), ballAt + BALL_PINK_GAP));
         const flagAt = TOY_BALL_DELAY + TOY_FLAG_GAP;
         if (armed.has("flag")) toyTimers.push(window.setTimeout(() => spawnToy("flag"), flagAt));
         const propsAt = flagAt + TOY_PROP_GAP;
@@ -10207,6 +10219,8 @@ export default function BreedTree({
         props.forEach((kind: ToyKind, i: number) => {
           const at =
             PROPS_IN_FLOOD.includes(kind) ? floodMid
+            : simple && kind === "slipper" ? SIMPLE_TOY_AT.slipper
+            : simple && kind === "stickBig" ? SIMPLE_TOY_AT.stickBig
             : i < 2 ? propsAt
             : propsAt + TOY_ROCK_GAP * (i - 1);
           const left = i % 2 === 0 ? firstLeft : !firstLeft;
@@ -10215,7 +10229,7 @@ export default function BreedTree({
         // The bone is in every band (owner: the bone should always drop), so this
         // reads as unconditional in practice. It is gated all the same, because
         // the band table is the single source and nothing should sit outside it.
-        if (armed.has("bone")) toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
+        if (armed.has("bone")) toyTimers.push(window.setTimeout(() => spawnToy("bone"), simple ? SIMPLE_TOY_AT.bone : boneAt));
         toyTimers.push(window.setTimeout(spawnChums, chumsAt));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
