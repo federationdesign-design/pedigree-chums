@@ -980,6 +980,8 @@ const BOMB_ADDS_SECS = 10;
 /* HALF ON THE EXTREME LEVELS, 25 September 2026 (owner): a bomb adds 5 seconds
    there, not 10. The table is the /play page's own, via ladderTableOf. */
 const BOMB_ADDS_SECS_EXTREME = 5;
+// A bomb the player did not set off (knocked, or chained by another blast).
+const BOMB_ADDS_SECS_UNAIDED = 2;
 /* VERY COMMON COMES IN THREE SHADES OF YELLOW (owner, 24 September 2026: "if we
    do have more than one instance of the very common rarity within the pit, it
    takes a different colour shade"). Every very-common file has a B and a C twin,
@@ -11387,7 +11389,11 @@ export default function BreedTree({
              countdown off. It adds BOMB_ADDS_SECS to a running count instead,
              uncapped, once per blast, so a chain of bombs adds once for each. The
              note above is kept for the history of the old rule. */
-          if (fullTriggeredRef.current) cdAddRef.current?.(ladderTableOf(levelName) === LADDER_EXTREME ? BOMB_ADDS_SECS_EXTREME : BOMB_ADDS_SECS);
+          /* ONLY THE PLAYER'S OWN BOMBS GET THE FULL BONUS, 25 September 2026
+             (owner). wasHeld is true when the player dealt the final hit, a
+             click or a hold on this bomb; a knock from the pit or a chain from
+             another blast is false, and adds only BOMB_ADDS_SECS_UNAIDED. */
+          if (fullTriggeredRef.current) cdAddRef.current?.(!wasHeld ? BOMB_ADDS_SECS_UNAIDED : ladderTableOf(levelName) === LADDER_EXTREME ? BOMB_ADDS_SECS_EXTREME : BOMB_ADDS_SECS);
           // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
           // once, near takes two hits, far takes one and only if already lit.
           const SHOVE_R = bsz * 5.5;
