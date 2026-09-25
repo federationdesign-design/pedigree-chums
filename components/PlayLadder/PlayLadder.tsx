@@ -6,7 +6,7 @@ import { chumCircleCount } from "../../data/playIntros";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { resolveLineageName } from "../../data/lineageNames";
 import { isEchoName } from "../../data/lineageShape";
-import { treesContaining } from "../../data/lineageArchive";
+import { treesContaining, descendantPackBreeds } from "../../data/lineageArchive";
 import { ukBreeds } from "../../data/uk-breeds";
 import { statusFor, STATUS_LABEL, type BreedStatus } from "../../data/breedStatus";
 import ScrollRail from "../PlayChumsRail/ScrollRail";
@@ -96,7 +96,24 @@ const RARITY: { min: number; colour: string; label: string }[] = [
 ];
 const rarityOf = (name: string) => RARITY.find((r) => treesContaining(name) >= r.min) ?? RARITY[RARITY.length - 1];
 
-type Row = { slug: string; name: string; image: string; circles: number; dogs: number; era: string | null; status: BreedStatus | undefined; rarity: { colour: string; label: string } };
+/* THE CHUMS COLUMN, 25 September 2026 (owner): what share of the 54 pack dogs can
+   drop into this level, by the pit's own rule (BreedTree's levelChums): every pack
+   dog descending from any of the level's ancestors, with a picture. The Doberman
+   and Miniature Schnauzer drop all of them; the Husky only a handful. */
+const PACK_TOTAL = breeds.filter((b) => !!b.slug && !!b.image).length;
+function chumShare(name: string): number {
+  const lin = getLineage(resolveLineageName(name));
+  if (!lin || !PACK_TOTAL) return 0;
+  const names = new Set<string>();
+  const walk = (n: LineageNode, depth: number) => {
+    if (depth > 0) names.add(n.name);
+    for (const c of n.children ?? []) walk(c, depth + 1);
+  };
+  walk(lin, 0);
+  const n = descendantPackBreeds([...names]).filter((b) => !!b.image).length;
+  return Math.min(100, Math.round((n / PACK_TOTAL) * 100));
+}
+type Row = { slug: string; name: string; image: string; circles: number; dogs: number; chums: number; era: string | null; status: BreedStatus | undefined; rarity: { colour: string; label: string } };
 
 function Ladder({ title, colour, rows }: { title: string; colour: string; rows: Row[] }) {
   const top = rows[0];
@@ -124,6 +141,7 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
           a line between the rows. */}
       <div className={styles.colHead} aria-hidden="true">
         <span>Chum history</span>
+        <span>Chums</span>
         <span>Ancestors</span>
         <span>Ins</span>
       </div>
@@ -136,6 +154,7 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
                   <span className={styles.name}>{r.name}</span>
                 </span>
               </span>
+              <span className={styles.num}>{r.chums}%</span>
               <span className={styles.num}>{r.dogs}</span>
               <span className={styles.num}>{r.circles}</span>
             </Link>
@@ -149,7 +168,7 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
 export default function PlayLadder() {
   const rows: Row[] = breeds
     .filter((b) => !!b.slug)
-    .map((b) => ({ slug: b.slug, name: b.name, image: b.image, circles: chumCircleCount(b.name), dogs: dogCount(b.name), era: eraOf(b.name, b.established), status: statusFor(b.name), rarity: rarityOf(b.name) }))
+    .map((b) => ({ slug: b.slug, name: b.name, image: b.image, circles: chumCircleCount(b.name), dogs: dogCount(b.name), chums: chumShare(b.name), era: eraOf(b.name, b.established), status: statusFor(b.name), rarity: rarityOf(b.name) }))
     .sort((a, b) => b.circles - a.circles || a.name.localeCompare(b.name));
   // Dealt out hardest first; the first (rows % 7) columns take one extra.
   const dealt = LEVELS.map((lv, i) => ({ ...lv, rows: rows.slice(i * PER_TABLE, (i + 1) * PER_TABLE) })).filter((g) => g.rows.length > 0);
