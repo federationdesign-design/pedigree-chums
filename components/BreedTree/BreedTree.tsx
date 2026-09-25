@@ -16037,6 +16037,28 @@ export default function BreedTree({
                   different formulas.
                   pointerEvents none: it must never swallow a tap meant for a
                   dog behind it. */}
+              {/* THE LOGO FROM THE START, 25 September 2026 (owner: show it on the
+                  learn and start screens too, in its play position). Before the
+                  round there is no logo body, so this draws the same artwork at
+                  the same spot and size, from the same sums the sim uses when it
+                  builds the body: top centre, 20% down the stage, width the main
+                  pit's figure clamped to 60% of the pit (its floor, wall to wall,
+                  is the stage less M = 4 either side), then LOGO_SHRINK. When the
+                  round starts the physics logo takes over in the same place. */}
+              {!started && (() => {
+                const asp = aspect; // the view's own shape, so logo and viewBox agree
+                const vbWf = asp >= 1 ? SIZE * asp : SIZE;
+                const vbHf = asp >= 1 ? SIZE : SIZE / asp;
+                const xMinF = asp >= 1 ? -vbWf * (centred ? 0.5 : SHIFT) : -vbWf / 2;
+                const lw = Math.min(84 * upp * LOGO_BIG_MULT, (vbWf - 8) * LOGO_PIT_FRACTION) * LOGO_SHRINK;
+                const lh = lw / LOGO_ASPECT;
+                return (
+                  <g style={{ pointerEvents: "none" }} aria-hidden="true"
+                    transform={`translate(${xMinF + vbWf / 2},${-vbHf / 2 + vbHf * 0.2})`}>
+                    <image href={LOGO_SRC} x={-lw / 2} y={-lh / 2} width={lw} height={lh} preserveAspectRatio="xMidYMid meet" />
+                  </g>
+                );
+              })()}
               {started && (() => {
                 const lb = ub?.find((u) => u.kind === "logo");
                 if (!lb || !lb.w || !lb.h) return null;
