@@ -1050,7 +1050,8 @@ const accTierOf = (src: string): string | null => {
    accessory alone, and no two breeds on a level share both accessory and tone.
    "" is the original art, in public/faces/{tier}; any other tone lives in
    public/faces/{tier}-{tone}. */
-const ACC_TONES: Record<string, string[]> = { common: ["", "bright", "sunshine"] };
+// Lemon added 25 September 2026 (owner): all four tones in.
+const ACC_TONES: Record<string, string[]> = { common: ["", "bright", "sunshine", "lemon"] };
 // A tone for this accessory that no other breed on the level has with it yet.
 const pickTone = (tones: string[], used: Set<string>, acc: string): string => {
   const free = tones.filter((t) => !used.has(acc + "|" + t));
