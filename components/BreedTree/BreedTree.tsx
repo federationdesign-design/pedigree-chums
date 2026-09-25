@@ -13453,7 +13453,11 @@ export default function BreedTree({
       el.style.top = `${sp.y + rPx + CHAIN_POP_BELOW_PX}px`;
       el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
       el.style.animationDuration = `${CHAIN_POP_MS}ms`;
-      document.body.appendChild(el);
+      /* INSIDE THE GAME, NOT ON THE PAGE (25 September 2026: it never showed).
+         Appended to document.body it sat at z-index 62 on the page, behind the
+         game's overlay at 900, so every pop was hidden. It now goes in beside the
+         main chain counter, inside the same overlay, where 62 is above the pit. */
+      (chainCountRef.current?.parentElement ?? document.body).appendChild(el);
       window.setTimeout(() => el.remove(), CHAIN_POP_MS + 50);
     };
     const paintChainCount = () => {
