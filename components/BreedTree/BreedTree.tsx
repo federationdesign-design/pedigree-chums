@@ -1002,8 +1002,6 @@ const loadFactsSeen = (): Set<string> => {
 const saveFactsSeen = (seen: Set<string>) => {
   try { window.sessionStorage.setItem(FACTS_SEEN_KEY, JSON.stringify([...seen])); } catch { /* private mode: repeats are allowed */ }
 };
-// A bare lineage note ending "Now extinct." (the fact card uses its rewrite instead).
-const BARE_EXTINCT = /now extinct\.?$/i;
 const shuffledFacts = (pool: string[]): string[] => {
   const o = [...new Set(pool)];
   for (let i = o.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [o[i], o[j]] = [o[j], o[i]]; }
@@ -5751,10 +5749,13 @@ export default function BreedTree({
     if (fd.nodes !== lvl) { fd.nodes = lvl; fd.deck = []; }
     const seen = loadFactsSeen();
     if (!fd.deck.length) {
-      /* The level's own notes, but not the bare "Now extinct." ones: those are in
-         the pool already, rewritten to stand on their own (EXTINCT_REWRITES). */
-      const notes = lvl.map((n) => (n.data.note ?? "").trim()).filter((t) => t.length > 20 && !BARE_EXTINCT.test(t));
-      const pool = [...allDogFacts(), ...notes];
+      /* The fact pool only, NOT the level's lineage notes, 25 September 2026
+         (owner: a fact opening "This was..." made no sense on its own). Those notes
+         are written to sit under their dog's name in a family tree, and many
+         describe what one dog gave another ("A dash of setter for the rich golden
+         colour"), so they cannot stand alone. They still show in the learn box
+         and on the lifted card. Every fact in allDogFacts names its dog. */
+      const pool = allDogFacts();
       let fresh = pool.filter((t) => !seen.has(factHash(t)));
       // Every fact seen this visit: start the list again.
       if (!fresh.length) { seen.clear(); fresh = pool; }
