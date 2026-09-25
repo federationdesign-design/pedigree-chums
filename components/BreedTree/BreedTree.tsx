@@ -586,6 +586,9 @@ const LOGO_GROUP = -7;
 
    The cards are still collected: that is a double tap on the SVG node, React
    and not Matter, and it never went through the constraint. */
+// The pit's physics passes per step; see Engine.create. Matter's defaults are 6 and 4.
+const PIT_POSITION_ITERATIONS = 8;
+const PIT_VELOCITY_ITERATIONS = 5;
 const MC_CAT = 0x0002;
 const CHUM_MASK = 0xFFFFFFFF & ~MC_CAT;
 /* Share of the pit width the drawn logo may take. Was 0.7; owner's call on
@@ -9007,7 +9010,12 @@ export default function BreedTree({
          ones.
          To revert, set this back to Engine.create(). Leave wakeBody and its
          call sites in place: they are correct either way. */
-      const engine = Engine.create({ enableSleeping: true });
+      /* A LITTLE MORE PUSH-APART, 25 September 2026 (owner: in a full pit the chum
+         cards sat embedded in the dog circles). Matter's defaults are 6 position
+         passes (pushing overlaps apart) and 4 velocity passes per step; a small
+         step up to test before going further. Every pass costs time on the big
+         levels, so raise these with care. */
+      const engine = Engine.create({ enableSleeping: true, positionIterations: PIT_POSITION_ITERATIONS, velocityIterations: PIT_VELOCITY_ITERATIONS });
       engine.gravity.y = 1; // pit verbatim
       const world = engine.world;
       /* THE CATCH, and the reason wakeBody exists. Matter wakes a body by
