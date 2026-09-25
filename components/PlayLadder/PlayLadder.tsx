@@ -35,10 +35,10 @@ import styles from "./PlayLadder.module.css";
 const PER_TABLE = 11;
 const LEVELS: { title: string; colour: string }[] = [
   { title: "Impossible", colour: "#ffffff" }, // was "Oober"; white, was purple (owner, 24 September 2026)
-  { title: "Very hard", colour: "#ef4444" },
+  { title: "Extreme", colour: "#ef4444" }, // was "Very hard" (owner, 25 September 2026)
   { title: "Hard", colour: "#f97316" },
   { title: "Medium", colour: "#ffd23e" },
-  { title: "Easy", colour: "#84cc16" },
+  { title: "Simple", colour: "#84cc16" }, // was "Easy" (owner, 25 September 2026)
 ];
 
 // Different dogs in a chum's tree: every name below the chum, counted once.
@@ -136,7 +136,6 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
               <span className={styles.chum}>
                 <span className={styles.nameLine}>
                   <span className={styles.name}>{r.name}</span>
-                  <span className={styles.dot} style={{ background: r.rarity.colour }} title={r.rarity.label} aria-label={r.rarity.label} />
                 </span>
               </span>
               <span className={styles.num}>{r.dogs}</span>
