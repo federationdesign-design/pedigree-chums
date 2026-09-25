@@ -40,6 +40,30 @@
   box-shadow: 0 12px 32px rgba(10, 58, 87, 0.32);
   padding: 16px 14px 12px;
   color: #ffffff;
+  position: relative;
+}
+/* THE OUTLINE FADES IN, 25 September 2026 (owner). Over the faint outline above,
+   a second outline runs from fully see-through to solid white at the foot. It
+   starts 10px below the top card: the card begins 26px down (16px padding plus
+   the head's 10px) and is the table's inner width (100cqi less 28px of padding)
+   times 1122/821, the printed card's shape. Drawn as a ring with a mask, so the
+   rounded corners and the blur behind are untouched. */
+.ladder::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  padding: 2px;
+  border-radius: 26px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0) calc(26px + (100cqi - 28px) * 1.3666 + 10px),
+    #ffffff 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
 }
 /* The top chum's printed card, then the level's name under it. */
 .head { text-align: center; margin: 10px 0 12px; }
