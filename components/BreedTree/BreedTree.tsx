@@ -997,27 +997,33 @@ const shuffledFacts = (pool: string[]): string[] => {
    little and fade as they grow. Fired when a chum card is collected and when a
    dog chain's circles lift. Drawn in the game's overlay above the lifted layer
    (z-index 80). Honours reduced motion by doing nothing. */
-const HEART_PATH = "M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z";
+// BONES, not hearts, and half the size, 25 September 2026 (owner). Each one tumbles as it flies.
+const HEART_PATH = "M7.2 9.6a2.8 2.8 0 1 0-3.1 2.4 2.8 2.8 0 1 0 3.1 2.4h9.6a2.8 2.8 0 1 0 3.1-2.4 2.8 2.8 0 1 0-3.1-2.4z";
 const HEART_COLOURS = ["#ff1f57", "#ff9645", "#ffea73", "#7fff7a", "#61a8ff", "#cf82ff"];
 const HEART_MS = 1600;
-const heartBurst = (host: Element | null | undefined, x: number, y: number, count: number, size = 26) => {
+const heartBurst = (host: Element | null | undefined, x: number, y: number, count: number, size = 13) => {
   if (!host || typeof window === "undefined") return;
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
   for (let k = 0; k < count; k++) {
     const el = document.createElement("div");
     el.setAttribute("aria-hidden", "true");
     const colour = HEART_COLOURS[Math.floor(Math.random() * HEART_COLOURS.length)];
-    el.innerHTML = `<svg viewBox="0 0 24 24" width="${size}" height="${size}"><path d="${HEART_PATH}" fill="${colour}" stroke="#ffffff" stroke-width="1.2"/></svg>`;
+    el.innerHTML = `<svg viewBox="0 0 24 24" width="${size}" height="${size}"><path d="${HEART_PATH}" fill="${colour}" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
     Object.assign(el.style, { position: "fixed", left: `${x}px`, top: `${y}px`, zIndex: "80", pointerEvents: "none", lineHeight: "0" });
     host.appendChild(el);
-    // The pen's spread: sideways -6 to +5 of its heart widths, up 10 to 17, then back to 80%.
-    const dx = (Math.random() * 11 - 6) * size * 0.55;
-    const dy = (10 + Math.random() * 7) * size * 0.55;
+    /* The pen's spread, measured in the ORIGINAL 26px heart widths so halving the
+       bones does not halve how far they fly: sideways -6 to +5, up 10 to 17, then
+       back to 80%. Each bone also turns as it goes, a random way and amount. */
+    const unit = 26 * 0.55;
+    const dx = (Math.random() * 11 - 6) * unit;
+    const dy = (10 + Math.random() * 7) * unit;
+    const spin = (Math.random() < 0.5 ? -1 : 1) * (180 + Math.random() * 360);
+    const tilt = Math.random() * 360;
     const anim = el.animate([
-      { transform: "translate(-50%, -50%) translate(0px, 0px) scale(0.6)", opacity: 1 },
-      { transform: `translate(-50%, -50%) translate(${dx * 0.55}px, ${-dy}px) scale(1)`, opacity: 0.85, offset: 0.5 },
-      { transform: `translate(-50%, -50%) translate(${dx * 0.7}px, ${-dy}px) scale(1.1)`, opacity: 0.6, offset: 0.6 },
-      { transform: `translate(-50%, -50%) translate(${dx}px, ${-dy * 0.8}px) scale(1.5)`, opacity: 0 },
+      { transform: `translate(-50%, -50%) translate(0px, 0px) rotate(${tilt}deg) scale(0.6)`, opacity: 1 },
+      { transform: `translate(-50%, -50%) translate(${dx * 0.55}px, ${-dy}px) rotate(${tilt + spin * 0.5}deg) scale(1)`, opacity: 0.85, offset: 0.5 },
+      { transform: `translate(-50%, -50%) translate(${dx * 0.7}px, ${-dy}px) rotate(${tilt + spin * 0.6}deg) scale(1.1)`, opacity: 0.6, offset: 0.6 },
+      { transform: `translate(-50%, -50%) translate(${dx}px, ${-dy * 0.8}px) rotate(${tilt + spin}deg) scale(1.5)`, opacity: 0 },
     ], { duration: HEART_MS + Math.random() * 300, delay: k * 40, easing: "ease-out", fill: "forwards" });
     anim.onfinish = () => el.remove();
   }
