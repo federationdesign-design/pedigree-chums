@@ -1015,7 +1015,10 @@ const shuffledFacts = (pool: string[]): string[] => {
    (z-index 80). Honours reduced motion by doing nothing. */
 // BONES, not hearts, and half the size, 25 September 2026 (owner). Each one tumbles as it flies.
 const HEART_PATH = "M7.2 9.6a2.8 2.8 0 1 0-3.1 2.4 2.8 2.8 0 1 0 3.1 2.4h9.6a2.8 2.8 0 1 0 3.1-2.4 2.8 2.8 0 1 0-3.1-2.4z";
-const HEART_COLOURS = ["#ff1f57", "#ff9645", "#ffea73", "#7fff7a", "#61a8ff", "#cf82ff"];
+// The brand colours, not the pen's rainbow, 25 September 2026 (owner): lemon
+// (--ng-lemon), the orange-yellow (--yellow), and light, medium and dark blue
+// (--blue-sky, --blue, --blue-deep), all from app/globals.css.
+const HEART_COLOURS = ["#ffed00", "#ffd23e", "#5cc4ee", "#1497d6", "#0b78bd"];
 const HEART_MS = 1600;
 // Bones from a completed dog chain: 12 for 2 circles, 100 for 10, 400 (the cap) from about 30.
 const BONES_BASE = 5;
