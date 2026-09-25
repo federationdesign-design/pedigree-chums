@@ -17836,7 +17836,7 @@ export default function BreedTree({
                             rarity pill, so the colour still says the rarity. */}
                         <span className={styles.foundListTag} style={{ background: band.bg, color: band.fg }} title={band.label}>{d.era}</span>
                         {open ? (
-                          <div className={styles.foundDetail}>
+                          <div className={`${styles.foundDetail} ${open === "zoom" ? styles.foundDetailZoom : ""}`}>
                             {open === "info" ? <p>{info}</p> : null}
                             {open === "zoom" && img ? (
                               // eslint-disable-next-line @next/next/no-img-element

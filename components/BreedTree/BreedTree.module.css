@@ -2594,7 +2594,7 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  width: min(86vw, 360px);
+  width: 90vw; /* 90% of the screen, 25 September 2026 (owner); was min(86vw, 360px) */
   max-height: 55vh;
   overflow-y: auto;
   padding: 10px 12px 12px;
@@ -2656,10 +2656,11 @@
   /* The pill carries its own rarity colours, so no glass shadow on its text. */
   text-shadow: none;
   align-self: center;
-  font-size: 10px;
+  /* Twice the size, 25 September 2026 (owner): was 10px on 3px 8px. */
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  padding: 3px 8px;
+  padding: 6px 16px;
   border-radius: 999px;
   white-space: nowrap;
 }
@@ -2739,8 +2740,9 @@
   padding: 0 7px;
   border: 1.5px solid #ffffff;
   border-radius: 999px;
-  background: var(--yellow, #ffd23e);
-  color: #0a3a57;
+  /* Dark blue, 25 September 2026 (owner): was yellow with navy text. */
+  background: var(--blue-deep, #0c5b92);
+  color: #ffffff;
   font-size: 10px;
   font-weight: 800;
 }
@@ -2750,12 +2752,17 @@
   margin-top: 6px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: var(--blue-deep, #0c5b92);
+  /* The panel's clear glass, not dark blue, 25 September 2026 (owner), with the
+     text at 600 and the panel's own drop shadow so it holds over the pit. */
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  text-shadow: none;
+  font-weight: 600;
   font-size: 13px;
   line-height: 1.4;
 }
+/* The picture box has no background at all (owner, 25 September 2026). */
+.foundDetailZoom { background: none; border: none; padding: 0; }
 .foundDetail p { margin: 0; }
 .foundDetailImg { display: block; width: 100%; max-width: 280px; margin: 0 auto; border-radius: 10px; }
 .foundDetailHead { font-weight: 700; margin-bottom: 6px !important; }
