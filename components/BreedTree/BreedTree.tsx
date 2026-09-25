@@ -1041,6 +1041,20 @@ const accTierOf = (src: string): string | null => {
   for (const t in ACC_TIERS) if (ACC_TIERS[t].expr[src]) return t;
   return null;
 };
+/* SKIN TONES, 25 September 2026 (owner: see the yellow dogs in the original, bright
+   and sunshine tones together). A tier listed here also picks a TONE per breed,
+   at random, so the tones show on every level; each breed's accessory still comes
+   from the shuffled order as before, so the first breeds are told apart by
+   accessory alone, and no two breeds on a level share both accessory and tone.
+   "" is the original art, in public/faces/{tier}; any other tone lives in
+   public/faces/{tier}-{tone}. */
+const ACC_TONES: Record<string, string[]> = { common: ["", "bright", "sunshine"] };
+// A tone for this accessory that no other breed on the level has with it yet.
+const pickTone = (tones: string[], used: Set<string>, acc: string): string => {
+  const free = tones.filter((t) => !used.has(acc + "|" + t));
+  const pool = free.length ? free : tones;
+  return pool[Math.floor(Math.random() * pool.length)];
+};
 // A fresh random order of a tier's accessories (a Fisher-Yates shuffle).
 const shuffledAcc = (list: readonly string[]): string[] => {
   const o: string[] = [...list];
@@ -1050,7 +1064,8 @@ const shuffledAcc = (list: readonly string[]): string[] => {
 /* Sets a face image and, for an accessory face, the bigger box it needs. */
 const setFaceHref = (el: SVGImageElement | Element, href: string) => {
   if (el.getAttribute("href") !== href) el.setAttribute("href", href);
-  const tier = href.startsWith("/faces/") ? href.split("/")[2] : null;
+  // "common-bright" and the like are a tone of "common": same fit.
+  const tier = href.startsWith("/faces/") ? href.split("/")[2].split("-")[0] : null;
   const fit = tier ? ACC_TIERS[tier] : null;
   const size = fit ? QMARK_VB / fit.head : QMARK_VB;
   const x = fit ? QMARK_VB / 2 - size / 2 : 0;
@@ -6398,7 +6413,7 @@ export default function BreedTree({
   };
   // Called only from the face writer, never during render.
   // The green breeds' accessories, reset with the level exactly as the shades are.
-  const greenAccRef = useRef<{ nodes: Node[] | null; of: Map<string, string>; order: Record<string, string[]>; seen: Record<string, number> }>({ nodes: null, of: new Map(), order: {}, seen: {} });
+  const greenAccRef = useRef<{ nodes: Node[] | null; of: Map<string, string>; order: Record<string, string[]>; seen: Record<string, number>; used: Set<string> }>({ nodes: null, of: new Map(), order: {}, seen: {}, used: new Set() });
   const shadeFace = (d: Node, src: string): string => {
     const tier = accTierOf(src);
     if (tier) {
@@ -6407,17 +6422,22 @@ export default function BreedTree({
          always see the same dog in the bandana). A fresh random order per tier
          each time the level's tree is built, which is every level start and
          every refresh; within the round twins match and different breeds differ. */
-      if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); st.order = {}; st.seen = {}; }
+      if (st.nodes !== nodesRef.current) { st.nodes = nodesRef.current; st.of = new Map(); st.order = {}; st.seen = {}; st.used = new Set(); }
       const key = tier + ":" + d.data.name;
-      let acc = st.of.get(key);
-      if (acc === undefined) {
+      let look = st.of.get(key); // "accessory|tone"
+      if (look === undefined) {
         const order = (st.order[tier] ??= shuffledAcc(ACC_TIERS[tier].list));
         const n = st.seen[tier] ?? 0;
         st.seen[tier] = n + 1;
-        acc = order[n % order.length];
-        st.of.set(key, acc);
+        const acc = order[n % order.length];
+        const tones = ACC_TONES[tier];
+        const tone = tones ? pickTone(tones, st.used, tier + ":" + acc) : "";
+        st.used.add(tier + ":" + acc + "|" + tone);
+        look = acc + "|" + tone;
+        st.of.set(key, look);
       }
-      return `/faces/${tier}/${ACC_TIERS[tier].expr[src]}_${acc}.webp`;
+      const [acc, tone] = look.split("|");
+      return `/faces/${tier}${tone ? "-" + tone : ""}/${ACC_TIERS[tier].expr[src]}_${acc}.webp`;
     }
     if (!src.startsWith("/very-common")) return src;
     const st = faceShadeRef.current;
