@@ -2593,7 +2593,8 @@ const HOLD_MORE_FROM = 293;
 const HOLD_LAST_LAYERS_BIG = 4;
 /* AND ONE MORE RING AT EACH OF THESE (owner, 25 September 2026): five layers
    from 350 circles, six from 400. Read by holdLayersFor, largest first. */
-const HOLD_STEPS: [number, number][] = [[400, 6], [350, 5], [HOLD_MORE_FROM, HOLD_LAST_LAYERS_BIG]];
+// Seven from 630 and eight from 800 (owner, 25 September 2026).
+const HOLD_STEPS: [number, number][] = [[800, 8], [630, 7], [400, 6], [350, 5], [HOLD_MORE_FROM, HOLD_LAST_LAYERS_BIG]];
 const holdLayersFor = (circles: number) => HOLD_STEPS.find(([from]) => circles >= from)?.[1] ?? HOLD_LAST_LAYERS;
 const DEEP_HOLD_MS = 5000;
 const HOLD_RELEASE_MS = 1500;
