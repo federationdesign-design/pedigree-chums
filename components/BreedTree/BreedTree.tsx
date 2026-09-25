@@ -1909,6 +1909,23 @@ const CHAIN_JOIN_BONUS_MS = 1000;
 const chainAllowanceMs = (connections: number) =>
   CHAIN_JOIN_BASE_MS + CHAIN_JOIN_BONUS_MS * Math.max(0, connections);
 type ChainSq = { x: number; y: number; a: number; h: number };
+/* THE CHAIN'S CANDIDATES GROW, 25 September 2026 (owner). While a chain is live,
+   every dog that could still join it (chTwin in the painter) is drawn 5% larger,
+   arriving with a pop: past 5% to CHAIN_TWIN_PEAK, back under to CHAIN_TWIN_DIP
+   for a shorter spell, then settling at CHAIN_TWIN_GROW, over CHAIN_TWIN_POP_MS.
+   Drawing only: the physics body keeps its size, so the pile does not shove. */
+const CHAIN_TWIN_GROW = 1.05;
+const CHAIN_TWIN_PEAK = 1.08;
+const CHAIN_TWIN_DIP = 1.035;
+const CHAIN_TWIN_POP_MS = 300;
+// Half the time rising to the peak, a quarter falling to the dip, a quarter settling.
+function chainTwinPop(ms: number): number {
+  const t = Math.max(0, Math.min(1, ms / CHAIN_TWIN_POP_MS));
+  const ease = (a: number, b: number, u: number) => a + (b - a) * (1 - (1 - u) * (1 - u));
+  if (t < 0.5) return ease(1, CHAIN_TWIN_PEAK, t / 0.5);
+  if (t < 0.75) return ease(CHAIN_TWIN_PEAK, CHAIN_TWIN_DIP, (t - 0.5) / 0.25);
+  return ease(CHAIN_TWIN_DIP, CHAIN_TWIN_GROW, (t - 0.75) / 0.25);
+}
 /* Separating axis test for two rotated squares (centre, angle in radians, half
    side). Returns the largest gap along any of the four axes: zero or less means
    they overlap or touch. */
@@ -5476,6 +5493,8 @@ export default function BreedTree({
      whole pit on every join. The lifted layer's own counters are plain DOM for
      the same reason. Written by paintChainCount below and by nothing else. */
   const chainCountRef = useRef<HTMLDivElement>(null);
+  // When each chain candidate started its grow pop. See CHAIN_TWIN_GROW.
+  const chainGrowRef = useRef<Map<Node, number>>(new Map());
   const foundCountRef = useRef<HTMLDivElement>(null);
   /* THE DOGS-FOUND COUNTER ONLY FLASHES (owner, 24 September 2026): it shows for
      FOUND_FLASH_MS when the run's figure goes UP, then goes. prevFoundRef starts
@@ -7389,6 +7408,17 @@ export default function BreedTree({
         c?.style.opacity !== "0";
       const chHeld = paintable && chainHolds(d);
       const chTwin = paintable && !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
+      // The candidates' 5% pop: timed from the frame each one became a candidate.
+      let twinK = 1;
+      {
+        const grow = chainGrowRef.current;
+        if (chTwin) {
+          const now = performance.now();
+          const at = grow.get(d) ?? now;
+          if (!grow.has(d)) grow.set(d, now);
+          twinK = chainTwinPop(now - at);
+        } else if (grow.size) grow.delete(d);
+      }
       /* EVERY OTHER BREED RECEDES WHILE A CHAIN IS LIVE (owner, 19 September
          2026: once the first is selected, darken the circles that cannot be
          linked so the ones that can are obvious).
@@ -7590,7 +7620,7 @@ export default function BreedTree({
       if (c) {
         c.setAttribute("display", isWordNode ? "none" : "inline");
         c.setAttribute("transform", `translate(${tx},${ty})`);
-        c.setAttribute("r", String(drawR(d, v, k)));
+        c.setAttribute("r", String(drawR(d, v, k) * twinK));
         // The radius is scaled by the view but the stroke was not, so a circle
         // drawn small kept a full-size ring and read as heavy. Scale both.
         /* AN AVAILABLE TWIN WEARS DOG_CHAIN_TWIN_STROKE_K TIMES ITS OWN WEIGHT.
@@ -7767,7 +7797,7 @@ export default function BreedTree({
              would flip the dog on and off like a fault. Mirrored on the vertical
              axis, which is what "facing the other way" means for a face drawn
              head on. */
-          const sc = (drawR(d, v, k) * FACE_FILL_K) / QMARK_VB;
+          const sc = (drawR(d, v, k) * twinK * FACE_FILL_K) / QMARK_VB;
           q.setAttribute("transform", `translate(${tx},${ty + FACE_NUDGE_Y / k}) scale(${flip ? -sc : sc},${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
         }
         /* THE MARK IS THE HIGHLIGHT. While a
