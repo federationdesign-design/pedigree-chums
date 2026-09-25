@@ -2725,7 +2725,13 @@ const HOLD_MS_BANDS: { from: number; under: number; ms: number; stageMs?: number
      stageMs releases layer by layer instead, so that drip no longer runs. */
   // The Cockapoo's band, its own times (owner, 25 September 2026).
   { from: 475, under: 630, ms: 500, stageMs: 500, stageTimes: [500, 1000, 2000, 3000, 4000, 4500] },
-  { from: 630, under: Infinity, ms: 500, stageMs: 500 },
+  /* 630 and up split in three, each with its own times (owner, 25 September
+     2026). Layers beyond a list take its last time plus stageMs each. 630 to 799's
+     third time (1.4s) is before its second (1.6s) as given: a deeper layer can only
+     come out of a parent that is already out, so it joins the second's wave. */
+  { from: 630, under: 800, ms: 700, stageMs: 500, stageTimes: [700, 1600, 1400, 2000, 2700, 3000, 3500] },
+  { from: 800, under: 1200, ms: 700, stageMs: 500, stageTimes: [700, 1600, 1900, 2200, 2700, 3000, 3500] },
+  { from: 1200, under: Infinity, ms: 500, stageMs: 500, stageTimes: [500, 1800, 2400, 3000, 3700, 4000, 4300] },
 ];
 const holdBandFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under);
 const holdMsFor = (circles: number) => holdBandFor(circles)?.ms ?? DEEP_HOLD_MS;
