@@ -3281,7 +3281,12 @@ export default function LineageMap({
        ever needs capping the lever is autoArmed, arming once per level or once
        every few lifts, NOT the cost: AUTO already forfeits 500 a node in earnings
        it never pays, so raising AUTO_COST_LIFT would bill the deep dogs twice. */
-    if (circular) circularComplete();
+    /* AUTO NO LONGER COMPLETES, 25 September 2026 (owner: players had no time to
+       look at the framed pictures before the overlay closed). It still opens,
+       pops and places everything, then STOPS on the finished tree; the player
+       presses Complete when they have looked. The 18 September note above
+       describes the old ending; circularComplete is untouched and still runs from
+       the Complete button. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [picked, autoPlaceTick]);
 
