@@ -2524,6 +2524,12 @@ const POP_GROW = 1.5;
 const HEAVY_LEVEL_CIRCLES = 200;
 const QUIET_NUMBERS_MS = 10000;
 const HOLD_LAST_LAYERS = 3; // was 5 (owner, 25 September 2026)
+/* ONE MORE LAYER FROM THE CAVACHON UP (owner, 25 September 2026: the Poodle is
+   fine on three; by the Cavachon, 295 circles, it starts to struggle). 293 sits
+   between the Cavalier King Charles (291) and the Cavachon so a small difference
+   in how the pit counts cannot tip either the wrong way. */
+const HOLD_MORE_FROM = 293;
+const HOLD_LAST_LAYERS_BIG = 4;
 const DEEP_HOLD_MS = 5000;
 const HOLD_RELEASE_MS = 1500;
 // And a floor, in screen pixels across. Growth alone can never win: each
@@ -8615,7 +8621,7 @@ export default function BreedTree({
       const dropT0 = performance.now();
       // The first layer held back: the last HOLD_LAST_LAYERS of this tree, never
       // the top two, so the opening cascade always plays.
-      const holdFrom = Math.max(3, nodes.reduce((m, n) => Math.max(m, n.depth), 0) - HOLD_LAST_LAYERS + 1);
+      const holdFrom = Math.max(3, nodes.reduce((m, n) => Math.max(m, n.depth), 0) - (nodes.length - 1 >= HOLD_MORE_FROM ? HOLD_LAST_LAYERS_BIG : HOLD_LAST_LAYERS) + 1);
       // ---- the words ----
       // Sized by the SAME fitter the circles use, so a name is the size it was
       // inside its circle, then 30% up because it has no ring or picture around
