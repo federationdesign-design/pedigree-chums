@@ -1671,7 +1671,17 @@ export default function LineageMap({
   }, [breedMix]);
   // (Stage 1 console diagnostic removed) /* mix-box */
   const [filled, setFilled] = useState<Map<string, string>>(new Map()); // frameId -> the card id dropped into it
-  useEffect(() => setFilled(new Map()), [breed.name]);
+  /* AUTO SHOWS COMPLETE WHEN ITS LAST CARD LANDS, 25 September 2026 (owner: after
+     AUTO stopped closing the lift, the Complete button stayed hidden). Complete
+     waits for framesDone, and after AUTO a frame can be left that no card fills,
+     which the old ending hid by completing regardless. This switches on just
+     after AUTO's last fly-in lands (autoLandMsRef, set by placeAllUnplaced), so
+     Complete appears the moment the pictures are in. Reset for every new dog. */
+  const [autoReady, setAutoReady] = useState(false);
+  const autoLandMsRef = useRef(0);
+  // Which dog a pending autoReady timer belongs to, so a stale one cannot fire on the next.
+  const autoDogRef = useRef(0);
+  useEffect(() => { setFilled(new Map()); setAutoReady(false); autoDogRef.current++; }, [breed.name]);
   const [stacked, setStacked] = useState<Map<string, string[]>>(new Map()); // frameId -> extra duplicate cards piled on top of the primary
   useEffect(() => setStacked(new Map()), [breed.name]);
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
@@ -3191,6 +3201,8 @@ export default function LineageMap({
     const flyAt = new Map<string, number>();
     let flyClock = 0;
     for (const f of flyOrder) { flyAt.set(f.c.id, flyClock); flyClock += autoStep(80, f.d); }
+    // When the last card will have landed: its start plus the 460ms glide.
+    autoLandMsRef.current = (circular ? flyClock : unplaced.length * 80) + 460;
     unplaced.forEach((c, i) => {
       // Find target using local snapshot so each card claims a unique slot
       const emptyTarget = frames.find((f) => f.img === c.img && !claimedFilled.has(f.id));
@@ -3250,7 +3262,13 @@ export default function LineageMap({
     if (stillPopping && !autoForceRef.current) return;
     autoForceRef.current = false;
     autoPlaceRef.current = false;
-    placeAllUnplaced();
+    const placing = placeAllUnplaced();
+    // Complete shows once the last card has landed (see autoReady).
+    if (circular) {
+      const wait = placing ? autoLandMsRef.current + 200 : 0;
+      const dog = autoDogRef.current;
+      window.setTimeout(() => { if (autoDogRef.current === dog) setAutoReady(true); }, wait);
+    }
     /* AND ON THE PLAY LIFT, AUTO FINISHES THE JOB (owner, 18 September 2026).
 
        PLAY AREA ONLY. `circular` is the lift; the learn area keeps what it had, so
@@ -4145,7 +4163,7 @@ export default function LineageMap({
             ON A SOLO DOG IT IS THERE FROM THE START, 20 September 2026 (owner),
             because framesDone cannot be true until the card is placed and the
             press is what places it. */}
-        {circular && (framesDone || soloLeaf) && !rootGone && !scattered ? (
+        {circular && (framesDone || soloLeaf || autoReady) && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,${4 * learnBtnScale + 2}) scale(${learnBtnScale})`}
