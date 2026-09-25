@@ -921,14 +921,14 @@ const FACE_SHAKE_SRC: Record<RarityTier, string> = {
    note at the writer, where the circle is faded rather than swapped. */
 const FACE_STANDDOWN_SRC: Record<RarityTier, string> = {
   extremelyRare: "/extreme-rare4.webp",
-  rare: "/rare2.webp", // side-eye, 25 Sept 2026: the blue set has no worried face
+  rare: "/rare6.webp", // worried again, 25 Sept 2026: the blue set now has it (sheet 8)
   uncommon: "/uncommon2.webp",
   common: "/very-common3.webp",
   veryCommon: "/common5.webp",
 };
 const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
   extremelyRare: ["/extreme-rare.webp", "/extreme-rare2.webp"],
-  rare: ["/rare.webp", "/rare3.webp", "/rare7.webp"], // the new squint in place of the worried face, 25 Sept 2026
+  rare: ["/rare.webp", "/rare3.webp", "/rare6.webp", "/rare7.webp"], // worried back, plus the new squint, 25 Sept 2026
   uncommon: ["/uncommon.webp", "/uncommon2.webp", "/uncommon4.webp", "/uncommon5.webp", "/uncommon7.webp"], // + the laughing face, 25 Sept 2026
   common: ["/very-common2.webp", "/very-common3.webp", "/very-common4.webp"],
   veryCommon: ["/common.webp", "/common2.webp", "/common5.webp"],
@@ -1000,7 +1000,8 @@ const ACC_TIERS: Record<string, { expr: Record<string, number>; list: readonly s
     list: GREEN_ACC, head: 0.806, cy: 0.515,
   },
   rare: {
-    expr: { "/rare.webp": 2, "/rare2.webp": 3, "/rare7.webp": 4, "/rare3.webp": 5, "/rare4.webp": 6, "/rare5.webp": 7 },
+    // Sheet 8, the worried face, added 25 September 2026 (owner drew it).
+    expr: { "/rare.webp": 2, "/rare2.webp": 3, "/rare7.webp": 4, "/rare3.webp": 5, "/rare4.webp": 6, "/rare5.webp": 7, "/rare6.webp": 8 },
     list: BLUE_ACC, head: 0.795, cy: 0.512,
   },
 };
