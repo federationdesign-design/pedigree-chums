@@ -123,16 +123,14 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
       {/* A TABLE, 24 September 2026 (owner): the column names once at the top,
           a line between the rows. */}
       <div className={styles.colHead} aria-hidden="true">
-        <span />
         <span>Chum history</span>
         <span>Ancestors</span>
         <span>Ins</span>
       </div>
       <ol className={styles.list}>
-        {rows.map((r, i) => (
+        {rows.map((r) => (
           <li key={r.slug}>
             <Link href={`/play/${r.slug}`} className={styles.row} aria-label={`Play the ${r.name}: ${r.dogs} ancestors, ${r.circles} instances`}>
-              <span className={styles.rank}>{i + 1}</span>
               <span className={styles.chum}>
                 <span className={styles.nameLine}>
                   <span className={styles.name}>{r.name}</span>
