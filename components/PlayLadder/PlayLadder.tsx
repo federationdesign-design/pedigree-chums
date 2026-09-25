@@ -140,10 +140,11 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
       {/* A TABLE, 24 September 2026 (owner): the column names once at the top,
           a line between the rows. */}
       <div className={styles.colHead} aria-hidden="true">
-        <span>Chum history</span>
+        {/* Renamed 25 September 2026 (owner). */}
+        <span>Name</span>
         <span>Chums</span>
         <span>Ancestors</span>
-        <span>Ins</span>
+        <span>Inputs</span>
       </div>
       <ol className={styles.list}>
         {rows.map((r) => (
