@@ -2679,7 +2679,7 @@ const DEEP_HOLD_MS = 5000;
    circles (four layers held) release at 2 seconds, not 5. Every other band keeps
    DEEP_HOLD_MS. Read by holdMsFor. */
 const HOLD_MS_BANDS: { from: number; under: number; ms: number }[] = [
-  { from: 293, under: 350, ms: 2000 },
+  { from: 293, under: 350, ms: 1000 }, // 1 second, 25 September 2026 (owner; was 2)
 ];
 const holdMsFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under)?.ms ?? DEEP_HOLD_MS;
 const HOLD_RELEASE_MS = 1500;
