@@ -1915,8 +1915,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Ancient Spitz dogs",
     note: "The small spitz-type dogs of northern Europe, pricked-eared and curl-tailed. Now extinct.",
     img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg",
+    /* THE OLDER STAGE AS A SECOND PARENT, 25 September 2026 (owner: a dog with
+       one parent reads as a straight line; letting it also breed with the older
+       stage shows it changing over time, the Celtic Heeler idea). The main
+       parent keeps three quarters, the older stage takes a quarter. */
     children: [
-      { name: "Ancient Arctic Spitz", note: "The northern spitz family they spread south from. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 100 }
+      { name: "Ancient Arctic Spitz", note: "The northern spitz family they spread south from. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 75 },
+      { name: "Zhokhov Island sled dogs", note: "The 9,500-year-old sled dogs of Zhokhov Island in Arctic Siberia, whose genome modern huskies still largely share. Now extinct.", img: "/history/breeds/zhokhov-sled-dogs.jpg", value: 25 }
     ]
   },
   /* OLD EUROPEAN LAPDOGS, 24 September 2026 (owner, Group 1). Europe's lapdogs from the two ancient companion lines, the bichons and the miniature sighthounds. */
@@ -1944,8 +1949,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Arctic sled Spitz",
     note: "The large Nordic sled, hunting and herding spitz of the far north. Now extinct.",
     img: "/history/breeds/Ancient-Arctic-spitz.jpg",
+    /* THE OLDER STAGE AS A SECOND PARENT, 25 September 2026 (owner: a dog with
+       one parent reads as a straight line; letting it also breed with the older
+       stage shows it changing over time, the Celtic Heeler idea). The main
+       parent keeps three quarters, the older stage takes a quarter. */
     children: [
-      { name: "Ancient Arctic Spitz", note: "The ancient northern spitz family. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 100 }
+      { name: "Ancient Arctic Spitz", note: "The ancient northern spitz family. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 75 },
+      { name: "Zhokhov Island sled dogs", note: "The 9,500-year-old sled dogs of Zhokhov Island in Arctic Siberia, whose genome modern huskies still largely share. Now extinct.", img: "/history/breeds/zhokhov-sled-dogs.jpg", value: 25 }
     ]
   },
   /* GERMAN FARM SPITZ, 24 September 2026 (owner, Group 1). Spitz stock kept on the farms. */
@@ -1963,8 +1973,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Chukchi sled dogs",
     note: "The endurance team dogs of the Siberian Arctic. Now extinct.",
     img: "/history/breeds/Chukchi-sled-dogs.jpg",
+    /* THE OLDER STAGE AS A SECOND PARENT, 25 September 2026 (owner: a dog with
+       one parent reads as a straight line; letting it also breed with the older
+       stage shows it changing over time, the Celtic Heeler idea). The main
+       parent keeps three quarters, the older stage takes a quarter. */
     children: [
-      { name: "Ancient Arctic Spitz", note: "The ancient Arctic sled-dog line, thousands of years old. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 100 }
+      { name: "Ancient Arctic Spitz", note: "The ancient Arctic sled-dog line, thousands of years old. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 75 },
+      { name: "Zhokhov Island sled dogs", note: "The 9,500-year-old sled dogs of Zhokhov Island in Arctic Siberia, whose genome modern huskies still largely share. Now extinct.", img: "/history/breeds/zhokhov-sled-dogs.jpg", value: 25 }
     ]
   },
   /* ANCIENT TECHICHI DOGS, 24 September 2026 (owner, Group 1). One parent. Picture made for the Mesoamerican dogs. */
@@ -2633,8 +2648,11 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Roman shepherd dogs",
     note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
     img: "/history/breeds/roman-shepherd-dogs.jpg",
+    /* The Molossers' share split with their own older stage, the Old Mastiffs of
+       the East, 25 September 2026 (owner); the self-link keeps its half. */
     children: [
-      { name: "Ancient Molossers", note: "The big flock-guarding stock of the ancient world. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 },
+      { name: "Ancient Molossers", note: "The big flock-guarding stock of the ancient world. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 15 },
+      { name: "Old Mastiffs of the East", note: "The huge guard mastiffs of the ancient East the Molossers came from, the older stage behind the flock guards. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 10 },
       { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 25 },
     ],
   },
@@ -2873,8 +2891,13 @@ const LINEAGE: Record<string, LineageNode> = {
   "Arctic sled dogs": {
     name: "Arctic sled dogs",
     note: "The Siberian and Alaskan sled dogs, Husky and Malamute, behind the wolfish modern recreations.",
+    /* THE OLDER STAGE AS A SECOND PARENT, 25 September 2026 (owner: a dog with
+       one parent reads as a straight line; letting it also breed with the older
+       stage shows it changing over time, the Celtic Heeler idea). The main
+       parent keeps three quarters, the older stage takes a quarter. */
     children: [
-      { name: "Ancient Spitz dogs", note: "The broad northern spitz family the arctic sled dogs belong to, Nordic stock that sits outside the British Tudor record and reaches no era card.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg", value: 100 }
+      { name: "Ancient Spitz dogs", note: "The broad northern spitz family the arctic sled dogs belong to, Nordic stock that sits outside the British Tudor record and reaches no era card.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg", value: 75 },
+      { name: "Ancient Arctic Spitz", note: "The ancient northern spitz family behind the pricked ears, curled tail and thick coat. Now extinct.", img: "/history/breeds/Ancient-Arctic-dog-ancestry-Deep-northern-eastern-Eurasian-dog.jpg", value: 25 }
     ]
   },
 
@@ -2896,9 +2919,9 @@ const LINEAGE: Record<string, LineageNode> = {
   "Ancient Molossers": {
     name: "Ancient Molossers",
     note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+    /* One entry, 25 September 2026: the same parent was listed twice (a bug). */
     children: [
-      { name: "Old Mastiffs of the East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 50 },
-      { name: "Old Mastiffs of the East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 50 }
+      { name: "Old Mastiffs of the East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 100 }
     ]
   },
 
@@ -2957,8 +2980,13 @@ const LINEAGE: Record<string, LineageNode> = {
        unchanged, so the balance is as before with the missing stage in between.
        Lord Orford's 1770s bulldog cross is LEFT OUT at the owner's word: the
        sources doubt any of it survived. */
+    /* THE OLDER STAGE AS A SECOND PARENT, 25 September 2026 (owner: a dog with
+       one parent reads as a straight line; letting it also breed with the older
+       stage shows it changing over time, the Celtic Heeler idea). The main
+       parent keeps three quarters, the older stage takes a quarter. */
     children: [
-      { name: "Medieval Greyhound", note: "The noble hunting greyhound of Norman and Plantagenet England, so prized that Canute's Forest Laws of 1016 kept it from commoners and King John took greyhounds in payment of fines. Now extinct.", img: "/history/breeds/medieval-greyhound.jpg", value: 100 }
+      { name: "Medieval Greyhound", note: "The noble hunting greyhound of Norman and Plantagenet England, so prized that Canute's Forest Laws of 1016 kept it from commoners and King John took greyhounds in payment of fines. Now extinct.", img: "/history/breeds/medieval-greyhound.jpg", value: 75 },
+      { name: "Celtic Coursing Hound", note: "The swift coursing hound of the Celts, the vertragus the Romans wrote about, still in the mix as the greyhound took its medieval form. An extinct historical type.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 25 }
     ]
   },
   /* THE MEDIEVAL GREYHOUND, 24 September 2026 (owner). Carries the Greyhound's old
@@ -3710,8 +3738,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Carriage guard dogs",
     note: "The road dogs kept to run with the horses and mind the coach, the job the Dalmatian was made for. Now extinct.",
     img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg",
+    /* THE OLDER STAGE AS A SECOND PARENT, 25 September 2026 (owner: a dog with
+       one parent reads as a straight line; letting it also breed with the older
+       stage shows it changing over time, the Celtic Heeler idea). The main
+       parent keeps three quarters, the older stage takes a quarter. */
     children: [
-      { name: "Pointer", note: "Pointer blood is the ancestry usually given for the spotted coach dogs. It is the traditional account rather than documented descent. Now in-decline.", img: "/history/breeds/british-pointers.jpg", value: 100 }
+      { name: "Pointer", note: "Pointer blood is the ancestry usually given for the spotted coach dogs. It is the traditional account rather than documented descent. Now in-decline.", img: "/history/breeds/british-pointers.jpg", value: 75 },
+      { name: "Ancient spotted Hounds", note: "The old spotted hunting dogs pictured across Europe and the Mediterranean for centuries, the spotted coat behind the coach dog. Now extinct.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 25 }
     ]
   },
 
