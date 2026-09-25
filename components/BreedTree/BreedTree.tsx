@@ -2523,7 +2523,7 @@ const POP_GROW = 1.5;
    depth, so every big level keeps its top layers' opening cascade. */
 const HEAVY_LEVEL_CIRCLES = 200;
 const QUIET_NUMBERS_MS = 10000;
-const HOLD_LAST_LAYERS = 5;
+const HOLD_LAST_LAYERS = 3; // was 5 (owner, 25 September 2026)
 const DEEP_HOLD_MS = 5000;
 const HOLD_RELEASE_MS = 1500;
 // And a floor, in screen pixels across. Growth alone can never win: each
