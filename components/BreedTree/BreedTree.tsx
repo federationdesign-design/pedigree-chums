@@ -2381,7 +2381,17 @@ const PIT_FULL_GRACE_MS = 30000;
    change if the longer end is wanted after all. */
 const PIT_FULL_GRACE_FREE = 2;
 const PIT_FULL_GRACE_PER_CIRCLE_MS = 2500;
+/* NO GRACE ON THE IMPOSSIBLE LEVELS, 25 September 2026 (owner: the pit fills
+   almost at once with 500 or so objects, so the countdown should start more or
+   less straight away). A level with at least this many circles gets no grace at
+   all; the poll's own 4s settle-in still stops it firing mid-drop. 475 is the
+   Cockapoo, the smallest dog in the Impossible table today (Border Terrier, the
+   next one down, is 444). */
+const NO_GRACE_FROM_CIRCLES = 475;
 function pitFullGraceMs(ns: Node[]): number {
+  let all = 0;
+  for (const d of ns) if (d.depth > 0 && !isHiddenCopy(d)) all++;
+  if (all >= NO_GRACE_FROM_CIRCLES) return 0;
   let n = 0;
   for (const d of ns) if (d.depth > 0 && d.depth <= 2 && !isHiddenCopy(d)) n++;
   return PIT_FULL_GRACE_MS + Math.max(0, n - PIT_FULL_GRACE_FREE) * PIT_FULL_GRACE_PER_CIRCLE_MS;
