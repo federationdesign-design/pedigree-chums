@@ -968,30 +968,59 @@ const FACE_FLIP_SHARE = 0.4;
    bright cyan instead. See paintChainCount. */
 const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
-/* PRAISE, 25 September 2026 (owner: encouraging on-screen messages, option 1).
-   A line pops up near the top of the pit when a chain is completed (sized by how
-   long it was) and when a chum card is collected. Never the same line twice
-   running, and never closer together than PRAISE_GAP_MS, so it cheers without
-   nagging. The pools are plain lists: edit freely. */
-const PRAISE_POOLS = {
-  small: ["Good boy!", "Nice link!", "Pawsome!", "Sniffed out!", "Fetch!", "Tidy!"],
-  good: ["Great chain!", "Ruff and ready!", "Top dog!", "Howl about that!", "Tail wagger!", "Paws for applause!"],
-  big: ["MEGA CHAIN!", "Unleashed!", "Pack leader!", "Best in show!", "Howling good!", "Who let the dogs out!"],
-  chum: ["Chum found!", "Welcome home!", "One for the pack!", "Good find!", "Collected!", "Into the kennel!"],
-} as const;
-const PRAISE_GAP_MS = 1200;
 // Bombs going off this close together count as one string. See onRoundStats.
 const BOMB_STRING_GAP_MS = 300;
-const PRAISE_SHOW_MS = 1700;
-// Each letter drops in this long after the one before. See praise().
-const PRAISE_LETTER_MS = 35;
-// A line from a pool, never the one just used.
-const pickPraise = (pool: readonly string[], last: string): string => {
-  const options = pool.filter((l) => l !== last);
-  return options[Math.floor(Math.random() * options.length)] ?? pool[0];
+/* DOG FACTS INSTEAD OF PRAISE, 25 September 2026 (owner). The line that pops up
+   when a chain completes or a chum is collected is now a fact about THAT dog:
+   its short lineage note if it has one, else the first sentence of its write-up
+   (breedInfo). Long facts stay on screen longer: FACT_BASE_MS plus
+   FACT_MS_PER_CHAR, within FACT_MIN_MS and FACT_MAX_MS. */
+const FACT_BASE_MS = 2200;
+const FACT_MS_PER_CHAR = 45;
+const FACT_MIN_MS = 4000;
+const FACT_MAX_MS = 9000;
+const FACT_WORD_MS = 60; // each word arrives this long after the one before
+const firstSentence = (t: string): string => {
+  const m = t.match(/^[\s\S]*?[.!?](?=\s|$)/);
+  return (m ? m[0] : t).trim();
 };
-// Which pool a completed chain of this many cards earns.
-const praiseTier = (cards: number): keyof typeof PRAISE_POOLS => (cards >= 7 ? "big" : cards >= 4 ? "good" : "small");
+const factFor = (name: string, note?: string): string => {
+  const n = (note ?? "").trim();
+  if (n) return n;
+  const info = (breedInfo as Record<string, string>)[name];
+  return info ? firstSentence(info) : "";
+};
+/* THE HEART BURST, 25 September 2026 (owner, from the CodePen "Give Heart
+   Button Microinteraction" by Takane Ichinose, rebuilt without Vue). Rainbow
+   hearts fly up from a point with a random sideways drift, peak, settle back a
+   little and fade as they grow. Fired when a chum card is collected and when a
+   dog chain's circles lift. Drawn in the game's overlay above the lifted layer
+   (z-index 80). Honours reduced motion by doing nothing. */
+const HEART_PATH = "M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z";
+const HEART_COLOURS = ["#ff1f57", "#ff9645", "#ffea73", "#7fff7a", "#61a8ff", "#cf82ff"];
+const HEART_MS = 1600;
+const heartBurst = (host: Element | null | undefined, x: number, y: number, count: number, size = 26) => {
+  if (!host || typeof window === "undefined") return;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  for (let k = 0; k < count; k++) {
+    const el = document.createElement("div");
+    el.setAttribute("aria-hidden", "true");
+    const colour = HEART_COLOURS[Math.floor(Math.random() * HEART_COLOURS.length)];
+    el.innerHTML = `<svg viewBox="0 0 24 24" width="${size}" height="${size}"><path d="${HEART_PATH}" fill="${colour}" stroke="#ffffff" stroke-width="1.2"/></svg>`;
+    Object.assign(el.style, { position: "fixed", left: `${x}px`, top: `${y}px`, zIndex: "80", pointerEvents: "none", lineHeight: "0" });
+    host.appendChild(el);
+    // The pen's spread: sideways -6 to +5 of its heart widths, up 10 to 17, then back to 80%.
+    const dx = (Math.random() * 11 - 6) * size * 0.55;
+    const dy = (10 + Math.random() * 7) * size * 0.55;
+    const anim = el.animate([
+      { transform: "translate(-50%, -50%) translate(0px, 0px) scale(0.6)", opacity: 1 },
+      { transform: `translate(-50%, -50%) translate(${dx * 0.55}px, ${-dy}px) scale(1)`, opacity: 0.85, offset: 0.5 },
+      { transform: `translate(-50%, -50%) translate(${dx * 0.7}px, ${-dy}px) scale(1.1)`, opacity: 0.6, offset: 0.6 },
+      { transform: `translate(-50%, -50%) translate(${dx}px, ${-dy * 0.8}px) scale(1.5)`, opacity: 0 },
+    ], { duration: HEART_MS + Math.random() * 300, delay: k * 40, easing: "ease-out", fill: "forwards" });
+    anim.onfinish = () => el.remove();
+  }
+};
 // The mini chain counter's life and its gap below the joined circle. See popChainCount.
 const CHAIN_POP_MS = 1500;
 const CHAIN_POP_BELOW_PX = 20;
@@ -5662,39 +5691,42 @@ export default function BreedTree({
       onRoundStats?.({ dogChain: r.dogChain, chumChain: r.chumChain, bombString: r.bombString });
     };
   }, [onRoundStats]);
-  // The praise line's memory: when the last one showed, and what it said.
-  const praiseRef = useRef<{ at: number; last: string }>({ at: 0, last: "" });
-  /* Shows one praise line (see PRAISE_POOLS), in the game's own overlay beside
-     the chain counter, under the lifted layer. Skipped if one showed too
-     recently. */
-  const praise = (pool: keyof typeof PRAISE_POOLS) => {
+  /* Shows a fact about one dog (see factFor), replacing any fact on screen: a
+     "Did you know?" head over the fact, the words arriving in turn, held for
+     long enough to read, then lifted and faded. Above the lifted layer. */
+  const factElRef = useRef<HTMLDivElement | null>(null);
+  const showFact = (name: string, note?: string) => {
     const host = chainCountRef.current?.parentElement;
     if (!host) return;
-    const now = performance.now();
-    const st = praiseRef.current;
-    if (now - st.at < PRAISE_GAP_MS) return;
-    const line = pickPraise(PRAISE_POOLS[pool], st.last);
-    st.at = now;
-    st.last = line;
+    const fact = factFor(name, note);
+    if (!fact) return;
+    factElRef.current?.remove();
+    const ms = Math.max(FACT_MIN_MS, Math.min(FACT_MAX_MS, FACT_BASE_MS + fact.length * FACT_MS_PER_CHAR));
     const el = document.createElement("div");
-    el.className = `${styles.praisePop} ${pool === "big" ? styles.praiseBig : ""}`;
-    /* LETTER BY LETTER, 25 September 2026 (owner: an arrival and an exit). Each
-       letter is its own span dropping in PRAISE_LETTER_MS after the last; the
-       whole line then lifts and fades (the container's own animation). The line
-       is read out once, whole, by the aria-label. */
+    el.className = styles.factPop;
     el.setAttribute("role", "status");
-    el.setAttribute("aria-label", line);
-    [...line].forEach((ch, i) => {
+    el.setAttribute("aria-label", `Did you know? ${fact}`);
+    const head = document.createElement("div");
+    head.className = styles.factHead;
+    head.textContent = "Did you know?";
+    head.setAttribute("aria-hidden", "true");
+    el.appendChild(head);
+    const body = document.createElement("div");
+    body.className = styles.factBody;
+    body.setAttribute("aria-hidden", "true");
+    fact.split(/\s+/).forEach((w, i) => {
       const sp = document.createElement("span");
-      sp.className = styles.praiseLetter;
-      sp.textContent = ch === " " ? "\u00a0" : ch;
-      sp.setAttribute("aria-hidden", "true");
-      sp.style.animationDelay = `${i * PRAISE_LETTER_MS}ms`;
-      el.appendChild(sp);
+      sp.className = styles.factWord;
+      sp.textContent = w;
+      sp.style.animationDelay = `${150 + i * FACT_WORD_MS}ms`;
+      body.appendChild(sp);
+      body.appendChild(document.createTextNode(" "));
     });
-    el.style.animationDuration = `${PRAISE_SHOW_MS}ms`;
+    el.appendChild(body);
+    el.style.animationDuration = `${ms}ms`;
     host.appendChild(el);
-    window.setTimeout(() => el.remove(), PRAISE_SHOW_MS + 50);
+    factElRef.current = el;
+    window.setTimeout(() => { el.remove(); if (factElRef.current === el) factElRef.current = null; }, ms + 50);
   };
   // Whether a dog may be drawn as its name here: the rarity rule, unless this
   // level is one of NO_WORD_LEVELS.
@@ -6098,7 +6130,13 @@ export default function BreedTree({
     // Counted straight away, so the box pops and the number
     // climbs as the card sets off, not when it lands.
     const cm = chumList[i];
-    if (cm) { onChumCollected?.(cm.name); praise("chum"); }
+    if (cm) { onChumCollected?.(cm.name); showFact(cm.name, nodes.find((n) => n.data.name === cm.name)?.data.note); }
+    // Hearts from the card as it goes. See heartBurst.
+    {
+      const card = chumsGRef.current?.children[i] as Element | undefined;
+      const cr = card?.getBoundingClientRect();
+      if (cr && cr.width > 0) heartBurst(chainCountRef.current?.parentElement, cr.left + cr.width / 2, cr.top + cr.height / 2, 8);
+    }
     flashCorner();
   };
   // The tap's own collect, the same three
@@ -14526,8 +14564,31 @@ export default function BreedTree({
       // The lift waits for the flare; the kind's teardown waits with it, or the
       // held circles would lose their rims halfway through their own moment.
       startFlare(ch, () => { ch.kind.settle(ch); ch.kind.over?.(); });
-      // Praise the completed chain, sized by its length. See PRAISE_POOLS.
-      praise(praiseTier(ch.cards.length));
+      /* A fact about the dog just chained (a dog chain's breed). Chum card chains
+         collect their chums, and each collect shows its own fact. See showFact. */
+      if (ch.kind === DOG && ch.cards.length) {
+        const dn = dogNode(ch.cards[0]);
+        if (dn) showFact(dn.data.name, dn.data.note);
+      }
+      /* Hearts from each of a dog chain's circles as they lift, up to 18 in all.
+         geo is in the pit's own SVG space, so it is mapped to the screen the way
+         popChainCount does it. See heartBurst. */
+      if (ch.kind === DOG) {
+        const svg = fxRef.current?.ownerSVGElement;
+        const m = svg?.getScreenCTM();
+        const host = chainCountRef.current?.parentElement;
+        if (svg && m) {
+          const each = Math.max(1, Math.min(3, Math.floor(18 / Math.max(1, ch.cards.length))));
+          for (const ci of ch.cards) {
+            const g = ch.kind.geo(ci);
+            if (!g) continue;
+            const pt = svg.createSVGPoint();
+            pt.x = g.x; pt.y = g.y;
+            const sp = pt.matrixTransform(m);
+            heartBurst(host, sp.x, sp.y, each);
+          }
+        }
+      }
       // And note it if it is the round's longest of its kind. See onRoundStats.
       {
         const r = roundStatsRef.current;
