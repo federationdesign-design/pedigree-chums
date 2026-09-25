@@ -2854,3 +2854,7 @@
 .factSkip:hover, .factSkip:focus-visible { background: rgba(10, 58, 87, 0.8); }
 @media (prefers-reduced-motion: reduce) { .factBarFill { animation-timing-function: linear; } }
 
+/* A fact closed early, when its dog is completed (owner, 25 September 2026). */
+.factClosing { animation: factClose 250ms ease-in forwards !important; }
+@keyframes factClose { to { opacity: 0; transform: translate(-50%, -12px) scale(0.97); } }
+

@@ -5707,6 +5707,15 @@ export default function BreedTree({
   // The level's dogs, for the deck's lineage notes: a ref, so showFact stays stable.
   const factNodesRef = useRef<Node[]>([]);
   useEffect(() => { factNodesRef.current = nodes; }, [nodes]);
+  /* Closes the fact on screen with a quick fade (owner, 25 September 2026): used
+     when the lifted dog is completed, so the fact never lingers over the result. */
+  const closeFact = () => {
+    const el = factElRef.current;
+    if (!el) return;
+    factElRef.current = null;
+    el.classList.add(styles.factClosing);
+    window.setTimeout(() => el.remove(), 260);
+  };
   const showFact = () => {
     const host = chainCountRef.current?.parentElement;
     if (!host) return;
@@ -17911,6 +17920,8 @@ export default function BreedTree({
           currentScore={0}
           onScore={onScore}
           onRemove={(name) => {
+            // Completing the lifted dog closes any fact still showing. See closeFact.
+            closeFact();
             // learnt: the circle leaves the pit for good
             if (learnNode && name === learnNode.data.name) {
               /* THE SHORTCUT COST, 31 August 2026 (Steve). Mirrors the main
