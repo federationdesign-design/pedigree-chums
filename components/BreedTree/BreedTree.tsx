@@ -943,7 +943,7 @@ const FACE_REST_SRC: Record<RarityTier, readonly string[]> = {
   rare: ["/rare.webp", "/rare3.webp", "/rare6.webp", "/rare7.webp"], // worried back, plus the new squint, 25 Sept 2026
   uncommon: ["/uncommon.webp", "/uncommon2.webp", "/uncommon4.webp", "/uncommon5.webp", "/uncommon7.webp"], // + the laughing face, 25 Sept 2026
   common: ["/very-common2.webp", "/very-common3.webp", "/very-common4.webp"],
-  veryCommon: ["/common.webp", "/common2.webp", "/common5.webp"],
+  veryCommon: ["/common.webp", "/common2.webp", "/common5.webp", "/common7.webp"], // + the eyes-shut face, 25 Sept 2026
 };
 /* HOW LONG A BOMB OR SHAKE FACE HOLDS, and how long a resting face is kept
    before the dog picks another.
@@ -1020,6 +1020,17 @@ const YELLOW_ACC = [
   "headband_green", "bandana_blue", "collar_teal_bone", "neckerchief_magenta", "collar_teal_tag", "bowtie_blue",
   "headband_red", "bandana_navy", "collar_red_bone", "neckerchief_blue", "collar_green_tag", "bowtie_pink",
 ] as const;
+/* THE ORANGE (VERY COMMON) DOGS, 25 September 2026 (owner). Thirty looks: the
+   original set, sunglasses and round sunglasses, and colour variants of the
+   headband, bandana, collar, neckerchief and bow tie. Sheets 1 to 6. The owner's
+   sheet 6 draws its three "moustache_bowtie" looks as a bow tie alone. */
+const ORANGE_ACC = [
+  "plain", "monocle", "glasses", "eyepatch", "bandana_red", "flower",
+  "headband_red", "earring_plaster", "collar_red_bone", "neckerchief_green", "collar_green_tag", "moustache_bowtie_yellow",
+  "headband_green", "sunglasses", "collar_cyan_bone", "neckerchief_pink", "sunglasses_round", "bandana_blue",
+  "bandana_lightblue", "bandana_green", "collar_purple_bone", "neckerchief_cyan", "collar_blue_tag", "moustache_bowtie_pink",
+  "bandana_yellow", "bandana_purple", "collar_magenta_bone", "neckerchief_blue", "collar_orange_tag", "moustache_bowtie_blue",
+] as const;
 /* Per tier: which of the owner's sheets each game face is, the accessories, and
    how the head sits on the cut-out canvas. THE ACCESSORY FACES HAVE ROOM ROUND
    THE HEAD for tails, tags and flowers, and the old faces are cropped tight, so
@@ -1030,6 +1041,12 @@ const ACC_TIERS: Record<string, { expr: Record<string, number>; list: readonly s
   uncommon: {
     expr: { "/uncommon.webp": 1, "/uncommon2.webp": 2, "/uncommon4.webp": 3, "/uncommon7.webp": 4, "/uncommon5.webp": 5, "/uncommon6.webp": 6, "/uncommon3.webp": 7 },
     list: GREEN_ACC, head: 0.806, cy: 0.515,
+  },
+  veryCommon: {
+    // common2 and common6 are both the goofy face (sheet 1); common7, sheet 3's
+    // eyes-shut face, is new and joins the resting faces.
+    expr: { "/common.webp": 6, "/common2.webp": 1, "/common6.webp": 1, "/common7.webp": 3, "/common4.webp": 2, "/common5.webp": 4, "/common3.webp": 5 },
+    list: ORANGE_ACC, head: 0.8, cy: 0.55,
   },
   common: {
     expr: { "/very-common.webp": 1, "/very-common2.webp": 2, "/very-common6.webp": 3, "/very-common4.webp": 4, "/very-common5.webp": 5, "/very-common3.webp": 6 },
