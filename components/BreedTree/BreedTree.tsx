@@ -17,6 +17,7 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
 import { breedInfo, breedInfoLong } from "../../data/breedInfo";
+import { allDogFacts } from "../../data/dogFacts";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 /* The pit's own stylesheet, imported so the learn area's collect flourish IS the
@@ -970,26 +971,25 @@ const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
 // Bombs going off this close together count as one string. See onRoundStats.
 const BOMB_STRING_GAP_MS = 300;
-/* DOG FACTS INSTEAD OF PRAISE, 25 September 2026 (owner). The line that pops up
-   when a chain completes or a chum is collected is now a fact about THAT dog:
-   its short lineage note if it has one, else the first sentence of its write-up
-   (breedInfo). Long facts stay on screen longer: FACT_BASE_MS plus
-   FACT_MS_PER_CHAR, within FACT_MIN_MS and FACT_MAX_MS. */
+/* DOG FACTS INSTEAD OF PRAISE, 25 September 2026 (owner). A chain completed or
+   a chum collected shows a random dog fact (see RANDOM FACTS below). Long facts
+   stay on screen longer: FACT_BASE_MS plus FACT_MS_PER_CHAR, within FACT_MIN_MS
+   and FACT_MAX_MS. */
 // Twice as long on screen, 25 September 2026 (owner): was 2200 + 45 a character, 4 to 9s.
 const FACT_BASE_MS = 4400;
 const FACT_MS_PER_CHAR = 90;
 const FACT_MIN_MS = 8000;
 const FACT_MAX_MS = 18000;
 const FACT_WORD_MS = 60; // each word arrives this long after the one before
-const firstSentence = (t: string): string => {
-  const m = t.match(/^[\s\S]*?[.!?](?=\s|$)/);
-  return (m ? m[0] : t).trim();
-};
-const factFor = (name: string, note?: string): string => {
-  const n = (note ?? "").trim();
-  if (n) return n;
-  const info = (breedInfo as Record<string, string>)[name];
-  return info ? firstSentence(info) : "";
+/* RANDOM FACTS, 25 September 2026 (owner: random dog facts from everything the
+   site holds, not facts about the dog just chained). The pool is allDogFacts
+   (data/dogFacts.ts: the history page's facts, the chatbot's breed lines, the
+   famous dogs and the breed write-ups) plus the current level's lineage notes,
+   dealt from a shuffled deck so every fact shows before any comes round again. */
+const shuffledFacts = (pool: string[]): string[] => {
+  const o = [...new Set(pool)];
+  for (let i = o.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [o[i], o[j]] = [o[j], o[i]]; }
+  return o;
 };
 /* THE HEART BURST, 25 September 2026 (owner, from the CodePen "Give Heart
    Button Microinteraction" by Takane Ichinose, rebuilt without Vue). Rainbow
@@ -5696,10 +5696,22 @@ export default function BreedTree({
      "Did you know?" head over the fact, the words arriving in turn, held for
      long enough to read, then lifted and faded. Above the lifted layer. */
   const factElRef = useRef<HTMLDivElement | null>(null);
-  const showFact = (name: string, note?: string) => {
+  // The shuffled deck the next fact is dealt from, and the level it was built for.
+  const factDeckRef = useRef<{ nodes: Node[] | null; deck: string[] }>({ nodes: null, deck: [] });
+  // The level's dogs, for the deck's lineage notes: a ref, so showFact stays stable.
+  const factNodesRef = useRef<Node[]>([]);
+  useEffect(() => { factNodesRef.current = nodes; }, [nodes]);
+  const showFact = () => {
     const host = chainCountRef.current?.parentElement;
     if (!host) return;
-    const fact = factFor(name, note);
+    const fd = factDeckRef.current;
+    const lvl = factNodesRef.current;
+    if (fd.nodes !== lvl) { fd.nodes = lvl; fd.deck = []; }
+    if (!fd.deck.length) {
+      const notes = lvl.map((n) => (n.data.note ?? "").trim()).filter((t) => t.length > 20);
+      fd.deck = shuffledFacts([...allDogFacts(), ...notes]);
+    }
+    const fact = fd.deck.pop();
     if (!fact) return;
     factElRef.current?.remove();
     const ms = Math.max(FACT_MIN_MS, Math.min(FACT_MAX_MS, FACT_BASE_MS + fact.length * FACT_MS_PER_CHAR));
@@ -6154,7 +6166,7 @@ export default function BreedTree({
     // Counted straight away, so the box pops and the number
     // climbs as the card sets off, not when it lands.
     const cm = chumList[i];
-    if (cm) { onChumCollected?.(cm.name); showFact(cm.name, nodes.find((n) => n.data.name === cm.name)?.data.note); }
+    if (cm) { onChumCollected?.(cm.name); showFact(); }
     // Hearts from the card as it goes. See heartBurst.
     {
       const card = chumsGRef.current?.children[i] as Element | undefined;
@@ -14592,7 +14604,7 @@ export default function BreedTree({
          collect their chums, and each collect shows its own fact. See showFact. */
       if (ch.kind === DOG && ch.cards.length) {
         const dn = dogNode(ch.cards[0]);
-        if (dn) showFact(dn.data.name, dn.data.note);
+        if (dn) showFact();
       }
       /* Hearts from each of a dog chain's circles as they lift, up to 18 in all.
          geo is in the pit's own SVG space, so it is mapped to the screen the way
