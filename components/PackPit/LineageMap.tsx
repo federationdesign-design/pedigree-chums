@@ -273,7 +273,11 @@ const LIFT_TIDY = true;
    "auto": lay the whole tree out BOTH ways, score each (overlapping circles
    first, then how far it spreads), and draw the winner. "tidy" or "balloon":
    force one, to compare them on a real dog. Only read while LIFT_TIDY is on. */
-const LIFT_LAYOUT: "auto" | "tidy" | "balloon" = "auto";
+/* "tidy" FOR NOW, 24 September 2026 (owner): with no fit to screen yet, "auto"
+   kept choosing the balloon, which spreads widest, and on a phone its circles
+   landed off the edges leaving only the lines. Back to "auto" once the lift
+   shrinks to fit the screen. */
+const LIFT_LAYOUT: "auto" | "tidy" | "balloon" = "tidy";
 /* AUTO SPEEDS UP AS IT GOES DEEPER, lifted layer only (owner, 24 September 2026:
    it ran in stages rather than one smooth slide, because each layer down a big
    tree holds more dogs and every dog had the same flat delay). Each dog's delay is
