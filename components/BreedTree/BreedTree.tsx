@@ -1085,6 +1085,24 @@ const shuffledAcc = (list: readonly string[]): string[] => {
   for (let i = o.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [o[i], o[j]] = [o[j], o[i]]; }
   return o;
 };
+/* PRIORITY GROUPS, 25 September 2026 (owner, orange first). Where a tier has
+   groups, its accessories are dealt group by group: the first breeds of that
+   colour on a level wear group 1, shuffled among themselves; group 2 only comes in
+   once group 1 is all in use, then the rest. Anything not named in a group comes
+   last, shuffled. Tiers without groups shuffle the whole list as before. */
+const ACC_GROUPS: Record<string, string[][]> = {
+  veryCommon: [
+    ["plain", "eyepatch", "sunglasses", "sunglasses_round", "bandana_blue", "headband_green", "earring_plaster", "collar_cyan_bone", "moustache_bowtie_yellow", "collar_orange_tag"],
+    ["glasses", "monocle", "bandana_yellow", "neckerchief_pink", "headband_red", "collar_red_bone", "moustache_bowtie_pink", "collar_blue_tag", "bandana_green"],
+  ],
+};
+// A tier's deal order: its groups in turn, each shuffled, then everything else.
+const dealAcc = (tier: string, list: readonly string[]): string[] => {
+  const groups = ACC_GROUPS[tier];
+  if (!groups) return shuffledAcc(list);
+  const named = new Set(groups.flat());
+  return [...groups.flatMap((g) => shuffledAcc(g.filter((a) => list.includes(a)))), ...shuffledAcc(list.filter((a) => !named.has(a)))];
+};
 /* Sets a face image and, for an accessory face, the bigger box it needs. */
 const setFaceHref = (el: SVGImageElement | Element, href: string) => {
   if (el.getAttribute("href") !== href) el.setAttribute("href", href);
@@ -6491,7 +6509,7 @@ export default function BreedTree({
       const key = tier + ":" + d.data.name;
       let look = st.of.get(key); // "accessory|tone"
       if (look === undefined) {
-        const order = (st.order[tier] ??= shuffledAcc(ACC_TIERS[tier].list));
+        const order = (st.order[tier] ??= dealAcc(tier, ACC_TIERS[tier].list));
         const n = st.seen[tier] ?? 0;
         st.seen[tier] = n + 1;
         const acc = order[n % order.length];
