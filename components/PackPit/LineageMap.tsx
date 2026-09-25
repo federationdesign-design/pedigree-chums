@@ -6217,7 +6217,11 @@ className={[
         conflict never existed. .autoWrapLift is deleted rather than left behind,
         because a spare position class is the kind of thing that gets re-applied by
         accident. */}
-    {showAuto && !bounded && (
+    {/* ONLY WHEN THERE IS MORE THAN ONE PICTURE TO PLACE, 25 September 2026
+        (owner): on the lift a dog with a single picture, a single-leaf dog, has
+        nothing for AUTO to save, so the button is not shown. allNodes is the
+        lifted dog's tree; hasImg marks a picture that goes into a frame. */}
+    {showAuto && !bounded && (!circular || allNodes.filter((n) => n.hasImg).length > 1) && (
       <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
           <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />
