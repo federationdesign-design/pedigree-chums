@@ -2678,10 +2678,18 @@ const DEEP_HOLD_MS = 5000;
 /* A SHORTER HOLD ON ONE BAND, 25 September 2026 (owner): levels of 293 to 349
    circles (four layers held) release at 2 seconds, not 5. Every other band keeps
    DEEP_HOLD_MS. Read by holdMsFor. */
-const HOLD_MS_BANDS: { from: number; under: number; ms: number }[] = [
+/* LAYER BY LAYER ON 350 TO 474, 25 September 2026 (owner: the Springer Spaniel
+   and the Border Terrier). stageMs, where a band has it, releases the held layers
+   one at a time: the first held layer at `ms`, each deeper one stageMs later. A
+   deeper layer sits inside the circles of the one above, so each layer comes out
+   at its time from whichever parents have popped; any others come out later, when
+   their parent is knocked, as usual. 475 is where the Impossible table starts. */
+const HOLD_MS_BANDS: { from: number; under: number; ms: number; stageMs?: number }[] = [
   { from: 293, under: 350, ms: 1000 }, // 1 second, 25 September 2026 (owner; was 2)
+  { from: 350, under: 475, ms: 1000, stageMs: 1000 },
 ];
-const holdMsFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under)?.ms ?? DEEP_HOLD_MS;
+const holdBandFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under);
+const holdMsFor = (circles: number) => holdBandFor(circles)?.ms ?? DEEP_HOLD_MS;
 const HOLD_RELEASE_MS = 1500;
 // And a floor, in screen pixels across. Growth alone can never win: each
 // generation is a share of the last, so the shrinking compounds and any
@@ -8809,6 +8817,10 @@ export default function BreedTree({
       const holdFrom = Math.max(3, nodes.reduce((m, n) => Math.max(m, n.depth), 0) - holdLayersFor(nodes.length - 1) + 1);
       // How long this level holds them: see HOLD_MS_BANDS.
       const holdMs = holdMsFor(nodes.length - 1);
+      // Layer by layer where the band says so: see HOLD_MS_BANDS.
+      const holdStageMs = holdBandFor(nodes.length - 1)?.stageMs ?? 0;
+      const holdMaxDepth = nodes.reduce((m, n) => Math.max(m, n.depth), 0);
+      const releaseAt = (depth: number) => holdMs + (holdStageMs ? Math.max(0, depth - holdFrom) * holdStageMs : 0);
       // ---- the words ----
       // Sized by the SAME fitter the circles use, so a name is the size it was
       // inside its circle, then 30% up because it has no ring or picture around
@@ -9558,7 +9570,20 @@ export default function BreedTree({
         ghost(newMbs);
         wakeBody(mb);
       };
-      if (heavyLevel) ghostTimers.push(window.setTimeout(() => {
+      /* LAYER BY LAYER: one timer per held layer, at releaseAt(depth), popping that
+         layer's waiting circles within its own stage. See HOLD_MS_BANDS. */
+      if (heavyLevel && holdStageMs) {
+        for (let dpt = holdFrom; dpt <= holdMaxDepth; dpt++) {
+          const layer = dpt;
+          ghostTimers.push(window.setTimeout(() => {
+            const wave = deepHeld.filter((h) => h.ch.depth === layer);
+            for (let q = deepHeld.length - 1; q >= 0; q--) if (deepHeld[q].ch.depth === layer) deepHeld.splice(q, 1);
+            const step = wave.length ? Math.min(20, (holdStageMs * 0.9) / wave.length) : 0;
+            wave.forEach((h, i) => ghostTimers.push(window.setTimeout(() => popOneHeld(h.ch, h.from), i * step)));
+          }, releaseAt(layer)));
+        }
+      }
+      if (heavyLevel && !holdStageMs) ghostTimers.push(window.setTimeout(() => {
         const queue = [...deepHeld].sort((a, b) => a.ch.depth - b.ch.depth);
         deepHeld.length = 0;
         if (nodes.length - 1 >= HOLD_DRIP_FROM) {
@@ -9581,7 +9606,7 @@ export default function BreedTree({
         for (const ch of b.n.children ?? []) {
           if (isHiddenCopy(ch)) continue;
           // On a big level a deep circle waits for the late drop. See DEEP_HOLD_MS.
-          if (heavyLevel && ch.depth >= holdFrom && performance.now() - dropT0 < holdMs) { deepHeld.push({ ch, from: b }); continue; }
+          if (heavyLevel && ch.depth >= holdFrom && performance.now() - dropT0 < releaseAt(ch.depth)) { deepHeld.push({ ch, from: b }); continue; }
           // Grown once, then floored. b.popped guards popChildren against a
           // second run, so this cannot compound down a deep tree. The floor is
           // given in screen pixels and converted here, because the packed radii
