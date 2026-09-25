@@ -1001,6 +1001,10 @@ const shuffledFacts = (pool: string[]): string[] => {
 const HEART_PATH = "M7.2 9.6a2.8 2.8 0 1 0-3.1 2.4 2.8 2.8 0 1 0 3.1 2.4h9.6a2.8 2.8 0 1 0 3.1-2.4 2.8 2.8 0 1 0-3.1-2.4z";
 const HEART_COLOURS = ["#ff1f57", "#ff9645", "#ffea73", "#7fff7a", "#61a8ff", "#cf82ff"];
 const HEART_MS = 1600;
+// Bones from a completed dog chain: 12 for 2 circles, 100 for 10, 400 (the cap) from about 30.
+const BONES_BASE = 5;
+const BONES_GROW = 1.3;
+const BONES_MAX = 400;
 const heartBurst = (host: Element | null | undefined, x: number, y: number, count: number, size = 13) => {
   if (!host || typeof window === "undefined") return;
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
@@ -14669,7 +14673,12 @@ export default function BreedTree({
         const m = svg?.getScreenCTM();
         const host = chainCountRef.current?.parentElement;
         if (svg && m) {
-          const each = Math.max(1, Math.min(3, Math.floor(18 / Math.max(1, ch.cards.length))));
+          /* MORE BONES FOR LONGER CHAINS, 25 September 2026 (owner: a 30-long chain
+             should throw out an extreme amount). The total grows faster than the
+             chain (BONES_BASE times length to the power BONES_GROW), up to
+             BONES_MAX, and is shared between the chain's circles. */
+          const total = Math.min(BONES_MAX, Math.round(BONES_BASE * Math.pow(ch.cards.length, BONES_GROW)));
+          const each = Math.max(1, Math.ceil(total / Math.max(1, ch.cards.length)));
           for (const ci of ch.cards) {
             const g = ch.kind.geo(ci);
             if (!g) continue;
