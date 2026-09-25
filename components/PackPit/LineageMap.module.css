@@ -223,6 +223,20 @@
   stroke-dasharray: 1;
   stroke-dashoffset: var(--green-off, 1);
 }
+/* THE LIQUID RING FILL, 25 September 2026 (owner). fluidRise carries the level
+   and eases to each new one as a card lands; fluidTurn spins the rounded square
+   round its own centre so its corner rolls past the top like a fluid surface. */
+.fluidRise { transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.3, 1); }
+.fluidTurn {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: lm-fluid-turn 7s linear infinite;
+}
+@keyframes lm-fluid-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .fluidTurn { animation: none; }
+  .fluidRise { transition: none; }
+}
 @media (prefers-reduced-motion: no-preference) {
   .progressRing {
     /* transition grows the arc as each card lands. The animation draws it on with

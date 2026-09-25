@@ -3790,60 +3790,51 @@ export default function LineageMap({
               a re-lift with frames already filled it draws on sharing the rarity
               ring's 0.2s delay and 0.9s sweep, so the lift replays cleanly. Keyed on
               the dog, like the rarity ring, so that draw-on remounts per lift. */}
-          {rarityTier && frameTotal > 0 ? (
-            <circle
-              key={`green-${breed.name}`}
-              cx={0}
-              cy={0}
-              r={R + rootRingW / 2}
-              fill="none"
-              /* LEMON WHILE IT FILLS, GREEN WHEN IT IS FULL (owner, 18 September
-                 2026). The note this replaces said the done state reads as the
-                 pit's learnt colour rather than a green of its own, and then
-                 observed the thing that made it a bug: "At 100% this ring covers
-                 the lifted circle's own rim, so it is what you actually see round
-                 a finished dog." It is the TOP of the stack, so its lemon was
-                 burying the green of both layers underneath and sweeping it away
-                 as the arc drew on. That is what the owner saw: green at 2/2,
-                 then a yellow arc round it, then fully yellow.
-
-                 THE FILL IS THE DOG'S OWN TIER COLOUR NOW (owner, 18 September
-                 2026), not a flat lemon, read the same way the rarity band and the
-                 crisp ring read it so the three cannot disagree about a tier. The
-                 arc is already inside the rarityTier gate, so there is no null
-                 case to carry.
-
-                 doneRing IS STILL THE OUTER TEST, so green still wins the moment
-                 the last frame lands, and this element is still the top of the
-                 ring stack, so nothing is painted over that green. The tier colour
-                 only ever appears on the false branch.
-
-                 MEASURED WARNING, ACCEPTED BY THE OWNER. The lift wash composites
-                 to about #0d5a87 at its centre and #083d62 at its edge over the
-                 pit navy, and the five tiers measure against those:
-                   extremely rare #4d2e91  1.34 / 1.14   was 8.21 on the lemon
-                   rare           #2547c4  1.02 / 1.50   was 6.25
-                   uncommon       #5dbf86  3.27 / 5.00
-                   common         #f47421  2.60 / 3.97
-                   very common    #ffd23e  5.14 / 7.84
-                 On RARE and EXTREMELY RARE the arc is effectively invisible
-                 against the backdrop, and those are the tiers a player most wants
-                 to see; the lemon it replaces read at 6.25 and 8.21 there, which is
-                 why it was chosen. Very common measures 1.19 against the old lemon
-                 so that tier looks unchanged, which was expected.
-                 IF THE TWO RAREST READ BADLY, lighten those fills for this use the
-                 way the glow bands just above already do with lighten(). Do not
-                 revert to the flat lemon: that loses the tier everywhere to fix
-                 two cases. */
-              stroke={doneRing ? "#22c55e" : RARITY_BAND[rarityTier].bg}
-              strokeWidth={rootRingW + 6}
-              strokeLinecap="round"
-              pathLength={1}
-              transform="rotate(90)"
-              className={styles.progressRing}
-              style={{ ["--green-off" as string]: `${1 - filled.size / frameTotal}`, ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
-            />
-          ) : null}
+          {/* THE RING FILLS LIKE LIQUID, 25 September 2026 (owner: the arc that
+              swept round the ring looked angular). The ring band now fills from
+              the bottom up: a big rounded square, turning slowly, rises inside a
+              clip that is exactly the ring's band, so its corner rolls past like a
+              fluid surface (the "fluid radius" technique). The level is the share
+              of frames filled and eases up as each card lands. The colour is the
+              dog's own tier colour, as the arc was, and green the moment the last
+              frame lands (doneRing), when the fluid tops the ring. The picture
+              inside is never covered: only the band is clipped in. */}
+          {rarityTier && frameTotal > 0 ? (() => {
+            const mid = R + rootRingW / 2;
+            const half = (rootRingW + 6) / 2;
+            const outer = mid + half;
+            const inner = Math.max(0, mid - half);
+            const share = doneRing ? 1 : Math.max(0, Math.min(1, filled.size / frameTotal));
+            // The fluid's top edge, from the ring's foot (outer) up to its crown (-outer).
+            const level = outer - share * 2 * outer - (doneRing ? outer * 0.3 : 0);
+            const size = outer * 2.6;
+            const clipId = `fluid-${breed.name.replace(/[^a-z0-9]/gi, "")}`;
+            return (
+              <g key={`fluid-${breed.name}`} aria-hidden="true">
+                <defs>
+                  <clipPath id={clipId}>
+                    <path
+                      clipRule="evenodd"
+                      d={`M ${outer} 0 A ${outer} ${outer} 0 1 0 ${-outer} 0 A ${outer} ${outer} 0 1 0 ${outer} 0 Z M ${inner} 0 A ${inner} ${inner} 0 1 1 ${-inner} 0 A ${inner} ${inner} 0 1 1 ${inner} 0 Z`}
+                    />
+                  </clipPath>
+                </defs>
+                <g clipPath={`url(#${clipId})`}>
+                  <g className={styles.fluidRise} style={{ transform: `translateY(${level}px)` }}>
+                    <rect
+                      className={styles.fluidTurn}
+                      x={-size / 2}
+                      y={0}
+                      width={size}
+                      height={size}
+                      rx={size * 0.3}
+                      fill={doneRing ? "#22c55e" : RARITY_BAND[rarityTier].bg}
+                    />
+                  </g>
+                </g>
+              </g>
+            );
+          })() : null}
           {/* Rarity band: a coloured strip across the bottom of the circle, on the
               artwork just above the Learn button. Clipped to the same circle so it
               never spills past the rim, but its top edge is a straight DIAGONAL
