@@ -35,7 +35,10 @@ export default function WatchVideoRow({ name, slug, vimeoId, seconds }: { name: 
       if (e.source !== frameRef.current?.contentWindow) return;
       let d: { event?: string } | null = null;
       try { d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch { return; }
-      if (d?.event === "ended" || d?.event === "finish") window.location.assign(`/play/${slug}?from=home`);
+      /* intro=1 (owner, 25 September 2026): after the film, the level opens with
+         its intro clip and the 3, 2, 1 countdown on every screen, desktop
+         included. See PlayIntro. */
+      if (d?.event === "ended" || d?.event === "finish") window.location.assign(`/play/${slug}?from=home&intro=1`);
     };
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);

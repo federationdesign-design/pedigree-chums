@@ -55,7 +55,12 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       const mobile = window.matchMedia(MOBILE_QUERY).matches;
-      setPhase(video && mobile ? "video" : "game");
+      /* STRAIGHT FROM A FILM, THE INTRO PLAYS EVERYWHERE (owner, 25 September
+         2026). A slider film that finishes sends the player here with ?intro=1,
+         and then the clip and its 3, 2, 1 countdown play on a desktop too. Any
+         other arrival keeps the phones-only rule above. */
+      const fromFilm = new URLSearchParams(window.location.search).get("intro") === "1";
+      setPhase(video && (mobile || fromFilm) ? "video" : "game");
     });
     return () => cancelAnimationFrame(id);
   }, [video]);
@@ -116,7 +121,10 @@ export default function PlayIntro({ video, children }: { video?: string; childre
           setSecsLeft((cur) => (cur === show ? cur : show));
         }}
         onError={() => setPhase("game")}
-        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        /* A phone fills the screen with it; a wide screen shows the portrait
+           clip WHOLE on the navy, since cropping it to fill would cut off the
+           dog (desktop only ever sees it straight from a film, see ?intro=1). */
+        style={{ width: "100%", height: "100%", objectFit: typeof window !== "undefined" && !window.matchMedia(MOBILE_QUERY).matches ? "contain" : "cover", display: "block" }}
       />
       {secsLeft !== null ? (
         <div
