@@ -3937,7 +3937,10 @@ const LINEAGE: Record<string, LineageNode> = {
    chums grow and the other 33 never reach seven generations; across all 54 the
    circles go from 7,193 to 13,156, the biggest level from 770 (Golden Retriever)
    to 1,774, and 15 chums cross a toy band. No cap at all would be 14,432. */
-const MAX_LINEAGE_DEPTH = 10;
+/* 11, 25 September 2026 (owner). At 10 the cap trimmed the Goldendoodle's
+   inherited Golden Retriever tree (it sits a generation lower there), so the
+   cross ranked below its own parent. */
+const MAX_LINEAGE_DEPTH = 11;
 
 // Some circles are labelled with a common name; map it to its lineage key so
 // the same history is grafted in wherever the name appears.

@@ -2712,14 +2712,18 @@ const DEEP_HOLD_MS = 5000;
    deeper layer sits inside the circles of the one above, so each layer comes out
    at its time from whichever parents have popped; any others come out later, when
    their parent is knocked, as usual. 475 is where the Impossible table starts. */
-const HOLD_MS_BANDS: { from: number; under: number; ms: number; stageMs?: number }[] = [
+/* stageTimes, where a band has it, gives each held layer its own release time
+   in order, outermost first (owner, 25 September 2026). A deeper layer beyond the
+   list takes the last time plus stageMs for each extra layer. */
+const HOLD_MS_BANDS: { from: number; under: number; ms: number; stageMs?: number; stageTimes?: number[] }[] = [
   { from: 293, under: 350, ms: 1000 }, // 1 second, 25 September 2026 (owner; was 2)
   { from: 350, under: 475, ms: 500, stageMs: 500 }, // half-second steps, 25 September 2026 (owner; was 1s)
   /* EVERY BAND FROM 475 UP, half-second steps, 25 September 2026 (owner: the same
      as 350 to 474). 475 to 629 was 1s steps. 630 and up had no band, so it took
      the 5 second hold and the three-wave drip (HOLD_DRIP_FROM); a band with
      stageMs releases layer by layer instead, so that drip no longer runs. */
-  { from: 475, under: 630, ms: 500, stageMs: 500 },
+  // The Cockapoo's band, its own times (owner, 25 September 2026).
+  { from: 475, under: 630, ms: 500, stageMs: 500, stageTimes: [500, 1000, 2000, 3000, 4000, 4500] },
   { from: 630, under: Infinity, ms: 500, stageMs: 500 },
 ];
 const holdBandFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under);
@@ -8863,7 +8867,12 @@ export default function BreedTree({
       // Layer by layer where the band says so: see HOLD_MS_BANDS.
       const holdStageMs = holdBandFor(nodes.length - 1)?.stageMs ?? 0;
       const holdMaxDepth = nodes.reduce((m, n) => Math.max(m, n.depth), 0);
-      const releaseAt = (depth: number) => holdMs + (holdStageMs ? Math.max(0, depth - holdFrom) * holdStageMs : 0);
+      const holdTimes = holdBandFor(nodes.length - 1)?.stageTimes;
+      const releaseAt = (depth: number) => {
+        const i = Math.max(0, depth - holdFrom);
+        if (holdTimes && holdTimes.length) return i < holdTimes.length ? holdTimes[i] : holdTimes[holdTimes.length - 1] + (i - holdTimes.length + 1) * (holdStageMs || 500);
+        return holdMs + (holdStageMs ? i * holdStageMs : 0);
+      };
       // ---- the words ----
       // Sized by the SAME fitter the circles use, so a name is the size it was
       // inside its circle, then 30% up because it has no ring or picture around
