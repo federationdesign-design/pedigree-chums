@@ -4011,6 +4011,26 @@ export default function BreedTree({
         }
       }
     }
+    /* RARITY DECIDES WHO IS ON TOP, 25 September 2026 (owner: orange always at the
+       bottom, purple always on top). SVG has no z-index: what is drawn later sits
+       above. So the list itself is ordered, here at the source, and every index
+       the pit uses (cg.children[i], nodes.indexOf) still lines up with it.
+       Each dog takes a layer, orange 0 up to purple 4, but NEVER LOWER THAN ITS
+       PARENT'S, so a dog nested inside another is always drawn after it and can
+       never hide beneath it (an orange dog inside a purple one rides in the purple
+       layer). Ties keep the tree's own order, so parents still come first, and the
+       level's own dog stays first. Game only: the display pages are untouched. */
+    if (dockAside && !displayOnly) {
+      const RANK: Record<RarityTier, number> = { veryCommon: 0, common: 1, uncommon: 2, rare: 3, extremelyRare: 4 };
+      const layer = new Map<Node, number>();
+      for (const d of ns) {
+        const own = d.depth === 0 ? -1 : RANK[rarityTier(treesContaining(d.data.name))];
+        const up = d.parent ? layer.get(d.parent as Node) ?? -1 : -1;
+        layer.set(d, Math.max(own, up));
+      }
+      const at = new Map<Node, number>(ns.map((d, i) => [d, i]));
+      ns.sort((a, b) => (layer.get(a) ?? 0) - (layer.get(b) ?? 0) || (at.get(a) ?? 0) - (at.get(b) ?? 0));
+    }
     return ns;
   }, [root, isMobile, aspectKey, dockAside, level, displayOnly]);
 
