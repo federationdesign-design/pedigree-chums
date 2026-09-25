@@ -2687,6 +2687,8 @@ const DEEP_HOLD_MS = 5000;
 const HOLD_MS_BANDS: { from: number; under: number; ms: number; stageMs?: number }[] = [
   { from: 293, under: 350, ms: 1000 }, // 1 second, 25 September 2026 (owner; was 2)
   { from: 350, under: 475, ms: 1000, stageMs: 1000 },
+  // And 475 to 629, the smaller Impossible levels (owner, 25 September 2026).
+  { from: 475, under: 630, ms: 1000, stageMs: 1000 },
 ];
 const holdBandFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under);
 const holdMsFor = (circles: number) => holdBandFor(circles)?.ms ?? DEEP_HOLD_MS;
