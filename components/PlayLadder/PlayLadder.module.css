@@ -61,9 +61,11 @@
   bottom: 0;
   left: 0;
   right: 0;
-  /* 2 degrees more tilt than the Chum Finder's, and twice the type (owner,
+  /* NO TURN OF ITS OWN (owner, 25 September 2026): the tag sits inside the card,
+     which is already turned 2 degrees, so it now lies at exactly the card's
+     angle. It was -5deg, which fought the card's tilt. Twice the type (owner,
      24 September 2026). */
-  transform: rotate(-5deg) translateY(2px);
+  transform: translateY(2px);
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.6rem;
   letter-spacing: 0.06em;

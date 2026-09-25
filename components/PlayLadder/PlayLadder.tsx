@@ -82,7 +82,7 @@ function eraOf(name: string, established: string): string | null {
 }
 const STATUS_COLOUR: Record<BreedStatus, { bg: string; fg: string }> = {
   trending: { bg: "#22c55e", fg: "#ffffff" },
-  popular: { bg: "#2e9e5b", fg: "#ffffff" },
+  popular: { bg: "#22c55e", fg: "#ffffff" }, // the buttons' green (owner, 25 September 2026); was #2e9e5b
   "in-decline": { bg: "#ffed00", fg: "#0a3a57" },
   endangered: { bg: "#e08a1e", fg: "#ffffff" },
   rare: { bg: "#f0a437", fg: "#ffffff" },
