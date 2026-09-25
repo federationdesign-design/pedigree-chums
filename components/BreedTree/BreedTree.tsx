@@ -965,6 +965,9 @@ const FACE_FLIP_SHARE = 0.4;
    bright cyan instead. See paintChainCount. */
 const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
+// The mini chain counter's life and its gap below the joined circle. See popChainCount.
+const CHAIN_POP_MS = 1500;
+const CHAIN_POP_BELOW_PX = 20;
 // How long the dogs-found counter stays up after a new dog is found.
 const FOUND_FLASH_MS = 5000;
 // How long the ancestors list stays open before it closes itself.
@@ -13374,6 +13377,36 @@ export default function BreedTree({
     const dogHasTwin = (n: Node): boolean => liveBreed(n.data.name).length > 1;
     /* Writes the counter and shows or hides it. Shown only while a chain is being
        drawn: the hooks clear it on `over`, which is every way a chain ends. */
+    /* THE MINI CHAIN COUNTER, 25 September 2026 (owner). A half-size copy of the
+       chain counter that pops in by each new link and pops out again, over
+       CHAIN_POP_MS: same text, same blue-to-green fill. Placed centred under the
+       circle just joined, CHAIN_POP_BELOW_PX below its bottom edge so it never
+       covers the dog. The circle's position comes from dogGeo, which is the pit's
+       own SVG coordinates, mapped to the screen through that SVG's transform. */
+    const popChainCount = (i: number) => {
+      const total = chainTotalRef.current;
+      const geo = dogGeo(i);
+      const svg = fxRef.current?.ownerSVGElement;
+      const ctm = svg?.getScreenCTM();
+      if (!total || !geo || !svg || !ctm) return;
+      const pt = svg.createSVGPoint();
+      pt.x = geo.x; pt.y = geo.y;
+      const sp = pt.matrixTransform(ctm);
+      const rPx = geo.h * Math.hypot(ctm.a, ctm.b);
+      const held = dogChainNodesRef.current.size;
+      const t = Math.max(0, Math.min(1, held / total));
+      const hsl = CHAIN_COUNT_FROM.map((c, j) => c + (CHAIN_COUNT_TO[j] - c) * t);
+      const el = document.createElement("div");
+      el.className = styles.chainPop;
+      el.textContent = `${held}/${total}`;
+      el.setAttribute("aria-hidden", "true");
+      el.style.left = `${sp.x}px`;
+      el.style.top = `${sp.y + rPx + CHAIN_POP_BELOW_PX}px`;
+      el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
+      el.style.animationDuration = `${CHAIN_POP_MS}ms`;
+      document.body.appendChild(el);
+      window.setTimeout(() => el.remove(), CHAIN_POP_MS + 50);
+    };
     const paintChainCount = () => {
       const el = chainCountRef.current;
       if (!el) return;
@@ -13634,6 +13667,7 @@ export default function BreedTree({
         if (n) dogChainNodesRef.current.add(n);
         if (n) dogTetherJoinRef.current?.(n);
         paintChainCount();
+        popChainCount(i);
       },
       over: () => {
         chainFirstRef.current = null;

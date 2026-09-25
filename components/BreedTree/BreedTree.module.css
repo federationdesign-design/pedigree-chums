@@ -2659,3 +2659,43 @@
   white-space: nowrap;
 }
 
+/* THE MINI CHAIN COUNTER, 25 September 2026 (owner). Half the size of
+   .chainCount, every measure halved together so the pill keeps its shape; placed
+   and filled inline by popChainCount. It pops in with a little overshoot, holds,
+   and pops out, over the inline animation-duration (CHAIN_POP_MS). */
+.chainPop {
+  position: fixed;
+  z-index: 62;
+  transform: translate(-50%, 0) scale(0.3);
+  transform-origin: 50% 0;
+  opacity: 0;
+  padding: 7.5px 12px 4.5px 12px;
+  border-radius: 15px;
+  background: #2547c4;
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(10, 58, 87, 0.6);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.1;
+  letter-spacing: 0.4px;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 2.25px 0 rgba(10, 58, 87, 0.3);
+  animation: chainPopInOut 1500ms ease-out forwards;
+}
+@keyframes chainPopInOut {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.3); }
+  12% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+  22% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  80% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, 0) scale(0.3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chainPop { animation-name: chainPopFade; }
+  @keyframes chainPopFade {
+    0% { opacity: 0; transform: translate(-50%, 0); }
+    15%, 80% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, 0); }
+  }
+}
+
