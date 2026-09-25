@@ -2675,6 +2675,13 @@ const HOLD_DRIP_WAVES = 3;
 const HOLD_DRIP_PERIOD_MS = 3000;
 const holdLayersFor = (circles: number) => HOLD_STEPS.find(([from]) => circles >= from)?.[1] ?? HOLD_LAST_LAYERS;
 const DEEP_HOLD_MS = 5000;
+/* A SHORTER HOLD ON ONE BAND, 25 September 2026 (owner): levels of 293 to 349
+   circles (four layers held) release at 2 seconds, not 5. Every other band keeps
+   DEEP_HOLD_MS. Read by holdMsFor. */
+const HOLD_MS_BANDS: { from: number; under: number; ms: number }[] = [
+  { from: 293, under: 350, ms: 2000 },
+];
+const holdMsFor = (circles: number) => HOLD_MS_BANDS.find((b) => circles >= b.from && circles < b.under)?.ms ?? DEEP_HOLD_MS;
 const HOLD_RELEASE_MS = 1500;
 // And a floor, in screen pixels across. Growth alone can never win: each
 // generation is a share of the last, so the shrinking compounds and any
@@ -8800,6 +8807,8 @@ export default function BreedTree({
       // The first layer held back: the last HOLD_LAST_LAYERS of this tree, never
       // the top two, so the opening cascade always plays.
       const holdFrom = Math.max(3, nodes.reduce((m, n) => Math.max(m, n.depth), 0) - holdLayersFor(nodes.length - 1) + 1);
+      // How long this level holds them: see HOLD_MS_BANDS.
+      const holdMs = holdMsFor(nodes.length - 1);
       // ---- the words ----
       // Sized by the SAME fitter the circles use, so a name is the size it was
       // inside its circle, then 30% up because it has no ring or picture around
@@ -9564,7 +9573,7 @@ export default function BreedTree({
         }
         const step = queue.length ? Math.min(20, HOLD_RELEASE_MS / queue.length) : 0;
         queue.forEach((h, i) => ghostTimers.push(window.setTimeout(() => popOneHeld(h.ch, h.from), i * step)));
-      }, DEEP_HOLD_MS));
+      }, holdMs));
       const popChildren = (b: Body) => {
         if (!b.n || b.popped) return;
         b.popped = true;
@@ -9572,7 +9581,7 @@ export default function BreedTree({
         for (const ch of b.n.children ?? []) {
           if (isHiddenCopy(ch)) continue;
           // On a big level a deep circle waits for the late drop. See DEEP_HOLD_MS.
-          if (heavyLevel && ch.depth >= holdFrom && performance.now() - dropT0 < DEEP_HOLD_MS) { deepHeld.push({ ch, from: b }); continue; }
+          if (heavyLevel && ch.depth >= holdFrom && performance.now() - dropT0 < holdMs) { deepHeld.push({ ch, from: b }); continue; }
           // Grown once, then floored. b.popped guards popChildren against a
           // second run, so this cannot compound down a deep tree. The floor is
           // given in screen pixels and converted here, because the packed radii
