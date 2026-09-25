@@ -1879,3 +1879,43 @@
 /* The finished level's paw pattern is not drawn in the views either, 21 September 2026
    (owner: remove the paw pattern from the accessibility views). */
 :global(:root[data-pc-contrast-scheme]) .overlayDone::before { display: none !important; }
+
+/* THE CHUM FINISH SCREEN'S STATS, 25 September 2026 (owner). Glass cards in a
+   two-by-two grid under Dog Done, the big figure in the display face and yellow,
+   the words under it in white. */
+.winStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: min(calc(100vw - 36px), 520px);
+  margin: 18px auto 0;
+  position: relative;
+  z-index: 2;
+}
+.winStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 10px 9px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  text-align: center;
+}
+.winStatValue {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1;
+  color: var(--yellow, #ffd23e);
+  text-shadow: 0 2px 0 rgba(10, 58, 87, 0.5);
+}
+.winStatLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+}
+

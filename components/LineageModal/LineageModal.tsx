@@ -362,6 +362,20 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
   // This level's chum page slug, when the level is one of the 54 pack chums.
   const chumSlug = packBreeds.find((b) => b.name === name)?.slug ?? null;
+  /* THIS LEVEL'S OWN DOGS FOUND, for the chum finish screen's stats (owner, 25
+     September 2026). dogsFound is a running total across the whole game, so the
+     level's figure is worked out here: this dog's unique ancestors, and how many
+     of them are in the found list. */
+  const levelDogNames = (() => {
+    const names = new Set<string>();
+    const walk = (n: LineageNode, depth: number) => {
+      if (depth > 0) names.add(n.name);
+      for (const c of n.children ?? []) walk(c, depth + 1);
+    };
+    if (lineage) walk(lineage, 0);
+    return names;
+  })();
+  const levelDogsFound = (dogsFoundList ?? []).filter((d) => levelDogNames.has(d.name)).length;
   useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
   // Score-milestone celebration, ported from the main pit (shared ../Milestone).
   // The mini pit's score is a CAMPAIGN total that rides in via initialScore, and
@@ -1111,7 +1125,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                       chums in it, INCLUDING a round where none were caught: nought
                       per cent is a rate, and hiding it is why you could not find
                       it on a round where you caught nothing. */}
-                  {packSize > 0 && (
+                  {/* On a chum level these two move into the stats panel below
+                      (owner, 25 September 2026); every other level keeps them here. */}
+                  {!chumSlug && packSize > 0 && (
                     <span className={css.winRate}>
                       <span className={css.winRateTitle}>Chum rate:</span>
                       <span className={css.winRateValue}>
@@ -1129,7 +1145,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                       Wears the round's own classes rather than new ones, so the
                       two read as the same kind of figure and the stylesheet does
                       not gain a near-duplicate rule. */}
-                  {(runChumsPossible ?? 0) > 0 && (
+                  {!chumSlug && (runChumsPossible ?? 0) > 0 && (
                     <span className={css.winRate}>
                       {/* NO TITLE ON THIS ONE, 19 September 2026 (owner). The figure and
                           the line under it carry it: "found from N chums so far" already
@@ -1153,6 +1169,38 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   reader collected nothing should not be told so. */}
               {/* "Dog Done", was "Round Won" (owner, 24 September 2026). */}
               <div className={css.winFlash}>Dog Done</div>
+              {/* THE ROUND'S STATS, chum levels only (owner, 25 September 2026): the
+                  spare space under Dog Done, in the usual level-complete style. The
+                  chum rate and the running chum count moved here from the top
+                  right. Each card only shows when it has something to say. */}
+              {chumSlug && (
+                <div className={css.winStats}>
+                  {levelDogNames.size > 0 && (
+                    <div className={css.winStat}>
+                      <span className={css.winStatValue}>{levelDogsFound}</span>
+                      <span className={css.winStatLabel}>of {levelDogNames.size} dogs found</span>
+                    </div>
+                  )}
+                  {packSize > 0 && (
+                    <div className={css.winStat}>
+                      <span className={css.winStatValue}>{Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%</span>
+                      <span className={css.winStatLabel}>chum rate: {collectedChums.size} of {Math.max(packSize, collectedChums.size)} chums</span>
+                    </div>
+                  )}
+                  {circleCount && circleCount.tot > 0 && (
+                    <div className={css.winStat}>
+                      <span className={css.winStatValue}>{Math.max(0, circleCount.tot - circleCount.left)}</span>
+                      <span className={css.winStatLabel}>of {circleCount.tot} circles cleared</span>
+                    </div>
+                  )}
+                  {(runChumsPossible ?? 0) > 0 && (
+                    <div className={css.winStat}>
+                      <span className={css.winStatValue}>{runChumsFound ?? 0}</span>
+                      <span className={css.winStatLabel}>of {runChumsPossible} chums so far</span>
+                    </div>
+                  )}
+                </div>
+              )}
               {/* THE ERA JOIN. Two messages in one slot: the first lands with
                   the screen, the second pops over the top of it a beat later.
                   Sits ABOVE the next-level block rather than replacing it, so
