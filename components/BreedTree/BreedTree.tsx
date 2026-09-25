@@ -2697,7 +2697,7 @@ const DEEP_HOLD_MS = 5000;
    their parent is knocked, as usual. 475 is where the Impossible table starts. */
 const HOLD_MS_BANDS: { from: number; under: number; ms: number; stageMs?: number }[] = [
   { from: 293, under: 350, ms: 1000 }, // 1 second, 25 September 2026 (owner; was 2)
-  { from: 350, under: 475, ms: 1000, stageMs: 1000 },
+  { from: 350, under: 475, ms: 500, stageMs: 500 }, // half-second steps, 25 September 2026 (owner; was 1s)
   // And 475 to 629, the smaller Impossible levels (owner, 25 September 2026).
   { from: 475, under: 630, ms: 1000, stageMs: 1000 },
 ];
