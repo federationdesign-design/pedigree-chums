@@ -968,6 +968,28 @@ const FACE_FLIP_SHARE = 0.4;
    bright cyan instead. See paintChainCount. */
 const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
+/* PRAISE, 25 September 2026 (owner: encouraging on-screen messages, option 1).
+   A line pops up near the top of the pit when a chain is completed (sized by how
+   long it was) and when a chum card is collected. Never the same line twice
+   running, and never closer together than PRAISE_GAP_MS, so it cheers without
+   nagging. The pools are plain lists: edit freely. */
+const PRAISE_POOLS = {
+  small: ["Good boy!", "Nice link!", "Pawsome!", "Sniffed out!", "Fetch!", "Tidy!"],
+  good: ["Great chain!", "Ruff and ready!", "Top dog!", "Howl about that!", "Tail wagger!", "Paws for applause!"],
+  big: ["MEGA CHAIN!", "Unleashed!", "Pack leader!", "Best in show!", "Howling good!", "Who let the dogs out!"],
+  chum: ["Chum found!", "Welcome home!", "One for the pack!", "Good find!", "Collected!", "Into the kennel!"],
+} as const;
+const PRAISE_GAP_MS = 1200;
+// Bombs going off this close together count as one string. See onRoundStats.
+const BOMB_STRING_GAP_MS = 300;
+const PRAISE_SHOW_MS = 1400;
+// A line from a pool, never the one just used.
+const pickPraise = (pool: readonly string[], last: string): string => {
+  const options = pool.filter((l) => l !== last);
+  return options[Math.floor(Math.random() * options.length)] ?? pool[0];
+};
+// Which pool a completed chain of this many cards earns.
+const praiseTier = (cards: number): keyof typeof PRAISE_POOLS => (cards >= 7 ? "big" : cards >= 4 ? "good" : "small");
 // The mini chain counter's life and its gap below the joined circle. See popChainCount.
 const CHAIN_POP_MS = 1500;
 const CHAIN_POP_BELOW_PX = 20;
@@ -3537,6 +3559,7 @@ export default function BreedTree({
   levelNo,
   collectedChums,
   onChumCollected,
+  onRoundStats,
   onChumsDropped,
   dogsFound,
   dogsTotal,
@@ -3631,6 +3654,11 @@ export default function BreedTree({
   levelNo?: number;
   collectedChums?: Set<string>;
   onChumCollected?: (name: string) => void;
+  /* THE ROUND'S RECORDS, 25 September 2026 (owner: the finish screen's stats).
+     Reported whenever one is beaten, and zeroed at the start of each drop: the
+     longest dog chain completed, the longest chum card chain completed, and the
+     most bombs going off in one cascade. */
+  onRoundStats?: (s: { dogChain: number; chumChain: number; bombString: number }) => void;
   /* THE DOGS-FOUND COUNTER (owner, 24 September 2026). BreedStrip owns the run's
      set of unique dogs collected; the pit reports each collect through
      onDogFound and draws dogsFound / dogsTotal. */
@@ -5622,6 +5650,38 @@ export default function BreedTree({
      whole pit on every join. The lifted layer's own counters are plain DOM for
      the same reason. Written by paintChainCount below and by nothing else. */
   const chainCountRef = useRef<HTMLDivElement>(null);
+  // The round's records, and the bomb run in progress. See onRoundStats.
+  const roundStatsRef = useRef({ dogChain: 0, chumChain: 0, bombString: 0, bombRun: 0, lastBoom: 0 });
+  // Held in a ref so the effects can call it without re-running on each render.
+  const reportRoundStatsRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    reportRoundStatsRef.current = () => {
+      const r = roundStatsRef.current;
+      onRoundStats?.({ dogChain: r.dogChain, chumChain: r.chumChain, bombString: r.bombString });
+    };
+  }, [onRoundStats]);
+  // The praise line's memory: when the last one showed, and what it said.
+  const praiseRef = useRef<{ at: number; last: string }>({ at: 0, last: "" });
+  /* Shows one praise line (see PRAISE_POOLS), in the game's own overlay beside
+     the chain counter, under the lifted layer. Skipped if one showed too
+     recently. */
+  const praise = (pool: keyof typeof PRAISE_POOLS) => {
+    const host = chainCountRef.current?.parentElement;
+    if (!host) return;
+    const now = performance.now();
+    const st = praiseRef.current;
+    if (now - st.at < PRAISE_GAP_MS) return;
+    const line = pickPraise(PRAISE_POOLS[pool], st.last);
+    st.at = now;
+    st.last = line;
+    const el = document.createElement("div");
+    el.className = `${styles.praisePop} ${pool === "big" ? styles.praiseBig : ""}`;
+    el.textContent = line;
+    el.setAttribute("role", "status");
+    el.style.animationDuration = `${PRAISE_SHOW_MS}ms`;
+    host.appendChild(el);
+    window.setTimeout(() => el.remove(), PRAISE_SHOW_MS + 50);
+  };
   // Whether a dog may be drawn as its name here: the rarity rule, unless this
   // level is one of NO_WORD_LEVELS.
   const wordsOffHere = !!levelName && NO_WORD_LEVELS.has(levelName);
@@ -6024,7 +6084,7 @@ export default function BreedTree({
     // Counted straight away, so the box pops and the number
     // climbs as the card sets off, not when it lands.
     const cm = chumList[i];
-    if (cm) onChumCollected?.(cm.name);
+    if (cm) { onChumCollected?.(cm.name); praise("chum"); }
     flashCorner();
   };
   // The tap's own collect, the same three
@@ -8829,6 +8889,9 @@ export default function BreedTree({
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
+      // A fresh round: its records start from nothing. See onRoundStats.
+      roundStatsRef.current = { dogChain: 0, chumChain: 0, bombString: 0, bombRun: 0, lastBoom: 0 };
+      reportRoundStatsRef.current();
       const v = viewRef.current;
       const k = SIZE / v[2];
       // The scale every pit word is measured against for the rest of the round.
@@ -11327,6 +11390,15 @@ export default function BreedTree({
          it goes on a ref like the shake and the slowmo do. */
       faceCollectRef.current = () => faceEventAll(FACE_COLLECT_SRC, performance.now(), FACE_COLLECT_MS);
       const detonate = (b: Body, wasHeld: boolean) => {
+        /* THE BOMB STRING, for the round's records: bombs going off within
+           BOMB_STRING_GAP_MS of the last one are one cascade. See onRoundStats. */
+        {
+          const r = roundStatsRef.current;
+          const now = performance.now();
+          r.bombRun = now - r.lastBoom < BOMB_STRING_GAP_MS ? r.bombRun + 1 : 1;
+          r.lastBoom = now;
+          if (r.bombRun > r.bombString) { r.bombString = r.bombRun; reportRoundStatsRef.current(); }
+        }
         if (b.blown) return;
         b.blown = true;
         faceEventAll(FACE_BOMB_SRC, performance.now());
@@ -14440,6 +14512,15 @@ export default function BreedTree({
       // The lift waits for the flare; the kind's teardown waits with it, or the
       // held circles would lose their rims halfway through their own moment.
       startFlare(ch, () => { ch.kind.settle(ch); ch.kind.over?.(); });
+      // Praise the completed chain, sized by its length. See PRAISE_POOLS.
+      praise(praiseTier(ch.cards.length));
+      // And note it if it is the round's longest of its kind. See onRoundStats.
+      {
+        const r = roundStatsRef.current;
+        const n = ch.cards.length;
+        if (ch.kind === DOG && n > r.dogChain) { r.dogChain = n; reportRoundStatsRef.current(); }
+        else if (ch.kind === CARD && n > r.chumChain) { r.chumChain = n; reportRoundStatsRef.current(); }
+      }
       chain = null;
     };
     // Every existing link, every frame. Only the chain's own cards are measured.
@@ -16370,7 +16451,12 @@ export default function BreedTree({
                   pit's figure clamped to 60% of the pit (its floor, wall to wall,
                   is the stage less M = 4 either side), then LOGO_SHRINK. When the
                   round starts the physics logo takes over in the same place. */}
-              {!started && (() => {
+              {/* Until the DROP, not until the round starts (owner, 25 September
+                  2026): on the chum levels the round starts as the level opens,
+                  so gating on !started left the diagram screen with no logo at
+                  all until the circles fell. `dropped` flips at the very moment
+                  the physics logo is built, so one hands straight to the other. */}
+              {!dropped && (() => {
                 const asp = aspect; // the view's own shape, so logo and viewBox agree
                 const vbWf = asp >= 1 ? SIZE * asp : SIZE;
                 const vbHf = asp >= 1 ? SIZE : SIZE / asp;

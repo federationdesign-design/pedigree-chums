@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useCallback, useEffect, useRef, useState, type Ref } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
@@ -360,6 +361,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
   }, [portraitEl]);
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
+  // The round's records from the pit, for the finish screen. See BreedTree onRoundStats.
+  const [roundStats, setRoundStats] = useState({ dogChain: 0, chumChain: 0, bombString: 0 });
   // This level's chum page slug, when the level is one of the 54 pack chums.
   const chumSlug = packBreeds.find((b) => b.name === name)?.slug ?? null;
   /* THIS LEVEL'S OWN DOGS FOUND, for the chum finish screen's stats (owner, 25
@@ -856,6 +859,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             onChumCaught?.(n);
           }}
           onChumsDropped={(n) => setPackSize(n + collectedChums.size)}
+          onRoundStats={setRoundStats}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
@@ -1170,38 +1174,64 @@ export default function LineageModal({ name, image, character, lineage, fromRect
               {/* "Dog Done", was "Round Won" (owner, 24 September 2026). */}
               {/* "Done", was "Dog Done" (owner, 25 September 2026). */}
               <div className={css.winFlash}>Done</div>
+              {/* A CLOSING LINE, 25 September 2026 (owner: a strong finish). Chosen
+                  from the chum rate where there is one, else a general line; the
+                  pick is steady for the round (worked out from the score, not a
+                  random draw each render). */}
+              {(() => {
+                const rate = packSize > 0 ? collectedChums.size / packSize : null;
+                const pool = rate === null ? ["Nice work!", "Good dog!", "Well sniffed!"]
+                  : rate >= 0.9 ? ["Best in show!", "Top of the pack!", "Leader of the pack!"]
+                  : rate >= 0.6 ? ["Great run!", "Good dog!", "Tails up!"]
+                  : ["Nice work!", "Every chum counts!", "Keep sniffing!"];
+                return <div className={css.winLine}>{pool[Math.abs(score) % pool.length]}</div>;
+              })()}
               {/* THE ROUND'S STATS, chum levels only (owner, 25 September 2026): the
                   spare space under Dog Done, in the usual level-complete style. The
                   chum rate and the running chum count moved here from the top
                   right. Each card only shows when it has something to say. */}
-              {chumSlug && (
-                <div className={css.winStats}>
-                  {levelDogNames.size > 0 && (
-                    <div className={css.winStat}>
-                      <span className={css.winStatValue}>{levelDogsFound}</span>
-                      <span className={css.winStatLabel}>of {levelDogNames.size} dogs found</span>
+              {chumSlug && (() => {
+                /* THE ROUND IN NUMBERS, 25 September 2026 (owner: a game-style end
+                   screen, this round only). Rings fill and bars slide in as the
+                   screen appears. Bars are measured against a par (BAR_PAR) and
+                   stop at full beyond it. Replaces the four cards of J18-165. */
+                const RING_C = 2 * Math.PI * 26;
+                const ring = (label: string, share: number, big: string) => (
+                  <div className={css.winRing} key={label}>
+                    <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                      <circle cx="32" cy="32" r="26" className={css.winRingTrack} />
+                      <circle cx="32" cy="32" r="26" className={css.winRingFill}
+                        style={{ strokeDasharray: RING_C, ["--c" as string]: RING_C, ["--off" as string]: RING_C * (1 - Math.max(0, Math.min(1, share))) } as React.CSSProperties} />
+                    </svg>
+                    <span className={css.winRingBig}>{big}</span>
+                    <span className={css.winRingLabel}>{label}</span>
+                  </div>
+                );
+                const BAR_PAR = { chain: 10, chum: 10, bomb: 5 };
+                const bar = (label: string, value: number, par: number) => (
+                  <div className={css.winBar} key={label}>
+                    <span className={css.winBarLabel}>{label}</span>
+                    <span className={css.winBarTrack}><span className={css.winBarFill} style={{ ["--w" as string]: `${Math.min(100, (value / par) * 100)}%` } as React.CSSProperties} /></span>
+                    <span className={css.winBarValue}>{value}</span>
+                  </div>
+                );
+                const cleared = circleCount && circleCount.tot > 0 ? Math.max(0, circleCount.tot - circleCount.left) / circleCount.tot : 0;
+                return (
+                  <div className={css.winStats}>
+                    <div className={css.winRings}>
+                      {levelDogNames.size > 0 && ring("dogs found", levelDogsFound / levelDogNames.size, `${levelDogsFound}/${levelDogNames.size}`)}
+                      {packSize > 0 && ring("chum rate", collectedChums.size / packSize, `${Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%`)}
+                      {circleCount && circleCount.tot > 0 && ring("circles cleared", cleared, `${Math.round(cleared * 100)}%`)}
                     </div>
-                  )}
-                  {packSize > 0 && (
-                    <div className={css.winStat}>
-                      <span className={css.winStatValue}>{Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%</span>
-                      <span className={css.winStatLabel}>chum rate: {collectedChums.size} of {Math.max(packSize, collectedChums.size)} chums</span>
+                    <div className={css.winBars}>
+                      {bar("Biggest chain", roundStats.dogChain, BAR_PAR.chain)}
+                      {bar("Best chum chain", roundStats.chumChain, BAR_PAR.chum)}
+                      {bar("Longest bomb string", roundStats.bombString, BAR_PAR.bomb)}
                     </div>
-                  )}
-                  {circleCount && circleCount.tot > 0 && (
-                    <div className={css.winStat}>
-                      <span className={css.winStatValue}>{Math.max(0, circleCount.tot - circleCount.left)}</span>
-                      <span className={css.winStatLabel}>of {circleCount.tot} circles cleared</span>
-                    </div>
-                  )}
-                  {(runChumsPossible ?? 0) > 0 && (
-                    <div className={css.winStat}>
-                      <span className={css.winStatValue}>{runChumsFound ?? 0}</span>
-                      <span className={css.winStatLabel}>of {runChumsPossible} chums so far</span>
-                    </div>
-                  )}
-                </div>
-              )}
+                    {(runChumsPossible ?? 0) > 0 && <div className={css.winRunLine}>{runChumsFound ?? 0} of {runChumsPossible} chums found so far</div>}
+                  </div>
+                );
+              })()}
               {/* THE ERA JOIN. Two messages in one slot: the first lands with
                   the screen, the second pops over the top of it a beat later.
                   Sits ABOVE the next-level block rather than replacing it, so
