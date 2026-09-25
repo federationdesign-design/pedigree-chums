@@ -2604,10 +2604,12 @@
      copy's navy shadow, scaled down to this type size, which is what holds it
      over a busy pit. Replaces the light blue fill and navy text. */
   border-radius: 26px;
-  background: transparent;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  /* LIQUID GLASS, 25 September 2026 (owner): the fact card's glass (see
+     .factPop), replacing the clear 10px blur and white edge. */
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px) saturate(120%) brightness(1.15);
+  -webkit-backdrop-filter: blur(4px) saturate(120%) brightness(1.15);
+  border: none;
   /* NAVY, 24 September 2026 (owner: the white was hard to read over the pit).
      The navy shadow the white text wore would smear navy text, so it becomes a
      soft white halo instead, which lifts the navy off a busy pit behind the glass. */
@@ -2620,7 +2622,8 @@
   /* 2pt smaller, 24 September 2026 (owner). Was 14px. */
   font-size: 14px; /* 2pt back up, 24 September 2026: the owner's "two sizes bigger" */
   line-height: 1.3;
-  box-shadow: 0 12px 32px rgba(10, 58, 87, 0.32);
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.75), inset 0 0 5px rgba(255, 255, 255, 0.75);
   cursor: default;
 }
 .foundListHead {
@@ -2770,13 +2773,20 @@
   z-index: 80;
   width: min(86vw, 560px);
   padding: 14px 18px 16px;
-  border-radius: 18px;
-  background: rgba(10, 58, 87, 0.82);
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 10px 28px rgba(10, 58, 87, 0.3);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  /* LIQUID GLASS, 25 September 2026 (owner, from a CodePen "liquid glass" set):
+     a light blur of the pit behind, a little brighter and more saturated, a 25%
+     white tint, a bright inner edge (the specular) and a soft shadow. The pen's
+     SVG lens warp is left out: it only works reliably in Chrome. The text keeps
+     a dark shadow so white reads on the lighter glass. */
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.75), inset 0 0 5px rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(4px) saturate(120%) brightness(1.15);
+  backdrop-filter: blur(4px) saturate(120%) brightness(1.15);
   color: #ffffff;
+  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.6), 0 0 6px rgba(0, 0, 0, 0.35);
   text-align: center;
   pointer-events: none;
   transform: translate(-50%, 0);
