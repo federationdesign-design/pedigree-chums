@@ -1087,6 +1087,11 @@ const rnd = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
    AN ORPHANED WORD IS UNTOUCHED. That is the latch a collected twin leaves behind
    and it is a different mechanism: see orphanSetRef. */
 const wordTier = (tier: RarityTier) => tier === "common" || tier === "veryCommon";
+/* LEVELS THAT NEVER DRAW WORDS, 25 September 2026 (owner: on the Irish Wolfhound
+   every dog came in as a name and no dog pictures were seen). On these levels
+   every dog is drawn as a circle, whatever its rarity: the override is applied
+   through wordOk, which all four word decisions now ask. */
+const NO_WORD_LEVELS = new Set<string>(["Irish Wolfhound"]);
 /* How far back a stand-down dog is faded. Enough to drop it behind the chain's
    own breed, not so far that the pit looks broken. */
 const FACE_STANDDOWN_OPACITY = 0.45;
@@ -5525,6 +5530,10 @@ export default function BreedTree({
      whole pit on every join. The lifted layer's own counters are plain DOM for
      the same reason. Written by paintChainCount below and by nothing else. */
   const chainCountRef = useRef<HTMLDivElement>(null);
+  // Whether a dog may be drawn as its name here: the rarity rule, unless this
+  // level is one of NO_WORD_LEVELS.
+  const wordsOffHere = !!levelName && NO_WORD_LEVELS.has(levelName);
+  const wordOk = (name: string) => !wordsOffHere && wordTier(rarityTier(treesContaining(name)));
   // When each chain candidate started its grow pop. See CHAIN_TWIN_GROW.
   const chainGrowRef = useRef<Map<Node, number>>(new Map());
   const foundCountRef = useRef<HTMLDivElement>(null);
@@ -7153,7 +7162,7 @@ export default function BreedTree({
 
              All three now ask wordTier, which is the one place to change if the
              tiers that read as words ever move. */
-          const wRare = !!wn && !wordTier(rarityTier(treesContaining(wn.data.name)));
+          const wRare = !!wn && !wordOk(wn.data.name);
           const wGone = wTwin || wRare || b.held || (!!wn && removedNodesRef.current.has(wn));
           el.setAttribute("display", wGone ? "none" : "inline");
           if (wGone) continue;
@@ -7382,7 +7391,7 @@ export default function BreedTree({
          and both make the node unpaintable, so everything downstream treats them
          alike without knowing which it is. */
       const orphanWord = orphanSetRef.current.has(d);
-      const isWordNode = orphanWord || (PIT_DRAWS_WORDS && fellRef.current && d.depth === 1 && !twinNamesRef.current.has(d.data.name) && wordTier(rarityTier(treesContaining(d.data.name))));
+      const isWordNode = orphanWord || (PIT_DRAWS_WORDS && fellRef.current && d.depth === 1 && !twinNamesRef.current.has(d.data.name) && wordOk(d.data.name));
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       /* A CIRCLE IN THE CHAIN IS INVERTED:
          light blue where it was navy, and navy where its outline was. It wore a
@@ -7546,7 +7555,7 @@ export default function BreedTree({
          The two rules must ask the same question: see wordTier. */
       const wantWord = paintable && !chHeld && !chTwin && fellRef.current
         && (levelBreedLeft.get(d.data.name) ?? 0) === 1
-        && wordTier(rarityTier(treesContaining(d.data.name)))
+        && wordOk(d.data.name)
         && !!pitBodiesRef.current?.owned.has(d);
       if (wantWord && !orphanWord) {
         orphanSetRef.current.add(d);
@@ -9043,7 +9052,7 @@ export default function BreedTree({
          decides the physics body a dog gets, a name box rather than a circle, and
          the two disagreeing would give a dog a word-shaped collider and a circular
          drawing. See wordTier. */
-      const wordBreed = (b: Body) => PIT_DRAWS_WORDS && !!b.n && !twinNamesRef.current.has(b.n.data.name) && wordTier(rarityTier(treesContaining(b.n.data.name)));
+      const wordBreed = (b: Body) => PIT_DRAWS_WORDS && !!b.n && !twinNamesRef.current.has(b.n.data.name) && wordOk(b.n.data.name);
       for (const b of bodies) { if (wordBreed(b)) mkWord(b, CIRCLE_OPTS); else mkCircle(b, "circle", CIRCLE_OPTS); }
       for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
       // The opening shove: up and out, the first name one way and the next the
