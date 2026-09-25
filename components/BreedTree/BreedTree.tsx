@@ -997,6 +997,18 @@ const GREEN_ACC = ["plain", "glasses", "eyepatch", "bandana", "moustache_bowtie"
    twelve looks, except the blue set's last is a bow tie on its own. The owner's
    blue sheets are numbered 2 to 7. */
 const BLUE_ACC = ["plain", "glasses", "eyepatch", "bandana", "bowtie", "headband", "monocle", "blue_neckerchief", "red_collar", "green_collar", "flower", "earring_plaster"] as const;
+/* THE YELLOW (COMMON) DOGS, 25 September 2026 (owner). Twenty-four looks: the
+   original set plus colour variants of the headband, bandana, collar, neckerchief
+   and bow tie, because a level can hold up to 31 yellow breeds. The owner's sheets
+   1 to 6 (sheet 7 was a duplicate of 4). While yellow dogs wear accessories their
+   skin-tone shades (VERY_COMMON_SHADES) are off: the accessory face is used in
+   place of the shaded one. The owner asked to see this first, shades after. */
+const YELLOW_ACC = [
+  "plain", "monocle", "glasses", "eyepatch", "bandana_red", "flower",
+  "headband_blue", "earring_plaster", "collar_blue_bone", "neckerchief_green", "collar_red_tag", "bowtie_yellow",
+  "headband_green", "bandana_blue", "collar_teal_bone", "neckerchief_magenta", "collar_teal_tag", "bowtie_blue",
+  "headband_red", "bandana_navy", "collar_red_bone", "neckerchief_blue", "collar_green_tag", "bowtie_pink",
+] as const;
 /* Per tier: which of the owner's sheets each game face is, the accessories, and
    how the head sits on the cut-out canvas. THE ACCESSORY FACES HAVE ROOM ROUND
    THE HEAD for tails, tags and flowers, and the old faces are cropped tight, so
@@ -1007,6 +1019,10 @@ const ACC_TIERS: Record<string, { expr: Record<string, number>; list: readonly s
   uncommon: {
     expr: { "/uncommon.webp": 1, "/uncommon2.webp": 2, "/uncommon4.webp": 3, "/uncommon7.webp": 4, "/uncommon5.webp": 5, "/uncommon6.webp": 6, "/uncommon3.webp": 7 },
     list: GREEN_ACC, head: 0.806, cy: 0.515,
+  },
+  common: {
+    expr: { "/very-common.webp": 1, "/very-common2.webp": 2, "/very-common6.webp": 3, "/very-common4.webp": 4, "/very-common5.webp": 5, "/very-common3.webp": 6 },
+    list: YELLOW_ACC, head: 0.735, cy: 0.487,
   },
   rare: {
     // Sheet 8, the worried face, added 25 September 2026 (owner drew it).
