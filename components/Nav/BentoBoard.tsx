@@ -114,7 +114,7 @@ export default function BentoBoard({
         </div>
         <div className={styles.cluster}>
           {!hidePromoTiles && (
-            <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={navigate} />
+            <ChumDropTile href="/play" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={navigate} />
           )}
           {coverTile(NAV_TILES.dogsAtWork, styles.dogsAtWorkWide, false, true)}
           <div className={styles.clusterRow}>

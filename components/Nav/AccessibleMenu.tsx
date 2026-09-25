@@ -35,7 +35,7 @@ export default function AccessibleMenu({ onNavigate }: { onNavigate?: () => void
       <div className={styles.row}>
         {box("/name-generator", "Dog Name Generator")}
         <div className={styles.col}>
-          {box("/", "Mini-game: Chum Drop", true)}
+          {box("/play", "Mini-game: Chum Drop", true)} {/* was "/", 25 September 2026 (owner) */}
           <div className={styles.pairRow}>
             {box("/britains-dog-history", "Britain's Dog History")}
             {box("/about", "About")}
