@@ -2530,6 +2530,10 @@ const HOLD_LAST_LAYERS = 3; // was 5 (owner, 25 September 2026)
    in how the pit counts cannot tip either the wrong way. */
 const HOLD_MORE_FROM = 293;
 const HOLD_LAST_LAYERS_BIG = 4;
+/* AND ONE MORE RING AT EACH OF THESE (owner, 25 September 2026): five layers
+   from 350 circles, six from 400. Read by holdLayersFor, largest first. */
+const HOLD_STEPS: [number, number][] = [[400, 6], [350, 5], [HOLD_MORE_FROM, HOLD_LAST_LAYERS_BIG]];
+const holdLayersFor = (circles: number) => HOLD_STEPS.find(([from]) => circles >= from)?.[1] ?? HOLD_LAST_LAYERS;
 const DEEP_HOLD_MS = 5000;
 const HOLD_RELEASE_MS = 1500;
 // And a floor, in screen pixels across. Growth alone can never win: each
@@ -8621,7 +8625,7 @@ export default function BreedTree({
       const dropT0 = performance.now();
       // The first layer held back: the last HOLD_LAST_LAYERS of this tree, never
       // the top two, so the opening cascade always plays.
-      const holdFrom = Math.max(3, nodes.reduce((m, n) => Math.max(m, n.depth), 0) - (nodes.length - 1 >= HOLD_MORE_FROM ? HOLD_LAST_LAYERS_BIG : HOLD_LAST_LAYERS) + 1);
+      const holdFrom = Math.max(3, nodes.reduce((m, n) => Math.max(m, n.depth), 0) - holdLayersFor(nodes.length - 1) + 1);
       // ---- the words ----
       // Sized by the SAME fitter the circles use, so a name is the size it was
       // inside its circle, then 30% up because it has no ring or picture around
