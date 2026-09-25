@@ -1168,7 +1168,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   Hidden at zero rather than showing "0 chums": a level where the
                   reader collected nothing should not be told so. */}
               {/* "Dog Done", was "Round Won" (owner, 24 September 2026). */}
-              <div className={css.winFlash}>Dog Done</div>
+              {/* "Done", was "Dog Done" (owner, 25 September 2026). */}
+              <div className={css.winFlash}>Done</div>
               {/* THE ROUND'S STATS, chum levels only (owner, 25 September 2026): the
                   spare space under Dog Done, in the usual level-complete style. The
                   chum rate and the running chum count moved here from the top
