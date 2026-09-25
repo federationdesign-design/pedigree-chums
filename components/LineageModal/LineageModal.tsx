@@ -1209,13 +1209,15 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                       <a href="/home" className={heroBtn.introBtn} style={{ textAlign: "center", textDecoration: "none" }}>Home</a>
                       <a href={`/chums/${chumSlug}`} className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} style={{ textAlign: "center", textDecoration: "none" }}>Learn</a>
                     </div>
+                    {/* Random in purple and Back in red (owner, 25 September 2026): the
+                        same fill-and-darker-edge pairing as the green and blue. */}
                     <div className={heroBtn.introBtnRow} style={{ marginTop: 0 }}>
-                      <button type="button" className={heroBtn.introBtn} onClick={() => {
+                      <button type="button" className={heroBtn.introBtn} style={{ background: "#a855f7", boxShadow: "0 4px 0 #7e22ce" }} onClick={() => {
                         const others = packBreeds.filter((b) => b.slug && b.slug !== chumSlug);
                         const pick = others[Math.floor(Math.random() * others.length)];
                         if (pick) window.location.assign(`/play/${pick.slug}`);
                       }}>Random</button>
-                      <button type="button" className={`${heroBtn.introBtn} ${heroBtn.introBtnAlt}`} onClick={() => {
+                      <button type="button" className={heroBtn.introBtn} style={{ background: "#ef4444", boxShadow: "0 4px 0 #b91c1c" }} onClick={() => {
                         if (window.history.length > 1) window.history.back();
                         else window.location.assign("/play");
                       }}>Back</button>
