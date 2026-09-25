@@ -141,6 +141,33 @@ const firstSentence = (t: string): string => {
 };
 const withArticle = (name: string) => (/^[aeiou]/i.test(name) ? `an ${name}` : `a ${name}`);
 
+/* FACT-CHECKED OVERRIDES, 25 September 2026 (owner: "Bull's-eye was not a Bull
+   Terrier, the breed had not been invented yet"). The famous dogs are written
+   from a template ("[dog] from [story] is a [breed]"), which flattens cases where
+   the breed depends on the version, came later than the story, or is uncertain.
+   Each of these was checked; the fact below replaces the template's. null leaves
+   the dog out of the facts entirely (unverified). Keyed "breed-slug|dog name".
+   The breed pages' own famous-dog lists are untouched by this. */
+const FAMOUS_OVERRIDES: Record<string, string | null> = {
+  // Dickens only calls him "a white shaggy dog"; the Bull Terrier dates from the 1860s.
+  "bull-terrier|Bull's-eye": "In Oliver Twist (1838), Dickens described Bill Sikes's dog Bull's-eye only as a white, shaggy dog. He is usually shown as a Bull Terrier on stage and screen, but that breed was not developed until the 1860s.",
+  // Queen Victoria's Dash (1830s) was a King Charles Spaniel; the Cavalier dates from the 1920s.
+  "cavalier-king-charles-spaniel|Dash": "Queen Victoria's much-loved dog Dash was a King Charles Spaniel. The Cavalier King Charles Spaniel, bred to look like the toy spaniels of old paintings, was only developed in the 1920s.",
+  // The books call Fang a boarhound; the films cast Neapolitan Mastiffs.
+  "mastiff|Fang": "In the Harry Potter books, Hagrid's dog Fang is a boarhound, an old name for a Great Dane. In the films he was played by Neapolitan Mastiffs.",
+  // Barrie's Nana is a Newfoundland; Disney made her a Saint Bernard.
+  "saint-bernard|Nana": "In J. M. Barrie's Peter Pan, the Darling children's nurse Nana is a Newfoundland. Disney's film made her a Saint Bernard.",
+  // A stray of uncertain breed.
+  "boston-terrier|Sergeant Stubby": "Sergeant Stubby was a stray, usually described as a Boston Terrier type, who became a decorated war dog in the First World War.",
+  // An Irish Wolfhound in Disney's film only; the novel's Chief is a different hound.
+  "irish-wolfhound|Chief": "In Disney's film The Fox and the Hound, the old hunting dog Chief is an Irish Wolfhound. In the original novel he is a different kind of hound.",
+  // A legend, so hedged.
+  "irish-wolfhound|Gelert": "In the Welsh legend of Llywelyn the Great, his faithful hound Gelert is traditionally said to have been a wolfhound.",
+  // Barry lived before the breed was formalised.
+  "saint-bernard|Barry": "Barry, the famous rescue dog of the Great St Bernard Hospice in the early 1800s, was one of the hospice dogs that became the Saint Bernard breed.",
+  // Not found in the PDSA's records; left out until verified.
+  "staffordshire-bull-terrier|Sox": null,
+};
 function famousFacts(): string[] {
   const nameOf = new Map(breeds.filter((b) => !!b.slug).map((b) => [b.slug, b.name]));
   const out: string[] = [];
@@ -148,6 +175,12 @@ function famousFacts(): string[] {
     const breed = nameOf.get(slug);
     if (!breed) continue;
     for (const d of dogs) {
+      const key = `${slug}|${d.name}`;
+      if (key in FAMOUS_OVERRIDES) {
+        const fixed = FAMOUS_OVERRIDES[key];
+        if (fixed) out.push(fixed);
+        continue;
+      }
       const known = d.knownFor.trim();
       out.push(d.type.startsWith("Real")
         ? `${d.name}, the ${known.charAt(0).toLowerCase() + known.slice(1)}, was ${withArticle(breed)}.`
