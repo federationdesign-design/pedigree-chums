@@ -2639,8 +2639,10 @@
 .foundListRows { list-style: none; margin: 0; padding: 0; }
 .foundListRow {
   display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas: "name tag";
+  /* The icons sit between the name and the era (owner, 25 September 2026), and
+     a row's blue box opens across the full width beneath it. */
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas: "name icons tag" "detail detail detail";
   gap: 2px 8px;
   padding: 7px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.25);
@@ -2702,4 +2704,58 @@
     100% { opacity: 0; transform: translate(-50%, 0); }
   }
 }
+
+/* THE FOUND LIST'S ROW ICONS AND BOX, 25 September 2026 (owner). The lifted
+   layer's own three: the blue "i", the magnifier, the % pill. */
+.foundListIcons { grid-area: icons; display: flex; align-items: center; gap: 5px; }
+.foundIconInfo, .foundIconZoom, .foundIconPill {
+  text-shadow: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.foundIconInfo {
+  width: 22px; height: 22px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: var(--blue-deep, #0c5b92);
+  color: #ffffff;
+  font: italic 700 12px Georgia, serif;
+}
+.foundIconZoom {
+  width: 22px; height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(10, 58, 87, 0.55);
+  color: #ffffff;
+}
+.foundIconPill {
+  height: 20px;
+  padding: 0 7px;
+  border: 1.5px solid #ffffff;
+  border-radius: 999px;
+  background: var(--yellow, #ffd23e);
+  color: #0a3a57;
+  font-size: 10px;
+  font-weight: 800;
+}
+.foundIconInfo[aria-pressed="true"], .foundIconZoom[aria-pressed="true"], .foundIconPill[aria-pressed="true"] { outline: 2px solid #ffed00; outline-offset: 1px; }
+.foundDetail {
+  grid-area: detail;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--blue-deep, #0c5b92);
+  color: #ffffff;
+  text-shadow: none;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.foundDetail p { margin: 0; }
+.foundDetailImg { display: block; width: 100%; max-width: 280px; margin: 0 auto; border-radius: 10px; }
+.foundDetailHead { font-weight: 700; margin-bottom: 6px !important; }
+.foundDetailMix { list-style: none; margin: 0; padding: 0; }
+.foundDetailMix li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-top: 1px solid rgba(255, 255, 255, 0.2); }
 

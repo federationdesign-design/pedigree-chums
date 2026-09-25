@@ -5598,14 +5598,20 @@ export default function BreedTree({
   /* THE LIST behind the counter (owner, 24 September 2026): a tap on the counter
      opens every dog found this run. The counter stays up while it is open. */
   const [foundListOpen, setFoundListOpen] = useState(false);
+  /* THE ROW ICONS' BOX, 25 September 2026 (owner): the placed cards' three icons
+     on the lifted layer (info, magnify, the % pill) now sit beside each found
+     dog too, and open a blue box under that row. One box at a time. */
+  const [foundDetail, setFoundDetail] = useState<{ name: string; kind: "info" | "zoom" | "mix" } | null>(null);
   const foundListRef = useRef<HTMLDivElement>(null);
   /* THE LIST CLOSES ITSELF after FOUND_LIST_OPEN_MS (owner, 24 September 2026),
      in place of the close X. A tap on the counter still opens and shuts it. */
   useEffect(() => {
-    if (!foundListOpen) return;
+    // Not while a row's box is open: the player is reading it. The count
+    // starts again when the box is shut.
+    if (!foundListOpen || foundDetail) return;
     const t = window.setTimeout(() => setFoundListOpen(false), FOUND_LIST_OPEN_MS);
     return () => window.clearTimeout(t);
-  }, [foundListOpen]);
+  }, [foundListOpen, foundDetail]);
   /* THE LIST STAYS ON SCREEN (owner, 24 September 2026: it was running off the
      left edge). It hangs right-aligned under the counter, and the counter can sit
      near the left of a narrow pit, so the list could start off screen. Measured
@@ -12456,6 +12462,30 @@ export default function BreedTree({
         // that can be dragged into the pack is a worse control. The chum
         // scenery is out too, since it was never draggable.
         const MC_KINDS = new Set(["badge", "circle", "rod", "pill", "toy", "btn"]);
+        /* BOMBS LAST, 25 September 2026 (owner: bombs were hard to click in a full
+           pit). Matter's grab checks every body under the pointer and the LAST one
+           in the world's list wins, so a dog popped after a bomb would take the
+           click. After each step any live bomb is moved to the end of the list,
+           keeping everything else in its order; the tail is checked first, so a
+           list already in order costs a few comparisons. */
+        const isLiveBomb = (bd: unknown) => {
+          const br = (bd as { plugin?: { bridge?: Body } }).plugin?.bridge;
+          return !!br?.bomb && !br.blown;
+        };
+        Events.on(engine, "afterUpdate", () => {
+          const list = world.bodies;
+          let bombs = 0;
+          for (const bd of list) if (isLiveBomb(bd)) bombs++;
+          if (!bombs) return;
+          let inPlace = true;
+          for (let i = list.length - bombs; i < list.length; i++) if (!isLiveBomb(list[i])) { inPlace = false; break; }
+          if (inPlace) return;
+          const rest = list.filter((bd: unknown) => !isLiveBomb(bd));
+          const tail = list.filter((bd: unknown) => isLiveBomb(bd));
+          list.length = 0;
+          list.push(...rest, ...tail);
+          Composite.setModified(world, true, false, false);
+        });
         /* THE FALLEN LOGO IS DRAGGABLE, the others are not (owner, 31 Aug 2026:
            "I want to pick up and move it around, just like the main pit").
 
@@ -15017,6 +15047,172 @@ export default function BreedTree({
               pointer, or it would answer the hit test in a circle's place.
               It carries the swipe chain's own filter, not a second one. */}
           <g ref={twinGlowGRef} filter="url(#bt-chain-glow)" style={{ pointerEvents: "none" }} />
+          {/* THE TOKENS ARE DRAWN BEFORE THE DOGS, 25 September 2026 (owner: in a
+              full pit the % tokens sat on top of the dog circles). SVG draws in
+              order, so this layer now comes ahead of circlesRef and every dog
+              circle sits over every token. Moved whole, fade-in and chain dim
+              included; nothing inside it changed. The bombs are mirrored above the
+              dogs separately: see THE BOMBS ON TOP. */}
+          {/* Physics badges: once dropped, the yellow % chips live here and are
+              positioned by the sim / zoomTo from their body coordinates. */}
+          {/* The badges are laid out from viewRef, which only reaches its final
+              value when the drop-in entrance calls zoomTo at the end. Showing
+              them before that put every chip at the wrong scale and origin (up
+              and to the left), then snapped it to the rim. They now fade in with
+              the labels, already at their resting spot on the lower-right rim,
+              which is exactly where the physics bodies spawn. */}
+          <g style={{ display: dockAside && !learning && !displayOnly ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
+            {/* THE STAND-DOWN DIM FOR TOKENS (owner, 24 September 2026). While a
+                dog chain is live, every token drops to FACE_STANDDOWN_OPACITY,
+                the same 45% a dog that cannot join is faded to. Set on this inner
+                group by the chain itself, never by React, so it cannot fight the
+                outer group's own fade-in opacity.
+                badgesRef MOVED HERE from the outer group, deliberately: three
+                readers reach a token as badgesRef.children[i], and these are the
+                tokens themselves, so the index still lands on the right one. */}
+            <g ref={badgesRef}>
+            {badgePcts.map((item, i) => {
+              const v = viewRef.current;
+              const kk = SIZE / v[2];
+              const b = badgeBodiesRef.current?.[i];
+              // The circle this badge came from, carried by the badge. This used
+              // to be nodes.filter(depth === 1)[i], which is the coupling stage 1
+              // exists to remove. Used only before the bodies exist, to park the
+              // badge on its circle's rim.
+              const d1n = item.src ?? null;
+              const bx = b ? b.x : d1n ? d1n.x - d1n.r * 0.707 : v[0];
+              const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
+              const inert = inertBadges.has(i);
+              /* ONLY A CHIP OFF A LIFTED DOG WEARS THE RARITY COLOUR, 20
+                 September 2026 (owner). The first cut of this, earlier the same
+                 day, keyed on `src` and got it exactly backwards: `src` is the
+                 circle a chip was PARKED ON, which is set for the start screen
+                 and for every chip the drop and the pop throw out, and null for
+                 the scatter off the learn layer. So the colour landed on all the
+                 chips that were meant to stay lemon and on none of the chips that
+                 were meant to change.
+
+                 THE KEY IS `rarity`, the breed name, set at the scatter and
+                 nowhere else. The start screen and everything that falls from the
+                 diagram carry no name, so they keep CHIP_FILL without a test of
+                 their own.
+
+                 SAME TABLE, SAME PAIR as an available twin and a held circle:
+                 RARITY_BAND, indexed by rarityTier(treesContaining(name)). `bg`
+                 fills and `fg` inks, and the pair is already measured, which is
+                 why the figure moves off navy with it. Navy against the purple
+                 and the royal blue is 1.20 and 1.58 and would vanish.
+
+                 THE OTHER THREE STATES ARE UNTOUCHED, and each says something the
+                 rarity does not: inert blue for a spent chip, inert white for a
+                 spent learnt one, sky blue for the labelled solo-dog circle. A
+                 bomb draws a sprite and never reaches this. */
+              const chipBand = !item.bomb && !inert && !item.label && item.rarity
+                ? RARITY_BAND[rarityTier(treesContaining(item.rarity))]
+                : null;
+              if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
+              if (item.r <= 0) return <g key={i} style={{ display: "none" }} />; // dog below the legibility floor: no badge
+              return (
+              <g key={i} id={item.bomb ? `bt-bomb-${i}` : undefined} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk}) rotate(${(b ? b.a : 0) * 57.2958})`}
+                style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
+                onClick={(e) => e.stopPropagation()}
+>
+                {/* J17 stage 2: a bomb wears the main pit's sprite in place of
+                    the yellow disc, sized the same way the pit sizes it: a box
+                    of 2.4 radii with the aspect ratio preserved inside it. The
+                    transparent circle underneath keeps the grab area identical
+                    to a badge's, so drag, tap and hit-testing are unchanged.
+                    It keeps the sprite when the badge goes inert, because a
+                    bomb turning into a blue disc reads as broken. Stage 3
+                    replaces the charge counting with the fuse. */}
+                {item.bomb ? (
+                  <>
+                    {/* The sprite is drawn 2.4 radii wide, so the ball you aim
+                        at is bigger than the body under it. The grab area
+                        matches what you can see rather than the physics radius,
+                        which matters most for the press and hold that burns the
+                        fuse. */}
+                    <circle cx={0} cy={0} r={item.r * 1.13} style={{ fill: "transparent", pointerEvents: "all" }} />
+                    <image
+                      href="/bomb.svg"
+                      x={-item.r * 1.2}
+                      y={-item.r * 1.2}
+                      width={item.r * 2.4}
+                      height={item.r * 2.4}
+                      preserveAspectRatio="xMidYMid meet"
+                      style={{ pointerEvents: "none" }}
+                    />
+                  </>
+                ) : (
+                /* The outline is a fraction of the radius, so a chip keeps the same
+                   ring-to-disc proportion at every difficulty stop. A fixed
+                   pixel width was tried and rejected: it reads correctly on the
+                   small level-0 chips and thins out badly as they grow. The
+                   fractions are calibrated so a level-0 chip is unchanged, by
+                   measuring the ring off the level-0 screen: 5 * upp against a
+                   radius of about 41 to 46 units, which is 0.19. The label
+                   variant keeps the same 18% extra it always had. */
+                /* THE LEARNT CHIP IS LEMON NOW, NOT GREEN (31 Aug 2026, Steve),
+                   matching the #ffed00 rolled out across the reveal card, the
+                   shortlist bar, the knockout round and the superpower pages.
+
+                   THE RING AND THE FIGURE HAD TO MOVE WITH IT. Both were white,
+                   which only ever worked because the disc underneath was green.
+                   Measured against #ffed00: white is 1.21:1, invisible. Navy
+                   #0a3a57 is 9.89:1. The old note directly below said as much
+                   about the yellow chips, that white on yellow would not be
+                   readable, and it was right.
+
+                   Both are navy now, which is what every other badge in the pit
+                   already used, so the `item.green` branch on the stroke and on
+                   the text is gone rather than recoloured. */
+                /* A learnt badge still goes inert WHITE, not the blue every
+                   other badge uses, so a spent one reads as a distinct dead
+                   token. The ring no longer needs to switch to navy on going
+                   inert, because it is navy in both states now. Ordinary
+                   badges keep the blue inert fill (white on white would
+                   disappear). */
+                <circle cx={0} cy={0} r={item.r} style={{ /* IN AN ACCESSIBILITY VIEW, 21 September 2026 (owner: the % pills in the
+                     view's colours, inverted on each): an ink disc with an ink ring and a
+                     figure in the page colour; a spent badge the reverse, so it still reads
+                     as a dead token. Outside a view, the colours below as before. */
+                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN : chipBand.bg) : CHIP_FILL, stroke: sInk ?? (chipBand === RARITY_BAND.veryCommon && !inert && !item.label ? VERY_COMMON_TOKEN_INK : chipBand === RARITY_BAND.common && !inert && !item.label ? "#0a3a57" /* THE COMMON TOKEN RINGS AND READS NAVY, 23 September 2026 (owner). White measured 2.85:1 on the orange; navy is 6.03. The other tiers keep the white ring. */ : chipBand && !inert && !item.label ? "#ffffff" : "#0a3a57"), /* WHITE RING ON A RARITY TOKEN, 21 September 2026 (owner: the figure on a rarity-coloured token is white, and its ring should be too). A yellow token, a spent one and a name disc keep navy. THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                     (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
+                     0.09, the weight a first-generation circle wears on the lifted
+                     screen, read from the shared RING_FRAC table rather than typed
+                     in again, so the two cannot drift.
+                     The labelled solo-dog circle keeps its 0.225: it is a different
+                     object, it was not asked about, and it carries a name rather
+                     than a figure. */
+                  strokeWidth: item.r * (item.label ? 0.225 : ringFrac(1)) }} />
+                )}
+                {!item.bomb && !inert && (item.label ? (
+                  // solo dog circle: the breed name it wore before the round
+                  // started, measured by the same fitter the pit circles use
+                  (() => {
+                    const lab = fitLabel(item.label, item.r, item.r * 0.34, labelFont);
+                    // Same rule as the pit circles: a name that will not fit is
+                    // not drawn, the disc stands on its own rather than spilling.
+                    if (!lab.fits) return null;
+                    const top = -((lab.lines.length - 1) * lab.fs * LABEL_LINE_H) / 2;
+                    return (
+                      <text x={0} y={0} dominantBaseline="central" style={{ fill: sPaper ?? "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${lab.fs}px`, pointerEvents: "none", userSelect: "none" }}>
+                        {lab.lines.map((ln, li) => (
+                          <tspan key={li} x={0} y={top + li * lab.fs * LABEL_LINE_H}>{ln}</tspan>
+                        ))}
+                      </text>
+                    );
+                  })()
+                ) : (
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN_INK : chipBand === RARITY_BAND.common ? "#0a3a57" : chipBand === RARITY_BAND.uncommon ? "#ffffff" /* white on the orange and green tokens too, 21 Sept 2026 (owner), to match their white ring; the band labels elsewhere keep RARITY_BAND's black */ : chipBand.fg) : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                    {`${item.pct}%`}
+                  </text>
+                ))}
+              </g>
+              );
+            })}
+            </g>
+          </g>
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
@@ -15568,167 +15764,6 @@ export default function BreedTree({
             })}
           </g>
 
-          {/* Physics badges: once dropped, the yellow % chips live here and are
-              positioned by the sim / zoomTo from their body coordinates. */}
-          {/* The badges are laid out from viewRef, which only reaches its final
-              value when the drop-in entrance calls zoomTo at the end. Showing
-              them before that put every chip at the wrong scale and origin (up
-              and to the left), then snapped it to the rim. They now fade in with
-              the labels, already at their resting spot on the lower-right rim,
-              which is exactly where the physics bodies spawn. */}
-          <g style={{ display: dockAside && !learning && !displayOnly ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
-            {/* THE STAND-DOWN DIM FOR TOKENS (owner, 24 September 2026). While a
-                dog chain is live, every token drops to FACE_STANDDOWN_OPACITY,
-                the same 45% a dog that cannot join is faded to. Set on this inner
-                group by the chain itself, never by React, so it cannot fight the
-                outer group's own fade-in opacity.
-                badgesRef MOVED HERE from the outer group, deliberately: three
-                readers reach a token as badgesRef.children[i], and these are the
-                tokens themselves, so the index still lands on the right one. */}
-            <g ref={badgesRef}>
-            {badgePcts.map((item, i) => {
-              const v = viewRef.current;
-              const kk = SIZE / v[2];
-              const b = badgeBodiesRef.current?.[i];
-              // The circle this badge came from, carried by the badge. This used
-              // to be nodes.filter(depth === 1)[i], which is the coupling stage 1
-              // exists to remove. Used only before the bodies exist, to park the
-              // badge on its circle's rim.
-              const d1n = item.src ?? null;
-              const bx = b ? b.x : d1n ? d1n.x - d1n.r * 0.707 : v[0];
-              const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
-              const inert = inertBadges.has(i);
-              /* ONLY A CHIP OFF A LIFTED DOG WEARS THE RARITY COLOUR, 20
-                 September 2026 (owner). The first cut of this, earlier the same
-                 day, keyed on `src` and got it exactly backwards: `src` is the
-                 circle a chip was PARKED ON, which is set for the start screen
-                 and for every chip the drop and the pop throw out, and null for
-                 the scatter off the learn layer. So the colour landed on all the
-                 chips that were meant to stay lemon and on none of the chips that
-                 were meant to change.
-
-                 THE KEY IS `rarity`, the breed name, set at the scatter and
-                 nowhere else. The start screen and everything that falls from the
-                 diagram carry no name, so they keep CHIP_FILL without a test of
-                 their own.
-
-                 SAME TABLE, SAME PAIR as an available twin and a held circle:
-                 RARITY_BAND, indexed by rarityTier(treesContaining(name)). `bg`
-                 fills and `fg` inks, and the pair is already measured, which is
-                 why the figure moves off navy with it. Navy against the purple
-                 and the royal blue is 1.20 and 1.58 and would vanish.
-
-                 THE OTHER THREE STATES ARE UNTOUCHED, and each says something the
-                 rarity does not: inert blue for a spent chip, inert white for a
-                 spent learnt one, sky blue for the labelled solo-dog circle. A
-                 bomb draws a sprite and never reaches this. */
-              const chipBand = !item.bomb && !inert && !item.label && item.rarity
-                ? RARITY_BAND[rarityTier(treesContaining(item.rarity))]
-                : null;
-              if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
-              if (item.r <= 0) return <g key={i} style={{ display: "none" }} />; // dog below the legibility floor: no badge
-              return (
-              <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk}) rotate(${(b ? b.a : 0) * 57.2958})`}
-                style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
-                onClick={(e) => e.stopPropagation()}
->
-                {/* J17 stage 2: a bomb wears the main pit's sprite in place of
-                    the yellow disc, sized the same way the pit sizes it: a box
-                    of 2.4 radii with the aspect ratio preserved inside it. The
-                    transparent circle underneath keeps the grab area identical
-                    to a badge's, so drag, tap and hit-testing are unchanged.
-                    It keeps the sprite when the badge goes inert, because a
-                    bomb turning into a blue disc reads as broken. Stage 3
-                    replaces the charge counting with the fuse. */}
-                {item.bomb ? (
-                  <>
-                    {/* The sprite is drawn 2.4 radii wide, so the ball you aim
-                        at is bigger than the body under it. The grab area
-                        matches what you can see rather than the physics radius,
-                        which matters most for the press and hold that burns the
-                        fuse. */}
-                    <circle cx={0} cy={0} r={item.r * 1.13} style={{ fill: "transparent", pointerEvents: "all" }} />
-                    <image
-                      href="/bomb.svg"
-                      x={-item.r * 1.2}
-                      y={-item.r * 1.2}
-                      width={item.r * 2.4}
-                      height={item.r * 2.4}
-                      preserveAspectRatio="xMidYMid meet"
-                      style={{ pointerEvents: "none" }}
-                    />
-                  </>
-                ) : (
-                /* The outline is a fraction of the radius, so a chip keeps the same
-                   ring-to-disc proportion at every difficulty stop. A fixed
-                   pixel width was tried and rejected: it reads correctly on the
-                   small level-0 chips and thins out badly as they grow. The
-                   fractions are calibrated so a level-0 chip is unchanged, by
-                   measuring the ring off the level-0 screen: 5 * upp against a
-                   radius of about 41 to 46 units, which is 0.19. The label
-                   variant keeps the same 18% extra it always had. */
-                /* THE LEARNT CHIP IS LEMON NOW, NOT GREEN (31 Aug 2026, Steve),
-                   matching the #ffed00 rolled out across the reveal card, the
-                   shortlist bar, the knockout round and the superpower pages.
-
-                   THE RING AND THE FIGURE HAD TO MOVE WITH IT. Both were white,
-                   which only ever worked because the disc underneath was green.
-                   Measured against #ffed00: white is 1.21:1, invisible. Navy
-                   #0a3a57 is 9.89:1. The old note directly below said as much
-                   about the yellow chips, that white on yellow would not be
-                   readable, and it was right.
-
-                   Both are navy now, which is what every other badge in the pit
-                   already used, so the `item.green` branch on the stroke and on
-                   the text is gone rather than recoloured. */
-                /* A learnt badge still goes inert WHITE, not the blue every
-                   other badge uses, so a spent one reads as a distinct dead
-                   token. The ring no longer needs to switch to navy on going
-                   inert, because it is navy in both states now. Ordinary
-                   badges keep the blue inert fill (white on white would
-                   disappear). */
-                <circle cx={0} cy={0} r={item.r} style={{ /* IN AN ACCESSIBILITY VIEW, 21 September 2026 (owner: the % pills in the
-                     view's colours, inverted on each): an ink disc with an ink ring and a
-                     figure in the page colour; a spent badge the reverse, so it still reads
-                     as a dead token. Outside a view, the colours below as before. */
-                  fill: sInk && sPaper ? (inert ? sPaper : sInk) : inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN : chipBand.bg) : CHIP_FILL, stroke: sInk ?? (chipBand === RARITY_BAND.veryCommon && !inert && !item.label ? VERY_COMMON_TOKEN_INK : chipBand === RARITY_BAND.common && !inert && !item.label ? "#0a3a57" /* THE COMMON TOKEN RINGS AND READS NAVY, 23 September 2026 (owner). White measured 2.85:1 on the orange; navy is 6.03. The other tiers keep the white ring. */ : chipBand && !inert && !item.label ? "#ffffff" : "#0a3a57"), /* WHITE RING ON A RARITY TOKEN, 21 September 2026 (owner: the figure on a rarity-coloured token is white, and its ring should be too). A yellow token, a spent one and a name disc keep navy. THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
-                     (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
-                     0.09, the weight a first-generation circle wears on the lifted
-                     screen, read from the shared RING_FRAC table rather than typed
-                     in again, so the two cannot drift.
-                     The labelled solo-dog circle keeps its 0.225: it is a different
-                     object, it was not asked about, and it carries a name rather
-                     than a figure. */
-                  strokeWidth: item.r * (item.label ? 0.225 : ringFrac(1)) }} />
-                )}
-                {!item.bomb && !inert && (item.label ? (
-                  // solo dog circle: the breed name it wore before the round
-                  // started, measured by the same fitter the pit circles use
-                  (() => {
-                    const lab = fitLabel(item.label, item.r, item.r * 0.34, labelFont);
-                    // Same rule as the pit circles: a name that will not fit is
-                    // not drawn, the disc stands on its own rather than spilling.
-                    if (!lab.fits) return null;
-                    const top = -((lab.lines.length - 1) * lab.fs * LABEL_LINE_H) / 2;
-                    return (
-                      <text x={0} y={0} dominantBaseline="central" style={{ fill: sPaper ?? "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${lab.fs}px`, pointerEvents: "none", userSelect: "none" }}>
-                        {lab.lines.map((ln, li) => (
-                          <tspan key={li} x={0} y={top + li * lab.fs * LABEL_LINE_H}>{ln}</tspan>
-                        ))}
-                      </text>
-                    );
-                  })()
-                ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: sInk && sPaper ? (inert ? sInk : sPaper) : chipBand ? (chipBand === RARITY_BAND.veryCommon ? VERY_COMMON_TOKEN_INK : chipBand === RARITY_BAND.common ? "#0a3a57" : chipBand === RARITY_BAND.uncommon ? "#ffffff" /* white on the orange and green tokens too, 21 Sept 2026 (owner), to match their white ring; the band labels elsewhere keep RARITY_BAND's black */ : chipBand.fg) : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
-                    {`${item.pct}%`}
-                  </text>
-                ))}
-              </g>
-              );
-            })}
-            </g>
-          </g>
-
           {/* The elements knocked off the logo. Debris, so pointer events are
               off: they must never take a tap meant for a dog behind them. The
               frame loop positions each by index into this container, which is
@@ -16129,6 +16164,16 @@ export default function BreedTree({
                 </g>
               );
             })}
+          </g>
+
+          {/* THE BOMBS ON TOP, 25 September 2026 (owner: in a full pit the bombs
+              were hard to see and click). The tokens are drawn under the dogs
+              (J18-133), bombs included, so each bomb is MIRRORED here, after the
+              dog circles, with <use>: it follows the real bomb's position, tilt
+              and art exactly, and the token layer itself is unchanged. The click
+              side is the physics: see BOMBS LAST. */}
+          <g style={{ pointerEvents: "none" }} aria-hidden="true">
+            {badgePcts.map((item, i) => (item.bomb && !deadBadges.has(i) && item.r > 0 ? <use key={i} href={`#bt-bomb-${i}`} /> : null))}
           </g>
 
           {/* Collision number flashes, appended imperatively by the sim. */}
@@ -17456,8 +17501,8 @@ export default function BreedTree({
           tabIndex={0}
           aria-expanded={foundListOpen}
           aria-label={`${dogsFound ?? 0} of ${dogsTotal} dogs found. Show the list`}
-          onClick={() => setFoundListOpen((o) => !o)}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFoundListOpen((o) => !o); } }}
+          onClick={() => { setFoundListOpen((o) => !o); setFoundDetail(null); }}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFoundListOpen((o) => !o); setFoundDetail(null); } }}
         >
           {`${dogsFound ?? 0}/${dogsTotal}`}
           {/* THE LIST, hung under the counter so it moves with it. Newest first:
@@ -17473,13 +17518,54 @@ export default function BreedTree({
                 <ul className={styles.foundListRows}>
                   {[...(dogsFoundList ?? [])].reverse().map((d) => {
                     const band = RARITY_BAND[rarityTier(treesContaining(d.name))];
+                    /* The dog's own record, from this level's tree: its picture,
+                       its write-up and its parents. */
+                    const node = nodes.find((n) => n.data.name === d.name);
+                    const info = breedInfo[d.name] || node?.data.note || "";
+                    const img = node?.data.img;
+                    const parents = ((node?.data.children ?? []) as LineageNode[]).filter((k) => !isEchoName(k.name, d.name) || k.name === d.name);
+                    const total = parents.reduce((sum, k) => sum + (k.value ?? 0), 0);
+                    const share = nodes[0] ? ancestorShareOf(nodes[0].data.name, d.name) : null;
+                    const shareTxt = share === null ? null : share < 1 ? "<1%" : `${share}%`;
+                    const open = foundDetail?.name === d.name ? foundDetail.kind : null;
+                    const toggle = (kind: "info" | "zoom" | "mix") => setFoundDetail((cur) => (cur?.name === d.name && cur.kind === kind ? null : { name: d.name, kind }));
                     return (
                       <li key={d.name} className={styles.foundListRow}>
                         <span className={styles.foundListName}>{d.name}</span>
+                        <span className={styles.foundListIcons}>
+                          {info ? <button type="button" className={styles.foundIconInfo} aria-label={`About the ${d.name}`} aria-pressed={open === "info"} onClick={() => toggle("info")}>i</button> : null}
+                          {img ? (
+                            <button type="button" className={styles.foundIconZoom} aria-label={`See the ${d.name}`} aria-pressed={open === "zoom"} onClick={() => toggle("zoom")}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" /></svg>
+                            </button>
+                          ) : null}
+                          {shareTxt ? <button type="button" className={styles.foundIconPill} aria-label={`Where the ${d.name} comes from`} aria-pressed={open === "mix"} onClick={() => toggle("mix")}>{shareTxt}</button> : null}
+                        </span>
                         {/* THE ERA IN A PILL, filled with the dog's rarity colour
                             (owner, 24 September 2026). It replaces the separate
                             rarity pill, so the colour still says the rarity. */}
                         <span className={styles.foundListTag} style={{ background: band.bg, color: band.fg }} title={band.label}>{d.era}</span>
+                        {open ? (
+                          <div className={styles.foundDetail}>
+                            {open === "info" ? <p>{info}</p> : null}
+                            {open === "zoom" && img ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={encodeURI(bust(img))} alt={d.name} className={styles.foundDetailImg} />
+                            ) : null}
+                            {open === "mix" ? (
+                              <>
+                                <p className={styles.foundDetailHead}>{shareTxt} of the {nodes[0]?.data.name}. Its parents:</p>
+                                {parents.length && total > 0 ? (
+                                  <ul className={styles.foundDetailMix}>
+                                    {parents.map((k) => (
+                                      <li key={k.name}><span>{k.name === d.name ? `Earlier ${k.name}` : k.name}</span><span>{Math.round(((k.value ?? 0) / total) * 100)}%</span></li>
+                                    ))}
+                                  </ul>
+                                ) : <p>An ancient root: no recorded parents.</p>}
+                              </>
+                            ) : null}
+                          </div>
+                        ) : null}
                       </li>
                     );
                   })}
