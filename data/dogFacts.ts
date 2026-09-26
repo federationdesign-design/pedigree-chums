@@ -256,7 +256,8 @@ export const EXTRA_FACTS: string[] = [];
    that chum is caught or chained.
    Batch 1 (J18-241): Jackapoo, 9 new facts (1 existing, 10 in all).
    Batch 2 (J18-245): Cavachon, 9 new facts (1 existing, 10 in all).
-   Batch 3 (J18-253): Cavapoo, 9 new facts (1 existing, 10 in all). */
+   Batch 3 (J18-253): Cavapoo, 9 new facts (1 existing, 10 in all).
+   Batch 4 (J18-257): Maltipoo, 9 new facts (1 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -292,6 +293,18 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "King Charles II let his little spaniels, the ancestors of the Cavapoo's Cavalier side, go almost everywhere with him, even into his bedroom, where he let them have their puppies. After the king died in 1685, the writer John Evelyn grumbled in his diary that the dogs had made the bedroom, and indeed the whole royal court, smelly.",
     "The Poodle side of the Cavapoo helped the American army start using dogs. In 1942, during the Second World War, a Poodle breeder called Alene Erlanger set up Dogs for Defense, which asked American families to lend their pets to the armed forces. Poodles were on the army's first list of war dogs, praised for how quickly they learned, and some worked as guard dogs in America, though they did not go overseas.",
     "A Cavapoo is a small dog, usually about 23 to 33cm tall and weighing 4 to 10kg, depending mostly on whether its Poodle parent was a Toy or a Miniature. Its coat can be silky like a Cavalier King Charles Spaniel's or curly like a Poodle's, in colours from apricot and red to cream, black, brown and white.",
+  ],
+  // Batch 4 (J18-257): 9 new, 10 in all.
+  Maltipoo: [
+    "The Maltipoo, a cross of the Maltese and the Poodle, first appeared in the USA in the late 1980s or the 1990s, but nobody has ever claimed to have bred the first one. Breeders wanted a tiny, cuddly companion with the Maltese's small size and soft coat and the Poodle's quick brain, and the Maltipoo became one of the smallest dogs of the Poodle-cross craze.",
+    "The Maltipoo has also been called the Moodle, the Maltoodle, the Maltipoodle and the Malt-A-Poo. Dog clubs in America still cannot agree on the spelling: some use Malt-A-Poo and others Maltipoo. Maltipoo is the name most breeders now use, joining the Malti of the Maltese to the poo of the Poodle. None of the big kennel clubs recognise it as a breed.",
+    "The Maltese side of the Maltipoo is one of the oldest pet dogs we know of. On a Greek vase from about 500 BC, found at Vulci in Italy, a little dog with a pointed nose was painted beside the word melitaie, meaning a dog from Melita. Melita is the old name for Malta, but there was also an island called Melita off the coast of what is now Croatia, so nobody is quite sure which island these dogs came from.",
+    "The Greek thinker Aristotle wrote about the Maltipoo's Maltese ancestors around 370 BC, calling them Melitaean dogs and comparing them to a weasel-like animal. That makes the Maltese one of the earliest pet dogs to be written about by name, more than 2,300 years before anyone crossed one with a Poodle to make a Maltipoo.",
+    "In Roman times, the poet Martial wrote a poem about a little white lapdog called Issa, who belonged to his friend Publius. Many people think Issa was a Maltese, the ancestor that gives the Maltipoo half its name. Martial says Issa was more playful than a sparrow, and that Publius had her portrait painted so she would never be forgotten, a picture so lifelike you could not tell the dog from the painting.",
+    "People in ancient Greece loved the Maltipoo's Maltese ancestors so much that one writer poked fun at it. Around 300 BC, Theophrastus described a show-off who, when his little dog from Melita died, put up a memorial stone for it. Those little Melitaean lapdogs are the ancestors of the Maltese, the dog behind the Malti in Maltipoo.",
+    "The people of Sybaris, an ancient Greek city famous for its luxury, loved their little Melitaean lapdogs so much that, according to the writer Athenaeus, they took them everywhere, even to the gym. Those tiny white dogs were ancestors of the Maltese, which gives the Maltipoo half of its name. The word sybarite, meaning someone who loves luxury, comes from that city.",
+    "The Maltese side of the Maltipoo has had many names over the centuries. In Latin it was Canis Melitaeus, and in English it has been called the Ancient Dog of Malta, the Roman Ladies' Dog and the Maltese Lion Dog. The Kennel Club in Britain settled on plain Maltese in the 1800s.",
+    "A Maltipoo is tiny, usually weighing about 2 to 7kg and standing no more than 38cm tall, depending mostly on whether its Poodle parent was a Toy or a Miniature. The Maltese side has a long, silky, pure white coat, but Poodles come in many colours, so Maltipoos come in more colours than the Maltese, with coats anywhere from silky to curly.",
   ],
 };
 
@@ -788,6 +801,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "In 1570 the doctor John Caius described a little spaniel", q: "What did John Caius call the little lapdog spaniel?", options: ["The comforter", "The cuddler", "The snuggler"], answer: 0, evidence: "comforter" },
   { match: "In 1635 the painter Anthony van Dyck painted", q: "Why was King Charles I cross with Van Dyck's first painting?", options: ["His son was shown in a skirt", "The dogs looked too big", "The king was left out"], answer: 0, evidence: "wearing a skirt" },
   { match: "a Poodle breeder called Alene Erlanger set up Dogs for Defense", q: "What was Alene Erlanger's wartime scheme called?", options: ["Dogs for Defense", "Pups for Peace", "Hounds for Heroes"], answer: 0, evidence: "Dogs for Defense" },
+  // Batch 4 (J18-257): Maltipoo.
+  { match: "The Maltipoo has also been called the Moodle", q: "Which of these has also been used as a name for the Maltipoo?", options: ["The Moodle", "The Moopoo", "The Maltbone"], answer: 0, evidence: "the Moodle" },
+  { match: "On a Greek vase from about 500 BC, found at Vulci", q: "Which old name for Malta was written on the Greek vase, as melitaie?", options: ["Melita", "Mellow", "Molten"], answer: 0, evidence: "from Melita" },
+  { match: "The Greek thinker Aristotle wrote about the Maltipoo's", q: "Which Greek thinker wrote about Melitaean dogs around 370 BC?", options: ["Aristotle", "Archimedes", "Homer"], answer: 0, evidence: "Aristotle" },
+  { match: "the poet Martial wrote a poem about a little white lapdog called Issa", q: "What was the name of Publius's little white lapdog?", options: ["Issa", "Fido", "Rex"], answer: 0, evidence: "called Issa" },
+  { match: "The people of Sybaris, an ancient Greek city", q: "Where did the people of Sybaris even take their lapdogs?", options: ["To the gym", "To the moon", "To school"], answer: 0, evidence: "even to the gym" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
