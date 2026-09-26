@@ -5856,6 +5856,10 @@ export default function BreedTree({
     head.textContent = headText;
     head.setAttribute("aria-hidden", "true");
     el.appendChild(head);
+    // THE TITLE ABOVE THE PICTURES (owner, 26 September 2026): the picture row
+    // was built first, so the heading is moved in front of it.
+    const dogsRow = el.querySelector(`.${styles.factDogs}`);
+    if (dogsRow) el.insertBefore(head, dogsRow);
     const body = document.createElement("div");
     body.className = styles.factBody;
     body.setAttribute("aria-hidden", "true");
@@ -5899,7 +5903,8 @@ export default function BreedTree({
     // skip arrow beside the time bar. It does the same thing, closes the fact.
     skip.className = styles.factClose;
     skip.setAttribute("aria-label", "Close this fact");
-    skip.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+    // The site's red close cross (red-icon.svg, as on the chatbot), no circle.
+    skip.innerHTML = '<img src="/red-icon.svg" alt="" aria-hidden="true" />';
     el.appendChild(skip);
     el.appendChild(foot);
     el.style.animationDuration = `${ms}ms`;
