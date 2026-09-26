@@ -1020,8 +1020,10 @@ const FACT_DOGS_BIG_UPTO = 3; // each word arrives this long after the one befor
    (data/dogFacts.ts: the history page's facts, the chatbot's breed lines, the
    famous dogs and the breed write-ups) plus the current level's lineage notes,
    dealt from a shuffled deck so every fact shows before any comes round again. */
-/* NO REPEATS IN A VISIT, 25 September 2026 (owner: a second or third level should
-   bring new facts). The facts already shown are remembered in sessionStorage,
+/* NO REPEATS, 25 September 2026 (owner: a second or third level should bring new
+   facts). KEPT ACROSS DAYS, 27 September 2026 (owner: a tester plays over three
+   days and should not see a fact twice): localStorage, which lasts until the
+   browser's data is cleared, rather than sessionStorage, which went with the tab. The facts already shown are remembered in sessionStorage,
    which lasts until the tab is closed, as short hashes. Each new deck leaves them
    out; only when every fact has been seen does the list start again. */
 const FACTS_SEEN_KEY = "pc-facts-seen";
@@ -1031,10 +1033,10 @@ const factHash = (t: string): string => {
   return (h >>> 0).toString(36);
 };
 const loadFactsSeen = (): Set<string> => {
-  try { return new Set<string>(JSON.parse(window.sessionStorage.getItem(FACTS_SEEN_KEY) ?? "[]")); } catch { return new Set<string>(); }
+  try { return new Set<string>(JSON.parse(window.localStorage.getItem(FACTS_SEEN_KEY) ?? "[]")); } catch { return new Set<string>(); }
 };
 const saveFactsSeen = (seen: Set<string>) => {
-  try { window.sessionStorage.setItem(FACTS_SEEN_KEY, JSON.stringify([...seen])); } catch { /* private mode: repeats are allowed */ }
+  try { window.localStorage.setItem(FACTS_SEEN_KEY, JSON.stringify([...seen])); } catch { /* private mode: repeats are allowed */ }
 };
 const shuffledFacts = (pool: string[]): string[] => {
   const o = [...new Set(pool)];
