@@ -5932,25 +5932,35 @@ export default function BreedTree({
       const order = quiz.options.map((_, oi) => oi);
       if (quiz.options.length > 2) order.sort(() => Math.random() - 0.5);
       const btns: HTMLButtonElement[] = [];
-      for (const oi of order) {
+      order.forEach((oi, pos) => {
         const b = document.createElement("button");
         b.type = "button";
         b.className = styles.factQuizBtn;
+        // The knockout cards land one after another (see .factQuizBtn).
+        b.style.animationDelay = `${pos * 90}ms`;
         b.textContent = quiz.options[oi];
         b.addEventListener("click", (e) => {
           e.stopPropagation();
           if (box.dataset.done) return;
           box.dataset.done = "1";
           const right = oi === quiz.answer;
-          for (const other of btns) other.disabled = true;
-          b.classList.add(right ? styles.factQuizRight : styles.factQuizWrong);
-          if (!right) btns[order.indexOf(quiz.answer)]?.classList.add(styles.factQuizRight);
+          /* THE KNOCKOUT ROUND'S CLICK, 27 September 2026 (owner: the questions should
+             look and move exactly like the name generator's knockout rounds). The
+             right answer pulses green; every other card tips over and falls away. A
+             wrong pick turns red before it falls, so the right one is still shown. */
+          const correctBtn = btns[order.indexOf(quiz.answer)];
+          for (const other of btns) {
+            other.disabled = true;
+            if (other === correctBtn) other.classList.add(styles.factQuizWin);
+            else if (other === b) other.classList.add(styles.factQuizLose);
+            else other.classList.add(styles.factQuizFall);
+          }
           note.textContent = right ? `Correct! +${QUIZ_POINTS}` : `Not quite: it was ${quiz.options[quiz.answer]}.`;
           if (right) { onScoreRef.current?.(QUIZ_POINTS); recordQuizRight(); }
         });
         btns.push(b);
         row.appendChild(b);
-      }
+      });
       box.appendChild(qp);
       box.appendChild(row);
       box.appendChild(note);

@@ -2991,26 +2991,85 @@
 }
 @keyframes factDogsIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .factQuizQ { margin: 0 0 calc(8px * var(--fact-k, 1)); font-weight: 800; font-size: calc(clamp(0.95rem, 3.4vw, 1.15rem) * var(--fact-k, 1)); color: #ffed00; }
-.factQuizRow { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(8px * var(--fact-k, 1)); }
+.factQuizRow { display: flex; flex-wrap: nowrap; justify-content: center; align-items: stretch; gap: calc(8px * var(--fact-k, 1)); }
+/* THE KNOCKOUT ROUND'S CARDS, 27 September 2026 (owner: exactly like the name
+   generator's knockout rounds, app/name-generator/KnockoutRound.module.css and
+   knockout-shared.module.css). Navy cards with a soft white edge, the display font,
+   landing with the same bounce; hovering one turns it green and the rest red; on a
+   pick the right one pulses green and the others fall away. Sizes follow the fact
+   card (--fact-k). */
 .factQuizBtn {
-  font: inherit;
-  font-weight: 800;
-  font-size: calc(clamp(0.85rem, 3vw, 1rem) * var(--fact-k, 1));
-  padding: calc(6px * var(--fact-k, 1)) calc(14px * var(--fact-k, 1));
-  border-radius: 999px;
-  border: 2px solid #ffffff;
-  background: rgba(10, 58, 87, 0.55);
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--font-display), "Luckiest Guy", system-ui, sans-serif;
+  font-size: calc(clamp(0.95rem, 3.4vw, 1.2rem) * var(--fact-k, 1));
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  padding: calc(12px * var(--fact-k, 1)) calc(8px * var(--fact-k, 1));
+  border-radius: calc(16px * var(--fact-k, 1));
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: var(--navy, #0a3a57);
   color: #ffffff;
   cursor: pointer;
   text-shadow: none;
-  transition: transform 0.12s ease, background 0.2s ease;
+  overflow-wrap: anywhere;
+  opacity: 0;
+  animation: quizCardLand 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
 }
-.factQuizBtn:hover:not(:disabled), .factQuizBtn:focus-visible { transform: scale(1.05); background: rgba(10, 58, 87, 0.8); }
-.factQuizBtn:disabled { cursor: default; opacity: 0.75; }
-.factQuizRight { background: #22c55e !important; border-color: #22c55e !important; opacity: 1 !important; }
-.factQuizWrong { background: #ef4444 !important; border-color: #ef4444 !important; opacity: 1 !important; }
+/* Hover, as the knockout: the card under the pointer green and a touch larger, the
+   others red and a touch smaller, after the same short pause. */
+.factQuizRow:has(.factQuizBtn:hover:not(:disabled)) .factQuizBtn:not(:disabled) {
+  background: #ef4444;
+  border-color: #ef4444;
+  transform: scale(0.95);
+  transition-delay: 0.3s;
+}
+.factQuizRow .factQuizBtn:hover:not(:disabled) {
+  background: #22c55e;
+  border-color: #22c55e;
+  transform: scale(1.05);
+  transition-delay: 0.3s;
+}
+.factQuizBtn:focus-visible { outline: 3px solid #ffed00; outline-offset: 2px; }
+.factQuizBtn:disabled { cursor: default; }
+/* The pick: the right answer pulses green, a wrong pick turns red and falls, the
+   rest fall away. */
+.factQuizWin {
+  opacity: 1;
+  background: #22c55e !important;
+  border-color: #22c55e !important;
+  animation: quizWinnerPulse 0.5s ease forwards !important;
+}
+.factQuizLose {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  animation: quizFallAway 0.65s cubic-bezier(0.4, 0, 1, 1) 0.35s forwards !important;
+  opacity: 1;
+}
+.factQuizFall {
+  opacity: 1;
+  animation: quizFallAway 0.65s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+}
+@keyframes quizCardLand {
+  0%   { opacity: 0; transform: scale(0.6) translateY(22px); }
+  55%  { opacity: 1; transform: scale(1.06) translateY(0) rotate(-2deg); }
+  70%  { transform: scale(1) rotate(2deg); }
+  85%  { transform: rotate(-1.2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes quizWinnerPulse {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  40%  { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(34, 197, 94, 0.3); }
+  100% { transform: scale(1.04); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+@keyframes quizFallAway {
+  0%   { transform: rotate(0deg) translateY(0); opacity: 1; }
+  20%  { transform: rotate(6deg) translateY(8px); opacity: 1; }
+  100% { transform: rotate(12deg) translateY(160px); opacity: 0; }
+}
 .factQuizNote { min-height: 1.2em; margin: calc(8px * var(--fact-k, 1)) 0 0; font-weight: 800; }
-@media (prefers-reduced-motion: reduce) { .factQuiz { animation: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .factQuiz, .factQuizBtn, .factQuizWin, .factQuizFall, .factQuizLose { animation: none !important; opacity: 1; } }
 
 /* THE ANCESTORS DISCOVERED LIST, RESTYLED, 27 September 2026 (owner). Kept
    together here, after the rules they adjust, so each change reads in one place:
