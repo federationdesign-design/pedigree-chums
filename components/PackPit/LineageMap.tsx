@@ -1504,7 +1504,13 @@ export default function LineageMap({
      would delete the one frame those levels have. Six trees, gated by name. */
   const hiddenIds = useMemo(() => {
     const out = new Set<string>();
-    if (!root || INSTR_NAMES.has(breed.name)) return out;
+    /* SINGLE-LEAF DOGS ARE EXEMPT TOO, 27 September 2026 (owner: single-leaf dogs
+       could not be completed, no frame and no card). Their tree is the dog plus a
+       stand-in child that is the same dog again, which the echo rule reads as a
+       hidden copy; since J18-211 hidden copies get no frame and no card, so the
+       dog had nothing to place. The stand-in is the whole point of the tree, and
+       its circle is never drawn for a solo dog anyway (see soloLeaf). */
+    if (!root || INSTR_NAMES.has(breed.name) || soloLeaf) return out;
     const walkH = (n: Node) => {
       const kids = (n.children as Node[] | undefined) ?? [];
       kids.forEach((c, i) => {
@@ -1514,7 +1520,7 @@ export default function LineageMap({
     };
     walkH(root);
     return out;
-  }, [root, breed.name]);
+  }, [root, breed.name, soloLeaf]);
 
   /* HIDDEN COPIES ARE NOT IN HERE, and that is the point (18 September 2026).
      autoCollect opens, sees and POPS A CARD for every entry, so leaving them in
