@@ -620,6 +620,9 @@ const FACT_SUBJECT = new Map<string, string>();
    Fact card only: the history page and the learn box keep their own text. Each
    was checked against sources before it went in (see the batch review notes). */
 const FACT_ENRICH: Record<string, string> = {
+  // More context for a reader who knows nothing about Corgis (owner, 27 September 2026, J18-248).
+  "The Pembroke kept the Welsh cattle dog's job, but grew into a slightly different kind of Corgi from the Cardigan.":
+    "Wales has two kinds of Corgi, the Cardigan and the Pembroke, named after the old Welsh counties of Cardiganshire and Pembrokeshire where each was found. Both were cattle dogs, small farm dogs that moved cows along by nipping at their heels. The Cardigan is thought to be the older of the two. The Pembroke is usually said to come from little spitz-type dogs brought to Pembrokeshire by Flemish weavers who settled there in the 1100s. You can tell them apart by the tail: the Cardigan has a long one, while many Pembrokes have only a short one, and the Cardigan is the bigger dog. The Kennel Club counted them as one breed until 1934. The Pembroke is the Corgi Queen Elizabeth II loved.",
   "The Mastiff is today's version of Britain's very old, heavy guard dogs.":
     "The Mastiff is Britain's ancient giant guard dog. When the Romans invaded in 55 BC, they found the Britons already had huge, brave mastiff-type dogs that beat the Romans' own dogs in fights, and some were shipped to Rome to fight wild animals in the Colosseum. Over the centuries Mastiffs guarded estates, helped gamekeepers and hunted wolves. By the end of the Second World War, only one Mastiff was left in Britain, a female called Nydia of Frithend, and the breed was saved by fourteen dogs sent back from America.",
   "The Westie was bred from the white puppies born among Scotland's old Highland terriers.":
@@ -760,6 +763,7 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Legend says that in 1704 the Duchess of Marlborough", q: "In the legend, what made the Blenheim spot?", options: ["The Duchess's thumb", "A drop of paint", "A bee sting"], answer: 0, evidence: "pressed her thumb" },
   { match: "so linked with the Canary Island of Tenerife", q: "Which island gave the Bichon Tenerife its name?", options: ["Tenerife", "Malta", "Jersey"], answer: 0, evidence: "Canary Island of Tenerife" },
   { match: "King Henri III, who ruled from 1574 to 1589", q: "How did King Henri III carry his little dogs?", options: ["In a basket round his neck", "In his crown", "In a wheelbarrow"], answer: 0, evidence: "basket hung round his neck" },
+  { match: "Wales has two kinds of Corgi, the Cardigan and the Pembroke", q: "Until which year did the Kennel Club count the two Corgis as one breed?", options: ["1934", "1834", "1994"], answer: 0, evidence: "until 1934" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
