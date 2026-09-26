@@ -259,7 +259,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 3 (J18-253): Cavapoo, 9 new facts (1 existing, 10 in all).
    Batch 4 (J18-257): Maltipoo, 9 new facts (1 existing, 10 in all).
    Batch 5 (J18-258): Goldendoodle, 9 new facts (1 existing, 10 in all).
-   Batch 6 (J18-261): Labradoodle, 9 new facts (1 existing, 10 in all). */
+   Batch 6 (J18-261): Labradoodle, 9 new facts (1 existing, 10 in all).
+   Batch 7 (J18-265): Doberman, 9 new facts (2 existing, 11 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -331,6 +332,18 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "Many people buy a Labradoodle believing it will not cause allergies, but scientists have tested that idea. A 2012 study in the Netherlands measured a common dog allergen in the coats of hundreds of dogs, and Labradoodles and Poodles actually had more of it in their coats than Labradors did. The air in their owners' homes held no less either. Allergies come mostly from skin flakes and spit, not hair, so no dog is truly allergy-free.",
     "In the 1990s, breeders in Australia carried on from Wally Conron's first Labradoodles. Instead of always crossing a Labrador with a Poodle, they bred Labradoodles with each other and added a few other breeds, hoping to make the coat, size and temper more predictable. Their dogs became known as Australian Labradoodles, though they are still not recognised as a breed by any major kennel club.",
     "The Labradoodle is still a working dog as well as a pet. Guide Dogs Victoria, where the first Labradoodles were bred, no longer breeds them, but other guide and assistance dog groups in Australia and elsewhere still do. Both of the Labradoodle's parents are hard workers: the Labrador is the world's best-known guide dog, and the Poodle began as a retriever of ducks from water.",
+  ],
+  // Batch 7 (J18-265): 9 new, 11 in all.
+  "Doberman Pinscher": [
+    "Louis Dobermann, the man the Dobermann is named after, had a lot of jobs in the German town of Apolda in the 1800s: tax collector, night watchman, dogcatcher, and keeper of the town's dog pound. That last job was the useful one. With a pound full of dogs to choose from, he picked the strongest, bravest and cleverest to breed his guard dogs from.",
+    "Nobody knows exactly which dogs Louis Dobermann mixed to make the Dobermann, because he kept no written records. Experts believe the Rottweiler, the German Pinscher, the Weimaraner and old German sheepdogs were among them, with perhaps some Greyhound for speed and Manchester Terrier for its sleek black-and-tan coat.",
+    "When Louis Dobermann died in 1894, a distillery owner in Apolda called Otto Göller carried on his work. Göller kept around 80 Dobermanns at his home, founded the first Dobermann club in 1899, and was so proud of the breed that his distillery even made a drink called Real Dobermann Bitter.",
+    "In Britain and most of the world the breed is called the Dobermann, with two n's, after Louis Dobermann. In America it is the Doberman Pinscher, with one n. Pinscher is a German word for a type of lively terrier-like dog, and most countries dropped it because the Dobermann grew into a much bigger guard dog that no longer looked like one.",
+    "During the Second World War, a Doberman called Kurt served with the United States Marines on the Pacific island of Guam in 1944. He warned about 250 Marines that a large enemy force was ahead, but he was badly hurt in the fighting and became the first of the war dogs to die on Guam. A bronze statue of Kurt, called Always Faithful, now stands over the war dogs' graves there.",
+    "In his 1994 book The Intelligence of Dogs, the psychologist Stanley Coren ranked breeds by how quickly they learned and obeyed commands. The Dobermann came fifth, behind only the Border Collie, the Poodle, the German Shepherd and the Golden Retriever. That quick brain is one reason Dobermanns have worked as police dogs, guard dogs and war dogs.",
+    "Many people picture the Dobermann with tall, pointed ears and a very short tail, but those come from cutting them when the dog is a puppy. In Britain it is against the law to crop a dog's ears, and tail docking has been banned for pet dogs since 2007, so British Dobermanns keep their natural floppy ears and long tails.",
+    "The town of Apolda in Germany is proud of the dog it gave the world. A statue of Louis Dobermann, who was born there in 1834 and died there in 1894, stands in the town. Apolda held its first dog market in 1863, and Dobermann's early guard dogs were shown there long before the breed first appeared at a proper dog show in the 1890s.",
+    "A Dobermann's short, smooth coat comes in black, blue, fawn or red, always with rust-coloured markings on the face, chest and legs. That sleek coat helps it look powerful and alert, which was the point: Louis Dobermann wanted a dog whose looks alone would make anyone think twice before causing trouble.",
   ],
 };
 
@@ -875,6 +888,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Sergeant Stubby was a stray", q: "In which war did Sergeant Stubby serve?", options: ["The First World War", "The Second World War", "The English Civil War"], answer: 0, evidence: "First World War" },
   { match: "Myth: A special law lets Cavalier King Charles Spaniels into the Houses of Parliament", q: "Is there a law letting Cavaliers into the Houses of Parliament?", options: ["Yes", "No"], answer: 1, evidence: "There is no such law" },
   { match: "The Chukchi sled dogs were bred by", q: "Who bred the sled dogs behind the Siberian Husky?", options: ["The Chukchi people", "The Vikings", "The Romans"], answer: 0, evidence: "Chukchi people" },
+  // Batch 7 (J18-265): Doberman.
+  { match: "had a lot of jobs in the German town of Apolda", q: "Which of Louis Dobermann's jobs gave him lots of dogs to choose from?", options: ["Keeper of the dog pound", "Baker", "Circus ringmaster"], answer: 0, evidence: "keeper of the town's dog pound" },
+  { match: "a distillery owner in Apolda called Otto Göller", q: "What drink did Otto Göller's distillery make?", options: ["Real Dobermann Bitter", "Dobermann Cola", "Pinscher Pop"], answer: 0, evidence: "Real Dobermann Bitter" },
+  { match: "a Doberman called Kurt served with the United States Marines", q: "What is the statue of Kurt on Guam called?", options: ["Always Faithful", "Forever Brave", "Good Boy"], answer: 0, evidence: "Always Faithful" },
+  { match: "The Dobermann came fifth, behind only the Border Collie", q: "Where did the Dobermann come in Stanley Coren's ranking of quick learners?", options: ["Fifth", "First", "Fiftieth"], answer: 0, evidence: "came fifth" },
+  { match: "In Britain it is against the law to crop a dog's ears", q: "Why do British Dobermanns keep their floppy ears?", options: ["Cropping ears is against the law", "They are a different breed", "Their ears never grow"], answer: 0, evidence: "against the law to crop" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
