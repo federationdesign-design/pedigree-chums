@@ -274,7 +274,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 18 (J18-278): Papillon, 6 new facts (4 existing, 10 in all).
    Batch 19 (J18-279): Beagle, 6 new facts (4 existing, 10 in all).
    Batch 20 (J18-281): Shih Tzu, 6 new facts (4 existing, 10 in all).
-   Batch 21 (J18-283): Whippet, 5 new facts (7 existing, 12 in all). */
+   Batch 21 (J18-283): Whippet, 5 new facts (7 existing, 12 in all).
+   Batch 22 (J18-284): French Bulldog, 6 new facts (4 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -498,6 +499,15 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "In a mining family, the Whippet was much more than a pet. It could win prize money at the races and catch a rabbit for the family's dinner, so it was looked after like a treasure. It was said that no racehorse got more care than a miner's Whippet, and it was not unusual for one to share its owner's meals and even his pillow.",
     "The Whippet Club, set up in 1899, was the first Whippet breed club in the world. The Whippet had been recognised by the Kennel Club as a breed of its own only a few years before. Today there are eleven Whippet breed clubs in the UK, and the Whippet is one of the most popular hounds in the country.",
     "A racing Whippet can reach about 56km/h (35mph), and Whippets have been timed running 200 yards in under 12 seconds. For its size, it is one of the fastest dogs there is. Yet at home the Whippet is famously calm and gentle, and very fond of a warm, soft bed.",
+  ],
+  // Batch 22 (J18-284): 6 new, 10 in all.
+  "French Bulldog": [
+    "The French Bulldog's first name was the Bouledogue Français. In French, boule means ball and dogue means mastiff, so the name describes a round little mastiff-type dog. The dogs had come from England, but it was in France that they got their name and became a breed of their own.",
+    "In 1800s Paris, the French Bulldog was the dog of ordinary working people: butchers, café owners and shopkeepers. English breeders did a busy trade selling their smallest bulldogs across the Channel, and before long fashionable Parisians wanted a French Bulldog too.",
+    "The most famous French Bulldog in art was Bouboule, who belonged to Madame Palmyre, owner of a Paris café called La Souris, meaning The Mouse. The painter Henri de Toulouse-Lautrec painted Bouboule in 1897. The little dog was famous for weeing on the ankles of any customer who tried to stroke him.",
+    "The French Bulldog's bat ears were won in a row. At a big American dog show in 1897, the judge would only choose French Bulldogs with folded rose ears, like an English Bulldog's. Their American owners were furious, set up the world's first French Bulldog club, and insisted on the tall bat ears, which became the breed's trademark.",
+    "There was one French Bulldog on the Titanic, a dog called Gamin de Pycombe. A young banker, Robert Daniel, had just bought him in England for the large sum of £150. Robert Daniel survived the sinking in 1912, but his French Bulldog did not.",
+    "In Britain, the Kennel Club first recognised the breed in the early 1900s under its French name, the Bouledogue Français. In 1912 the name was changed to the French Bulldog, the name we use today. More than a century later, the French Bulldog became one of the most popular dogs in Britain.",
   ],
 };
 
@@ -1132,6 +1142,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "In a mining family, the Whippet was much more than a pet", q: "What could a miner's Whippet catch for the family's dinner?", options: ["A rabbit", "A fish", "A chicken"], answer: 0, evidence: "catch a rabbit" },
   { match: "The Whippet Club, set up in 1899", q: "When was the world's first Whippet breed club set up?", options: ["1899", "1999", "1799"], answer: 0, evidence: "set up in 1899" },
   { match: "A racing Whippet can reach about 56km/h", q: "About how fast can a racing Whippet run?", options: ["About 56km/h (35mph)", "About 10km/h (6mph)", "About 150km/h (93mph)"], answer: 0, evidence: "56km/h (35mph)" },
+  // Batch 22 (J18-284): French Bulldog.
+  { match: "The French Bulldog's first name was the Bouledogue Français", q: "What does boule mean in Bouledogue?", options: ["Ball", "Bull", "Bread"], answer: 0, evidence: "boule means ball" },
+  { match: "The most famous French Bulldog in art was Bouboule", q: "Which painter painted Bouboule the French Bulldog?", options: ["Henri de Toulouse-Lautrec", "Pablo Picasso", "Claude Monet"], answer: 0, evidence: "Toulouse-Lautrec" },
+  { match: "The French Bulldog's bat ears were won in a row", q: "Which ears did the American owners insist on?", options: ["Tall bat ears", "Folded rose ears", "Long floppy ears"], answer: 0, evidence: "tall bat ears" },
+  { match: "There was one French Bulldog on the Titanic", q: "What was the French Bulldog on the Titanic called?", options: ["Gamin de Pycombe", "Pierre le Chien", "Boule de Neige"], answer: 0, evidence: "Gamin de Pycombe" },
+  { match: "In Britain, the Kennel Club first recognised the breed in the early 1900s", q: "In which year was the name changed to French Bulldog?", options: ["1912", "1812", "2012"], answer: 0, evidence: "In 1912" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
