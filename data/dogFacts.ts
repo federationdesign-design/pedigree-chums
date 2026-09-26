@@ -281,7 +281,9 @@ export const EXTRA_FACTS: string[] = [];
    Batch 24 (J18-286): Rottweiler, 5 new facts (6 existing, 11 in all).
    Batch 25 (J18-287): Basset Hound, 6 new facts (5 existing, 11 in all).
    Batch 26 (J18-288): Bichon Frise, 4 new facts (11 existing, most through the Cavachon; 15 in all).
-   Batch 27 (J18-291): West Highland Terrier, 5 new facts (5 existing, 10 in all). */
+   Batch 27 (J18-291): West Highland Terrier, 5 new facts (5 existing, 10 in all).
+   Batch 28 (J18-292): six chums in one pass (owner): Springer Spaniel, Irish Wolfhound,
+   Chihuahua, Afghan Hound, Dachshund and Boxer, 26 new facts. */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -554,6 +556,50 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The West Highland Terrier has a short, thick tail shaped like a carrot, and it is said to be strong enough for a hunter to pull the little dog out of a burrow by it. Its double coat, a harsh white outer layer over a soft undercoat, sheds dirt and water, which kept it going in the cold, wet Highlands.",
     "The West Highland Terrier's cheerful white face is one of the most famous in advertising. For many years a black Scottish Terrier and a white Westie have appeared together as the symbol of a Scotch whisky, and a Westie has long been the face of a well-known brand of dog food.",
     "The Malcolm family's white terriers at Poltalloch in Argyll are thought to go back as far as the time of King James I, around 400 years ago. The Malcolms are still the lairds of Poltalloch today, and the old kennels where the West Highland Terrier was bred are now a family home.",
+  ],
+  // Batch 28 (J18-292): Springer Spaniel, 5 new.
+  "Springer Spaniel": [
+    "The Springer Spaniel and the Cocker Spaniel were once born in the same litters. In the 1800s, the puppies were sorted by weight: the smaller ones, under about 11kg, became Cockers and hunted woodcock, and the bigger ones became Springers, which made birds spring up into the air for the hunter.",
+    "The Springer Spaniel has one of the longest family records of any dog. In 1812 the Boughey family of Aqualate in Shropshire bred a spaniel called Mop 1, and for over a century they kept a stud book of his descendants. One of them, Velox Powder, won twenty field trials.",
+    "The Kennel Club recognised the English Springer Spaniel as a breed of its own in 1902. The next year, a liver and white dog called Beechgrove Will became the first English Springer Spaniel ever to win a Challenge Certificate at a dog show.",
+    "Working Springer Spaniels and show Springer Spaniels look so different that they could be two breeds. Show dogs are heavier, with long ears and a thick, feathery coat. Working dogs are lighter and faster. The two types have been bred apart for at least 70 years.",
+    "The Springer Spaniel's tireless nose and love of searching make it one of Britain's favourite sniffer dogs. Springers work with the police, the armed forces and border officers, hunting out drugs, weapons and explosives, and treat every search as a game.",
+  ],
+  // Batch 28 (J18-292): Irish Wolfhound, 5 new.
+  "Irish Wolfhound": [
+    "The greatest hero of Irish legend is named after an Irish Wolfhound-type dog. As a boy called Sétanta, he killed the fierce guard dog of Culann the smith in self-defence, and then offered to guard Culann's house himself until a new dog was trained. From then on he was called Cú Chulainn, the Hound of Culann.",
+    "Irish Wolfhounds were once such prized gifts for kings and queens across Europe that too many left Ireland. In 1652 Oliver Cromwell banned sending them abroad, because the wolves they hunted were becoming a danger again. Ireland's last wolf is said to have been killed in 1786, and after that the Irish Wolfhound almost disappeared.",
+    "The Irish Wolfhound was brought back from the edge of extinction by a British army officer, Captain George Augustus Graham. From the 1860s he gathered the last dogs of the old type and crossed them with Scottish Deerhounds, Great Danes and even a Borzoi. In 1885 he founded the Irish Wolfhound Club.",
+    "Since 1902 the Irish Wolfhound has been the mascot of the Irish Guards, a regiment of the British Army. The regiment's Wolfhound still marches with the soldiers on parade, dressed in its own ceremonial coat, a tradition that has lasted well over a hundred years.",
+    "The Irish Wolfhound is the tallest dog breed in the world. A big male can stand about 80 to 90cm at the shoulder, and when it stands on its back legs it can be taller than a grown man. Yet the breed is famous for being gentle and calm, a true gentle giant.",
+  ],
+  // Batch 28 (J18-292): Chihuahua, 4 new.
+  "Chihuahua": [
+    "The Chihuahua is named after Chihuahua, a state in northern Mexico. In the mid-1800s, American travellers crossing the border found tiny dogs there and bought them in local markets. At first people called them Arizona dogs or Texas dogs, but the name Chihuahua stuck.",
+    "The first Chihuahua registered by the American Kennel Club, in 1904, was called Midget. He belonged to a man named H. Raynor from Texas. Within a few years the breed had its first show champion, and today the Chihuahua is popular all over the world, including Britain.",
+    "The Chihuahua is the smallest dog breed in the world. In 2023 a Chihuahua called Pearl was named by Guinness World Records as the shortest living dog, just 9.14cm tall, which is about the length of a lollipop stick. She took the title from another Chihuahua, Miracle Milly, who was a relative of hers.",
+    "The Chihuahua comes in two coats: smooth, with short glossy hair, and long, with soft, feathery fur. Chihuahuas are famous for burrowing under blankets, cushions and even piles of washing, curling up somewhere warm and snug, which suits such a small dog.",
+  ],
+  // Batch 28 (J18-292): Afghan Hound, 4 new.
+  "Afghan Hound": [
+    "The first famous Afghan Hound in Britain was Zardin, brought back from India by Captain John Barff in 1907. His long coat caused a sensation, and Queen Alexandra asked for him to be brought to Buckingham Palace so she could see him. Zardin became the model for the breed's first standard, written in 1912.",
+    "Today's Afghan Hounds come from two groups of dogs brought to Britain in the 1920s. The Bell-Murray dogs, from 1920, were lighter desert hounds with thinner coats. The Ghazni dogs, brought from Kabul by Mary Amps in 1925, were heavily coated mountain hounds. Breeders argued over which was best, but in the end the two were mixed.",
+    "In 2005 an Afghan Hound puppy called Snuppy became the first dog ever to be cloned. He was made by scientists in South Korea from the skin cells of a three-year-old Afghan Hound, and TIME magazine named him the invention of the year.",
+    "The artist Pablo Picasso loved his Afghan Hound, Kabul, and painted an Afghan Hound in a picture in 1962. The Afghan Hound's glamorous looks also made it a toy star: Barbie was given a pet Afghan Hound called Beauty.",
+  ],
+  // Batch 28 (J18-292): Dachshund, 4 new.
+  "Dachshund": [
+    "The Dachshund came to Britain in the 1840s as a royal present. Dachshunds were sent from Germany to Prince Albert, Queen Victoria's husband, and lived in the kennels at Windsor Castle, where they were used on shoots in Windsor Forest. By the 1870s, hundreds more were being brought over from Germany.",
+    "Queen Victoria loved her Dachshunds, and several were painted for her. She is said to have declared that nothing turns a man's home into a castle more quickly than a Dachshund, which was easy for her to say, as she lived in several.",
+    "The Dachshund Club was founded in England in 1881, seven years before the first Dachshund club in Germany, the breed's own homeland. British fans helped set down what a Dachshund should look like.",
+    "During the First World War, the Dachshund suffered for being German. In Britain and America it was used in cartoons as a symbol of the enemy, and some owners were mocked in the street. In America, some people even called their Dachshunds liberty hounds to protect them. After the war, the little dog slowly won back its popularity.",
+  ],
+  // Batch 28 (J18-292): Boxer, 4 new.
+  "Boxer": [
+    "Nobody knows for certain where the Boxer's name comes from. One popular idea is that it comes from the way Boxers play, standing up on their back legs and batting with their front paws like a boxer in the ring. Others think the name simply grew out of the old German names for its ancestors.",
+    "The first Boxer club was founded in Munich, Germany, in 1895, and the first Boxers were shown at a dog show for Saint Bernards there. The first Boxer ever entered in the breed's stud book, in 1904, was a dog called Mühlbauer's Flocki.",
+    "The most important Boxer breeder of all was a woman, Friederun Stockmann. Born in 1891 in Riga, she went to Munich to study art, met her husband through his Boxer, Pluto, and spent her life breeding Boxers. Her dogs helped shape the Boxer all over the world.",
+    "Boxers served in both world wars as messenger dogs, carrying packs and standing guard. After the Second World War, soldiers took Boxers home with them, and the breed became a favourite family dog. In 1951 a Boxer called Bang Away won Best in Show at America's famous Westminster dog show.",
   ],
 };
 
@@ -1223,6 +1269,37 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The West Highland Terrier has a short, thick tail shaped like a carrot", q: "What is the Westie's strong tail said to be for?", options: ["Pulling it out of a burrow", "Swimming faster", "Scaring away birds"], answer: 0, evidence: "pull the little dog out of a burrow" },
   { match: "The West Highland Terrier's cheerful white face is one of the most famous in advertising", q: "Which dog appears with the Westie as the symbol of a Scotch whisky?", options: ["A black Scottish Terrier", "A brown Labrador", "A spotty Dalmatian"], answer: 0, evidence: "black Scottish Terrier" },
   { match: "The Malcolm family's white terriers at Poltalloch", q: "What are the old Poltalloch kennels used as today?", options: ["A family home", "A museum", "A hotel"], answer: 0, evidence: "family home" },
+  // Batch 28 (J18-292): Springer Spaniel.
+  { match: "The Springer Spaniel and the Cocker Spaniel were once born in the same litters", q: "How were Springer and Cocker puppies once sorted?", options: ["By their weight", "By their colour", "By their bark"], answer: 0, evidence: "sorted by weight" },
+  { match: "The Springer Spaniel has one of the longest family records", q: "What was the Boughey family's first Springer Spaniel called?", options: ["Mop 1", "Bucket 1", "Brush 1"], answer: 0, evidence: "Mop 1" },
+  { match: "The Kennel Club recognised the English Springer Spaniel as a breed of its own in 1902", q: "In which year did the Kennel Club recognise the English Springer Spaniel?", options: ["1902", "1802", "2002"], answer: 0, evidence: "in 1902" },
+  { match: "The Springer Spaniel's tireless nose and love of searching", q: "What do sniffer Springer Spaniels treat every search as?", options: ["A game", "A chore", "A race"], answer: 0, evidence: "as a game" },
+  // Batch 28 (J18-292): Irish Wolfhound.
+  { match: "The greatest hero of Irish legend is named after an Irish Wolfhound-type dog", q: "What does the name Cú Chulainn mean?", options: ["The Hound of Culann", "The Wolf of Ireland", "The Giant of Culann"], answer: 0, evidence: "Hound of Culann" },
+  { match: "Irish Wolfhounds were once such prized gifts", q: "Who banned sending Irish Wolfhounds abroad in 1652?", options: ["Oliver Cromwell", "King Henry VIII", "Queen Victoria"], answer: 0, evidence: "Oliver Cromwell" },
+  { match: "The Irish Wolfhound was brought back from the edge of extinction", q: "Who brought the Irish Wolfhound back from near extinction?", options: ["Captain George Augustus Graham", "Sir Walter Scott", "Charles Darwin"], answer: 0, evidence: "Captain George Augustus Graham" },
+  { match: "Since 1902 the Irish Wolfhound has been the mascot of the Irish Guards", q: "Which regiment has an Irish Wolfhound as its mascot?", options: ["The Irish Guards", "The Royal Navy", "The Scots Guards"], answer: 0, evidence: "Irish Guards" },
+  { match: "The Irish Wolfhound is the tallest dog breed in the world", q: "What is the Irish Wolfhound the tallest of?", options: ["All dog breeds", "All hounds in Ireland", "Only puppies"], answer: 0, evidence: "tallest dog breed in the world" },
+  // Batch 28 (J18-292): Chihuahua.
+  { match: "The Chihuahua is named after Chihuahua, a state in northern Mexico", q: "What is the Chihuahua named after?", options: ["A state in Mexico", "A Mexican king", "A type of chilli"], answer: 0, evidence: "a state in northern Mexico" },
+  { match: "The first Chihuahua registered by the American Kennel Club", q: "What was the first Chihuahua registered in America called?", options: ["Midget", "Tiny", "Speck"], answer: 0, evidence: "called Midget" },
+  { match: "The Chihuahua is the smallest dog breed in the world", q: "How tall was Pearl, the shortest living dog, in 2023?", options: ["9.14cm", "91.4cm", "19cm"], answer: 0, evidence: "9.14cm" },
+  { match: "The Chihuahua comes in two coats", q: "Where do Chihuahuas famously like to burrow?", options: ["Under blankets and cushions", "In sandpits", "Down rabbit holes"], answer: 0, evidence: "burrowing under blankets" },
+  // Batch 28 (J18-292): Afghan Hound.
+  { match: "The first famous Afghan Hound in Britain was Zardin", q: "Who asked to see Zardin at Buckingham Palace?", options: ["Queen Alexandra", "Queen Victoria", "King Henry VIII"], answer: 0, evidence: "Queen Alexandra" },
+  { match: "Today's Afghan Hounds come from two groups of dogs", q: "Where did Mary Amps bring her Ghazni dogs from?", options: ["Kabul", "Paris", "Cairo"], answer: 0, evidence: "from Kabul" },
+  { match: "In 2005 an Afghan Hound puppy called Snuppy", q: "What was Snuppy the first dog ever to be?", options: ["Cloned", "Sent into space", "On television"], answer: 0, evidence: "cloned" },
+  { match: "The artist Pablo Picasso loved his Afghan Hound", q: "What was Barbie's Afghan Hound called?", options: ["Beauty", "Fluffy", "Princess"], answer: 0, evidence: "called Beauty" },
+  // Batch 28 (J18-292): Dachshund.
+  { match: "The Dachshund came to Britain in the 1840s as a royal present", q: "Who were the first Dachshunds in Britain sent to?", options: ["Prince Albert", "King George III", "Charles Dickens"], answer: 0, evidence: "Prince Albert" },
+  { match: "Queen Victoria loved her Dachshunds", q: "What did Queen Victoria say a Dachshund turns a home into?", options: ["A castle", "A zoo", "A palace"], answer: 0, evidence: "into a castle" },
+  { match: "The Dachshund Club was founded in England in 1881", q: "Where was the first Dachshund club founded?", options: ["England", "Germany", "France"], answer: 0, evidence: "founded in England" },
+  { match: "During the First World War, the Dachshund suffered for being German", q: "What did some Americans call their Dachshunds in the First World War?", options: ["Liberty hounds", "Freedom dogs", "Peace pups"], answer: 0, evidence: "liberty hounds" },
+  // Batch 28 (J18-292): Boxer.
+  { match: "Nobody knows for certain where the Boxer's name comes from", q: "How do Boxers play that may have given them their name?", options: ["Batting with their front paws", "Rolling in boxes", "Jumping over fences"], answer: 0, evidence: "front paws" },
+  { match: "The first Boxer club was founded in Munich, Germany, in 1895", q: "In which city was the first Boxer club founded?", options: ["Munich", "London", "Paris"], answer: 0, evidence: "Munich" },
+  { match: "The most important Boxer breeder of all was a woman, Friederun Stockmann", q: "What did Friederun Stockmann go to Munich to study?", options: ["Art", "Medicine", "Music"], answer: 0, evidence: "study art" },
+  { match: "Boxers served in both world wars as messenger dogs", q: "Which Boxer won Best in Show at Westminster in 1951?", options: ["Bang Away", "Knock Out", "Punch Line"], answer: 0, evidence: "Bang Away" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
