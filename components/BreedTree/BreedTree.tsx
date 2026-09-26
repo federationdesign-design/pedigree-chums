@@ -5997,6 +5997,13 @@ export default function BreedTree({
               card.appendChild(lab);
               card.appendChild(val);
               toast.appendChild(card);
+              /* CLEAR OF THE COUNTDOWN, 27 September 2026 (owner, J18-251: the
+                 toast and the pit-full count sat on top of each other). While a
+                 count is running its digits hold the middle of the screen (and the
+                 top-right corner on a phone), so the toast drops to the foot of the
+                 screen instead, same size. With no count it stays centred. Found by the
+                 marker the count's own element carries (runCountdown), not its ref. */
+              if (document.querySelector("[data-pit-countdown]")) { toast.style.placeItems = "end center"; toast.style.paddingBottom = "6vh"; }
               document.body.appendChild(toast);
               window.setTimeout(() => toast.remove(), 2600);
             }, QUIZ_TOAST_AFTER_MS);
@@ -6815,6 +6822,8 @@ export default function BreedTree({
         // score. 10px lower clears it.
         ? "align-items:flex-start;justify-content:flex-end;padding:18px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
         : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
+    // Marks a running count for the quiz toast, which steps clear of it (J18-251).
+    el.dataset.pitCountdown = "1";
     st.appendChild(el);
     /* A SECOND SET OF DIGITS, IN THE MIDDLE. The corner pair keeps the count
        clear of the play; this one puts it where the reader is actually looking.
