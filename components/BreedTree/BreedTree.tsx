@@ -7618,6 +7618,12 @@ export default function BreedTree({
         }
       }
     }
+    /* CHUM CARDS DIM BEHIND THE FOUND LIST TOO, 25 September 2026 (owner: the
+       see-through effect only reached the dog circles). The list's box is read
+       once for this pass, and only while the list is open; each card overlapping
+       it is dimmed to the circles' own FACE_STANDDOWN_OPACITY. It uses the SVG
+       opacity attribute, so any style the page sets later still wins. */
+    const chumListBox = foundListRef.current?.getBoundingClientRect() ?? null;
     for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef], [btnBodiesRef, btnsGRef], [logoPieceBodiesRef, logoPiecesGRef]] as const) {
       const list = (listRef as typeof rodBodiesRef).current;
       const gg = (gRef as typeof rodsGRef).current;
@@ -7637,6 +7643,12 @@ export default function BreedTree({
         // armed (yellow), resting on the floor (red), else white. The grace
         // clears a lifted card only after CHUM_FLOOR_GRACE_MS with no contact.
         if (el && gRef === chumsGRef) {
+          if (chumListBox) {
+            const cb = el.getBoundingClientRect();
+            const behind = cb.right > chumListBox.left && cb.left < chumListBox.right && cb.bottom > chumListBox.top && cb.top < chumListBox.bottom;
+            if (behind) el.setAttribute("opacity", String(FACE_STANDDOWN_OPACITY));
+            else el.removeAttribute("opacity");
+          } else if (el.hasAttribute("opacity")) el.removeAttribute("opacity");
           if (pr.floorLostAt && now - pr.floorLostAt > CHUM_FLOOR_GRACE_MS) { pr.onFloor = false; pr.floorLostAt = 0; }
           const edge = el.querySelector("[data-chum-edge]") as SVGRectElement | null;
           if (edge) edge.style.stroke =
