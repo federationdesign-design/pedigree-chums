@@ -276,7 +276,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 20 (J18-281): Shih Tzu, 6 new facts (4 existing, 10 in all).
    Batch 21 (J18-283): Whippet, 5 new facts (7 existing, 12 in all).
    Batch 22 (J18-284): French Bulldog, 6 new facts (4 existing, 10 in all).
-   Batch 23 (J18-285): Weimaraner, 5 new facts (6 existing, 11 in all). */
+   Batch 23 (J18-285): Weimaraner, 5 new facts (6 existing, 11 in all).
+   Batch 24 (J18-286): Rottweiler, 5 new facts (6 existing, 11 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -517,6 +518,14 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "For a long time the Weimaraner was a closely guarded secret. From 1897, the German Weimaraner Club allowed nobody to buy one unless they joined the club, and breeding was strictly controlled. If a Weimaraner was ever sold to someone outside the club, it was secretly neutered first, so the buyer could never breed from it.",
     "In 1928 an American hunter, Howard Knight, was allowed to join the German Weimaraner Club, the first outsider ever accepted. He promised to protect the breed, but the club still sent him two neutered Weimaraners. He kept trying, and in 1938 he finally received dogs he could breed from, which began the breed in America.",
     "After the Second World War, soldiers brought Weimaraners home from Germany, and the breed at last spread around the world. The Kennel Club in Britain recognised the Weimaraner in 1955. In America it became a star when President Dwight D. Eisenhower took his Weimaraner, Heidi, to live in the White House.",
+  ],
+  // Batch 24 (J18-286): 5 new, 11 in all.
+  Rottweiler: [
+    "The Rottweiler is named after the German town of Rottweil, and the town's name comes from red tiles. When the Roman remains there were dug up, the red roof tiles of an old Roman villa gave the place its name, das rote Wil, meaning the red villa, which became Rottweil.",
+    "The Rottweiler was once called the Rottweiler Metzgerhund, the butcher's dog of Rottweil. It drove cattle to market and pulled carts loaded with meat. The story goes that after a sale, a butcher would tie his money purse around his Rottweiler's neck for the journey home, because no robber would dare to take it.",
+    "When railways arrived in the mid-1800s, cattle no longer needed to be walked to market, and the Rottweiler almost vanished. At a dog show in Heilbronn in 1882, only one Rottweiler turned up, and not a very good one. A few people who loved the breed kept it going.",
+    "The Rottweiler was saved by a new job. In the years before the First World War, police forces needed strong, clever dogs, and in 1910 the German Police Dog Association made the Rottweiler one of its official police breeds. In the two world wars, Rottweilers served as messenger, ambulance, cart-pulling and guard dogs.",
+    "Rottweilers were first shown in Britain at Crufts in 1936, and the Kennel Club gave the breed its own separate register in 1966. Today, besides being family pets, Rottweilers work as search and rescue dogs, police dogs and even guide dogs, and some still herd cattle as their ancestors did.",
   ],
 };
 
@@ -1163,6 +1172,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "For a long time the Weimaraner was a closely guarded secret", q: "What did you have to do to buy a Weimaraner in Germany from 1897?", options: ["Join the Weimaraner Club", "Hunt a bear", "Live in Weimar"], answer: 0, evidence: "joined the club" },
   { match: "In 1928 an American hunter, Howard Knight", q: "In which year did Howard Knight finally get Weimaraners he could breed from?", options: ["1938", "1838", "2038"], answer: 0, evidence: "in 1938" },
   { match: "After the Second World War, soldiers brought Weimaraners home", q: "Which American president had a Weimaraner called Heidi?", options: ["Dwight D. Eisenhower", "Abraham Lincoln", "Barack Obama"], answer: 0, evidence: "Eisenhower" },
+  // Batch 24 (J18-286): Rottweiler.
+  { match: "The Rottweiler is named after the German town of Rottweil", q: "Where does the name of the town of Rottweil come from?", options: ["The red tiles of a Roman villa", "A rotten wheel", "A red river"], answer: 0, evidence: "red roof tiles" },
+  { match: "The Rottweiler was once called the Rottweiler Metzgerhund", q: "What did butchers tie around their Rottweiler's neck?", options: ["Their money purse", "A bell", "A string of sausages"], answer: 0, evidence: "money purse" },
+  { match: "When railways arrived in the mid-1800s, cattle no longer needed", q: "How many Rottweilers came to the Heilbronn dog show in 1882?", options: ["Only one", "About a hundred", "Over a thousand"], answer: 0, evidence: "only one Rottweiler" },
+  { match: "The Rottweiler was saved by a new job", q: "What job saved the Rottweiler in 1910?", options: ["Police dog", "Circus dog", "Sheepdog"], answer: 0, evidence: "police breeds" },
+  { match: "Rottweilers were first shown in Britain at Crufts in 1936", q: "In which year were Rottweilers first shown at Crufts?", options: ["1936", "1836", "2006"], answer: 0, evidence: "in 1936" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
