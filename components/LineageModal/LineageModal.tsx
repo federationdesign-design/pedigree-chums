@@ -1230,7 +1230,6 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                     <span className={css.winBarValue}>{value}</span>
                   </div>
                 );
-                const cleared = circleCount && circleCount.tot > 0 ? Math.max(0, circleCount.tot - circleCount.left) / circleCount.tot : 0;
                 return (
                   <div className={css.winStats}>
                     <div className={css.winRings}>
@@ -1238,9 +1237,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                           2026 (owner, J18-273). The questions ring shows only when at least
                           one question came up this round. */}
                       {levelDogNames.size > 0 && ring("dogs found", levelDogsFound / levelDogNames.size, `${levelDogsFound}/${levelDogNames.size}`)}
-                      {circleCount && circleCount.tot > 0 && ring("circles cleared", cleared, `${Math.round(cleared * 100)}%`)}
+                      {/* "circles cleared" hidden, 27 September 2026 (owner, J18-294). */}
                       {packSize > 0 && ring("chum rate", collectedChums.size / packSize, `${Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%`)}
-                      {roundStats.quizAsked > 0 && ring("questions right", roundStats.quizRight / roundStats.quizAsked, `${roundStats.quizRight}/${roundStats.quizAsked}`)}
+                      {roundStats.quizAsked > 0 && ring("trivia", /* was "questions right" (owner, J18-294) */ roundStats.quizRight / roundStats.quizAsked, `${roundStats.quizRight}/${roundStats.quizAsked}`)}
                     </div>
                     <div className={css.winBars}>
                       {bar("Biggest chain", roundStats.dogChain, BAR_PAR.chain)}
