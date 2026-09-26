@@ -255,7 +255,8 @@ export const EXTRA_FACTS: string[] = [];
    becomes each fact's FACT_SUBJECT so its picture leads and it is chosen when
    that chum is caught or chained.
    Batch 1 (J18-241): Jackapoo, 9 new facts (1 existing, 10 in all).
-   Batch 2 (J18-245): Cavachon, 9 new facts (1 existing, 10 in all). */
+   Batch 2 (J18-245): Cavachon, 9 new facts (1 existing, 10 in all).
+   Batch 3 (J18-253): Cavapoo, 9 new facts (1 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -279,6 +280,18 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The Cavachon's Bichon Frise side has sailed a long way. Little white dogs like it travelled with sailors around the Mediterranean, and one kind became so linked with the Canary Island of Tenerife that it was called the Bichon Tenerife. When France wrote down the breed's official description in 1933, it was given its modern name, Bichon Frise, meaning curly bichon. Bichon itself is thought to be short for barbichon, meaning little barbet, a shaggy water dog.",
     "The Bichon Frise side of the Cavachon was once a royal fashion accessory. In France, King Henri III, who ruled from 1574 to 1589, is said to have loved his little white dogs so much that he carried them everywhere in a basket hung round his neck on ribbons. The dogs were bathed, trimmed and perfumed, and French still has a verb, bichonner, meaning to pamper, which is said to come from them.",
     "The Bichon Frise side of the Cavachon went from palaces to the streets. When the little white dogs fell out of fashion with the rich, they did not disappear. By the late 1800s they were trotting beside organ grinders and doing tricks in circuses and at fairs, earning their keep by making crowds laugh. That knack for performing helped the breed survive, long before anyone thought of crossing one with a Cavalier King Charles Spaniel to make the Cavachon.",
+  ],
+  // Batch 3 (J18-253): 9 new, 10 in all.
+  Cavapoo: [
+    "Nobody knows for certain where the Cavapoo, a cross of the Cavalier King Charles Spaniel and the Poodle, was first bred. Some say the USA in the 1950s, but the cross really took off in Australia in the 1990s, during the craze for Poodle crosses that followed the Labradoodle. Breeders wanted a small, gentle family dog with the Cavalier's sweet nature and the Poodle's low-shedding coat.",
+    "In Australia the Cavapoo is called the Cavoodle, while in Britain and America it is usually the Cavapoo, and some call it the Cavadoodle. Each name joins Cav, from the Cavalier King Charles Spaniel, to poo or doodle, from the Poodle. The cross is so popular in Australia that when Anthony Albanese became Prime Minister in 2022, his Cavoodle, Toto, was nicknamed Australia's First Dog.",
+    "The Cavalier in Cavapoo comes from a war. In the English Civil War of the 1640s, the soldiers who fought for King Charles I were nicknamed Cavaliers, and those who fought for Parliament were called Roundheads. The little spaniels loved by Charles I and his son Charles II were only given the Cavalier name in the 1920s, to tell the long-nosed dogs apart from the flat-faced King Charles Spaniel.",
+    "Both halves of the Cavapoo can be found on the same side of the English Civil War. King Charles I loved his little spaniels, and his nephew Prince Rupert, the most famous Cavalier general, took his white hunting Poodle, Boye, almost everywhere, even into battle. Parliament's supporters spread stories that Boye had magic powers. Sadly, Boye was killed at the Battle of Marston Moor in 1644.",
+    "The Cavalier side of the Cavapoo has been a lapdog for more than 400 years. In 1570 the doctor John Caius described a little spaniel he called the spaniel gentle, or comforter, kept as a lapdog by fine ladies. In Tudor times these small spaniels warmed their owners' laps and feet, and people even believed they drew fleas away from them.",
+    "Little spaniels like the Cavapoo's Cavalier ancestors appear in royal paintings. In 1635 the painter Anthony van Dyck painted the three eldest children of King Charles I with a spaniel. The king was cross that his son, the future Charles II, was shown wearing a skirt, which only younger children wore then. So Van Dyck painted the children again, with the prince in breeches, and this time two spaniels.",
+    "King Charles II let his little spaniels, the ancestors of the Cavapoo's Cavalier side, go almost everywhere with him, even into his bedroom, where he let them have their puppies. After the king died in 1685, the writer John Evelyn grumbled in his diary that the dogs had made the bedroom, and indeed the whole royal court, smelly.",
+    "The Poodle side of the Cavapoo helped the American army start using dogs. In 1942, during the Second World War, a Poodle breeder called Alene Erlanger set up Dogs for Defense, which asked American families to lend their pets to the armed forces. Poodles were on the army's first list of war dogs, praised for how quickly they learned, and some worked as guard dogs in America, though they did not go overseas.",
+    "A Cavapoo is a small dog, usually about 23 to 33cm tall and weighing 4 to 10kg, depending mostly on whether its Poodle parent was a Toy or a Miniature. Its coat can be silky like a Cavalier King Charles Spaniel's or curly like a Poodle's, in colours from apricot and red to cream, black, brown and white.",
   ],
 };
 
@@ -768,6 +781,13 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "King Henri III, who ruled from 1574 to 1589", q: "How did King Henri III carry his little dogs?", options: ["In a basket round his neck", "In his crown", "In a wheelbarrow"], answer: 0, evidence: "basket hung round his neck" },
   { match: "Wales has two kinds of Corgi, the Cardigan and the Pembroke", q: "Until which year did the Kennel Club count the two Corgis as one breed?", options: ["1934", "1834", "1994"], answer: 0, evidence: "until 1934" },
   { match: "A Longdog is not a breed, but a cross between two sighthounds, dogs that hunt", q: "How fast can a Greyhound run in a race?", options: ["About 69km/h (43mph)", "About 29km/h (18mph)", "About 150km/h (93mph)"], answer: 0, evidence: "about 69km/h (43mph)" },
+  // Batch 3 (J18-253): Cavapoo.
+  { match: "In Australia the Cavapoo is called the Cavoodle", q: "What is the Cavapoo called in Australia?", options: ["The Cavoodle", "The Kangapoo", "The Cavapup"], answer: 0, evidence: "called the Cavoodle" },
+  { match: "The Cavalier in Cavapoo comes from a war", q: "What were the soldiers who fought for King Charles I nicknamed?", options: ["Cavaliers", "Roundheads", "Redcoats"], answer: 0, evidence: "nicknamed Cavaliers" },
+  { match: "Both halves of the Cavapoo can be found on the same side", q: "What was the name of Prince Rupert's Poodle?", options: ["Boye", "Rover", "Bouncer"], answer: 0, evidence: "Poodle, Boye" },
+  { match: "In 1570 the doctor John Caius described a little spaniel", q: "What did John Caius call the little lapdog spaniel?", options: ["The comforter", "The cuddler", "The snuggler"], answer: 0, evidence: "comforter" },
+  { match: "In 1635 the painter Anthony van Dyck painted", q: "Why was King Charles I cross with Van Dyck's first painting?", options: ["His son was shown in a skirt", "The dogs looked too big", "The king was left out"], answer: 0, evidence: "wearing a skirt" },
+  { match: "a Poodle breeder called Alene Erlanger set up Dogs for Defense", q: "What was Alene Erlanger's wartime scheme called?", options: ["Dogs for Defense", "Pups for Peace", "Hounds for Heroes"], answer: 0, evidence: "Dogs for Defense" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
