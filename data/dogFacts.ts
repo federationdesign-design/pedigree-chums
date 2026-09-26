@@ -258,7 +258,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 2 (J18-245): Cavachon, 9 new facts (1 existing, 10 in all).
    Batch 3 (J18-253): Cavapoo, 9 new facts (1 existing, 10 in all).
    Batch 4 (J18-257): Maltipoo, 9 new facts (1 existing, 10 in all).
-   Batch 5 (J18-258): Goldendoodle, 9 new facts (1 existing, 10 in all). */
+   Batch 5 (J18-258): Goldendoodle, 9 new facts (1 existing, 10 in all).
+   Batch 6 (J18-261): Labradoodle, 9 new facts (1 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -318,6 +319,18 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "Belle, the mother of the first Golden Retrievers and so an ancestor of every Goldendoodle, was a Tweed Water Spaniel, a breed that is now extinct. Tweed Water Spaniels had curly, liver-brown coats and looked rather like the Irish Water Spaniel. So a Goldendoodle's curls may come from its Poodle parent, but its golden side has curly water dogs in its past too.",
     "The Poodle side of the Goldendoodle once hunted for buried treasure. In Victorian England and France, small Poodle-type dogs were trained to sniff out truffles, rare fungi that grow underground and are prized by cooks. A dog book of 1886 described the truffle dog as a small, nearly pure Poodle. Poodles were also retrievers of ducks and famous performers in circuses.",
     "The Goldendoodle can be a working dog as well as a pet. Goldendoodles have worked as guide dogs, assistance dogs and therapy dogs, and one study even tested whether they could sniff out peanuts in food for people with nut allergies. Both of their parents are working breeds: the Golden Retriever fetches birds for hunters, and the Poodle began as a water retriever.",
+  ],
+  // Batch 6 (J18-261): 9 new, 10 in all.
+  Labradoodle: [
+    "The Labradoodle, a cross of the Labrador and the Poodle, began with a letter. In the 1980s Wally Conron, who bred puppies for the Royal Guide Dog Association of Australia, heard from a blind woman in Hawaii whose husband was allergic to dogs. She needed a guide dog that would not make him ill. Poodles shed little hair, so he tried 33 Standard Poodles over three years, but none of them made the grade as a guide dog.",
+    "The first planned Labradoodle litter was born in Australia in 1989. Wally Conron mated his Labrador, Brandy, with a Standard Poodle called Harley, and three puppies arrived: Simon, Sheik and Sultan. Clippings of their coats and samples of their spit were posted to Hawaii and tested on the woman's allergic husband, and only Sultan passed, so Sultan became the first Labradoodle guide dog.",
+    "Sultan, the very first Labradoodle guide dog, flew from Australia to Hawaii to work for the blind woman whose husband was allergic to most dogs. He did the job for about ten years. Sultan proved the idea could work: a dog with the Labrador's gentle, steady nature for guiding, and a coat the family could live with.",
+    "The name Labradoodle was partly a sales trick. Wally Conron's first crossbred puppies needed families to look after them while they grew up, but nobody wanted to take in a crossbreed. So he gave them a catchy name and told people there was an exciting new dog. Suddenly everyone wanted one. He went on to breed 31 Labradoodles for guide-dog work, and most of them became guide dogs.",
+    "The man who bred the first Labradoodles later said it was his biggest regret. In 2019 Wally Conron said he felt he had opened a Pandora's box, because the Labradoodle's fame led many breeders to cross dogs for money rather than for health and good temper. He worried about Labradoodles with painful hip and elbow problems, and wished people would take more care.",
+    "The word Labradoodle is British, and older than most people think. In 1955 Donald Campbell, who set world speed records on water in his boat Bluebird, wrote a book called Into the Water Barrier. In it he described his dog Maxie, which he had owned since 1949: a black Labrador and Poodle cross with thick, curly hair, which he called a Labradoodle.",
+    "Many people buy a Labradoodle believing it will not cause allergies, but scientists have tested that idea. A 2012 study in the Netherlands measured a common dog allergen in the coats of hundreds of dogs, and Labradoodles and Poodles actually had more of it in their coats than Labradors did. The air in their owners' homes held no less either. Allergies come mostly from skin flakes and spit, not hair, so no dog is truly allergy-free.",
+    "In the 1990s, breeders in Australia carried on from Wally Conron's first Labradoodles. Instead of always crossing a Labrador with a Poodle, they bred Labradoodles with each other and added a few other breeds, hoping to make the coat, size and temper more predictable. Their dogs became known as Australian Labradoodles, though they are still not recognised as a breed by any major kennel club.",
+    "The Labradoodle is still a working dog as well as a pet. Guide Dogs Victoria, where the first Labradoodles were bred, no longer breeds them, but other guide and assistance dog groups in Australia and elsewhere still do. Both of the Labradoodle's parents are hard workers: the Labrador is the world's best-known guide dog, and the Poodle began as a retriever of ducks from water.",
   ],
 };
 
@@ -826,6 +839,42 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "For years people told a story that the Golden Retriever", q: "What did people once wrongly believe the first Golden Retrievers were?", options: ["Russian circus dogs", "Royal guard dogs", "Arctic sled dogs"], answer: 0, evidence: "Russian circus dogs" },
   { match: "Golden Retrievers, one half of the Goldendoodle, go back to their birthplace", q: "How many Golden Retrievers were counted at Guisachan in 2023?", options: ["466", "46", "4,660"], answer: 0, evidence: "466" },
   { match: "The Poodle side of the Goldendoodle once hunted for buried treasure", q: "What did small Poodle-type dogs sniff out in Victorian England and France?", options: ["Truffles", "Diamonds", "Fossils"], answer: 0, evidence: "sniff out truffles" },
+  // Batch 6 (J18-261): Labradoodle.
+  { match: "began with a letter. In the 1980s Wally Conron", q: "How many Standard Poodles did Wally Conron try as guide dogs?", options: ["33", "3", "300"], answer: 0, evidence: "33 Standard Poodles" },
+  { match: "The first planned Labradoodle litter was born in Australia in 1989", q: "Which puppy from the first litter passed the allergy test?", options: ["Sultan", "Simon", "Sheik"], answer: 0, evidence: "only Sultan passed" },
+  { match: "The name Labradoodle was partly a sales trick", q: "Why did Wally Conron give his puppies a catchy name?", options: ["Nobody wanted to take in a crossbreed", "To win a prize", "A king asked him to"], answer: 0, evidence: "nobody wanted to take in a crossbreed" },
+  { match: "The word Labradoodle is British, and older than most people think", q: "Who called his dog a Labradoodle in a 1955 book?", options: ["Donald Campbell", "Roald Dahl", "Enid Blyton"], answer: 0, evidence: "Donald Campbell" },
+  { match: "A 2012 study in the Netherlands measured a common dog allergen", q: "Where do dog allergies mostly come from?", options: ["Skin flakes and spit", "Hair", "Paws"], answer: 0, evidence: "skin flakes and spit" },
+  /* QUIZ BATCH (J18-261, brief 4, 27 September 2026): questions on existing chum
+     facts that had none. Each answer is in its fact (evidence). */
+  { match: "Tudor London's bear gardens set mastiffs against bears", q: "When was bear-baiting with mastiffs finally banned?", options: ["1835", "1935", "1735"], answer: 0, evidence: "until 1835" },
+  { match: "When the Romans invaded in 55 BC, they found the Britons", q: "How many Mastiffs were left in Britain at the end of the Second World War?", options: ["One", "Fifty", "Five hundred"], answer: 0, evidence: "only one Mastiff was left" },
+  { match: "Zorba was an English Mastiff", q: "What record did Zorba the English Mastiff hold?", options: ["Heaviest and longest dog", "Fastest dog", "Loudest bark"], answer: 0, evidence: "heaviest and longest" },
+  { match: "Giant George was a Great Dane", q: "What record did Giant George hold?", options: ["Tallest dog alive", "Oldest dog alive", "Fastest dog alive"], answer: 0, evidence: "tallest dog alive" },
+  { match: "The word 'terrier' comes from the Latin", q: "Which Latin word does 'terrier' come from?", options: ["Terra, meaning earth", "Terror, meaning fear", "Tiara, meaning crown"], answer: 0, evidence: "'terra', meaning earth" },
+  { match: "In Tim Burton's 2012 film Frankenweenie", q: "What is the name of Victor's Bull Terrier in Frankenweenie?", options: ["Sparky", "Spot", "Sparkle"], answer: 0, evidence: "Sparky" },
+  { match: "The Doberman was created in Germany in the late 1800s by a tax collector", q: "Who created the Doberman?", options: ["A tax collector", "A baker", "A sailor"], answer: 0, evidence: "tax collector" },
+  { match: "In the 1992 film Beethoven", q: "What kind of dog is Beethoven in the 1992 film?", options: ["A Saint Bernard", "A Great Dane", "A Poodle"], answer: 0, evidence: "Saint Bernard puppy" },
+  { match: "Man Ray was a Weimaraner photographed", q: "Which artist photographed Man Ray the Weimaraner?", options: ["William Wegman", "Pablo Picasso", "David Hockney"], answer: 0, evidence: "William Wegman" },
+  { match: "Carriage dogs ran alongside the horses and guarded the coach", q: "What job was the Dalmatian made for?", options: ["Running beside carriages", "Herding sheep", "Pulling sleds"], answer: 0, evidence: "ran alongside the horses" },
+  { match: "In the 2000 film 102 Dalmatians, Oddball", q: "What is special about Oddball in 102 Dalmatians?", options: ["She has no spots", "She has blue spots", "She can fly"], answer: 0, evidence: "without any spots" },
+  { match: "The butchers of Rottweil kept cattle dogs", q: "Who kept the cattle dogs of Rottweil?", options: ["The butchers", "The bakers", "The monks"], answer: 0, evidence: "butchers of Rottweil" },
+  { match: "An Old English Sheepdog has starred in the Dulux paint adverts", q: "Which adverts made the Old English Sheepdog famous?", options: ["Dulux paint", "Andrex toilet roll", "Churchill insurance"], answer: 0, evidence: "Dulux paint" },
+  { match: "In December 1944, a shepherd called John Dagg", q: "Who did John Dagg and his sheepdog climb through the snow to reach?", options: ["The crew of a crashed bomber", "A lost king", "A stranded ship"], answer: 0, evidence: "crashed American bomber" },
+  { match: "The word dog first appears in Old English as docga", q: "Which old word gave us the word hound?", options: ["Hund", "Hood", "Hunt"], answer: 0, evidence: "hund" },
+  { match: "Droopy is a slow-talking, sad-faced Basset Hound", q: "When were the first Droopy cartoons made?", options: ["1943", "1993", "1843"], answer: 0, evidence: "1943" },
+  { match: "Myth: Bulldogs' flat faces were bred for fighting bulls", q: "How did Bulldogs get their very flat faces?", options: ["Bred for their looks at dog shows", "From fighting bulls", "From swimming"], answer: 0, evidence: "bred for their looks" },
+  { match: "Tillman was a real Bulldog from California", q: "What record did Tillman the Bulldog set?", options: ["Fastest dog on a skateboard", "Tallest dog", "Longest ears"], answer: 0, evidence: "fastest dog on a skateboard" },
+  { match: "Legend: In Welsh folklore, fairies rode Corgis", q: "In Welsh folklore, who rode Corgis?", options: ["Fairies", "Knights", "Giants"], answer: 0, evidence: "fairies rode Corgis" },
+  { match: "Master McGrath was an Irish Greyhound", q: "Which queen did Master McGrath meet?", options: ["Queen Victoria", "Queen Elizabeth I", "Queen Anne"], answer: 0, evidence: "Queen Victoria" },
+  { match: "The medieval Greyhound was the noble hunting hound", q: "What did King John accept greyhounds as?", options: ["Payment of fines", "Crowns", "Wedding gifts"], answer: 0, evidence: "payment of fines" },
+  { match: "Myth: Greyhounds need huge amounts of exercise", q: "What are Greyhounds nicknamed?", options: ["40-mile-an-hour couch potatoes", "Rocket dogs", "Lazy lightning"], answer: 0, evidence: "couch potatoes" },
+  { match: "In 1974 a Whippet called Ashley ran onto the pitch", q: "What did Ashley the Whippet catch?", options: ["Flying discs", "Baseballs", "Fish"], answer: 0, evidence: "flying discs" },
+  { match: "Myth: Huskies are part wolf", q: "Are Siberian Huskies part wolf?", options: ["Yes", "No"], answer: 1, evidence: "completely domestic dogs" },
+  { match: "Tibetan monks bred small, long-coated lion dogs", q: "Who bred the small lion dogs behind the Shih Tzu?", options: ["Tibetan monks", "Roman soldiers", "Viking sailors"], answer: 0, evidence: "Tibetan monks" },
+  { match: "Sergeant Stubby was a stray", q: "In which war did Sergeant Stubby serve?", options: ["The First World War", "The Second World War", "The English Civil War"], answer: 0, evidence: "First World War" },
+  { match: "Myth: A special law lets Cavalier King Charles Spaniels into the Houses of Parliament", q: "Is there a law letting Cavaliers into the Houses of Parliament?", options: ["Yes", "No"], answer: 1, evidence: "There is no such law" },
+  { match: "The Chukchi sled dogs were bred by", q: "Who bred the sled dogs behind the Siberian Husky?", options: ["The Chukchi people", "The Vikings", "The Romans"], answer: 0, evidence: "Chukchi people" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
