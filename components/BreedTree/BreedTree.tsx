@@ -5874,7 +5874,7 @@ export default function BreedTree({
     if (factDogs.length) {
       const row = document.createElement("div");
       // Three or fewer: twice the size (owner, 26 September 2026). See .factDogsBig.
-      row.className = `${styles.factDogs} ${factDogs.length <= FACT_DOGS_BIG_UPTO ? styles.factDogsBig : ""}`;
+      row.className = `${styles.factDogs} ${factDogs.length <= FACT_DOGS_BIG_UPTO ? styles.factDogsBig : ""} ${factDogs.length === 1 ? styles.factDogsOne : ""}`;
       factDogs.forEach((dg, di) => {
         const fig = document.createElement("figure");
         fig.className = styles.factDog;

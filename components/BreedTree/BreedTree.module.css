@@ -2939,6 +2939,21 @@
 }
 .factDogsBig .factDog figcaption { font-size: calc(13px * var(--fact-k, 1)); }
 @media (prefers-reduced-motion: reduce) { .factDog { animation: none; opacity: 1; } }
+/* PHONES (everything that is not the desktop rule), 27 September 2026 (owner):
+   one picture at half its size, and two or more ALWAYS on one line, each shrinking
+   to share the card's width rather than wrapping. */
+@media not all and (min-width: 1024px) and (hover: hover) {
+  .factDogs { flex-wrap: nowrap; gap: 6px; }
+  .factDogs .factDog,
+  .factDogsBig .factDog { flex: 1 1 0; min-width: 0; width: auto; max-width: 78px; }
+  .factDogs .factDog img,
+  .factDogsBig .factDog img { width: 100%; height: auto; aspect-ratio: 1 / 1; border-width: 3px; border-radius: 10px; }
+  .factDogs .factDog figcaption,
+  .factDogsBig .factDog figcaption { font-size: 9px; }
+  /* A single picture: half its size, 64px (was 128px). */
+  .factDogsOne .factDog { flex: 0 0 auto; width: 78px; max-width: none; }
+  .factDogsOne .factDog img { width: 64px; height: 64px; }
+}
 
 /* The fact card's close cross, top right (owner, 26 September 2026). The card is
    position: fixed, so this sits against its corner. The card's only other tappable
