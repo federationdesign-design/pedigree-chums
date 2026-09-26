@@ -3778,7 +3778,7 @@ export default function BreedTree({
      Reported whenever one is beaten, and zeroed at the start of each drop: the
      longest dog chain completed, the longest chum card chain completed, and the
      most bombs going off in one cascade. */
-  onRoundStats?: (s: { dogChain: number; chumChain: number; bombString: number }) => void;
+  onRoundStats?: (s: { dogChain: number; chumChain: number; bombString: number; quizAsked: number; quizRight: number }) => void;
   /* THE DOGS-FOUND COUNTER (owner, 24 September 2026). BreedStrip owns the run's
      set of unique dogs collected; the pit reports each collect through
      onDogFound and draws dogsFound / dogsTotal. */
@@ -5771,13 +5771,14 @@ export default function BreedTree({
      the same reason. Written by paintChainCount below and by nothing else. */
   const chainCountRef = useRef<HTMLDivElement>(null);
   // The round's records, and the bomb run in progress. See onRoundStats.
-  const roundStatsRef = useRef({ dogChain: 0, chumChain: 0, bombString: 0, bombRun: 0, lastBoom: 0 });
+  // quizAsked and quizRight: the fact-card questions answered this round (owner, J18-273).
+  const roundStatsRef = useRef({ dogChain: 0, chumChain: 0, bombString: 0, bombRun: 0, lastBoom: 0, quizAsked: 0, quizRight: 0 });
   // Held in a ref so the effects can call it without re-running on each render.
   const reportRoundStatsRef = useRef<() => void>(() => {});
   useEffect(() => {
     reportRoundStatsRef.current = () => {
       const r = roundStatsRef.current;
-      onRoundStats?.({ dogChain: r.dogChain, chumChain: r.chumChain, bombString: r.bombString });
+      onRoundStats?.({ dogChain: r.dogChain, chumChain: r.chumChain, bombString: r.bombString, quizAsked: r.quizAsked, quizRight: r.quizRight });
     };
   }, [onRoundStats]);
   /* Shows a fact about one dog (see factFor), replacing any fact on screen: a
@@ -5976,6 +5977,8 @@ export default function BreedTree({
             else other.classList.add(styles.factQuizFall);
           }
           if (!right) note.textContent = `Not quite: it was ${quiz.options[quiz.answer]}.`;
+          // Counted for the end screen's questions ring (J18-273).
+          { const rs = roundStatsRef.current; rs.quizAsked += 1; if (right) rs.quizRight += 1; reportRoundStatsRef.current(); }
           if (right) {
             onScoreRef.current?.(QUIZ_POINTS);
             recordQuizRight();
@@ -9478,7 +9481,7 @@ export default function BreedTree({
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
       // A fresh round: its records start from nothing. See onRoundStats.
-      roundStatsRef.current = { dogChain: 0, chumChain: 0, bombString: 0, bombRun: 0, lastBoom: 0 };
+      roundStatsRef.current = { dogChain: 0, chumChain: 0, bombString: 0, bombRun: 0, lastBoom: 0, quizAsked: 0, quizRight: 0 };
       reportRoundStatsRef.current();
       const v = viewRef.current;
       const k = SIZE / v[2];

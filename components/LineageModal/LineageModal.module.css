@@ -1989,3 +1989,12 @@
   .winFlash { font-size: clamp(6rem, 16.5vw, 13rem); }
   .winStats { zoom: 1.4; }
 }
+
+/* THE END SCREEN'S RINGS AND SCORE, 27 September 2026 (owner, J18-273):
+     - space between the round score and DONE;
+     - the rings fill in the site's lemon, #ffed00, not the softer yellow;
+     - up to four rings now (questions right joined), so each ring shares the row
+       equally instead of a fixed 84px, which four would overflow on a phone. */
+.winScore { margin-bottom: 16px; }
+.winRingFill { stroke: var(--yellow-header, #ffed00); }
+.winRing { width: auto; flex: 1 1 0; min-width: 0; }

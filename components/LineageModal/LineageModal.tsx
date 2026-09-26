@@ -366,7 +366,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   }, [portraitEl]);
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
   // The round's records from the pit, for the finish screen. See BreedTree onRoundStats.
-  const [roundStats, setRoundStats] = useState({ dogChain: 0, chumChain: 0, bombString: 0 });
+  const [roundStats, setRoundStats] = useState({ dogChain: 0, chumChain: 0, bombString: 0, quizAsked: 0, quizRight: 0 });
   // This level's chum page slug, when the level is one of the 54 pack chums.
   const chumSlug = packBreeds.find((b) => b.name === name)?.slug ?? null;
   /* THIS LEVEL'S OWN DOGS FOUND, for the chum finish screen's stats (owner, 25
@@ -1234,9 +1234,13 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                 return (
                   <div className={css.winStats}>
                     <div className={css.winRings}>
+                      {/* Chum rate third, and the questions ring added fourth, 27 September
+                          2026 (owner, J18-273). The questions ring shows only when at least
+                          one question came up this round. */}
                       {levelDogNames.size > 0 && ring("dogs found", levelDogsFound / levelDogNames.size, `${levelDogsFound}/${levelDogNames.size}`)}
-                      {packSize > 0 && ring("chum rate", collectedChums.size / packSize, `${Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%`)}
                       {circleCount && circleCount.tot > 0 && ring("circles cleared", cleared, `${Math.round(cleared * 100)}%`)}
+                      {packSize > 0 && ring("chum rate", collectedChums.size / packSize, `${Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%`)}
+                      {roundStats.quizAsked > 0 && ring("questions right", roundStats.quizRight / roundStats.quizAsked, `${roundStats.quizRight}/${roundStats.quizAsked}`)}
                     </div>
                     <div className={css.winBars}>
                       {bar("Biggest chain", roundStats.dogChain, BAR_PAR.chain)}
