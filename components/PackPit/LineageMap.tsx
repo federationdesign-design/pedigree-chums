@@ -3824,7 +3824,12 @@ export default function LineageMap({
                name). It no longer rides the surface: it holds just above the Learn and
                Complete buttons, where it starts, and the liquid rises past it. */
             const WORD_Y = R * 0.68;
-            const share = doneRing ? 1 : frameTotal > 0 ? Math.max(0, Math.min(1, filled.size / frameTotal)) : 0;
+            /* THE SAME FIGURE AS THE PROGRESS BAR, 27 September 2026 (owner, J18-256: the
+               liquid did not rise as Learn exposed each layer). It read frames filled
+               alone, so it only moved once cards were placed. It now reads learnProgress,
+               the bar's own share (layers exposed and frames filled, averaged), so the
+               two always agree. */
+            const share = doneRing ? 1 : Math.max(0, Math.min(1, learnProgress / 100));
             const surface = LIQUID_START_Y + share * (LIQUID_FULL_Y - LIQUID_START_Y);
             const size = R * 2.6;
             const wordY0 = R * 0.78;              // the word's own chord check, at its lowest
