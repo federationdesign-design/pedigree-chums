@@ -1963,3 +1963,17 @@
 @media (max-width: 768px) {
   .winWrapChum { padding-top: 130px; }
 }
+
+/* THE END SCREEN, TIDIED, 27 September 2026 (owner, J18-259):
+     - the round score in the site's lemon, #ffed00, not the softer yellow;
+     - the stats sit straight under DONE (the closing line above them is gone,
+       and their own top margin with it);
+     - the stats lose their box: no fill, no stroke, no blur. */
+.winScore { color: var(--yellow-header, #ffed00); }
+.winStats {
+  margin-top: 0;
+  background: none;
+  border: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}

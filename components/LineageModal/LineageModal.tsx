@@ -1182,18 +1182,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
               {/* "Dog Done", was "Round Won" (owner, 24 September 2026). */}
               {/* "Done", was "Dog Done" (owner, 25 September 2026). */}
               <div className={css.winFlash}>Done</div>
-              {/* A CLOSING LINE, 25 September 2026 (owner: a strong finish). Chosen
-                  from the chum rate where there is one, else a general line; the
-                  pick is steady for the round (worked out from the score, not a
-                  random draw each render). */}
-              {(() => {
-                const rate = packSize > 0 ? collectedChums.size / packSize : null;
-                const pool = rate === null ? ["Nice work!", "Good dog!", "Well sniffed!"]
-                  : rate >= 0.9 ? ["Best in show!", "Top of the pack!", "Leader of the pack!"]
-                  : rate >= 0.6 ? ["Great run!", "Good dog!", "Tails up!"]
-                  : ["Nice work!", "Every chum counts!", "Keep sniffing!"];
-                return <div className={css.winLine}>{pool[Math.abs(score) % pool.length]}</div>;
-              })()}
+              {/* THE CLOSING LINE ("Nice work!" and so on) WAS REMOVED, 27 September 2026
+                  (owner, J18-259). Its .winLine rule is left in the stylesheet, unused. */}
               {/* THE ROUND'S STATS, chum levels only (owner, 25 September 2026): the
                   spare space under Dog Done, in the usual level-complete style. The
                   chum rate and the running chum count moved here from the top
