@@ -285,7 +285,9 @@ export const EXTRA_FACTS: string[] = [];
    Batch 28 (J18-292): six chums in one pass (owner): Springer Spaniel, Irish Wolfhound,
    Chihuahua, Afghan Hound, Dachshund and Boxer, 26 new facts.
    ANCESTOR DOGS, batch 1 (J18-304): 5 more facts each for 20 of the 95 ancestor dogs,
-   keyed by their node names so each fact leads with that ancestor's picture. */
+   keyed by their node names so each fact leads with that ancestor's picture.
+   ANCESTOR DOGS, batch 2 (J18-306): 5 more each for 20 more ancestors with a real
+   written history (owner chose history-only; the thin groups keep what they have). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -743,6 +745,147 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The Tazi hounds of Central Asia have long, silky ears and feathered tails, and are built to run fast over open steppe.",
     "In Kazakh tradition, a good Tazy was so valuable that it was said to be worth the same as a fine horse.",
     "Tazi hounds are thought to be relatives of the Saluki and the Afghan Hound, part of a family of ancient sighthounds stretching from the Middle East to Central Asia.",
+  ],
+  // ANCESTOR DOGS, batch 2 (J18-306): 5 more facts each for 20 more ancestor dogs.
+  "Old scenting Hounds": [
+    "The Southern Hound was a big, slow, heavy British scenthound with long ears and a deep, bell-like voice. It had almost disappeared by the 1800s, but its blood lives on in later hounds.",
+    "The Talbot, a white medieval scenthound, gave its name and its image to the Talbot family, the Earls of Shrewsbury, who put a Talbot hound on their coat of arms.",
+    "In A Midsummer Night's Dream, Shakespeare describes hounds matched in mouth like bells, because hunters chose hounds whose voices blended together like a peal of church bells.",
+    "When a scenthound picks up a scent and starts to bay, hunters say it is giving tongue, or giving voice, which tells everyone the trail has been found.",
+    "In the 1700s, British breeders made the old slow scenthounds faster for chasing foxes, creating the English Foxhound, which could keep up with hunters on galloping horses.",
+  ],
+  "Dogs of the Alan horsemen": [
+    "The Alans were horse-riding nomads from the steppe north of the Caucasus mountains. They spoke a language related to Persian, and were cousins of the Scythians and Sarmatians.",
+    "In the early 400s AD, groups of Alans crossed the River Rhine into the Roman Empire and travelled through Gaul into Spain, bringing their big dogs with them.",
+    "Some Alans settled in Gaul, in what is now France, around the city of Orléans, and their dogs may have spread from there.",
+    "The Ossetians, who live in the Caucasus mountains today, are thought to be descendants of the ancient Alans.",
+    "Roman writers described the Alans as living in covered wagons and moving from pasture to pasture with their herds, which their dogs helped guard.",
+  ],
+  "Old German boarhounds": [
+    "Hunting wild boar was dangerous, because a boar's tusks could badly wound a dog. Some German boarhounds were given padded or armoured coats to protect them.",
+    "German princes kept huge kennels of boarhounds for grand hunts, bred specially to be both strong and fast enough to catch and hold a boar.",
+    "The Great Dane is not Danish. In the 1700s, the French naturalist Buffon called it the grand Danois, meaning the big Dane, and the name stuck in English.",
+    "In German, the Great Dane is called the Deutsche Dogge, meaning German mastiff. German breeders agreed on that name around 1880.",
+    "The German statesman Otto von Bismarck loved Great Danes, and his dogs, one of them called Tyras, became famous across Germany.",
+  ],
+  "Tibetan temple dogs": [
+    "The Lhasa Apso's Tibetan name is said to be Abso Seng Kye, meaning bark lion sentinel dog, because it guarded the inside of monasteries and homes.",
+    "By tradition, Lhasa Apsos were never sold. They were given as precious gifts, sometimes by the Dalai Lama to Chinese emperors and honoured visitors.",
+    "Tibetan Spaniels are said to have sat on the high walls of monasteries, watching the valley and barking to warn of anyone approaching.",
+    "The Tibetan Terrier is not really a terrier. In Tibet it was called the holy dog, believed to bring good luck, and was never sold.",
+    "The Tibetan Terrier came to Britain through Dr Agnes Greig, a doctor in India in the 1920s, who was given one as a thank-you gift after treating a patient.",
+  ],
+  "Old British ratting Terriers": [
+    "In Victorian London, some pubs held rat pits, where terriers were timed to see how quickly they could kill rats. It was cruel, but hugely popular at the time.",
+    "The most famous rat-pit terrier was Billy, who in 1823 is said to have killed 100 rats in about five and a half minutes.",
+    "Jack Black called himself Rat and Mole Destroyer to Queen Victoria. He caught rats with terriers and ferrets, and also bred and sold dogs.",
+    "Rat-baiting slowly faded away in the early 1900s, as people came to see it as cruel and new animal welfare laws were passed.",
+    "The Manchester Terrier and the English Toy Terrier descend from the smart black and tan ratting terriers kept in the cities of northern England.",
+  ],
+  "The First Setters": [
+    "Before guns were good enough to shoot flying birds, setting dogs crouched down beside the hidden birds, and hunters crept up and threw a net over the birds and the dog together.",
+    "The English writer Gervase Markham explained how to train a setting dog in 1621, showing that setters were already well known in Britain 400 years ago.",
+    "Setters get their name from setting, meaning to crouch or sit, the way early setters dropped low to show where birds were hiding.",
+    "Edward Laverack spent about 50 years in the 1800s breeding his own line of English Setters, and his dogs shaped the show English Setter.",
+    "Richard Purcell Llewellin bred a famous line of working English Setters in the 1800s, and setters from his line are still called Llewellin setters.",
+  ],
+  "Welsh herding dogs": [
+    "The medieval Welsh laws of Hywel Dda, from the 900s, set out what different dogs were worth. A good herdsman's dog was valued as highly as the best ox.",
+    "Welsh drovers walked huge herds of cattle all the way to markets in England, with dogs to keep them moving. It is said some dogs found their own way home alone afterwards.",
+    "Welsh sheepdogs traditionally work with a loose eye, moving freely and often barking, rather than stalking the sheep in a crouch.",
+    "The Welsh Sheepdog Society was formed in 1997 to protect the traditional Welsh working sheepdog, which was being replaced by Border Collies.",
+    "Welsh hill farmers bred their sheepdogs for work on steep, rough ground, choosing dogs for stamina and good sense rather than looks.",
+  ],
+  "Norse settlers dogs": [
+    "The Norwegian Buhund is an old Norse farm dog. Its name comes from bu, meaning a farm or homestead, and hund, meaning dog.",
+    "The Swedish Vallhund looks very like a Welsh Corgi, and people still argue whether Vikings took Corgi-type dogs to Scandinavia or brought Vallhund-type dogs to Britain.",
+    "The Norwegian Lundehund was bred to climb cliffs and pull puffins from their burrows. It has six toes on each foot and can bend its head right back over its shoulders.",
+    "In the Icelandic Njáls saga, the hero Gunnar has a loyal hound called Sámr, which guards his home and warns him of danger.",
+    "Norse settlers brought farm dogs to the islands of Shetland and Orkney, and those island dogs may have helped shape the small herding dogs of the north.",
+  ],
+  "Old Irish water dogs": [
+    "The Irish Water Spaniel was shaped by Justin McCarthy of Dublin in the 1830s to 1850s. His dog Boatswain, born in 1834, is known as the father of the breed.",
+    "The Irish Water Spaniel has a coat of tight curls all over, except for its tail, which is almost bare and is called a rat tail.",
+    "The Irish Water Spaniel is the tallest of all the spaniel breeds, and has a curly topknot of hair on its head.",
+    "Shakespeare mentions a water-spaniel in The Two Gentlemen of Verona, showing that water dogs were well known in Britain and Ireland 400 years ago.",
+    "The Irish Water Spaniel's oily, curly coat keeps it warm and dry in cold water, perfect for fetching ducks from Irish lakes and bogs.",
+  ],
+  "Old black-and-tan Setters": [
+    "The Gordon Setter is named after the 4th Duke of Gordon, who bred black-and-tan setters at Gordon Castle in Scotland in the 1820s.",
+    "The Gordon Setter was first called the Gordon Castle Setter, after the Duke of Gordon's home.",
+    "The Gordon Setter is the heaviest of the setters, built for steady work on the Scottish moors rather than for speed.",
+    "A story told about the Gordon Setter says that a clever Collie was once bred into the Duke of Gordon's setters to make them smarter.",
+    "The world's first dog show, held in Newcastle upon Tyne in 1859, was only for Pointers and Setters, and black-and-tan setters were among the dogs shown.",
+  ],
+  "Old hill and bearded Collies": [
+    "The Bearded Collie nearly disappeared in the 1900s. It was saved after 1944 by Mrs G. O. Willison, who ordered a Shetland Sheepdog puppy and was sent a Bearded Collie, called Jeannie, by mistake.",
+    "Mrs Willison searched for a male to breed with her Bearded Collie Jeannie, and found one called Bailie. Almost all Bearded Collies today descend from those two dogs.",
+    "A story says Polish sailors traded Polish Lowland Sheepdogs in Scotland in 1514, and that they helped create the Bearded Collie. It is a nice tale, but nobody can prove it.",
+    "Old names for the Bearded Collie include the Highland Collie and the Mountain Collie, because it worked the sheep and cattle of the Scottish hills.",
+    "Bearded Collies are famous for their bouncy energy. Shepherds say a good Beardie can work all day in wind, rain and snow.",
+  ],
+  "Old Scottish working Terriers": [
+    "King James VI of Scotland, who became James I of England, is said to have sent a gift of small terriers from Argyll to the King of France.",
+    "The Cairn Terrier is named after cairns, the piles of stones on Scottish hillsides where foxes and other animals hid, and where these little terriers went in after them.",
+    "Queen Victoria kept Skye Terriers, which helped make the breed fashionable in the 1800s.",
+    "The Scottish Terrier is sometimes nicknamed the Diehard, a name linked with its brave, stubborn character.",
+    "The American President Franklin D. Roosevelt had a Scottish Terrier called Fala, who went almost everywhere with him and even has a statue at his memorial.",
+  ],
+  "Thuringian herding dogs": [
+    "In 1899 a German cavalry officer, Max von Stephanitz, bought a sheepdog called Hektor at a dog show, renamed him Horand von Grafrath, and made him the first registered German Shepherd.",
+    "The club for German Shepherd dogs was founded on 22 April 1899, and Max von Stephanitz led it for many years.",
+    "Max von Stephanitz's motto for the German Shepherd was utility and intelligence. He wanted a working dog, not just a handsome one.",
+    "After the First World War, Britain renamed the German Shepherd the Alsatian Wolf Dog, to avoid the word German. The Kennel Club only brought back the name German Shepherd in 1977.",
+    "Horand von Grafrath, the first registered German Shepherd, came partly from the sharp, prick-eared herding dogs of Thuringia in central Germany.",
+  ],
+  "Old Desert coursing dogs": [
+    "The Saluki is one of the oldest known types of dog. Slim, feathered hounds like it appear in ancient Egyptian and Middle Eastern art thousands of years old.",
+    "Among Bedouin people, the Saluki was so honoured that it was called el hor, the noble one, and was allowed to sleep in the family tent.",
+    "Salukis hunted gazelles and hares in the desert, sometimes together with trained falcons that helped slow the prey down.",
+    "Some ancient Egyptians had their hunting hounds mummified and buried with them, so they could hunt together in the afterlife.",
+    "The Saluki was recognised by the Kennel Club in Britain in 1923, after British officers and travellers brought them back from the Middle East.",
+  ],
+  "Schnauzer-type farm dogs": [
+    "The word Schnauzer comes from the German Schnauze, meaning snout or muzzle, because of the dog's bearded, moustached face.",
+    "The Standard Schnauzer was first shown at a dog show in Hanover, Germany, in 1879, where it was called a wire-haired Pinscher.",
+    "There are three sizes of Schnauzer: the Miniature, the Standard and the Giant. The Giant Schnauzer worked with cattle drovers and butchers in Bavaria.",
+    "The Schnauzer's wiry coat protected it from bad weather and from bites by the rats it caught in stables and barns.",
+    "Schnauzer-type dogs guarded farm carts on the way to market in southern Germany, staying with the goods while the farmer was busy.",
+  ],
+  "Old working collies": [
+    "The first known sheepdog trial was held at Bala in north Wales in 1873, and was watched by a big crowd of farmers and visitors.",
+    "The International Sheep Dog Society was founded in 1906 to improve working sheepdogs, and it still keeps the stud book for working Border Collies.",
+    "A dog called Old Hemp, born in Northumberland in 1893, was such a brilliant sheepdog that he is known as the father of the Border Collie.",
+    "The BBC television series One Man and His Dog, first shown in 1976, made sheepdog trials famous across Britain.",
+    "Nobody is sure where the word collie comes from. One idea is that it comes from an old Scots word for the black-faced sheep the dogs herded.",
+  ],
+  "Old fell Terriers": [
+    "In the Lake District, fell packs hunt on foot across the steep fells, and tough fell terriers were bred to work with them.",
+    "The Patterdale Terrier is named after the village of Patterdale in the Lake District, where hardy black working terriers were bred.",
+    "Fell terriers were bred with narrow chests so they could squeeze into the rocky gaps among borrans, the heaps of boulders on the fellsides.",
+    "The Patterdale Terrier is not recognised by the Kennel Club. It is bred for work rather than for looks, so Patterdales vary a lot in appearance.",
+    "The Lakeland Terrier, a tidier cousin of the old fell terriers, was recognised by the Kennel Club in the 1920s.",
+  ],
+  "Carriage guard dogs": [
+    "Carriage dogs, especially Dalmatians, ran alongside or beneath horse-drawn coaches, clearing the way and guarding the horses and luggage at inns overnight.",
+    "Carriage dogs often slept in the stables with the horses, and were thought to calm them and keep thieves away.",
+    "In America, Dalmatians ran ahead of horse-drawn fire engines to clear the streets, which is why Dalmatians are still linked with fire stations.",
+    "In Georgian and Victorian Britain, a smart Dalmatian trotting beside a fine carriage was a sign of a wealthy household.",
+    "Carriage dogs needed great stamina, as they might run many miles a day alongside the horses. Dalmatians are still known for their endless energy.",
+  ],
+  "Old German Ratters": [
+    "The Affenpinscher's name means monkey terrier in German, because of its cheeky, monkey-like face.",
+    "German coaching inns and stables kept small pinscher-type ratters to keep down the rats that ate the horses' food.",
+    "The German Pinscher almost died out after the Second World War. It was saved in the 1950s by a breeder called Werner Jung, who searched for the last dogs.",
+    "Myth: The Miniature Pinscher is a small version of the Dobermann. The truth: It is a much older breed of German ratter, and only looks like a tiny Dobermann.",
+    "In 2013 an Affenpinscher called Banana Joe won Best in Show at America's Westminster Kennel Club Dog Show, the first of his breed to do so.",
+  ],
+  "Old hunting dogs of the Celts": [
+    "The early Irish Brehon laws set out fines for injuring or killing another person's hound, showing how valuable hunting dogs were.",
+    "In Irish legend, the hero Fionn mac Cumhaill had two great hounds, Bran and Sceólang, who were said to be his cousins under a magic spell.",
+    "The Greek writer Strabo wrote that the Celts of Gaul used dogs in war as well as in hunting, and that some of their best dogs came from Britain.",
+    "The Irish word cú means hound, and it appears in the names of many ancient Irish heroes, as a sign of courage and loyalty.",
+    "The old hunting dogs of the Celts are among the ancestors of today's Irish Wolfhound, Scottish Deerhound and Greyhound.",
   ],
 };
 
