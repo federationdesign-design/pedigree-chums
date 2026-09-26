@@ -246,5 +246,25 @@
   vertical-align: middle;
 }
 .doneTick svg { width: 75%; height: 75%; }
-.row:has(.doneTick) .name { text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.8; }
+.row:has(.doneTick) .nameText { text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.8; }
 
+
+/* PLAY TABLES, 27 September 2026 (owner, J18-282):
+     - the tick stays on the name's line: the name is plain inline text, and its
+       last word and the tick never break apart (.nameTail);
+     - two columns of tables from 1400px down, not 1100px, so a table is never
+       squeezed until its columns run into each other;
+     - the Inputs column goes whenever a table is narrower than 440px, measured on
+       the table itself (it is already a size container, see .ladder), so it
+       also covers narrow desktop windows, not only phones. */
+.nameLine { display: block; }
+.name { display: inline; }
+.nameTail { white-space: nowrap; }
+.doneTick { vertical-align: -0.2em; }
+@media (max-width: 1400px) and (min-width: 641px) {
+  .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (max-width: 440px) {
+  .colHead, .row { grid-template-columns: minmax(0, 1fr) 4.4rem 8.55rem; }
+  .colInputs { display: none; }
+}

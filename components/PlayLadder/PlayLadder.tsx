@@ -162,9 +162,18 @@ function Ladder({ title, colour, rows, all }: { title: string; colour: string; r
           <li key={r.slug}>
             <Link href={`/play/${r.slug}`} className={styles.row} aria-label={`Play the ${r.name}: ${r.dogs} ancestors, ${r.circles} instances`}>
               <span className={styles.chum}>
+                {/* THE TICK STAYS ON THE NAME'S LINE, 27 September 2026 (owner, J18-282:
+                    it kept dropping below the name). The last word and the tick are
+                    kept together (.nameTail, no wrapping), so a long name can still
+                    wrap, but the tick always sits right after its final word. */}
                 <span className={styles.nameLine}>
-                  <span className={styles.name}>{r.name}</span>
-                  <DoneTick name={r.name} />
+                  <span className={styles.name}>
+                    {r.name.includes(" ") ? <span className={styles.nameText}>{r.name.slice(0, r.name.lastIndexOf(" ") + 1)}</span> : null}
+                    <span className={styles.nameTail}>
+                      <span className={styles.nameText}>{r.name.slice(r.name.lastIndexOf(" ") + 1)}</span>
+                      <DoneTick name={r.name} />
+                    </span>
+                  </span>
                 </span>
               </span>
               <span className={styles.num}>{r.chums}%</span>
