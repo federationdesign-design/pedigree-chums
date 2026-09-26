@@ -3093,3 +3093,16 @@
 .foundDetailInfo { background: none; border: none; padding: 4px 0 0; font-size: 26px; }
 .foundDetailImg { width: 100%; max-width: none; }
 
+
+/* ANCESTORS DISCOVERED, SECOND ROUND, 27 September 2026 (owner):
+     - the magnifier's picture cropped 15% top and bottom (height set in the TSX);
+     - the "i" write-up in dark blue with no drop shadow, 1pt smaller (26px to 25px);
+     - the % pill's table in dark blue, 3pt bigger (13px to 16px), its percentage
+       totals in Luckiest Guy at twice the size;
+     - 10px more room above the yellow title, and 10px more inset on the left. */
+.foundDetailImg { object-fit: cover; object-position: 50% 50%; }
+.foundDetailInfo, .foundDetailInfo p { color: #0a3a57; text-shadow: none; font-size: 25px; }
+.foundDetailMixBox { color: #0a3a57; font-size: 16px; }
+.foundDetailMix li > span:last-child { font-family: var(--font-display), system-ui, sans-serif; font-size: 200%; line-height: 1; align-self: center; }
+.foundListHead { padding-top: 10px; }
+.foundList { padding-left: 22px; }

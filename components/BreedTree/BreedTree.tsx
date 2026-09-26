@@ -18119,11 +18119,18 @@ export default function BreedTree({
                             rarity pill, so the colour still says the rarity. */}
                         <span className={styles.foundListTag} style={{ background: band.bg, color: band.fg }} title={band.label}>{d.era}</span>
                         {open ? (
-                          <div className={`${styles.foundDetail} ${open === "zoom" ? styles.foundDetailZoom : ""} ${open === "info" ? styles.foundDetailInfo : ""}`}>
+                          <div className={`${styles.foundDetail} ${open === "zoom" ? styles.foundDetailZoom : ""} ${open === "info" ? styles.foundDetailInfo : ""} ${open === "mix" ? styles.foundDetailMixBox : ""}`}>
                             {open === "info" ? <p>{info}</p> : null}
                             {open === "zoom" && img ? (
+                              /* CROPPED 15% TOP AND BOTTOM, 27 September 2026 (owner: less
+                                 vertical space). Once the picture's own size is known, its
+                                 box is set to 70% of that height and object-fit: cover
+                                 trims the rest evenly from top and bottom. The ref covers
+                                 a cached picture that is complete before onLoad is wired. */
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={encodeURI(bust(img))} alt={d.name} className={styles.foundDetailImg} />
+                              <img src={encodeURI(bust(img))} alt={d.name} className={styles.foundDetailImg}
+                                ref={(el) => { if (el && el.complete && el.naturalWidth) el.style.aspectRatio = `${el.naturalWidth} / ${el.naturalHeight * 0.7}`; }}
+                                onLoad={(e) => { const el = e.currentTarget; if (el.naturalWidth) el.style.aspectRatio = `${el.naturalWidth} / ${el.naturalHeight * 0.7}`; }} />
                             ) : null}
                             {open === "mix" ? (
                               <>
