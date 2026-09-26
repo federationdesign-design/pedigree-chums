@@ -20,6 +20,8 @@ import { useRouter } from "next/navigation";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 import MilestoneMessage from "../Milestone/MilestoneMessage";
 import { MINI_PIT_MILESTONES as MS, milestoneLabel } from "../Milestone/milestones";
+// How often a waiting milestone checks for a clear screen (J18-263).
+const MS_WAIT_POLL_MS = 250;
 
 // Plain-language label for the status dot on the title portrait.
 const STATUS_LABEL: Record<BreedTag, string> = {
@@ -407,10 +409,25 @@ export default function LineageModal({ name, image, character, lineage, fromRect
       setMilestone({ value: reached, label: milestoneLabel(MS, reached), id: performance.now() });
     }
   }, [score, phase]);
+  /* THE CELEBRATION WAITS FOR A CLEAR SCREEN, 27 September 2026 (owner, J18-263:
+     the milestone sat on top of the Did you know card). A milestone is held back
+     while a fact card, the Ancestors discovered list or the quiz toast is up (each
+     carries a data- marker, set in BreedTree), checked every MS_WAIT_POLL_MS, and
+     shown the moment they have all gone. Only then does its 2.6s clock start.
+     msShownId records which milestone has been let through, so a new milestone
+     waits in its turn rather than inheriting an earlier one's pass. */
+  const [msShownId, setMsShownId] = useState<number | null>(null);
   useEffect(() => {
     if (!milestone) return;
-    const t = window.setTimeout(() => setMilestone(null), 2600); // clears after the pop-out finishes
-    return () => window.clearTimeout(t);
+    let t = 0;
+    const busy = () => !!document.querySelector("[data-fact-card],[data-found-list],[data-quiz-toast]");
+    const poll = window.setInterval(() => {
+      if (busy()) return;
+      window.clearInterval(poll);
+      setMsShownId(milestone.id);
+      t = window.setTimeout(() => setMilestone(null), 2600); // clears after the pop-out finishes
+    }, MS_WAIT_POLL_MS);
+    return () => { window.clearInterval(poll); window.clearTimeout(t); };
   }, [milestone]);
   /* The win screen's way on holds back for a beat. Pressed the instant the
      screen lands it did nothing, because the screen arrives before everything
@@ -718,7 +735,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           {scoreText(score)}
         </div>
       )}
-      {milestone && (
+      {milestone && msShownId === milestone.id && (
         <MilestoneMessage key={milestone.id} value={milestone.value} label={milestone.label} />
       )}
       {/* Title floats over the pit and never affects its size. The level's own

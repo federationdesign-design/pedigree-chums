@@ -5885,6 +5885,8 @@ export default function BreedTree({
     const el = document.createElement("div");
     el.className = styles.factPop;
     el.setAttribute("role", "status");
+    // Marks the card for LineageModal's milestone, which waits for it to go (J18-263).
+    el.dataset.factCard = "1";
     const headText = factHeadFor(fact);
     el.setAttribute("aria-label", `${headText} ${fact}`);
     /* THE DOGS IN THE FACT, 26 September 2026 (owner): pictures of the dogs a fact
@@ -5988,6 +5990,7 @@ export default function BreedTree({
               if (factElRef.current === el) { factElRef.current = null; el.classList.add(styles.factClosing); window.setTimeout(() => el.remove(), 260); }
               const toast = document.createElement("div");
               toast.className = msStyles.milestone;
+              toast.dataset.quizToast = "1"; // a waiting milestone holds back for it too (J18-263)
               toast.setAttribute("role", "status");
               const card = document.createElement("div");
               card.className = msStyles.milestoneCard;
@@ -18268,7 +18271,7 @@ export default function BreedTree({
           {/* THE LIST, hung under the counter so it moves with it. Newest first:
               the dog just found is the one the player is looking for. */}
           {foundListOpen && (
-            <div ref={foundListRef} className={styles.foundList} role="dialog" aria-label="Ancestors discovered this run" onClick={(e) => e.stopPropagation()}>
+            <div ref={foundListRef} className={styles.foundList} data-found-list="1" role="dialog" aria-label="Ancestors discovered this run" onClick={(e) => e.stopPropagation()}>
               <div className={styles.foundListHead}>
                 <span>Ancestors discovered</span>
               </div>
