@@ -15,6 +15,7 @@ import { SECTIONS } from "./historySections";
 import famousDogs from "./famousDogs";
 import { breedInfo } from "./breedInfo";
 import { breeds } from "./breeds";
+import { ukBreeds } from "./uk-breeds";
 import { getLineage, LINEAGE_ROOTS, type LineageNode } from "./lineage";
 import { packArt } from "./packArt";
 
@@ -419,6 +420,10 @@ function buildDogIndex() {
   if (dogIndex) return dogIndex;
   const img = new Map<string, string>();
   for (const b of breeds.filter((x) => !!x.slug && !!x.image)) img.set(b.name, packArt(b.name) ?? b.image);
+  /* AND EVERY DOG ON THE HISTORY PAGE, 26 September 2026 (owner: a fact about the
+     Longdog showed the sighthound group instead of the Longdog). The history
+     page's breeds (ukBreeds) carry their own pictures and were not in here. */
+  for (const b of ukBreeds) if (b.image && !img.has(b.name)) img.set(b.name, packArt(b.name) ?? b.image);
   for (const r of LINEAGE_ROOTS) {
     const l = getLineage(r);
     if (!l) continue;
