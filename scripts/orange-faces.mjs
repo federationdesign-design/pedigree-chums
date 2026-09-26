@@ -5,6 +5,9 @@
 // the new eyes-shut face, from sheet 3's plain face.
 // Stops without writing anything if any of the 180 files is missing.
 //   node scripts/orange-faces.mjs ~/Downloads/orange_dog_faces_cut
+// A fur tone, 25 September 2026: give the tone name and it writes to
+// public/faces/veryCommon-{tone} instead, and leaves common7.webp alone.
+//   node scripts/orange-faces.mjs ~/Downloads/orange_deep_dog_faces_cut deep
 import sharp from "sharp";
 import { existsSync, mkdirSync } from "fs";
 import { join } from "path";
@@ -17,13 +20,14 @@ const ACC = [
   "bandana_yellow", "bandana_purple", "collar_magenta_bone", "neckerchief_blue", "collar_orange_tag", "moustache_bowtie_blue",
 ];
 const src = process.argv[2];
+const tone = process.argv[3] || "";
 if (!src) { console.error("usage: node scripts/orange-faces.mjs <folder>"); process.exit(1); }
 const want = [];
 for (let e = 1; e <= 6; e++) for (const a of ACC) want.push([e, a, join(src, `orange_expr${e}_${a}.png`)]);
 const missing = want.filter(([, , p]) => !existsSync(p));
 if (missing.length) { console.error("missing " + missing.length + " files, e.g. " + missing.slice(0, 3).map((m) => m[2]).join(", ")); process.exit(1); }
-const out = "public/faces/veryCommon";
+const out = "public/faces/veryCommon" + (tone ? "-" + tone : "");
 mkdirSync(out, { recursive: true });
 for (const [e, a, p] of want) await sharp(p).resize(450, 450).webp({ quality: 85, alphaQuality: 90, effort: 6 }).toFile(join(out, `${e}_${a}.webp`));
-await sharp(join(src, "orange_expr3_plain.png")).trim().webp({ quality: 85, alphaQuality: 90, effort: 6 }).toFile("public/common7.webp");
-console.log("wrote 180 faces to " + out + " and public/common7.webp");
+if (!tone) await sharp(join(src, "orange_expr3_plain.png")).trim().webp({ quality: 85, alphaQuality: 90, effort: 6 }).toFile("public/common7.webp");
+console.log("wrote 180 faces to " + out + (tone ? "" : " and public/common7.webp"));

@@ -183,6 +183,8 @@ const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","M
    `fg` matters as much as `bg` to any consumer. It is the ink measured against
    that background, and it is the reason the pair can be used anywhere: white on
    the purple and the royal blue, black on the green, the orange and the yellow. */
+// The crisp ring's strength while the liquid fills it (see the crisp ring).
+const LIFT_TRACK_OPACITY = 0.3;
 export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon", { bg: string; fg: string; label: string }> = {
   extremelyRare: { bg: "#4d2e91", fg: "#ffffff", label: "EXTREMELY RARE" }, // purple
   rare:          { bg: "#2547c4", fg: "#ffffff", label: "RARE" },           // royal blue
@@ -3761,7 +3763,11 @@ export default function LineageMap({
                     />
                   );
                 })}
-                {/* The crisp ring itself, on top, tier colour. */}
+                {/* The crisp ring itself, on top, tier colour. A FAINT TRACK WHILE IT
+                    FILLS, 25 September 2026 (owner: the liquid fill could not be
+                    seen). The liquid rises in this same tier colour on top of it, so a
+                    full-strength ring hid it completely; at 30% it reads as the empty
+                    track the liquid fills. Full strength again once the dog is done. */}
                 <circle
                   key={`glowtop-${breed.name}`}
                   cx={0}
@@ -3769,6 +3775,7 @@ export default function LineageMap({
                   r={r0}
                   fill="none"
                   stroke={hex}
+                  strokeOpacity={frameTotal > 0 && !doneRing ? LIFT_TRACK_OPACITY : 1}
                   strokeWidth={ringW}
                   strokeLinecap="round"
                   pathLength={1}

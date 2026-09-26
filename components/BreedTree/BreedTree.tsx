@@ -1166,7 +1166,8 @@ const accTierOf = (src: string): string | null => {
    public/faces/{tier}-{tone}. */
 // Lemon added 25 September 2026 (owner): all four tones in.
 // Pale added the same day (owner): five tones, the most distinct of them pale.
-const ACC_TONES: Record<string, string[]> = { common: ["", "bright", "sunshine", "lemon", "pale"] };
+// The orange dogs' deep and light tones, 25 September 2026 (owner).
+const ACC_TONES: Record<string, string[]> = { common: ["", "bright", "sunshine", "lemon", "pale"], veryCommon: ["", "deep", "light"] };
 // A tone for this accessory that no other breed on the level has with it yet.
 /* LAST-RESORT TONES, 25 September 2026 (owner: the pale yellow only when the
    others are used). A tone listed here is only picked when no other tone is
