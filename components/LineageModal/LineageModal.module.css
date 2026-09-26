@@ -1950,3 +1950,16 @@
   transform: rotate(-3deg);
 }
 
+
+/* THE ROUND SCORE MOVES UP ON A CHUM LEVEL, phones only, 27 September 2026 (owner,
+   J18-254: the stats panel sat over the buttons at the foot). .winWrap's 205px top
+   padding clears the corner chum-rate stacks, and on a chum level those stacks are
+   not there: they moved into the stats panel. So only the tick, the dog's name and
+   the one-line banner need clearing: the name block ends about 100px down on a 390
+   phone, the score's -7deg tilt lifts its right end about 20px, plus 10 of air.
+   The whole stack (score, Done, the closing line and the stats) rises 75px with it.
+   Hand-measured like the 205 it replaces for this case, so re-check it if the top
+   block grows. Desktop keeps its 16vh. */
+@media (max-width: 768px) {
+  .winWrapChum { padding-top: 130px; }
+}

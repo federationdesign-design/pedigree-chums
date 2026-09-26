@@ -1116,7 +1116,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
               it, so there is no X competing with the button. Game Over keeps the
               older layout, since it is a different moment. */}
           {phase === "won" ? (
-            <div className={css.winWrap}>
+            <div className={`${css.winWrap}${chumSlug ? " " + css.winWrapChum : ""}`}>
               <div className={css.winTop}>
                 <span className={css.winDone}>
                   {/* Drawn rather than loaded: one less asset to ship, and it
