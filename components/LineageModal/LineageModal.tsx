@@ -1,5 +1,6 @@
 "use client";
 
+import { recordChumCaught, recordChumChain, recordLevelWon } from "../../lib/progress";
 import { markLevelDone } from "../../lib/levelsDone";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, type Ref } from "react";
@@ -858,9 +859,10 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           onChumCollected={(n) => {
             setCollectedChums((prev) => (prev.has(n) ? prev : new Set(prev).add(n)));
             onChumCaught?.(n);
+            recordChumCaught(n);
           }}
           onChumsDropped={(n) => setPackSize(n + collectedChums.size)}
-          onRoundStats={setRoundStats}
+          onRoundStats={(st) => { setRoundStats(st); recordChumChain(st.chumChain); }}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
@@ -904,6 +906,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                going back to learn, walking out, returns the score to whatever
                was banked here last. */
             onBankScore?.(score);
+            // Kept between visits: this level's own score (the campaign total less
+            // what was banked before it) and its chums, for the player's progress.
+            recordLevelWon(name, score - (bankedScore ?? 0), collectedChums.size, packSize > 0 ? Math.max(packSize, collectedChums.size) : 0);
             /* Completed, so this level's catch counts toward the run. This is
                the ONLY place it fires: a failed level never reaches here, which
                is what keeps the running total to completed levels only.

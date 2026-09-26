@@ -1,5 +1,6 @@
 "use client";
 
+import { recordQuizRight } from "../../lib/progress";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { ringFrac, RARITY_BAND, nodePillWidth, LIFT_PILL_SCREEN_K, liftNodeScreenR } from "../PackPit/LineageMap";
@@ -5945,7 +5946,7 @@ export default function BreedTree({
           b.classList.add(right ? styles.factQuizRight : styles.factQuizWrong);
           if (!right) btns[order.indexOf(quiz.answer)]?.classList.add(styles.factQuizRight);
           note.textContent = right ? `Correct! +${QUIZ_POINTS}` : `Not quite: it was ${quiz.options[quiz.answer]}.`;
-          if (right) onScoreRef.current?.(QUIZ_POINTS);
+          if (right) { onScoreRef.current?.(QUIZ_POINTS); recordQuizRight(); }
         });
         btns.push(b);
         row.appendChild(b);
@@ -18108,7 +18109,7 @@ export default function BreedTree({
                             rarity pill, so the colour still says the rarity. */}
                         <span className={styles.foundListTag} style={{ background: band.bg, color: band.fg }} title={band.label}>{d.era}</span>
                         {open ? (
-                          <div className={`${styles.foundDetail} ${open === "zoom" ? styles.foundDetailZoom : ""}`}>
+                          <div className={`${styles.foundDetail} ${open === "zoom" ? styles.foundDetailZoom : ""} ${open === "info" ? styles.foundDetailInfo : ""}`}>
                             {open === "info" ? <p>{info}</p> : null}
                             {open === "zoom" && img ? (
                               // eslint-disable-next-line @next/next/no-img-element

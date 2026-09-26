@@ -3012,3 +3012,25 @@
 .factQuizNote { min-height: 1.2em; margin: calc(8px * var(--fact-k, 1)) 0 0; font-weight: 800; }
 @media (prefers-reduced-motion: reduce) { .factQuiz { animation: none; opacity: 1; } }
 
+/* THE ANCESTORS DISCOVERED LIST, RESTYLED, 27 September 2026 (owner). Kept
+   together here, after the rules they adjust, so each change reads in one place:
+     - the dog's name in dark blue (the site's navy), no drop shadow;
+     - the "i" button on a black background;
+     - the magnifier on its own, with no container, twice the size;
+     - the percentage pill filled navy, half as big again;
+     - the "i" write-up with no box round it, its text twice the size;
+     - the picture the magnifier opens at the full width of the list. */
+.foundListName { color: #0a3a57; text-shadow: none; }
+.foundIconInfo { background: #000000; }
+.foundIconZoom { width: auto; height: auto; background: none; border-radius: 0; }
+.foundIconZoom svg { width: 28px; height: 28px; }
+.foundIconPill {
+  height: 30px;
+  padding: 0 10.5px;
+  border-width: 2px;
+  background: #0a3a57;
+  font-size: 15px;
+}
+.foundDetailInfo { background: none; border: none; padding: 4px 0 0; font-size: 26px; }
+.foundDetailImg { width: 100%; max-width: none; }
+

@@ -1,5 +1,6 @@
 "use client";
 
+import { readProgress, recordDogFound } from "../../lib/progress";
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -308,6 +309,15 @@ export default function BreedStrip({
      dog's own: only 73 of the 126 have an era of their own in the data, while the
      level being played always has one. */
   const [dogsFound, setDogsFound] = useState<ReadonlyMap<string, string>>(() => new Map());
+  /* THE DOGS FOUND ON EARLIER VISITS, 27 September 2026 (owner: progress should
+     survive a reload). Read after the page mounts, since the server cannot see
+     the browser's storage; only names the pit can hold are brought back. */
+  useEffect(() => {
+    const saved = Object.entries(readProgress().dogsFound).filter(([n]) => allPitAncestors().has(n));
+    if (!saved.length) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one read of saved progress after mount
+    setDogsFound((prev) => { const m = new Map(prev); for (const [n, era] of saved) if (!m.has(n)) m.set(n, era); return m; });
+  }, []);
   /* How many times each dog has been caught this run, by name. The picture is
      resolved from the pack data rather than carried through two components,
      because the pack is already the source of truth for it here. */
@@ -754,6 +764,7 @@ export default function BreedStrip({
         if (!allPitAncestors().has(n)) return;
         const era = curStrip ? ERA_SHORT[curStrip] ?? ERA_LABELS[curStrip] ?? curStrip : "";
         setDogsFound((m) => (m.has(n) ? m : new Map(m).set(n, era)));
+        recordDogFound(n, era);
       }}
       onChumCaught={(n) => setChumCounts((c) => ({ ...c, [n]: (c[n] ?? 0) + 1 }))}
       topChum={topChum}
