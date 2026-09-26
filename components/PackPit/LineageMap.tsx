@@ -3962,6 +3962,8 @@ export default function LineageMap({
           return (
           <g
             className={styles.removeBtn}
+            // Lets the pit keep the fact card off this button on a phone (J18-264).
+            data-lift-button={circular ? "1" : undefined}
             transform={`translate(0,${circular ? 4 * learnBtnScale + 2 : 62}) scale(${circular ? learnBtnScale : 1})`}
             /* The press still stops here so it cannot reach the layer behind,
                but it no longer moves the button or starts a timer. */
@@ -4008,6 +4010,7 @@ export default function LineageMap({
         {circular && (framesDone || soloLeaf || autoReady) && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
+            data-lift-button="1"
             transform={`translate(0,${4 * learnBtnScale + 2}) scale(${learnBtnScale})`}
             /* SOLO: place the card, let it land, then finish. 420ms is the settle
                time the old automatic path used, kept rather than re-guessed. The

@@ -6159,6 +6159,40 @@ export default function BreedTree({
         }
       };
       for (const at of FACT_CLEAR_CHECKS_MS) window.setTimeout(place, at);
+    } else {
+      /* KEEP THE LEARN BUTTON CLEAR ON A PHONE, 27 September 2026 (owner, J18-264:
+         the fact card covered the lifted dog and its Learn button). A phone has no
+         room beside the lift, so the card only has to keep off the BUTTON (the
+         Learn or Complete button, marked data-lift-button in LineageMap), which
+         keeps it pressable. If the card overlaps it, the card moves just above it,
+         else just below; if neither fits, the pictures go, then everything
+         shrinks (FACT_FIT_K), and it tries again; as a last resort it sits at the
+         top. Checked over the first 1.5s, as on desktop, because a chain's fact
+         shows just before the lift opens. A spot the player dragged to wins. */
+      const placePhone = () => {
+        if (factElRef.current !== el || factPosRef.current) return;
+        const btn = document.querySelector("[data-lift-button]");
+        if (!btn) return;
+        const B = btn.getBoundingClientRect();
+        const vh = window.innerHeight, pad = FACT_FIT_PAD;
+        const h = () => el.offsetHeight;
+        const top0 = el.getBoundingClientRect().top;
+        if (top0 + h() <= B.top - pad || top0 >= B.bottom + pad) return;
+        const spot = (): number | null =>
+          h() <= B.top - 2 * pad ? Math.max(pad, B.top - pad - h())
+            : B.bottom + pad + h() <= vh - pad ? B.bottom + pad
+              : null;
+        let t = spot();
+        if (t === null) {
+          const pics = el.querySelector(`.${styles.factDogs}`) as HTMLElement | null;
+          if (pics) pics.style.display = "none";
+          t = spot();
+        }
+        if (t === null) { el.style.setProperty("--fact-k", String(FACT_FIT_K)); t = spot(); }
+        el.style.top = `${t ?? pad}px`;
+        el.style.bottom = "auto";
+      };
+      for (const at of FACT_CLEAR_CHECKS_MS) window.setTimeout(placePhone, at);
     }
     const done = () => { el.remove(); if (factElRef.current === el) factElRef.current = null; };
     // The countdown, kept so a pause can stop it and a resume carry on from there.
