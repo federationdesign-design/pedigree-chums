@@ -10,6 +10,7 @@ import { treesContaining, descendantPackBreeds } from "../../data/lineageArchive
 import { ukBreeds } from "../../data/uk-breeds";
 import { statusFor, STATUS_LABEL, type BreedStatus } from "../../data/breedStatus";
 import ScrollRail from "../PlayChumsRail/ScrollRail";
+import DoneTick from "./DoneTick";
 import styles from "./PlayLadder.module.css";
 
 /* THE PLAY LADDERS (owner, 24 September 2026): every chum's game, ranked from
@@ -115,8 +116,18 @@ function chumShare(name: string): number {
 }
 type Row = { slug: string; name: string; image: string; circles: number; dogs: number; chums: number; era: string | null; status: BreedStatus | undefined; rarity: { colour: string; label: string } };
 
-function Ladder({ title, colour, rows }: { title: string; colour: string; rows: Row[] }) {
-  const top = rows[0];
+/* EACH TABLE'S TOP CARD, CHOSEN, 27 September 2026 (owner): a named chum per
+   table rather than whichever dog sits first. The card still opens that chum's
+   level. A table not listed here keeps its first row. */
+const TOP_CARD: Record<string, string> = {
+  Simple: "Pug",
+  Medium: "Yorkshire Terrier",
+  Hard: "French Bulldog",
+  Extreme: "Border Terrier",
+  Impossible: "Labrador",
+};
+function Ladder({ title, colour, rows, all }: { title: string; colour: string; rows: Row[]; all: Row[] }) {
+  const top = all.find((r) => r.name === TOP_CARD[title]) ?? rows[0];
   const topStatus = top?.status;
   return (
     <section className={styles.ladder} aria-label={`${title} levels`}>
@@ -144,7 +155,7 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
         <span>Name</span>
         <span>Chums</span>
         <span>Ancestors</span>
-        <span>Inputs</span>
+        <span className={styles.colInputs}>Inputs</span>
       </div>
       <ol className={styles.list}>
         {rows.map((r) => (
@@ -153,11 +164,12 @@ function Ladder({ title, colour, rows }: { title: string; colour: string; rows: 
               <span className={styles.chum}>
                 <span className={styles.nameLine}>
                   <span className={styles.name}>{r.name}</span>
+                  <DoneTick name={r.name} />
                 </span>
               </span>
               <span className={styles.num}>{r.chums}%</span>
               <span className={styles.num}>{r.dogs}</span>
-              <span className={styles.num}>{r.circles}</span>
+              <span className={`${styles.num} ${styles.colInputs}`}>{r.circles}</span>
             </Link>
           </li>
         ))}
@@ -188,7 +200,7 @@ export default function PlayLadder() {
     <div className={styles.outer}>
       <ScrollRail className={styles.wrap}>
         {groups.map((g) => (
-          <Ladder key={g.title} title={g.title} colour={g.colour} rows={g.rows} />
+          <Ladder key={g.title} title={g.title} colour={g.colour} rows={g.rows} all={rows} />
         ))}
       </ScrollRail>
     </div>

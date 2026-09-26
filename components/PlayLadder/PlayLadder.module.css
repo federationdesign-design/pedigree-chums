@@ -224,3 +224,27 @@
 :global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .colHead { border-bottom-color: rgba(10, 58, 87, 0.35); }
 :global(:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"]) .list li + li { border-top-color: rgba(10, 58, 87, 0.18); }
 
+/* PHONES: no Inputs column (owner, 27 September 2026), so the name has the room. */
+@media (max-width: 640px) {
+  .colHead, .row { grid-template-columns: minmax(0, 1fr) 4.4rem 8.55rem; }
+  .colInputs { display: none; }
+}
+
+/* A COMPLETED LEVEL (owner, 27 September 2026): a green tick after the name, and
+   the name struck through. DoneTick adds the tick; :has does the rest. */
+.doneTick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25em;
+  height: 1.25em;
+  margin-left: 0.4em;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #ffffff;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.doneTick svg { width: 75%; height: 75%; }
+.row:has(.doneTick) .name { text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.8; }
+

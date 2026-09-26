@@ -1,5 +1,6 @@
 "use client";
 
+import { markLevelDone } from "../../lib/levelsDone";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState, type Ref } from "react";
 import { createPortal } from "react-dom";
@@ -896,6 +897,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           onNavNextEra={onNavNextEra}
           onRoundWon={() => {
             setPhase("won");
+            // Remembered for the play page's green ticks, and later the save code.
+            markLevelDone(name);
             /* BANK IT. Completing a level is the ONE event that advances the
                campaign total for good. Everything else, losing, restarting,
                going back to learn, walking out, returns the score to whatever
