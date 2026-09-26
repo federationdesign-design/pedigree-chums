@@ -3820,14 +3820,17 @@ export default function LineageMap({
             const LIQUID_OPACITY = 1; // solid, 27 September 2026 (owner, J18-250): was 0.5, see-through
             const LIQUID_START_Y = R * 0.5;       // the surface with nothing filled (down is +)
             const LIQUID_FULL_Y = -R * 1.15;      // the surface when full: over the top, wobble included
-            const WORD_TOP_Y = R * 0.05;          // the word's highest centre, clear of the name
+            /* THE WORD STAYS DOWN, 27 September 2026 (owner, J18-252: it rose to sit under the
+               name). It no longer rides the surface: it holds just above the Learn and
+               Complete buttons, where it starts, and the liquid rises past it. */
+            const WORD_Y = R * 0.68;
             const share = doneRing ? 1 : frameTotal > 0 ? Math.max(0, Math.min(1, filled.size / frameTotal)) : 0;
             const surface = LIQUID_START_Y + share * (LIQUID_FULL_Y - LIQUID_START_Y);
             const size = R * 2.6;
             const wordY0 = R * 0.78;              // the word's own chord check, at its lowest
             const chord = 2 * Math.sqrt(Math.max(0, R * R - wordY0 * wordY0));
             const fs = Math.max(10, Math.min(R * 0.2, (chord * 0.92) / (0.68 * band.label.length)));
-            const wordY = Math.max(WORD_TOP_Y, surface + fs * 0.8);
+            const wordY = WORD_Y;
             return (
               <g key={`liquid-${breed.name}`} clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }} aria-hidden="true">
                 <g className={styles.fluidRise} style={{ transform: `translateY(${surface}px)` }}>
