@@ -1977,3 +1977,15 @@
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+
+/* BIGGER ON DESKTOP, 27 September 2026 (owner, J18-269: the end screen has far more
+   room on a desktop than it uses). The round score, DONE and the stats grow by about
+   half. Only on a window at least 769px wide AND 700px tall, so a short desktop
+   window keeps the old sizes rather than pushing the stats into the buttons. The
+   stats scale with zoom, so their rings, bars and labels grow together and the
+   layout makes room for them. */
+@media (min-width: 769px) and (min-height: 700px) {
+  .winScore { font-size: clamp(2.4rem, 5vw, 3.6rem); }
+  .winFlash { font-size: clamp(6rem, 16.5vw, 13rem); }
+  .winStats { zoom: 1.4; }
+}
