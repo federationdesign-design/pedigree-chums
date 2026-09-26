@@ -263,7 +263,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 7 (J18-265): Doberman, 9 new facts (2 existing, 11 in all).
    Batch 8 (J18-266): Miniature Schnauzer, 8 new facts (2 existing, 10 in all).
    Batch 9 (J18-267): Lurcher, 8 new facts (2 existing, 10 in all).
-   Batch 10 (J18-268): Cockapoo, 8 new facts (2 existing, 10 in all). */
+   Batch 10 (J18-268): Cockapoo, 8 new facts (2 existing, 10 in all).
+   Batch 11 (J18-270): Staffordshire Bull Terrier, 8 new facts (2 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -380,6 +381,17 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "Not every Cockapoo is a sofa dog. The Cocker Spaniel side was bred to flush birds for hunters, and in Britain some Cockapoos, often called Cockerpoos there, now work as gundogs on shoots, finding and fetching birds. Country magazines that once laughed at the cross as a passing fad have started taking them seriously.",
     "Cockapoos come in different sizes, set mostly by which size of Poodle was the parent. Toy Cockapoos weigh about 3 to 5kg and Miniature Cockapoos about 6 to 8kg, while those with a Standard Poodle parent are bigger still. That is why two Cockapoos out on a walk can look quite different.",
     "Cockapoo fans in America set up clubs in the late 1990s and early 2000s, including the Cockapoo Club of America and the American Cockapoo Club. They have written a standard for how a Cockapoo should look and behave, and hope the American Kennel Club will one day recognise it as a breed. For now, no major kennel club does.",
+  ],
+  // Batch 11 (J18-270): 8 new, 10 in all.
+  "Staffordshire Bull Terrier": [
+    "The Staffordshire Bull Terrier comes from the Black Country, the busy industrial area around Birmingham and south Staffordshire. Its bull-and-terrier ancestors were bred for cruel sports such as dog fighting and rat-killing contests. Bull-baiting was banned in 1835 and dog fighting was made illegal too, and over time the Staffie became what it is today: a loyal family pet.",
+    "The Staffordshire Bull Terrier was recognised by the Kennel Club on 25 May 1935. The club that asked for it began at a pub, the Cross Guns in Cradley Heath, run by Joe and Lil Mallen. Before then the dogs had no written pedigrees and went by names such as bull and terrier, or half-and-half.",
+    "The very first Staffordshire Bull Terrier club was a tiny affair. Only nine or ten people came to its first meeting at the Cross Guns pub in Cradley Heath in 1935, and the landlady, Lil Mallen, even lent one of them the five shillings he needed to join. Its first show was held just nine weeks later.",
+    "In the 1880s, the regimental Staffordshire Bull Terrier was travelling by train in Egypt with his regiment, the South Staffordshire Regiment. He jumped from the moving train and was given up for lost, but several days later he limped into the regiment's new camp, about 200 miles away. He had followed them all the way.",
+    "The regiments of Staffordshire have kept a Staffordshire Bull Terrier as their mascot since the 1800s, and every one is called Watchman. By 2018 there had been six Watchmen. Each is given by the people of Burton upon Trent, comes from a family of dogs bred in Cannock, and still marches at parades and ceremonies.",
+    "The Staffordshire Bull Terrier is sometimes nicknamed the nanny dog, because Staffies are famous for loving children, and the Kennel Club recommends the breed for families. But experts stress that the nickname should not be taken literally: no dog, however gentle, should ever be left alone with young children.",
+    "Many people think the Staffordshire Bull Terrier is a banned breed, but it is not. Britain's Dangerous Dogs Act bans the Pit Bull and a few other types, and stocky Staffies are sometimes mistaken for them. A well-bred, well-raised Staffie is legal to own and is usually a friendly, people-loving dog.",
+    "The Staffordshire Bull Terrier has been voted Britain's favourite dog in an ITV television poll, yet Staffies are also one of the most common dogs in rescue centres. Battersea once took in about 2,000 in a single year, and they wait longer for a new home than most dogs, often because of their unfair tough-guy image.",
   ],
 };
 
@@ -948,6 +960,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The Cockapoo goes by several names", q: "What is the Cockapoo called in Australia and New Zealand?", options: ["The Spoodle", "The Cockaroo", "The Poodlecock"], answer: 0, evidence: "the Spoodle" },
   { match: "Cockapoos arrived in Britain in the late 1990s", q: "By how much did the price of a Cockapoo puppy rise between 2019 and 2020?", options: ["168%", "16%", "1,680%"], answer: 0, evidence: "168%" },
   { match: "Not every Cockapoo is a sofa dog", q: "What job do some Cockapoos now do on British shoots?", options: ["Gundogs", "Sheepdogs", "Sled dogs"], answer: 0, evidence: "work as gundogs" },
+  // Batch 11 (J18-270): Staffordshire Bull Terrier.
+  { match: "The Staffordshire Bull Terrier was recognised by the Kennel Club on 25 May 1935", q: "In which year did the Kennel Club recognise the Staffordshire Bull Terrier?", options: ["1935", "1835", "1985"], answer: 0, evidence: "25 May 1935" },
+  { match: "The very first Staffordshire Bull Terrier club was a tiny affair", q: "Where did the first Staffordshire Bull Terrier club meet?", options: ["A pub in Cradley Heath", "A castle in Stafford", "A school in Birmingham"], answer: 0, evidence: "pub in Cradley Heath" },
+  { match: "the regimental Staffordshire Bull Terrier was travelling by train in Egypt", q: "How far did the regiment's Staffie travel to find it again?", options: ["About 200 miles", "About 2 miles", "About 2,000 miles"], answer: 0, evidence: "about 200 miles" },
+  { match: "The regiments of Staffordshire have kept a Staffordshire Bull Terrier as their mascot", q: "What is every Staffordshire regimental mascot called?", options: ["Watchman", "Sentry", "Guardsman"], answer: 0, evidence: "called Watchman" },
+  { match: "Many people think the Staffordshire Bull Terrier is a banned breed", q: "Is the Staffordshire Bull Terrier banned in Britain?", options: ["Yes", "No"], answer: 1, evidence: "but it is not" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
