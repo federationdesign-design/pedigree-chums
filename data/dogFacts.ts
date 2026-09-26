@@ -7,7 +7,8 @@
      3. the famous dogs (famousDogs.ts), written as a sentence each;
      4. the first sentence of every breed write-up (breedInfo.ts);
      5. the 95 extinct ancestors, rewritten to stand on their own (EXTINCT_REWRITES);
-     6. myths and legends, each shown with the truth (MYTHS).
+     6. myths and legends, each shown with the truth (MYTHS);
+     7. facts from the site's own Dogs at Work and Good Dog Bad Dog articles (ARTICLE_FACTS).
    The pit adds the current level's lineage notes on top and deals the lot from
    a shuffled deck. To add facts, add them to EXTRA_FACTS. */
 import { SECTIONS } from "./historySections";
@@ -188,12 +189,74 @@ export function factHeadFor(fact: string): string {
   return "Did you know?";
 }
 
+/* FROM THE SITE'S OWN ARTICLES, 25 September 2026 (owner: the Dogs at Work and
+   Good Dog Bad Dog pieces are full of facts). Each is rewritten to stand on its
+   own and names its subject, and each comes only from what the article already
+   says: the guide dog and medical alert costs from the Dogs at Work cost panel,
+   the medal dogs, the noses and the search dogs from their articles, and Anubis,
+   Argos, Bull's-eye, Gelert, Greyfriars Bobby, Lassie, the Baskerville hound and
+   Odin from Good Dog Bad Dog. Left out on purpose: the grimmer Victorian figures
+   and film release details that date quickly. */
+const ARTICLE_FACTS: string[] = [
+  "A guide dog costs more than 55,000 pounds over its life, from being born to retiring.",
+  "Training a medical alert dog costs about 29,000 pounds, yet the dogs are given free to the people who need them, paid for almost entirely by donations.",
+  "Guide dogs are trained to refuse to walk on if it would be unsafe, even when their owner has told them to go.",
+  "Guide dogs learn to cope with kerbs, traffic, buses, shops, other dogs, cats and birds, so they are not trained in an empty field.",
+  "In a survey by the charity Guide Dogs, 95 out of every 100 people with sight loss said they had been forced into the road by cars parked on the pavement.",
+  "Medical alert dogs can smell tiny changes in a person's body, and warn them before a problem such as a dangerous drop in blood sugar.",
+  "In 2009 a Labrador called Daisy kept pawing at her owner's chest until she got it checked. It was cancer, caught early, and her owner, Dr Claire Guest, went on to start the charity Medical Detection Dogs.",
+  "In 2004, dogs trained by the charity that became Medical Detection Dogs picked out samples from people with bladder cancer far more often than chance, a result published in the British Medical Journal.",
+  "In 2025, two dogs called Bumper and Peanut sniffed out Parkinson's disease from a swab of skin, in a test where nobody in the room knew the answers.",
+  "A dog's nose is tens of thousands of times more sensitive than ours.",
+  "In November 2025, an electronic nose inspired by dogs began a trial at Milton Keynes University Hospital, sniffing more than 500 samples for prostate cancer.",
+  "Digital detection dogs can find hidden memory cards and hard drives, because every piece of digital storage gives off the same tiny chemical smell.",
+  "Only about one dog in fifty passes the tests to become a digital detection dog.",
+  "Britain's first digital detection dogs worked for Devon and Cornwall Police, and one of them was a Labrador called Rob.",
+  "Search and rescue dogs that air-scent do not follow footsteps. They sniff for human scent carried on the wind, zigzagging until they find the person.",
+  "Trailing search dogs are given something that smells of the missing person, and then follow that one person's trail.",
+  "Volunteer search dog teams in Britain can be called out in any weather, by day or by night.",
+  "A sheepdog's first move towards the flock is called the lift, the moment it reaches the sheep and gets them moving.",
+  "Sheepdog trials are based on real farm work: gathering the sheep, bringing them to the shepherd, driving them and penning them.",
+  "During the Blitz, a German Shepherd called Crumstone Irma helped rescue 191 people from bombed buildings in London, and won the Dickin Medal in 1945.",
+  "The Dickin Medal is known as the animals' Victoria Cross. A dog called Khan won it in 1945 for saving a soldier from drowning under heavy shellfire.",
+  "After the war, the soldier Khan had saved asked to see him again at a parade in 1947, and Khan's family gave the dog to him.",
+  "A search dog called Appollo was the first search dog to arrive at Ground Zero after the attacks on New York in 2001.",
+  "In December 1944, a shepherd called John Dagg and his sheepdog climbed through fog and snow in the Cheviot Hills to reach the crew of a crashed American bomber.",
+  "When Britain first issued dog licences in 1867, 830,000 were bought, at five shillings each.",
+  "The animal long called the Egyptian jackal turned out, when scientists tested its DNA, to be a kind of wolf.",
+  "Dogs were the first animals ever to live with people. Scientists have found dogs living alongside hunters in Europe and western Asia 14,000 to 16,000 years ago, before farming began.",
+  "The word dog first appears in Old English as docga. The older word was hund, which gave us the word hound.",
+  "Anubis, the ancient Egyptian god of the dead, had the head of a dog-like animal, and his black colour stood for the rich, dark soil of the River Nile.",
+  "In Greek myths, a monstrous three-headed dog called Cerberus guarded the gates of the underworld.",
+  "Egyptian gods really did reach Britain, carried along Roman roads when the Romans ruled here.",
+  "In Homer's Odyssey, written around 2,700 years ago, the old dog Argos recognises his master Odysseus when he comes home after 20 years away, even though Odysseus is in disguise.",
+  "A Roman coin made in 82 BC shows the hero Odysseus with his faithful dog Argos.",
+  "The Hellenic Hound is the only Greek dog breed recognised by the world's main dog-breed organisation, and it is thought to come from the Laconian hounds of ancient Greece.",
+  "Oliver Twist came out between 1837 and 1839, and Dickens's own illustrator, George Cruikshank, soon started drawing Bull's-eye differently from the shaggy dog in the book.",
+  "The village of Beddgelert in North Wales has a name usually translated as Gelert's grave, and a stone memorial to the dog stands there beside the River Glaslyn.",
+  "Greyfriars Bobby was a real little terrier who lived in Edinburgh and died in January 1872. Visitors rub the nose of his bronze statue so often that it shines.",
+  "Lassie first appeared in a magazine story by Eric Knight in 1938, then in the book Lassie Come-Home in 1940, and in a film in 1943.",
+  "In the original Lassie story, set in Yorkshire, Lassie is a Rough Collie who belongs to a boy called Joe Carraclough.",
+  "In The Hound of the Baskervilles, the terrifying glowing hound on the moor turns out to be a real dog that the villain has made look ghostly.",
+  "In the 2026 film Heart of the Beast, the German Shepherd Odin is played by a dog called Uber, who was a real search and rescue dog before he was an actor.",
+];
+
 // Any facts written straight in here join the pool too.
 export const EXTRA_FACTS: string[] = [];
 
 const firstSentence = (t: string): string => {
   const m = t.match(/^[\s\S]*?[.!?](?=\s|$)/);
   return (m ? m[0] : t).trim();
+};
+const factFromWriteUp = (t: string): string => {
+  const sentences = t.match(/[^.!?]+[.!?]+(?=\s|$)/g)?.map((x) => x.trim()) ?? [t.trim()];
+  const out: string[] = [];
+  for (const sen of sentences) {
+    if (/^In our family tree/i.test(sen)) break;
+    out.push(sen);
+    if (out.length === 2) break;
+  }
+  return out.join(" ") || firstSentence(t);
 };
 const withArticle = (name: string) => (/^[aeiou]/i.test(name) ? `an ${name}` : `a ${name}`);
 
@@ -203,7 +266,9 @@ const withArticle = (name: string) => (/^[aeiou]/i.test(name) ? `an ${name}` : `
    the breed depends on the version, came later than the story, or is uncertain.
    Each of these was checked; the fact below replaces the template's. null leaves
    the dog out of the facts entirely (unverified). Keyed "breed-slug|dog name".
-   The breed pages' own famous-dog lists are untouched by this. */
+   The breed pages' own famous-dog lists are untouched by this. Since the rewrite
+   below, every famous dog is listed here, so the template is only a fallback
+   for a dog added to famousDogs.ts later. */
 const FAMOUS_OVERRIDES: Record<string, string | null> = {
   // Dickens only calls him "a white shaggy dog"; the Bull Terrier dates from the 1860s.
   "bull-terrier|Bull's-eye": "In Oliver Twist (1838), Dickens described Bill Sikes's dog Bull's-eye only as a white, shaggy dog. He is usually shown as a Bull Terrier on stage and screen, but that breed was not developed until the 1860s.",
@@ -225,6 +290,93 @@ const FAMOUS_OVERRIDES: Record<string, string | null> = {
   "bull-terrier|Scud": "In Toy Story, Scud is the snarling dog that belongs to Sid, the toy-wrecking boy next door. He is a Bull Terrier.",
   // Not found in the PDSA's records; left out until verified.
   "staffordshire-bull-terrier|Sox": null,
+  /* EVERY OTHER FAMOUS DOG, WITH ITS STORY, 25 September 2026 (owner: "Carl from
+     Good Dog, Carl is a Rottweiler" says nothing if you do not know the book).
+     Each now says what the book, film, show or event is, when (where certain),
+     and what the dog does in it, before its breed. Details not certain are left
+     out rather than guessed. */
+  "afghan-hound|What-a-Mess": "What-a-Mess is a scruffy, accident-prone Afghan Hound puppy from a series of children's books by the comedy writer Frank Muir, which were later turned into a TV cartoon.",
+  "basset-hound|Droopy": "Droopy is a slow-talking, sad-faced Basset Hound from old cartoons first made in 1943. However fast the villain runs, calm little Droopy is always there first.",
+  "basset-hound|Toby": "In Disney's 1986 film The Great Mouse Detective, Toby is Sherlock Holmes's Basset Hound, who helps the mouse detective Basil follow a trail by smell.",
+  "basset-hound|Lafayette": "In Disney's 1970 film The Aristocats, Lafayette is one of two farm dogs who chase the villainous butler Edgar. He is a Basset Hound.",
+  "beagle|Snoopy": "Snoopy is Charlie Brown's pet Beagle in the Peanuts comic strip by Charles Schulz, which began in 1950. He is famous for sleeping on the roof of his kennel and pretending to be a flying ace.",
+  "bloodhound|Trusty": "In Disney's 1955 film Lady and the Tramp, Trusty is Lady's old neighbour, a Bloodhound who keeps saying he has lost his sense of smell, until he helps save the day.",
+  "bloodhound|Copper": "In Disney's 1981 film The Fox and the Hound, Copper is a hound puppy who becomes best friends with a fox cub called Tod, even though he is being trained to hunt foxes.",
+  "border-collie|Shep": "Shep was a Border Collie on the BBC children's programme Blue Peter in the 1970s. His presenter John Noakes made the catchphrase \"Get down, Shep!\" famous.",
+  "border-collie|Meg": "Meg was a Border Collie who appeared on the BBC children's programme Blue Peter, one of a long line of Blue Peter dogs.",
+  "border-collie|Fly": "In the 1995 film Babe, Fly is the farm's Border Collie who takes the little pig Babe under her wing, and teaches him how to herd sheep.",
+  "border-collie|Dog": "Footrot Flats is a comic strip from New Zealand about a sheep farm, told by a hard-working sheepdog who is simply called Dog.",
+  "bull-terrier|Sparky": "In Tim Burton's 2012 film Frankenweenie, a boy called Victor uses science to bring his beloved dog Sparky back to life. Sparky is a Bull Terrier.",
+  "bull-terrier|Spuds MacKenzie": "Spuds MacKenzie was a Bull Terrier who became a famous mascot in American TV adverts in the 1980s.",
+  "bulldog|Spike": "In the Tom and Jerry cartoons, Spike is the tough Bulldog who protects Jerry the mouse and gets very cross when Tom the cat disturbs him.",
+  "bulldog|Tyke": "In the Tom and Jerry cartoons, Tyke is Spike the Bulldog's little puppy, and Spike will do anything to keep him safe.",
+  "bulldog|Churchill": "Churchill is the nodding Bulldog in the Churchill Insurance adverts, famous for saying \"Oh yes!\"",
+  "bulldog|Tillman": "Tillman was a real Bulldog from California who became famous for skateboarding and surfing, and once set a world record as the fastest dog on a skateboard.",
+  "chihuahua|Tito": "In Disney's 1988 film Oliver & Company, a doggy version of Oliver Twist, Tito is the tiny, excitable Chihuahua in Fagin's gang of street dogs.",
+  "chihuahua|Ren H\u00f6ek": "Ren H\u00f6ek is the bad-tempered Chihuahua in the 1990s cartoon The Ren & Stimpy Show, which follows his crazy adventures with his friend Stimpy the cat.",
+  "cocker-spaniel|Lady": "In Disney's 1955 film Lady and the Tramp, Lady is a pampered Cocker Spaniel who falls for a street dog called Tramp. They share the famous plate of spaghetti.",
+  "cocker-spaniel|Flush": "Flush is a 1933 book by Virginia Woolf that tells the real life of the poet Elizabeth Barrett Browning through the eyes of her pet Cocker Spaniel, Flush.",
+  "corgi|Susan": "Susan was the Corgi given to the future Queen Elizabeth II for her 18th birthday in 1944. Almost all the Queen's later Corgis came from her.",
+  "corgi|Muick": "Muick was one of the very last Corgis owned by Queen Elizabeth II, who kept Corgis for most of her life.",
+  "corgi|Ein": "In the Japanese cartoon series Cowboy Bebop, Ein is a Corgi who travels through space with a crew of bounty hunters, and is secretly a super-clever dog.",
+  "corgi|Rex": "In the 2019 animated film The Queen's Corgi, Rex is the Queen's favourite Corgi, who gets lost outside the palace and has to find his way home.",
+  "dachshund|Slinky Dog": "In Toy Story, Slinky Dog is a toy Dachshund with a metal spring for a middle, which lets him stretch really far. He is one of Woody's best friends.",
+  "dachshund|Buddy": "In the 2016 film The Secret Life of Pets, Buddy is a laid-back Dachshund who lives in the same block of flats as the hero, Max.",
+  "dachshund|Waldi": "Waldi, a stripy Dachshund, was the mascot of the 1972 Olympic Games in Munich, the very first official Olympic mascot.",
+  "dalmatian|Pongo": "In Dodie Smith's 1956 book The Hundred and One Dalmatians, later a Disney film, Pongo is the Dalmatian dad who sets out to rescue his stolen puppies from the wicked Cruella de Vil.",
+  "dalmatian|Perdita": "In Disney's 1961 film One Hundred and One Dalmatians, Perdita is Pongo's partner and the mum of the puppies that the wicked Cruella de Vil steals to make a spotty fur coat. In Dodie Smith's original book she is called Missis.",
+  "dalmatian|Marshall": "In the TV cartoon PAW Patrol, Marshall is the fire pup, a clumsy but brave Dalmatian who puts out fires and helps anyone who gets hurt.",
+  "dalmatian|Oddball": "In the 2000 film 102 Dalmatians, Oddball is a Dalmatian puppy born without any spots, who spends the film wishing she had some.",
+  "doberman-pinscher|Alpha": "In Disney Pixar's 2009 film Up, Alpha is the fierce Doberman who leads a pack of dogs. His talking collar breaks and makes his voice go funny and squeaky.",
+  "french-bulldog|Stella": "In the American TV comedy Modern Family, Stella is the French Bulldog belonging to Jay, the grumpy grandad of the family.",
+  "german-shepherd|Rin Tin Tin": "Rin Tin Tin was a German Shepherd puppy rescued from a battlefield in France at the end of the First World War by an American soldier. He grew up to be a huge Hollywood film star in the 1920s.",
+  "german-shepherd|Strongheart": "Strongheart was a German Shepherd who starred in films in the 1920s, one of the very first dog film stars.",
+  "german-shepherd|Inspector Rex": "Inspector Rex is an Austrian TV series from 1994 about a German Shepherd police dog who helps detectives solve crimes in Vienna.",
+  "golden-retriever|Goldie": "Goldie was a Golden Retriever on the BBC children's programme Blue Peter from the late 1970s.",
+  "golden-retriever|Bonnie": "Bonnie was a Golden Retriever on the BBC children's programme Blue Peter, and the daughter of Goldie, the Blue Peter dog before her.",
+  "golden-retriever|Shadow": "In the 1993 film Homeward Bound, Shadow is a wise old Golden Retriever who leads a young Bulldog and a cat on a long, dangerous journey home across the mountains.",
+  "golden-retriever|Dug": "In Disney Pixar's 2009 film Up, Dug is a friendly Golden Retriever whose special collar lets him talk. He is easily distracted, especially by squirrels.",
+  "great-dane|Scooby-Doo": "Scooby-Doo is a cowardly, snack-loving Great Dane who solves spooky mysteries with his best friend Shaggy, in cartoons that began in 1969.",
+  "great-dane|Marmaduke": "Marmaduke is a huge, clumsy Great Dane from an American comic strip that began in 1954, and was later made into films.",
+  "great-dane|Astro": "Astro is the family dog in The Jetsons, a 1960s cartoon about a family living in a future world of flying cars. He is a Great Dane.",
+  "great-dane|Giant George": "Giant George was a Great Dane from America who once held the world record for the tallest dog alive.",
+  "greyhound|Santa's Little Helper": "In The Simpsons, Santa's Little Helper is the family's pet Greyhound. Homer and Bart adopted him in the very first episode, after he lost a race.",
+  "greyhound|Mick the Miller": "Mick the Miller was a racing Greyhound who won the English Greyhound Derby in 1929 and 1930, and became a national hero.",
+  "greyhound|Master McGrath": "Master McGrath was an Irish Greyhound who won the Waterloo Cup, the biggest hare-coursing race of Victorian times, three times, and was even taken to meet Queen Victoria.",
+  "irish-setter|Big Red": "Big Red is a 1945 book by Jim Kjelgaard, later a Disney film, about a beautiful Irish Setter show dog and the boy who looks after him in the woods.",
+  "jack-russell-terrier|Eddie": "In the American TV comedy Frasier, Eddie is Martin Crane's Jack Russell Terrier, famous for staring at Frasier, which drives him mad.",
+  "jack-russell-terrier|Uggie": "Uggie was a Jack Russell Terrier who starred in The Artist, a 2011 black-and-white silent film that won the Oscar for Best Picture.",
+  "jack-russell-terrier|Milo": "In the 1994 film The Mask, Milo is the loyal Jack Russell Terrier belonging to the hero, Stanley. At one point Milo puts on the magic mask himself.",
+  "jack-russell-terrier|Max": "In the 2016 film The Secret Life of Pets, Max is a Jack Russell Terrier whose happy life in New York is turned upside down when his owner brings home another dog.",
+  "labrador|Marley": "Marley & Me is a 2005 book by John Grogan, later a film, about his family's lovable but hugely naughty Labrador, Marley.",
+  "labrador|Endal": "Endal was a British Labrador assistance dog. When his owner, a former Navy officer, was knocked out, Endal put him into the recovery position and fetched help.",
+  "labrador|Bouncer": "Bouncer was the Labrador in the Australian TV soap Neighbours in the late 1980s, and one of its best-loved characters.",
+  "labrador|Luath": "The Incredible Journey is a 1961 book by Sheila Burnford about three pets travelling hundreds of miles home across Canada. Luath, the young Labrador, leads the way.",
+  "mastiff|Zorba": "Zorba was an English Mastiff who once held the world record for the heaviest and longest dog ever measured.",
+  "miniature-schnauzer|Colin": "In the Channel 4 comedy Spaced, from 1999, Colin is the Miniature Schnauzer adopted by one of the main characters, Daisy.",
+  "old-english-sheepdog|Dulux dog": "An Old English Sheepdog has starred in the Dulux paint adverts since the 1960s, so the breed is often called the Dulux dog.",
+  "old-english-sheepdog|Digby": "Digby, the Biggest Dog in the World is a 1973 British film about an Old English Sheepdog who drinks an experimental liquid and grows to a giant size.",
+  "old-english-sheepdog|Max": "In Disney's 1989 film The Little Mermaid, Max is Prince Eric's big, shaggy Old English Sheepdog.",
+  "old-english-sheepdog|Ambrosius": "In the 1986 fantasy film Labyrinth, Ambrosius is the Old English Sheepdog ridden like a horse by the tiny fox knight, Sir Didymus.",
+  "pomeranian|Boo": "Boo was a fluffy Pomeranian from America who became famous online as the world's cutest dog, with millions of fans.",
+  "pomeranian|Marco": "Queen Victoria fell in love with Pomeranians on a trip to Italy, and her little dog Marco helped make the breed popular in Britain.",
+  "poodle|Roly": "Roly was the Poodle who lived at the Queen Vic pub in the BBC soap EastEnders in the 1980s and 1990s.",
+  "poodle|Georgette": "In Disney's 1988 film Oliver & Company, Georgette is a spoilt, prize-winning Poodle who is very jealous of the kitten Oliver.",
+  "pug|Frank": "In the Men in Black films, Frank looks like a Pug, but he is really a talking alien in disguise.",
+  "pug|Percy": "In Disney's 1995 film Pocahontas, Percy is the spoilt Pug belonging to the greedy Governor Ratcliffe.",
+  "pug|Willy": "Willy was the Pug belonging to Ethel Skinner, one of the best-loved characters in the BBC soap EastEnders.",
+  "rottweiler|Carl": "Good Dog, Carl is a picture book by Alexandra Day, first published in 1985, about a Rottweiler called Carl who looks after a baby while its mother goes out.",
+  "saint-bernard|Beethoven": "In the 1992 film Beethoven, a huge, slobbery Saint Bernard puppy moves in with the Newton family and causes chaos as he grows.",
+  "siberian-husky|Togo": "In 1925, sled dog teams raced medicine across Alaska to save the town of Nome from a deadly illness. Togo, a Siberian Husky, led his team on the longest and most dangerous part of the journey.",
+  "siberian-husky|Balto": "Balto was the Siberian Husky who led the last team into the town of Nome with life-saving medicine in 1925. There is a statue of him in Central Park, New York, and a 1995 cartoon film about him.",
+  "springer-spaniel|Buster": "Buster was an English Springer Spaniel who sniffed out hidden weapons and explosives with British soldiers in Iraq in 2003, and won the Dickin Medal for bravery.",
+  "weimaraner|Man Ray": "Man Ray was a Weimaraner photographed by the American artist William Wegman in the 1970s, often dressed up in funny costumes.",
+  "weimaraner|Fay Ray": "Fay Ray was a Weimaraner who became the star of the American artist William Wegman's photographs, after his first dog, Man Ray.",
+  "west-highland-terrier|Wee Jock": "In the 1990s BBC Scotland series Hamish Macbeth, Wee Jock is the West Highland Terrier belonging to the village policeman, Hamish.",
+  "west-highland-terrier|Cesar dog": "A West Highland White Terrier has starred for years in the adverts for Cesar dog food.",
+  "whippet|Ashley Whippet": "In 1974 a Whippet called Ashley ran onto the pitch at a big baseball game in America and wowed the crowd by catching flying discs, which helped start frisbee competitions for dogs.",
+  "yorkshire-terrier|Smoky": "Smoky was a tiny Yorkshire Terrier found by American soldiers in the jungle during the Second World War. She once pulled a telegraph wire through a narrow pipe, saving days of dangerous work.",
+  "yorkshire-terrier|Mr Famous": "Mr Famous was the actress Audrey Hepburn's Yorkshire Terrier, who even appeared with her in the 1957 film Funny Face.",
 };
 function famousFacts(): string[] {
   const nameOf = new Map(breeds.filter((b) => !!b.slug).map((b) => [b.slug, b.name]));
@@ -253,7 +405,12 @@ let cache: string[] | null = null;
 export function allDogFacts(): string[] {
   if (cache) return cache;
   const history = SECTIONS.flatMap((s) => s.facts.map((f) => f.text));
-  const breedLines = Object.values(breedInfo as Record<string, string>).map(firstSentence);
-  cache = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
+  /* THE FIRST TWO SENTENCES, 25 September 2026 (owner: one sentence on its own,
+     such as "The Collie comes from Britain's old working sheepdogs.", was too bare
+     to learn from). A write-up's second sentence usually carries the detail, so
+     the fact takes up to two, stopping before the "In our family tree" line,
+     which only makes sense beside the tree. */
+  const breedLines = Object.values(breedInfo as Record<string, string>).map(factFromWriteUp);
+  cache = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
   return cache;
 }
