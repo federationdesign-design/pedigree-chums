@@ -3658,6 +3658,8 @@ export default function LineageMap({
             width={R*2+rootRingW*2} height={R*2+rootRingW*2}
             rx={circular ? R + rootRingW : 24}
             className={styles.rootCard}
+            // Lets the pit find the lifted dog on screen, to keep the fact card clear of it.
+            data-lift-root={circular ? "1" : undefined}
             /* GREEN ONCE EVERY CIRCLE IS FRAMED, 16 September 2026 (owner: the ring
                goes back to its rarity yellow when the level is done, and should go
                green).

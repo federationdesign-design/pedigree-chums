@@ -2877,7 +2877,11 @@
   /* In the BOTTOM third on desktop, still centred (owner, 26 September 2026);
      phones keep it near the top. */
   /* 1.35, a tenth smaller than 1.5 (owner, 26 September 2026). */
-  .factPop { --fact-k: 1.35; top: auto; bottom: 8vh; }
+  .factPop { --fact-k: 1.35; top: auto; bottom: 8vh; transition: top 0.35s ease, left 0.35s ease, width 0.35s ease; }
+  /* The found list, half the screen wide on desktop, with the dogs' names twice the
+     size (owner, 26 September 2026). */
+  .foundList { width: 50vw; }
+  .foundListName { font-size: 200%; }
 }
 @media (prefers-reduced-motion: reduce) { .factBarFill { animation-timing-function: linear; } }
 
@@ -2915,7 +2919,7 @@
   height: calc(64px * var(--fact-k, 1));
   border-radius: calc(12px * var(--fact-k, 1));
   object-fit: cover;
-  border: 2px solid #ffffff;
+  border: 4px solid #ffffff; /* twice as thick, 26 September 2026 (owner) */
   background: rgba(255, 255, 255, 0.25);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
@@ -2926,6 +2930,14 @@
   text-align: center;
   overflow-wrap: anywhere;
 }
+/* One, two or three pictures: twice the size (owner, 26 September 2026). */
+.factDogsBig .factDog { width: calc(156px * var(--fact-k, 1)); }
+.factDogsBig .factDog img {
+  width: calc(128px * var(--fact-k, 1));
+  height: calc(128px * var(--fact-k, 1));
+  border-radius: calc(18px * var(--fact-k, 1));
+}
+.factDogsBig .factDog figcaption { font-size: calc(13px * var(--fact-k, 1)); }
 @media (prefers-reduced-motion: reduce) { .factDog { animation: none; opacity: 1; } }
 
 /* The fact card's close cross, top right (owner, 26 September 2026). The card is

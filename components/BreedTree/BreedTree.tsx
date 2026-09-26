@@ -1001,7 +1001,13 @@ const FACT_MIN_MS = 8000;
 const FACT_MAX_MS = 18000;
 const FACT_WORD_MS = 60;
 // The dog pictures pop in one after another, this far apart. See showFact.
-const FACT_DOG_WAVE_MS = 130; // each word arrives this long after the one before
+const FACT_DOG_WAVE_MS = 130;
+// Keeping the fact card clear of the lifted dog (desktop): the gap left around it,
+// and when to look again, since the lift opens just after a chain's fact appears.
+const FACT_CLEAR_PAD = 24;
+const FACT_CLEAR_CHECKS_MS = [0, 120, 400, 900, 1500];
+// Up to this many dog pictures are shown twice the size.
+const FACT_DOGS_BIG_UPTO = 3; // each word arrives this long after the one before
 /* RANDOM FACTS, 25 September 2026 (owner: random dog facts from everything the
    site holds, not facts about the dog just chained). The pool is allDogFacts
    (data/dogFacts.ts: the history page's facts, the chatbot's breed lines, the
@@ -5826,7 +5832,8 @@ export default function BreedTree({
     const factDogs = dogsForFact(fact);
     if (factDogs.length) {
       const row = document.createElement("div");
-      row.className = styles.factDogs;
+      // Three or fewer: twice the size (owner, 26 September 2026). See .factDogsBig.
+      row.className = `${styles.factDogs} ${factDogs.length <= FACT_DOGS_BIG_UPTO ? styles.factDogsBig : ""}`;
       factDogs.forEach((dg, di) => {
         const fig = document.createElement("figure");
         fig.className = styles.factDog;
@@ -5898,6 +5905,37 @@ export default function BreedTree({
     el.style.animationDuration = `${ms}ms`;
     host.appendChild(el);
     factElRef.current = el;
+    /* KEEP CLEAR OF THE LIFTED DOG, desktop only, 26 September 2026 (owner: the card
+       often sat on top of the dog being completed). The card finds the lifted dog
+       (data-lift-root) and moves into the biggest clear space: below it if there
+       is room, else above, else to whichever side has more room. A chain's fact
+       shows just before the lift opens, so it looks again over the first 1.5s. */
+    if (window.matchMedia?.("(min-width: 1024px) and (hover: hover)").matches) {
+      const place = () => {
+        if (factElRef.current !== el) return;
+        const lift = document.querySelector("[data-lift-root]");
+        if (!lift) { el.style.top = ""; el.style.bottom = ""; el.style.left = ""; el.style.width = ""; return; }
+        const L = lift.getBoundingClientRect();
+        const r = el.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight, pad = FACT_CLEAR_PAD;
+        const below = vh - (L.bottom + pad), above = L.top - pad;
+        const leftGap = L.left - pad, rightGap = vw - (L.right + pad);
+        el.style.bottom = "auto";
+        if (below >= r.height + pad) {
+          el.style.top = `${L.bottom + pad + (below - r.height) / 2}px`; el.style.left = ""; el.style.width = "";
+        } else if (above >= r.height + pad) {
+          el.style.top = `${Math.max(pad, (above - r.height) / 2)}px`; el.style.left = ""; el.style.width = "";
+        } else {
+          const toRight = rightGap >= leftGap;
+          const gap = Math.max(leftGap, rightGap);
+          const w = Math.min(r.width, gap - pad);
+          el.style.width = `${Math.max(240, w)}px`;
+          el.style.left = `${toRight ? L.right + pad + gap / 2 : gap / 2}px`;
+          el.style.top = `${Math.max(pad, (vh - el.getBoundingClientRect().height) / 2)}px`;
+        }
+      };
+      for (const at of FACT_CLEAR_CHECKS_MS) window.setTimeout(place, at);
+    }
     const done = () => { el.remove(); if (factElRef.current === el) factElRef.current = null; };
     // The countdown, kept so a pause can stop it and a resume carry on from there.
     let remaining = ms + 50;

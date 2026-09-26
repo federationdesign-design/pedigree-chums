@@ -383,6 +383,7 @@ const FAMOUS_OVERRIDES: Record<string, string | null> = {
 };
 function famousFacts(): string[] {
   const nameOf = new Map(breeds.filter((b) => !!b.slug).map((b) => [b.slug, b.name]));
+  const note = (fact: string, slug: string) => { const b = nameOf.get(slug); if (b) FACT_SUBJECT.set(fact.trim(), b); };
   const out: string[] = [];
   for (const [slug, dogs] of Object.entries(famousDogs)) {
     const breed = nameOf.get(slug);
@@ -391,13 +392,15 @@ function famousFacts(): string[] {
       const key = `${slug}|${d.name}`;
       if (key in FAMOUS_OVERRIDES) {
         const fixed = FAMOUS_OVERRIDES[key];
-        if (fixed) out.push(fixed);
+        if (fixed) { out.push(fixed); note(fixed, slug); }
         continue;
       }
       const known = d.knownFor.trim();
-      out.push(d.type.startsWith("Real")
+      const made = (d.type.startsWith("Real")
         ? `${d.name}, the ${known.charAt(0).toLowerCase() + known.slice(1)}, was ${withArticle(breed)}.`
         : `${d.name} from ${known} is ${withArticle(breed)}.`);
+      out.push(made);
+      note(made, slug);
     }
   }
   return out;
@@ -415,7 +418,7 @@ function famousFacts(): string[] {
    At most FACT_DOGS_MAX, in the order they appear. */
 export type FactDog = { name: string; img: string };
 export const FACT_DOGS_MAX = 5; // five, 26 September 2026 (owner; was six)
-let dogIndex: { names: string[]; img: Map<string, string> } | null = null;
+let dogIndex: { names: string[]; img: Map<string, string>; shortOf: Map<string, string> } | null = null;
 function buildDogIndex() {
   if (dogIndex) return dogIndex;
   const img = new Map<string, string>();
@@ -430,8 +433,26 @@ function buildDogIndex() {
     const w = (x: LineageNode) => { if (x.img && !img.has(x.name)) img.set(x.name, packArt(x.name) ?? x.img); for (const k of x.children ?? []) w(k); };
     w(l);
   }
-  const names = [...img.keys()].filter((n) => n.length >= 3).sort((a, b) => b.length - a.length);
-  dogIndex = { names, img };
+  /* SHORT FORMS, 27 September 2026: people drop a dog's last word ("the Dandie
+     Dinmont", "the Jack Russell", "the Sealyham"). A short form is kept when two or
+     more words are left, or when one distinctive word is left that no other dog
+     starts with and that is not a common word (Border, Welsh, Irish and so on). */
+  const COMMON = new Set(["Border", "Welsh", "Irish", "English", "Scottish", "German", "Old", "Great", "Ancient", "Medieval", "Black", "White", "Bull", "Fox", "Toy", "Water", "Cocker", "Springer", "Field", "Norfolk", "Norwich", "Skye", "Kerry", "Early", "Local", "Celtic", "British", "French", "Italian", "American", "Mountain", "Northern", "Rough", "Smooth", "Standard", "Miniature", "Golden", "Flat", "Curly", "Soft", "Wire", "King", "Cairn", "Lakeland", "Manchester", "Boston", "Tibetan", "Chinese", "Asian", "Roman", "Norman", "Southern", "North", "Continental", "Mediterranean",
+    // Places, which facts mention as places (the River Aire "in Yorkshire").
+    "Yorkshire", "Sussex", "Staffordshire", "Lancashire", "Newfoundland", "Clumber", "Bedlington", "Dumfriesshire", "Airedale"]);
+  const LAST = /\s+(Terriers?|Spaniels?|Hounds?|Retrievers?|Dogs?|Sheepdogs?|Setters?|Collies?|Pinschers?)$/;
+  const firstWordCount = new Map<string, number>();
+  for (const n of img.keys()) { const w = n.split(/\s+/)[0]; firstWordCount.set(w, (firstWordCount.get(w) ?? 0) + 1); }
+  const shortOf = new Map<string, string>();
+  for (const n of img.keys()) {
+    if (!LAST.test(n)) continue;
+    const short = n.replace(LAST, "");
+    const words = short.split(/\s+/);
+    const ok = words.length >= 2 || (words.length === 1 && short.length >= 6 && !COMMON.has(short) && (firstWordCount.get(short) ?? 0) === 1);
+    if (ok && !img.has(short) && !shortOf.has(short)) shortOf.set(short, n);
+  }
+  const names = [...img.keys(), ...shortOf.keys()].filter((n) => n.length >= 3).sort((a, b) => b.length - a.length);
+  dogIndex = { names, img, shortOf };
   return dogIndex;
 }
 const PACK = (pred: (name: string) => boolean) => () => breeds.filter((b) => !!b.slug && !!b.image && pred(b.name)).map((b) => b.name);
@@ -461,7 +482,7 @@ const FACT_ALIASES: Record<string, string> = {
   Dobermann: "Doberman Pinscher", Doberman: "Doberman Pinscher", Alsatian: "German Shepherd",
 };
 export function dogsForFact(fact: string): FactDog[] {
-  const { names, img } = buildDogIndex();
+  const { names, img, shortOf } = buildDogIndex();
   let rest = fact;
   const found: { name: string; at: number }[] = [];
   for (const n of names) {
@@ -471,7 +492,7 @@ export function dogsForFact(fact: string): FactDog[] {
     const re = new RegExp(`\\b${namePat(n)}\\b`, flags);
     const m = re.exec(rest);
     if (!m) continue;
-    found.push({ name: n, at: m.index });
+    found.push({ name: shortOf.get(n) ?? n, at: m.index });
     rest = rest.replace(new RegExp(`\\b${namePat(n)}\\b`, "g" + flags), (x) => " ".repeat(x.length));
   }
   // Then the everyday short names, on what is left.
@@ -483,7 +504,17 @@ export function dogsForFact(fact: string): FactDog[] {
     rest = rest.replace(new RegExp(`\\b${namePat(short)}\\b`, "g"), (x) => " ".repeat(x.length));
   }
   let out = found.sort((a, b) => a.at - b.at).map((f) => f.name);
-  if (!out.length) {
+  // The dog the fact is about always leads (FACT_SUBJECT), under its own name or
+  // the nearest one with a picture ("German Shepherd Dog" is the pack's "German Shepherd").
+  allDogFacts();
+  const subject = FACT_SUBJECT.get(fact.trim());
+  if (subject) {
+    const tries = [subject, SUBJECT_PICTURE[subject] ?? "", subject.replace(/\s+(Dog|Retriever)$/, ""), shortOf.get(subject.replace(/\s+(Terriers?|Spaniels?|Hounds?)$/, "")) ?? "", FACT_ALIASES[subject] ?? ""];
+    const hit = tries.find((t) => t && img.has(t));
+    if (hit) out = [hit, ...out.filter((n) => n !== hit)];
+  }
+  // The group fallback only when no dog is named and no article dog is either.
+  if (!out.length && !STORY_DOGS.some((d) => d.re.test(fact))) {
     const g = FACT_GROUPS.find((gr) => gr.re.test(fact));
     if (g) {
       // Cartoon and real in turn: pack, historic, pack, historic...
@@ -492,9 +523,39 @@ export function dogsForFact(fact: string): FactDog[] {
       for (let i = 0; i < Math.max(a.length, b.length); i++) { if (a[i]) out.push(a[i]); if (b[i]) out.push(b[i]); }
     }
   }
-  return [...new Set(out)].filter((n) => img.has(n)).slice(0, FACT_DOGS_MAX).map((n) => ({ name: n, img: img.get(n)! }));
+  const story = STORY_DOGS.filter((d) => d.re.test(fact));
+  const lead: FactDog[] = [];
+  for (const d of story) { lead.push({ name: d.name, img: d.img }); for (const r of d.related) if (img.has(r)) lead.push({ name: r, img: img.get(r)! }); }
+  const named: FactDog[] = [...new Set(out)].filter((n) => img.has(n)).map((n) => ({ name: n, img: img.get(n)! }));
+  const seenNames = new Set<string>();
+  return [...lead, ...named].filter((d) => (seenNames.has(d.name) ? false : (seenNames.add(d.name), true))).slice(0, FACT_DOGS_MAX);
 }
 
+/* THE DOG EACH FACT IS ABOUT, 27 September 2026 (owner: a Dandie Dinmont fact
+   showed other terriers but not the Dandie Dinmont; a dog a fact is about must
+   always be shown). Filled as the pool is built, from where each fact came:
+   its breed write-up, its extinct-ancestor entry or its famous dog. dogsForFact
+   puts this dog first, whatever the name matching finds. */
+const FACT_SUBJECT = new Map<string, string>();
+/* THE GOOD DOG BAD DOG DOGS, 26 September 2026 (owner: a Gelert fact showed no
+   Gelert). A fact naming one of the articles' dogs shows the article's own picture
+   of it first, then its related dog: Gelert and the Irish Wolfhound, Lassie and the
+   Rough Collie, and so on. Conan Doyle's hound is a cross of bloodhound and mastiff. */
+const STORY_DOGS: { re: RegExp; name: string; img: string; related: string[] }[] = [
+  { re: /\bGelert\b|\bBeddgelert\b/, name: "Gelert", img: "/gelert-painting.jpg", related: ["Irish Wolfhound"] },
+  { re: /\bGreyfriars Bobby\b/, name: "Greyfriars Bobby", img: "/greyfryers-bobby.jpg", related: ["Skye Terrier"] },
+  { re: /\bLassie\b/, name: "Lassie", img: "/lassie-img.jpg", related: ["Rough Collie"] },
+  { re: /\bBull's-eye\b/, name: "Bull's-eye", img: "/bulls-eye-img.jpg", related: ["Bull Terrier"] },
+  { re: /\bBaskervilles?\b/, name: "The Hound of the Baskervilles", img: "/hound-of-the-baskervilles.jpg", related: ["Bloodhound", "Mastiff"] },
+  { re: /\bOdin\b/, name: "Odin", img: "/obin-uber-hero-img.jpg", related: ["German Shepherd"] },
+  { re: /\bArgos\b/, name: "Argos", img: "/history/Argos-hero.jpg", related: ["Laconian tracking Hounds"] },
+  { re: /\bAnubis\b/, name: "Anubis", img: "/history/Anubis-hero.jpg", related: [] },
+];
+// A subject whose picture is filed under another name.
+const SUBJECT_PICTURE: Record<string, string> = {
+  Deerhound: "Scottish Deerhound", "White English Terrier": "English White Terrier", "Farm and kitchen curs": "Cur",
+  Setter: "English Setter", Collie: "Rough Collie", "Collie or working dog": "Old working collies",
+};
 let cache: string[] | null = null;
 // Every fact in the pool, each once, longer than a scrap.
 export function allDogFacts(): string[] {
@@ -505,7 +566,12 @@ export function allDogFacts(): string[] {
      to learn from). A write-up's second sentence usually carries the detail, so
      the fact takes up to two, stopping before the "In our family tree" line,
      which only makes sense beside the tree. */
-  const breedLines = Object.values(breedInfo as Record<string, string>).map(factFromWriteUp);
+  const breedLines = Object.entries(breedInfo as Record<string, string>).map(([name, text]) => {
+    const f = factFromWriteUp(text).trim();
+    FACT_SUBJECT.set(f, name);
+    return f;
+  });
+  for (const [name, text] of Object.entries(EXTINCT_REWRITES)) FACT_SUBJECT.set(text.trim(), name);
   cache = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
   return cache;
 }
