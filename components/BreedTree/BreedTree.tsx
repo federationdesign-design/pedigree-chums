@@ -9757,6 +9757,18 @@ export default function BreedTree({
          behind them that moved. If the throw feels weak, this figure is the one
          to raise, not the restitution. */
       const BADGE_OPTS = { restitution: 0.65, friction: 0.1, frictionAir: 0.01, density: 0.00025 };
+      /* BOUNCIER CHIPS, AND BOUNCIER THE RARER, 27 September 2026 (owner, J18-308:
+         the yellow tokens 50% more bouncy, rising with rarity). A chip's rarity is
+         the rarity of the dog it came from. Bounce HEIGHT goes with the square of
+         restitution, so 0.65 x sqrt(1.5) = 0.80 bounces 50% higher than the old 0.65,
+         and each rarer tier adds a little more, to 0.88 for the rarest (about 80%
+         higher). Kept below 0.9 on purpose: the toy ball note (0.97) shows how a
+         near-1 bounce can stop the pit ever settling; the ball settles at 0.85 with
+         far less air drag than a chip has. Bombs and the labelled solo circle keep
+         BADGE_OPTS. */
+      const CHIP_BOUNCE: Record<RarityTier, number> = { veryCommon: 0.80, common: 0.82, uncommon: 0.84, rare: 0.86, extremelyRare: 0.88 };
+      const chipOpts = (name: string | null | undefined, plain?: boolean) =>
+        plain || !name ? BADGE_OPTS : { ...BADGE_OPTS, restitution: CHIP_BOUNCE[rarityTier(treesContaining(name))] };
       const mkCircle = (b: Body, kind: string, opts: any) => {
         const p = pxFromWorld(b.x, b.y);
         const mb = Bodies.circle(p.x, p.y, Math.max(2, b.r * pxPerWorld), opts);
@@ -9821,7 +9833,7 @@ export default function BreedTree({
          drawing. See wordTier. */
       const wordBreed = (b: Body) => PIT_DRAWS_WORDS && !!b.n && !twinNamesRef.current.has(b.n.data.name) && wordOk(b.n.data.name);
       for (const b of bodies) { if (wordBreed(b)) mkWord(b, CIRCLE_OPTS); else mkCircle(b, "circle", CIRCLE_OPTS); }
-      for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
+      for (const b of badges) mkCircle(b, "badge", chipOpts(badgeNodes[b.idx]?.data.name));
       // The opening shove: up and out, the first name one way and the next the
       // other, with a spin so they arrive already tumbling rather than dropping
       // dead straight. Alternating by index rather than by position, so a level
@@ -10291,7 +10303,7 @@ export default function BreedTree({
             };
             bl.push(kb);
             all.push(kb);
-            const mbb = mkCircle(kb, "badge", BADGE_OPTS);
+            const mbb = mkCircle(kb, "badge", chipOpts(ch.data.name, kidBomb));
             MBody.setVelocity(mbb, { x: cmb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: cmb.velocity.y * 0.8 });
             newMbs.push(mbb);
             // Both homes, same order. See badgeSrcRef.
@@ -10345,7 +10357,7 @@ export default function BreedTree({
           const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: popR / k, rDraw: popR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
           bl.push(bb);
           all.push(bb);
-          const mbb = mkCircle(bb, "badge", BADGE_OPTS);
+          const mbb = mkCircle(bb, "badge", chipOpts(ch.data.name, popBomb));
           MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
           newMbs.push(mbb);
           badgeSrcRef.current.push(ch);
@@ -10420,7 +10432,7 @@ export default function BreedTree({
             const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: popR / k, rDraw: popR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
-            const mbb = mkCircle(bb, "badge", BADGE_OPTS);
+            const mbb = mkCircle(bb, "badge", chipOpts(ch.data.name, popBomb));
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
             badgeSrcRef.current.push(ch);
@@ -11398,7 +11410,7 @@ export default function BreedTree({
         const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, rDraw, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? (opts?.green ? 20 : 10), green: opts?.green, bomb: isBomb };
         bl.push(nb);
         all.push(nb);
-        const mb = mkCircle(nb, "badge", BADGE_OPTS);
+        const mb = mkCircle(nb, "badge", chipOpts(opts?.name, isBomb || !!opts?.label));
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract, verbatim
         /* A chip scattered in from the learn layer has no circle in this pit to
            come from, so its slot is null. The slot still has to exist or the two
