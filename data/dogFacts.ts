@@ -269,7 +269,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 13 (J18-272): Italian Greyhound, 7 new facts (3 existing, 10 in all).
    Batch 14 (J18-274): Boston Terrier, 7 new facts (3 existing, 10 in all).
    Batch 15 (J18-275): Pomeranian, 7 new facts (3 existing, 10 in all).
-   Batch 16 (J18-276): Yorkshire Terrier, 7 new facts (3 existing, 10 in all). */
+   Batch 16 (J18-276): Yorkshire Terrier, 7 new facts (3 existing, 10 in all).
+   Batch 17 (J18-277): Border Terrier, 7 new facts (3 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -448,6 +449,16 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "In 1997 a Yorkshire Terrier called Champion Ozmilion Mystification became the first Yorkie ever to win Best in Show at Crufts, the world's biggest dog show. His win, over thousands of much bigger dogs, showed that a tiny terrier from the mill towns could beat the best of them.",
     "A Yorkshire Terrier puppy is born black with tan markings, and its coat slowly changes colour as it grows up, usually turning a steel blue and tan. The adult coat is made of fine, silky hair that keeps on growing, more like human hair than fur. That is why show Yorkies have hair down to the floor, and why many pet Yorkies wear a bow to keep it out of their eyes.",
     "The Yorkshire Terrier started out bigger than it is now. Huddersfield Ben weighed about 5kg, but his puppies were often under 3kg, and breeders kept choosing the smallest. Today a Yorkshire Terrier weighs no more than about 3kg, but it still has the brave, busy nature of the ratters it came from.",
+  ],
+  // Batch 17 (J18-277): 7 new, 10 in all.
+  "Border Terrier": [
+    "The Border Terrier comes from the Border country, the wild, hilly land on both sides of the line between England and Scotland, around the Cheviot Hills. The weather there is often cold, wet and windy, so the dogs needed to be tough. Shepherds, farmers and huntsmen kept them to drive out foxes that had gone to ground.",
+    "Before it was called the Border Terrier, the breed had other names taken from the Northumberland valleys where it lived, such as the Coquetdale Terrier and the Reedwater Terrier. By about 1880 it had become known as the Border Terrier, after the Border Foxhounds, the local hunt it worked with.",
+    "Two Border families made the Border Terrier. The Robsons and the Dodds ran the Border Foxhounds and kept the best terriers to work with them, passing their dogs down from father to son. Years later, the grandsons of the two families were the ones who asked the Kennel Club to recognise the breed.",
+    "The first Border Terrier ever registered with the Kennel Club was a dog called The Moss Trooper, in 1913. At first the Kennel Club turned the breed down, in 1914, but it was finally recognised in 1920. That June, fans met in Hawick in the Scottish Borders to form the Border Terrier Club, and its first standard was written by Jacob Robson and John Dodd.",
+    "The Border Terrier's breed standard describes its head as being like an otter's: broad and flat on top, with a short, strong muzzle. Along with its small V-shaped ears that fold forward and its bright, keen expression, that otter head is what makes a Border Terrier easy to recognise.",
+    "In about 1896, the huntsman Jacob Robson wrote that the best Border Terriers weighed about 15 to 18 pounds, roughly 7 to 8kg. Anything bigger, he said, could not follow its fox underground so well. The breed's wiry, weatherproof coat kept it dry in the rain and wind of the hills.",
+    "A Border Terrier's coat comes in a few set colours: red, wheaten, grizzle and tan, or blue and tan. Grizzle means a mix of dark and light hairs, which gives a slightly grey, pepper-and-salt look. The rough outer coat is usually tidied by hand-stripping, pulling out the old hairs, rather than clipping.",
   ],
 };
 
@@ -1052,6 +1063,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The smallest dog ever recorded was a Yorkshire Terrier called Sylvia", q: "What was Sylvia, the smallest dog ever recorded, small enough to fit in?", options: ["A matchbox", "A shoebox", "A teapot"], answer: 0, evidence: "fit in a matchbox" },
   { match: "In 1997 a Yorkshire Terrier called Champion Ozmilion Mystification", q: "In which year did a Yorkshire Terrier first win Best in Show at Crufts?", options: ["1997", "1897", "2017"], answer: 0, evidence: "In 1997" },
   { match: "A Yorkshire Terrier puppy is born black with tan markings", q: "What colour is a Yorkshire Terrier puppy when it is born?", options: ["Black with tan markings", "Pink", "Pure white"], answer: 0, evidence: "born black with tan markings" },
+  // Batch 17 (J18-277): Border Terrier.
+  { match: "Before it was called the Border Terrier, the breed had other names", q: "What was one old name for the Border Terrier?", options: ["The Coquetdale Terrier", "The Cornish Terrier", "The Cotswold Terrier"], answer: 0, evidence: "Coquetdale Terrier" },
+  { match: "Two Border families made the Border Terrier", q: "Which two families made the Border Terrier?", options: ["The Robsons and the Dodds", "The Smiths and the Joneses", "The Browns and the Greens"], answer: 0, evidence: "Robsons and the Dodds" },
+  { match: "The first Border Terrier ever registered with the Kennel Club", q: "What was the first Border Terrier registered with the Kennel Club called?", options: ["The Moss Trooper", "The Border Reiver", "The Fox Hunter"], answer: 0, evidence: "The Moss Trooper" },
+  { match: "The Border Terrier's breed standard describes its head", q: "Which animal's head is the Border Terrier's said to be like?", options: ["An otter's", "A fox's", "A seal's"], answer: 0, evidence: "like an otter's" },
+  { match: "A Border Terrier's coat comes in a few set colours", q: "What does grizzle mean in a Border Terrier's coat?", options: ["A mix of dark and light hairs", "A curly coat", "A bald patch"], answer: 0, evidence: "mix of dark and light hairs" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
