@@ -264,7 +264,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 8 (J18-266): Miniature Schnauzer, 8 new facts (2 existing, 10 in all).
    Batch 9 (J18-267): Lurcher, 8 new facts (2 existing, 10 in all).
    Batch 10 (J18-268): Cockapoo, 8 new facts (2 existing, 10 in all).
-   Batch 11 (J18-270): Staffordshire Bull Terrier, 8 new facts (2 existing, 10 in all). */
+   Batch 11 (J18-270): Staffordshire Bull Terrier, 8 new facts (2 existing, 10 in all).
+   Batch 12 (J18-271): Irish Setter, 8 new facts (2 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -392,6 +393,17 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The Staffordshire Bull Terrier is sometimes nicknamed the nanny dog, because Staffies are famous for loving children, and the Kennel Club recommends the breed for families. But experts stress that the nickname should not be taken literally: no dog, however gentle, should ever be left alone with young children.",
     "Many people think the Staffordshire Bull Terrier is a banned breed, but it is not. Britain's Dangerous Dogs Act bans the Pit Bull and a few other types, and stocky Staffies are sometimes mistaken for them. A well-bred, well-raised Staffie is legal to own and is usually a friendly, people-loving dog.",
     "The Staffordshire Bull Terrier has been voted Britain's favourite dog in an ITV television poll, yet Staffies are also one of the most common dogs in rescue centres. Battersea once took in about 2,000 in a single year, and they wait longer for a new home than most dogs, often because of their unfair tough-guy image.",
+  ],
+  // Batch 12 (J18-271): 8 new, 10 in all.
+  "Irish Setter": [
+    "In Irish, the Irish Setter is called Madra Rua, which means red dog, and it is also known as the Red Setter. In the 1800s people sometimes called it the Irish Spaniel, because setters began as spaniels. An English farming book of 1616 already describes a sort of land spaniel called a setter, used to find game birds.",
+    "The first Irish Setters were not all red. Most were red and white, which made them easier for hunters to spot in the fields. Then, in the early 1800s, the Earl of Enniskillen declared that he would keep nothing but solid red setters in his kennels, red became the fashion, and the red Irish Setter took over.",
+    "Nearly every Irish Setter alive today goes back to one dog, Champion Palmerston, born in Ireland in 1862. His owner thought his long, narrow head made him look too fine for hunting and ordered him to be drowned. A dog lover saved him instead, and Palmerston became a star of the show ring and the father of the modern breed.",
+    "After Champion Palmerston's success at dog shows, Irish Setters split into two types. Show Irish Setters are bigger and heavier, with thicker, longer coats that look spectacular in the ring. Field Irish Setters, bred for hunting, are lighter, leaner and quicker. Both belong to the same breed.",
+    "When solid red became the fashion, the old Irish Red and White Setter nearly disappeared. A handful of people in remote parts of Ireland kept it going, including a clergyman, Rev. Noble Huston, who recorded his puppies in his parish register. Thanks to them the Irish Red and White Setter survived as a separate breed, cousin to today's red Irish Setter.",
+    "Two Irish Setters have lived in the White House. President Harry Truman had one called Mike, and President Richard Nixon had one called King Timahoe, named after a village in County Kildare in Ireland. The breed's glossy red coat made it a favourite with photographers.",
+    "Irish Setters were among the first dogs to star at British dog shows. In 1860, a show in Birmingham gave Irish Setters their very own section, one of the first times the breed was judged on its own. In Ireland they were working dogs, galloping back and forth across the moors and wetlands ahead of the hunter to find game birds.",
+    "An Irish Setter's rich red coat comes from the same kind of gene that gives many people red hair. The dog has two copies of a version of the gene that turns dark colour off in its coat, leaving only red. That is why two red Irish Setters always have red puppies, and why the breed never throws a black or brown one.",
   ],
 };
 
@@ -966,6 +978,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "the regimental Staffordshire Bull Terrier was travelling by train in Egypt", q: "How far did the regiment's Staffie travel to find it again?", options: ["About 200 miles", "About 2 miles", "About 2,000 miles"], answer: 0, evidence: "about 200 miles" },
   { match: "The regiments of Staffordshire have kept a Staffordshire Bull Terrier as their mascot", q: "What is every Staffordshire regimental mascot called?", options: ["Watchman", "Sentry", "Guardsman"], answer: 0, evidence: "called Watchman" },
   { match: "Many people think the Staffordshire Bull Terrier is a banned breed", q: "Is the Staffordshire Bull Terrier banned in Britain?", options: ["Yes", "No"], answer: 1, evidence: "but it is not" },
+  // Batch 12 (J18-271): Irish Setter.
+  { match: "In Irish, the Irish Setter is called Madra Rua", q: "What does Madra Rua mean?", options: ["Red dog", "Rain dog", "Royal dog"], answer: 0, evidence: "means red dog" },
+  { match: "The first Irish Setters were not all red", q: "Which earl would keep nothing but solid red setters?", options: ["The Earl of Enniskillen", "The Earl of Sandwich", "Earl Grey"], answer: 0, evidence: "Earl of Enniskillen" },
+  { match: "Nearly every Irish Setter alive today goes back to one dog, Champion Palmerston", q: "Which dog is the father of nearly every modern Irish Setter?", options: ["Champion Palmerston", "Big Red", "King Timahoe"], answer: 0, evidence: "Champion Palmerston" },
+  { match: "When solid red became the fashion, the old Irish Red and White Setter", q: "Where did Rev. Noble Huston record his setter puppies?", options: ["In his parish register", "In a cookbook", "On the church door"], answer: 0, evidence: "parish register" },
+  { match: "Two Irish Setters have lived in the White House", q: "Which president owned an Irish Setter called King Timahoe?", options: ["Richard Nixon", "Abraham Lincoln", "Barack Obama"], answer: 0, evidence: "Richard Nixon" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
