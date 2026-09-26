@@ -7,7 +7,11 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   async redirects() {
     return [
-      { source: "/pack-pit", destination: "/", permanent: true },
+      /* THE SITE OPENS ON /home, 27 September 2026 (owner, J18-290). The chum drop
+         pit used to be the front page; it now lives at /pack-pit (the name it had
+         before, whose old redirect back to / is gone, as it would loop). Not
+         permanent, so browsers do not cache it and the front page can change again. */
+      { source: "/", destination: "/home", permanent: false },
       /* Renamed after the dog rather than the film, 23 September 2026. The old
          route was live for a few hours, so the redirect is permanent. */
       { source: "/good-dog-bad-dog/heart-of-the-beast", destination: "/good-dog-bad-dog/odin", permanent: true },
