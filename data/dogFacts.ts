@@ -267,7 +267,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 11 (J18-270): Staffordshire Bull Terrier, 8 new facts (2 existing, 10 in all).
    Batch 12 (J18-271): Irish Setter, 8 new facts (2 existing, 10 in all).
    Batch 13 (J18-272): Italian Greyhound, 7 new facts (3 existing, 10 in all).
-   Batch 14 (J18-274): Boston Terrier, 7 new facts (3 existing, 10 in all). */
+   Batch 14 (J18-274): Boston Terrier, 7 new facts (3 existing, 10 in all).
+   Batch 15 (J18-275): Pomeranian, 7 new facts (3 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -426,6 +427,16 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The deaf and blind American writer Helen Keller owned a Boston Terrier called Sir Thomas, nicknamed Phiz, a present from her classmates at Radcliffe College. The dog was said to be fussy about who he made friends with, but he took to Helen Keller straight away.",
     "The first Boston Terriers were much bigger and heavier than today's, with longer snouts, and some were used for fighting. Breeders made them smaller and flatter-faced to be friendly pets. That flat face gives the Boston Terrier its sweet look, but it can also make breathing harder, so a good breeder chooses dogs that breathe easily.",
     "Despite its name, the Boston Terrier is not really a terrier at all: it was never bred to dig after foxes or rats. In 1923, when the American Kennel Club set up a new group called Non-Sporting, for dogs that did not fit the hunting, herding or terrier groups, the Boston Terrier was the first breed put in it.",
+  ],
+  // Batch 15 (J18-275): 7 new, 10 in all.
+  Pomeranian: [
+    "The Pomeranian is named after Pomerania, a region on the Baltic coast that is now part of northern Poland and eastern Germany. The name comes from old Slavic words, po more, meaning land by the sea. The Pomeranian's ancestors there were much bigger spitz dogs with thick coats and curly tails, used for work such as herding and guarding.",
+    "Pomeranians first came to Britain with royalty. In 1767 Queen Charlotte, the German-born wife of King George III, brought two with her, called Phebe and Mercury, and the painter Thomas Gainsborough painted them. They look like big, fluffy spitz dogs, and are thought to have weighed as much as 14 to 23kg, many times the size of a Pomeranian today.",
+    "The Pomeranian has shrunk enormously. When the Kennel Club began in 1873, the first ones shown weighed about 8kg. Queen Victoria loved the smaller ones, and during her lifetime the breed's size was halved. Today a Pomeranian usually weighs only about 2 to 3kg, small enough to sit in a large handbag.",
+    "Queen Victoria kept as many as 35 Pomeranians in her kennels. Her last favourite was a little white Pomeranian called Turi. When she was dying at Osborne House on the Isle of Wight in January 1901, she asked for Turi to be brought to her, and he was beside her bed at the end.",
+    "When the Titanic sank in 1912, only a few dogs survived, and two of them were Pomeranians. Being so small, they could be carried by their owners into the lifeboats, while most of the other dogs on board were lost.",
+    "The Pomeranian comes in a huge range of colours, more than most other breeds: orange, cream, black, white, chocolate, blue, sable and many mixtures. Queen Victoria's famous Marco was a red sable, and orange and red Pomeranians are still among the best known today.",
+    "Myth: The artist Michelangelo had a pet Pomeranian that sat on a silk cushion and watched him paint the Sistine Chapel. The truth: there is no evidence for this story. The Pomeranian as we know it was only developed in Britain in the 1800s, hundreds of years after Michelangelo, who died in 1564.",
   ],
 };
 
@@ -1018,6 +1029,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The Boston Terrier is nicknamed the American Gentleman", q: "What is the Boston Terrier's nickname?", options: ["The American Gentleman", "The Boston Bruiser", "The Tea Party Terrier"], answer: 0, evidence: "American Gentleman" },
   { match: "The city of Boston is proud of its dog", q: "What is the name of Boston University's Boston Terrier mascot?", options: ["Rhett", "Scarlett", "Rex"], answer: 0, evidence: "called Rhett" },
   { match: "The deaf and blind American writer Helen Keller owned a Boston Terrier", q: "Who gave Helen Keller her Boston Terrier?", options: ["Her college classmates", "The President", "A circus owner"], answer: 0, evidence: "her classmates" },
+  // Batch 15 (J18-275): Pomeranian.
+  { match: "The Pomeranian is named after Pomerania, a region on the Baltic coast", q: "What does the name Pomerania mean?", options: ["Land by the sea", "Land of fluff", "Mountain land"], answer: 0, evidence: "land by the sea" },
+  { match: "Pomeranians first came to Britain with royalty", q: "Which queen brought Pomeranians to Britain in 1767?", options: ["Queen Charlotte", "Queen Elizabeth I", "Queen Boudicca"], answer: 0, evidence: "Queen Charlotte" },
+  { match: "Queen Victoria kept as many as 35 Pomeranians in her kennels", q: "Which Pomeranian was beside Queen Victoria at the end of her life?", options: ["Turi", "Marco", "Boo"], answer: 0, evidence: "called Turi" },
+  { match: "When the Titanic sank in 1912, only a few dogs survived", q: "How many Pomeranians survived the sinking of the Titanic?", options: ["Two", "Twenty", "None"], answer: 0, evidence: "two of them were Pomeranians" },
+  { match: "Myth: The artist Michelangelo had a pet Pomeranian", q: "Did Michelangelo's Pomeranian really watch him paint the Sistine Chapel?", options: ["Yes", "No"], answer: 1, evidence: "no evidence" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
