@@ -279,7 +279,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 23 (J18-285): Weimaraner, 5 new facts (6 existing, 11 in all).
    Batch 24 (J18-286): Rottweiler, 5 new facts (6 existing, 11 in all).
    Batch 25 (J18-287): Basset Hound, 6 new facts (5 existing, 11 in all).
-   Batch 26 (J18-288): Bichon Frise, 4 new facts (11 existing, most through the Cavachon; 15 in all). */
+   Batch 26 (J18-288): Bichon Frise, 4 new facts (11 existing, most through the Cavachon; 15 in all).
+   Batch 27 (J18-291): West Highland Terrier, 5 new facts (5 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -544,6 +545,14 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The Bichon Frise nearly disappeared twice, after the First and Second World Wars. A few French and Belgian breeders gathered the little white dogs from the streets and saved the breed. The first Bichon Frise entered in the French stud book, in October 1934, was a female called Ida.",
     "The Bichon Frise reached America in 1956, when Hélène and François Picault from Dieppe in France arrived with six Bichons and bred the first American litter. The breed came to Britain in the late 1950s and was recognised by the Kennel Club in the 1970s. Today it is one of the best-loved small dogs in both countries.",
     "Little white dogs like the Bichon Frise appear in paintings by great artists over hundreds of years, including the Spanish painter Francisco Goya and the English painter Sir Joshua Reynolds. In the 1800s the Bichon came back into fashion in France under the Emperor Napoleon III, when it was known as the Ténériffe.",
+  ],
+  // Batch 27 (J18-291): 5 new, 10 in all.
+  "West Highland Terrier": [
+    "Before it was the West Highland Terrier, the Westie went by several names, each after the family who bred it. It was the Poltalloch Terrier on Colonel Malcolm's estate in Argyll, the Roseneath Terrier on the Duke of Argyll's, and the Pittenweem Terrier in Fife. Colonel Malcolm did not want the credit, and in 1903 he asked for his white terriers to be given a new name.",
+    "The West Highland Terrier was recognised by the Kennel Club in 1907, and appeared at Crufts for the first time that same year. Its full name, the West Highland White Terrier, first appears in print in 1908, in a book about otter hunting, chosen to describe where the dogs came from and their white coat.",
+    "The West Highland Terrier has a short, thick tail shaped like a carrot, and it is said to be strong enough for a hunter to pull the little dog out of a burrow by it. Its double coat, a harsh white outer layer over a soft undercoat, sheds dirt and water, which kept it going in the cold, wet Highlands.",
+    "The West Highland Terrier's cheerful white face is one of the most famous in advertising. For many years a black Scottish Terrier and a white Westie have appeared together as the symbol of a Scotch whisky, and a Westie has long been the face of a well-known brand of dog food.",
+    "The Malcolm family's white terriers at Poltalloch in Argyll are thought to go back as far as the time of King James I, around 400 years ago. The Malcolms are still the lairds of Poltalloch today, and the old kennels where the West Highland Terrier was bred are now a family home.",
   ],
 };
 
@@ -1207,6 +1216,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The Bichon Frise nearly disappeared twice", q: "What was the first Bichon Frise in the French stud book called?", options: ["Ida", "Fifi", "Belle"], answer: 0, evidence: "called Ida" },
   { match: "The Bichon Frise reached America in 1956", q: "How many Bichons did the Picaults bring to America in 1956?", options: ["Six", "Sixty", "One"], answer: 0, evidence: "six Bichons" },
   { match: "Little white dogs like the Bichon Frise appear in paintings", q: "Which Spanish painter put little white dogs like the Bichon Frise in his pictures?", options: ["Francisco Goya", "Pablo Picasso", "Salvador Dalí"], answer: 0, evidence: "Francisco Goya" },
+  // Batch 27 (J18-291): West Highland Terrier.
+  { match: "Before it was the West Highland Terrier, the Westie went by several names", q: "What was the Westie called on Colonel Malcolm's estate?", options: ["The Poltalloch Terrier", "The Edinburgh Terrier", "The Loch Ness Terrier"], answer: 0, evidence: "Poltalloch Terrier" },
+  { match: "The West Highland Terrier was recognised by the Kennel Club in 1907", q: "In which year did the Westie first appear at Crufts?", options: ["1907", "1807", "2007"], answer: 0, evidence: "1907" },
+  { match: "The West Highland Terrier has a short, thick tail shaped like a carrot", q: "What is the Westie's strong tail said to be for?", options: ["Pulling it out of a burrow", "Swimming faster", "Scaring away birds"], answer: 0, evidence: "pull the little dog out of a burrow" },
+  { match: "The West Highland Terrier's cheerful white face is one of the most famous in advertising", q: "Which dog appears with the Westie as the symbol of a Scotch whisky?", options: ["A black Scottish Terrier", "A brown Labrador", "A spotty Dalmatian"], answer: 0, evidence: "black Scottish Terrier" },
+  { match: "The Malcolm family's white terriers at Poltalloch", q: "What are the old Poltalloch kennels used as today?", options: ["A family home", "A museum", "A hotel"], answer: 0, evidence: "family home" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
