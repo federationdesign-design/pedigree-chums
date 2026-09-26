@@ -15,7 +15,7 @@ const FAQS: QA[] = [
   },
   {
     q: "Is Pedigree Chums food?",
-    a: "No — despite the name (a cheeky nod to a certain dog-food brand), Pedigree Chums is a card game, not dinner. The only thing your dog gets out of it is the joy of being spotted. Please don’t feed the cards to anyone.",
+    a: "No, despite the name, Pedigree Chums is a card game, not dinner. The only thing your dog gets out of it is the joy of being spotted. Please don’t feed the cards to anyone.", // owner, 27 September 2026 (J18-293)
   },
   {
     q: "How do you play Pedigree Chums?",
@@ -23,7 +23,7 @@ const FAQS: QA[] = [
   },
   {
     q: "I have young children — what age range is this game for?",
-    a: "It’s designed for ages 7 and up, and plays best with 2 or more people. Younger children can absolutely join in with a grown-up — matching cartoon dogs to real ones is exactly the kind of thing they love.",
+    a: "It’s designed for ages 7 and up, and plays best with 2 or more people. Younger children can absolutely join in, matching the cartoon dogs on the cards to real ones is something anyone with working eyes can do.", // owner, 27 September 2026 (J18-293)
   },
   {
     q: "Is it like Top Trumps, where the cards’ facts compete against each other?",

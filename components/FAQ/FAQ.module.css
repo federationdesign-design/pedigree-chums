@@ -124,7 +124,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(1.08rem, 1.9vw, 1.21rem);
   font-weight: 600;
-  line-height: 1.6;
+  line-height: 1.3em; /* was 1.6 (owner, 27 September 2026, J18-293) */
   color: var(--white, #fff);
 }
 
