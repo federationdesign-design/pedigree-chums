@@ -656,7 +656,15 @@ const PIT_BONE_MATCH = 0.56;
 
    THE TIE IS UNTOUCHED. Both figures scale the logo's own width, so moving the
    logo still moves the bone on either screen. */
-const PIT_BONE_MATCH_DESKTOP = 1;
+// 1.2, 26 September 2026 (owner: the bone still looked smaller than the falling
+// logo on desktop). Was 1, the measured silhouette match.
+const PIT_BONE_MATCH_DESKTOP = 1.2;
+/* DESKTOP-ONLY SIZE-UPS, 26 September 2026 (owner). Phones keep their sizes. The
+   chum cards are already at CHUM_MAX on desktop, so this goes on top of the cap;
+   the balls are the yellow and pink tennis balls only (the rock and fork share
+   ballDia and are left alone). */
+const CHUM_DESKTOP_K = 1.1;
+const BALL_DESKTOP_K = 1.15;
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
@@ -10092,7 +10100,7 @@ export default function BreedTree({
         // giant drops in noticeably bigger than a terrier, exactly as in the
         // main pit. Clamped before the band is applied, so the bands keep
         // their ratios instead of being flattened by the ceiling.
-        const diaMed = Math.max(CHUM_MIN, Math.min(CHUM_MAX, vw * CHUM_VW));
+        const diaMed = Math.max(CHUM_MIN, Math.min(CHUM_MAX, vw * CHUM_VW)) * (isMobileRef.current ? 1 : CHUM_DESKTOP_K);
         const stageTopPx = st ? st.getBoundingClientRect().top : 0;
         imgs.forEach(({ image, band, name: chumName }, i) => {
           const dia = diaMed * (CHUM_BAND[band] ?? 1);
@@ -10143,7 +10151,7 @@ export default function BreedTree({
         // rock reads at the ball's size, stick a little longer than the ball is
         // wide so it looks throwable rather than like a twig
         const dia =
-          kind === "ball" || kind === "ballPink" ? ballDia
+          kind === "ball" || kind === "ballPink" ? ballDia * (isMobileRef.current ? 1 : BALL_DESKTOP_K)
           : kind === "rock" ? ballDia
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : kind === "cookies" ? BIGT * 3.2

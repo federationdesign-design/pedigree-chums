@@ -2874,7 +2874,9 @@
 /* The whole fact card one and a half times the size on desktop (owner, 25
    September 2026): wide screens with a mouse or trackpad. */
 @media (min-width: 1024px) and (hover: hover) {
-  .factPop { --fact-k: 1.5; }
+  /* In the BOTTOM third on desktop, still centred (owner, 26 September 2026);
+     phones keep it near the top. */
+  .factPop { --fact-k: 1.5; top: auto; bottom: 8vh; }
 }
 @media (prefers-reduced-motion: reduce) { .factBarFill { animation-timing-function: linear; } }
 
