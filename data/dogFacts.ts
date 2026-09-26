@@ -268,7 +268,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 12 (J18-271): Irish Setter, 8 new facts (2 existing, 10 in all).
    Batch 13 (J18-272): Italian Greyhound, 7 new facts (3 existing, 10 in all).
    Batch 14 (J18-274): Boston Terrier, 7 new facts (3 existing, 10 in all).
-   Batch 15 (J18-275): Pomeranian, 7 new facts (3 existing, 10 in all). */
+   Batch 15 (J18-275): Pomeranian, 7 new facts (3 existing, 10 in all).
+   Batch 16 (J18-276): Yorkshire Terrier, 7 new facts (3 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -437,6 +438,16 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "When the Titanic sank in 1912, only a few dogs survived, and two of them were Pomeranians. Being so small, they could be carried by their owners into the lifeboats, while most of the other dogs on board were lost.",
     "The Pomeranian comes in a huge range of colours, more than most other breeds: orange, cream, black, white, chocolate, blue, sable and many mixtures. Queen Victoria's famous Marco was a red sable, and orange and red Pomeranians are still among the best known today.",
     "Myth: The artist Michelangelo had a pet Pomeranian that sat on a silk cushion and watched him paint the Sistine Chapel. The truth: there is no evidence for this story. The Pomeranian as we know it was only developed in Britain in the 1800s, hundreds of years after Michelangelo, who died in 1564.",
+  ],
+  // Batch 16 (J18-276): 7 new, 10 in all.
+  "Yorkshire Terrier": [
+    "Almost every Yorkshire Terrier alive today goes back to one dog, Huddersfield Ben. He was born in Huddersfield in 1865, bred by a draper called William Eastwood, and later owned by Mary Ann Foster of Bradford. Ben won 74 prizes at dog shows and in ratting contests, and so many breeders wanted his puppies that he became known as the father of the breed.",
+    "Huddersfield Ben, the father of the Yorkshire Terrier, died young: in 1871, aged just six, he was run over by a horse-drawn carriage. His body was stuffed and put on show in a glass case. It was last seen on the mantelpiece of a pub in the north of England between the two world wars, and nobody knows where it is now.",
+    "The Yorkshire Terrier has Scottish roots. Early Yorkies were called Broken-haired Terriers, and Huddersfield Ben's family tree includes Paisley Terriers, small silky terriers from Scotland. Many Scottish workers moved south to the busy mills of Yorkshire, and their little terriers came with them.",
+    "The smallest dog ever recorded was a Yorkshire Terrier called Sylvia, owned by Arthur Marples of Blackburn. When she died in 1945, aged about two, she stood just 6.3cm tall at the shoulder and weighed about 113g, roughly the weight of an apple. She was small enough to fit in a matchbox.",
+    "In 1997 a Yorkshire Terrier called Champion Ozmilion Mystification became the first Yorkie ever to win Best in Show at Crufts, the world's biggest dog show. His win, over thousands of much bigger dogs, showed that a tiny terrier from the mill towns could beat the best of them.",
+    "A Yorkshire Terrier puppy is born black with tan markings, and its coat slowly changes colour as it grows up, usually turning a steel blue and tan. The adult coat is made of fine, silky hair that keeps on growing, more like human hair than fur. That is why show Yorkies have hair down to the floor, and why many pet Yorkies wear a bow to keep it out of their eyes.",
+    "The Yorkshire Terrier started out bigger than it is now. Huddersfield Ben weighed about 5kg, but his puppies were often under 3kg, and breeders kept choosing the smallest. Today a Yorkshire Terrier weighs no more than about 3kg, but it still has the brave, busy nature of the ratters it came from.",
   ],
 };
 
@@ -1035,6 +1046,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Queen Victoria kept as many as 35 Pomeranians in her kennels", q: "Which Pomeranian was beside Queen Victoria at the end of her life?", options: ["Turi", "Marco", "Boo"], answer: 0, evidence: "called Turi" },
   { match: "When the Titanic sank in 1912, only a few dogs survived", q: "How many Pomeranians survived the sinking of the Titanic?", options: ["Two", "Twenty", "None"], answer: 0, evidence: "two of them were Pomeranians" },
   { match: "Myth: The artist Michelangelo had a pet Pomeranian", q: "Did Michelangelo's Pomeranian really watch him paint the Sistine Chapel?", options: ["Yes", "No"], answer: 1, evidence: "no evidence" },
+  // Batch 16 (J18-276): Yorkshire Terrier.
+  { match: "Almost every Yorkshire Terrier alive today goes back to one dog, Huddersfield Ben", q: "In which town was Huddersfield Ben born?", options: ["Huddersfield", "Harrogate", "Hull"], answer: 0, evidence: "born in Huddersfield" },
+  { match: "Huddersfield Ben, the father of the Yorkshire Terrier, died young", q: "Where was Huddersfield Ben's stuffed body last seen?", options: ["On a pub mantelpiece", "In the Tower of London", "On a ship"], answer: 0, evidence: "mantelpiece of a pub" },
+  { match: "The smallest dog ever recorded was a Yorkshire Terrier called Sylvia", q: "What was Sylvia, the smallest dog ever recorded, small enough to fit in?", options: ["A matchbox", "A shoebox", "A teapot"], answer: 0, evidence: "fit in a matchbox" },
+  { match: "In 1997 a Yorkshire Terrier called Champion Ozmilion Mystification", q: "In which year did a Yorkshire Terrier first win Best in Show at Crufts?", options: ["1997", "1897", "2017"], answer: 0, evidence: "In 1997" },
+  { match: "A Yorkshire Terrier puppy is born black with tan markings", q: "What colour is a Yorkshire Terrier puppy when it is born?", options: ["Black with tan markings", "Pink", "Pure white"], answer: 0, evidence: "born black with tan markings" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
