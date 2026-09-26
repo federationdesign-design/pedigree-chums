@@ -257,7 +257,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 1 (J18-241): Jackapoo, 9 new facts (1 existing, 10 in all).
    Batch 2 (J18-245): Cavachon, 9 new facts (1 existing, 10 in all).
    Batch 3 (J18-253): Cavapoo, 9 new facts (1 existing, 10 in all).
-   Batch 4 (J18-257): Maltipoo, 9 new facts (1 existing, 10 in all). */
+   Batch 4 (J18-257): Maltipoo, 9 new facts (1 existing, 10 in all).
+   Batch 5 (J18-258): Goldendoodle, 9 new facts (1 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -305,6 +306,18 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The people of Sybaris, an ancient Greek city famous for its luxury, loved their little Melitaean lapdogs so much that, according to the writer Athenaeus, they took them everywhere, even to the gym. Those tiny white dogs were ancestors of the Maltese, which gives the Maltipoo half of its name. The word sybarite, meaning someone who loves luxury, comes from that city.",
     "The Maltese side of the Maltipoo has had many names over the centuries. In Latin it was Canis Melitaeus, and in English it has been called the Ancient Dog of Malta, the Roman Ladies' Dog and the Maltese Lion Dog. The Kennel Club in Britain settled on plain Maltese in the 1800s.",
     "A Maltipoo is tiny, usually weighing about 2 to 7kg and standing no more than 38cm tall, depending mostly on whether its Poodle parent was a Toy or a Miniature. The Maltese side has a long, silky, pure white coat, but Poodles come in many colours, so Maltipoos come in more colours than the Maltese, with coats anywhere from silky to curly.",
+  ],
+  // Batch 5 (J18-258): 9 new, 10 in all.
+  Goldendoodle: [
+    "The Goldendoodle, a cross of the Golden Retriever and the Poodle, was first widely bred in the 1990s in the USA and Australia. It followed the Labradoodle and the Cockapoo, and some breeders hoped for a larger family dog than the Cockapoo, with the Golden Retriever's friendly nature and the Poodle's low-shedding coat. Some were also bred to work as therapy and assistance dogs.",
+    "In Australia and New Zealand the Goldendoodle is called the Groodle. Elsewhere Goldendoodle is the usual name, joining Golden, from the Golden Retriever, to doodle, the playful nickname given to many Poodle crosses. Whatever the name, it is not recognised as a breed by any major kennel club, including Dogs Australia and the American Kennel Club.",
+    "The first Goldendoodles all had a Standard Poodle parent, so they were big dogs. As they caught on, people asked for smaller ones, and breeders began crossing Golden Retrievers with Miniature Poodles, and later Toy Poodles, too. That is why a Goldendoodle can now be anything from a small lap-sized dog to a large one, depending on which size of Poodle was its parent.",
+    "The Goldendoodle's Golden Retriever side began with a single yellow puppy. In 1865 Dudley Marjoribanks, later Lord Tweedmouth, bought a yellow retriever called Nous from a cobbler in Brighton, the only yellow puppy in a litter of black ones. In 1868 he bred Nous with Belle, a Tweed Water Spaniel, at Guisachan, his Highland estate, and their yellow puppies, including Crocus, Cowslip and Primrose, founded the Golden Retriever.",
+    "For years people told a story that the Golden Retriever, the golden half of the Goldendoodle, came from a troupe of Russian circus dogs that Lord Tweedmouth bought after seeing them perform. It was a good story, but it was wrong. In 1952 his own handwritten record book was published, and it showed that the breed really began with his yellow retriever Nous and a water spaniel called Belle.",
+    "Golden Retrievers, one half of the Goldendoodle, go back to their birthplace for a party. Owners bring them to the ruins of Guisachan House in the Scottish Highlands, where the first litter was born in 1868. There were 188 Golden Retrievers at the 2006 gathering and 361 at the breed's 150th birthday in 2018, and in 2023 the club counted 466, from 12 countries.",
+    "Belle, the mother of the first Golden Retrievers and so an ancestor of every Goldendoodle, was a Tweed Water Spaniel, a breed that is now extinct. Tweed Water Spaniels had curly, liver-brown coats and looked rather like the Irish Water Spaniel. So a Goldendoodle's curls may come from its Poodle parent, but its golden side has curly water dogs in its past too.",
+    "The Poodle side of the Goldendoodle once hunted for buried treasure. In Victorian England and France, small Poodle-type dogs were trained to sniff out truffles, rare fungi that grow underground and are prized by cooks. A dog book of 1886 described the truffle dog as a small, nearly pure Poodle. Poodles were also retrievers of ducks and famous performers in circuses.",
+    "The Goldendoodle can be a working dog as well as a pet. Goldendoodles have worked as guide dogs, assistance dogs and therapy dogs, and one study even tested whether they could sniff out peanuts in food for people with nut allergies. Both of their parents are working breeds: the Golden Retriever fetches birds for hunters, and the Poodle began as a water retriever.",
   ],
 };
 
@@ -807,6 +820,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The Greek thinker Aristotle wrote about the Maltipoo's", q: "Which Greek thinker wrote about Melitaean dogs around 370 BC?", options: ["Aristotle", "Archimedes", "Homer"], answer: 0, evidence: "Aristotle" },
   { match: "the poet Martial wrote a poem about a little white lapdog called Issa", q: "What was the name of Publius's little white lapdog?", options: ["Issa", "Fido", "Rex"], answer: 0, evidence: "called Issa" },
   { match: "The people of Sybaris, an ancient Greek city", q: "Where did the people of Sybaris even take their lapdogs?", options: ["To the gym", "To the moon", "To school"], answer: 0, evidence: "even to the gym" },
+  // Batch 5 (J18-258): Goldendoodle.
+  { match: "In Australia and New Zealand the Goldendoodle is called the Groodle", q: "What is the Goldendoodle called in Australia?", options: ["The Groodle", "The Goldie", "The Kangadoodle"], answer: 0, evidence: "called the Groodle" },
+  { match: "The Goldendoodle's Golden Retriever side began with a single yellow puppy", q: "Who did Lord Tweedmouth buy Nous from?", options: ["A cobbler in Brighton", "A king in London", "A farmer in Wales"], answer: 0, evidence: "cobbler in Brighton" },
+  { match: "For years people told a story that the Golden Retriever", q: "What did people once wrongly believe the first Golden Retrievers were?", options: ["Russian circus dogs", "Royal guard dogs", "Arctic sled dogs"], answer: 0, evidence: "Russian circus dogs" },
+  { match: "Golden Retrievers, one half of the Goldendoodle, go back to their birthplace", q: "How many Golden Retrievers were counted at Guisachan in 2023?", options: ["466", "46", "4,660"], answer: 0, evidence: "466" },
+  { match: "The Poodle side of the Goldendoodle once hunted for buried treasure", q: "What did small Poodle-type dogs sniff out in Victorian England and France?", options: ["Truffles", "Diamonds", "Fossils"], answer: 0, evidence: "sniff out truffles" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
