@@ -3005,7 +3005,8 @@
   font-size: calc(clamp(0.95rem, 3.4vw, 1.2rem) * var(--fact-k, 1));
   letter-spacing: 0.03em;
   line-height: 1.05;
-  padding: calc(12px * var(--fact-k, 1)) calc(8px * var(--fact-k, 1));
+  /* 25% more above and below the label, 27 September 2026 (owner): was 12px. */
+  padding: calc(15px * var(--fact-k, 1)) calc(8px * var(--fact-k, 1));
   border-radius: calc(16px * var(--fact-k, 1));
   border: 2px solid rgba(255, 255, 255, 0.3);
   background: var(--navy, #0a3a57);
@@ -3019,17 +3020,12 @@
 }
 /* Hover, as the knockout: the card under the pointer green and a touch larger, the
    others red and a touch smaller, after the same short pause. */
-.factQuizRow:has(.factQuizBtn:hover:not(:disabled)) .factQuizBtn:not(:disabled) {
-  background: #ef4444;
-  border-color: #ef4444;
-  transform: scale(0.95);
-  transition-delay: 0.3s;
-}
+/* NO COLOUR ON HOVER, 27 September 2026 (owner: the answers turned red on hover,
+   giving nothing away but reading as wrong). They stay dark blue until the pick,
+   and the colours come only in the reveal. The card under the pointer still
+   lifts a touch, so it reads as pressable. */
 .factQuizRow .factQuizBtn:hover:not(:disabled) {
-  background: #22c55e;
-  border-color: #22c55e;
   transform: scale(1.05);
-  transition-delay: 0.3s;
 }
 .factQuizBtn:focus-visible { outline: 3px solid #ffed00; outline-offset: 2px; }
 .factQuizBtn:disabled { cursor: default; }
@@ -3047,8 +3043,12 @@
   animation: quizFallAway 0.65s cubic-bezier(0.4, 0, 1, 1) 0.35s forwards !important;
   opacity: 1;
 }
+/* THE REVEAL, 27 September 2026 (owner): every wrong answer turns red as it
+   falls, not just the one picked, so the reveal is green and red throughout. */
 .factQuizFall {
   opacity: 1;
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
   animation: quizFallAway 0.65s cubic-bezier(0.4, 0, 1, 1) forwards !important;
 }
 @keyframes quizCardLand {

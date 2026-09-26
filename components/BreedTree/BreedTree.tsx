@@ -29,6 +29,7 @@ import pitStyles from "../PackPit/PackPit.module.css";
    above: the box in the learn area should BE the pit's box, not a second one that
    drifts away from it. */
 import mapStyles from "../PackPit/LineageMap.module.css";
+import msStyles from "../Milestone/MilestoneMessage.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
 import { propsFor, toysForCircles, type LevelTheme } from "../../data/levelThemes";
@@ -1010,6 +1011,8 @@ const FACT_WORD_MS = 60;
 const QUIZ_EVERY = 3;
 const QUIZ_POINTS = 500;
 const QUIZ_EXTRA_MS = 10000;
+// How long the green reveal shows before a right answer closes the card (owner, 27 September 2026).
+const QUIZ_TOAST_AFTER_MS = 900;
 // The dog pictures pop in one after another, this far apart. See showFact.
 const FACT_DOG_WAVE_MS = 130;
 // Keeping the fact card clear of the lifted dog (desktop): the gap left around it,
@@ -5858,6 +5861,11 @@ export default function BreedTree({
     seen.add(factHash(fact));
     saveFactsSeen(seen);
     factElRef.current?.remove();
+    /* ONE PANEL AT A TIME, 27 September 2026 (owner: the fact card and the
+       Ancestors discovered list overlapped). The newest wins: a fact that opens
+       shuts the list, and the list opening shuts the fact (see the effect by
+       foundListOpen). Through a ref, as the chain counter does (foundStandDownRef). */
+    foundListShutRef.current();
     /* A QUIZ, about one fact in three (owner, 27 September 2026): only a fact with a
        real question (quizFor), and only once two facts have gone by without one. */
     const quiz = quizFor(fact);
@@ -5955,8 +5963,37 @@ export default function BreedTree({
             else if (other === b) other.classList.add(styles.factQuizLose);
             else other.classList.add(styles.factQuizFall);
           }
-          note.textContent = right ? `Correct! +${QUIZ_POINTS}` : `Not quite: it was ${quiz.options[quiz.answer]}.`;
-          if (right) { onScoreRef.current?.(QUIZ_POINTS); recordQuizRight(); }
+          if (!right) note.textContent = `Not quite: it was ${quiz.options[quiz.answer]}.`;
+          if (right) {
+            onScoreRef.current?.(QUIZ_POINTS);
+            recordQuizRight();
+            /* A RIGHT ANSWER CLOSES THE CARD AND POPS A TOAST, 27 September 2026
+               (owner): the points at the size of the score-milestone message.
+               The card waits QUIZ_TOAST_AFTER_MS so the green reveal is seen,
+               then fades as closeFact does; the toast wears the milestone's own
+               classes (no confetti) and goes after its 2.6s pop. On the body, not
+               the fact's host, which sits inside a scaled overlay. */
+            window.setTimeout(() => {
+              // closeFact's fade, written out so showFact still reads refs only.
+              if (factElRef.current === el) { factElRef.current = null; el.classList.add(styles.factClosing); window.setTimeout(() => el.remove(), 260); }
+              const toast = document.createElement("div");
+              toast.className = msStyles.milestone;
+              toast.setAttribute("role", "status");
+              const card = document.createElement("div");
+              card.className = msStyles.milestoneCard;
+              const lab = document.createElement("span");
+              lab.className = msStyles.milestoneLabel;
+              lab.textContent = "Correct!";
+              const val = document.createElement("span");
+              val.className = msStyles.milestoneValue;
+              val.textContent = `+${QUIZ_POINTS}`;
+              card.appendChild(lab);
+              card.appendChild(val);
+              toast.appendChild(card);
+              document.body.appendChild(toast);
+              window.setTimeout(() => toast.remove(), 2600);
+            }, QUIZ_TOAST_AFTER_MS);
+          }
         });
         btns.push(b);
         row.appendChild(b);
@@ -6081,6 +6118,17 @@ export default function BreedTree({
      dog too, and open a blue box under that row. One box at a time. */
   const [foundDetail, setFoundDetail] = useState<{ name: string; kind: "info" | "zoom" | "mix" } | null>(null);
   const foundListRef = useRef<HTMLDivElement>(null);
+  /* ONE PANEL AT A TIME, 27 September 2026 (owner): opening the list shuts the
+     fact card, with closeFact's quick fade. Written out here rather than calling
+     closeFact so the effect depends on the open flag alone. */
+  useEffect(() => {
+    if (!foundListOpen) return;
+    const el = factElRef.current;
+    if (!el) return;
+    factElRef.current = null;
+    el.classList.add(styles.factClosing);
+    window.setTimeout(() => el.remove(), 260);
+  }, [foundListOpen]);
   /* THE LIST CLOSES ITSELF after FOUND_LIST_OPEN_MS (owner, 24 September 2026),
      in place of the close X. A tap on the counter still opens and shuts it. */
   useEffect(() => {
@@ -6122,6 +6170,8 @@ export default function BreedTree({
      state, so it reaches it through a ref. */
   // Built once: both setters are stable, so nothing here goes stale.
   const foundStandDownRef = useRef<() => void>(() => { setFoundFlash(false); setFoundListOpen(false); });
+  // A new fact card shuts the list and its row box (owner, 27 September 2026). Built once, like the above.
+  const foundListShutRef = useRef<() => void>(() => { setFoundListOpen(false); setFoundDetail(null); });
   /* THE SWIPE WINS OVER THE COLLECT (owner,
      17 September 2026). A second press on an armed card collects it on the
      PRESS, before anyone can know whether a swipe follows. Under the chain flag,
