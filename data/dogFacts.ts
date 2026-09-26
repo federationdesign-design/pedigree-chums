@@ -283,7 +283,9 @@ export const EXTRA_FACTS: string[] = [];
    Batch 26 (J18-288): Bichon Frise, 4 new facts (11 existing, most through the Cavachon; 15 in all).
    Batch 27 (J18-291): West Highland Terrier, 5 new facts (5 existing, 10 in all).
    Batch 28 (J18-292): six chums in one pass (owner): Springer Spaniel, Irish Wolfhound,
-   Chihuahua, Afghan Hound, Dachshund and Boxer, 26 new facts. */
+   Chihuahua, Afghan Hound, Dachshund and Boxer, 26 new facts.
+   ANCESTOR DOGS, batch 1 (J18-304): 5 more facts each for 20 of the 95 ancestor dogs,
+   keyed by their node names so each fact leads with that ancestor's picture. */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -600,6 +602,147 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The first Boxer club was founded in Munich, Germany, in 1895, and the first Boxers were shown at a dog show for Saint Bernards there. The first Boxer ever entered in the breed's stud book, in 1904, was a dog called Mühlbauer's Flocki.",
     "The most important Boxer breeder of all was a woman, Friederun Stockmann. Born in 1891 in Riga, she went to Munich to study art, met her husband through his Boxer, Pluto, and spent her life breeding Boxers. Her dogs helped shape the Boxer all over the world.",
     "Boxers served in both world wars as messenger dogs, carrying packs and standing guard. After the Second World War, soldiers took Boxers home with them, and the breed became a favourite family dog. In 1951 a Boxer called Bang Away won Best in Show at America's famous Westminster dog show.",
+  ],
+  // ANCESTOR DOGS, batch 1 (J18-304): 5 more facts each for 20 ancestor dogs.
+  "Ancient Molossers": [
+    "The Ancient Molossers are named after the Molossians, a people of Epirus in north-western Greece, whose big dogs were famous across the ancient world.",
+    "The Greek writer Aristotle, more than 2,300 years ago, praised the Molossian dogs as especially brave, and said the sheepdogs among them were the best of all.",
+    "The Jennings Dog, a large marble statue in the British Museum, is thought to show a Molossian hound, sitting alert with its head turned, as if it has heard something.",
+    "The Romans prized the Ancient Molossers as guard dogs for houses and farms, and the poet Virgil advised farmers to feed Molossian dogs well, to keep thieves and wolves away.",
+    "Historians still debate what the Ancient Molossers looked like. Some think they were heavy mastiffs, while others think the name covered several kinds of large Greek dog, including sheepdogs and hounds.",
+  ],
+  "Laconian tracking Hounds": [
+    "The Laconian hounds came from Laconia, the region around the Greek city of Sparta, and were also called Spartan hounds.",
+    "The Greek writer Xenophon wrote a whole book about hunting with hounds, the Cynegeticus, about 2,400 years ago, much of it about Laconian hounds and how to train them.",
+    "Xenophon advised giving Laconian hounds short names that were easy to call, and suggested names such as Psyche, meaning spirit, and Hybris, meaning cheek.",
+    "In Shakespeare's A Midsummer Night's Dream, Duke Theseus boasts that his hounds are bred out of the Spartan kind, meaning they descend from the famous Laconian hounds.",
+    "Ancient Greek writers told a story that Laconian hounds were a cross between dogs and foxes. It is not true, because dogs and foxes cannot breed, but it shows how clever and quick the hounds seemed.",
+  ],
+  "Segusian tracking Hounds": [
+    "The Segusian hounds were named after the Segusiavi, a Celtic people who lived in Gaul, in the area around modern Lyon in France.",
+    "The Greek writer Arrian, in the 100s AD, described Segusian hounds as shaggy and rather ugly, with a mournful, pleading howl as they followed a trail.",
+    "Arrian said Segusian hounds were slow, but excellent at following a scent, a bit like a modern Bloodhound or Basset.",
+    "Because they worked by smell rather than speed, Segusian hounds are thought to be among the early ancestors of Europe's scenthounds, the dogs that later became the Bloodhound and Beagle's forebears.",
+    "The Segusian hounds' loud, sad-sounding howl while hunting was so well known that ancient writers compared it to the cries of beggars.",
+  ],
+  "Gaulish coursing Hounds": [
+    "The Gaulish coursing hounds were called vertragi by the Romans. The name is thought to come from a Celtic word meaning very fast.",
+    "Arrian, a Greek writer who lived under Roman rule, owned a vertragus bitch called Horme, meaning Impulse or Rush, and wrote that she was the fastest and cleverest hound he had ever known.",
+    "Arrian wrote about his hound Horme sleeping beside him and greeting him with joy, one of the earliest written descriptions of a dog as a loving pet as well as a hunter.",
+    "The Roman poet Martial wrote a short poem about a vertragus that hunted not for itself but for its master, bringing back a hare unharmed.",
+    "The Gaulish coursing hounds hunted hares by sight, just as Greyhounds and Whippets do today, and many experts think they were among the ancestors of those breeds.",
+  ],
+  "Norman Hound": [
+    "The Norman Hound was a big, heavy hound, usually white with markings, with long ears and a deep, bell-like voice that carried far across the countryside.",
+    "The Norman Hound was slow but steady. Hunters on horseback could keep up with it easily, which suited the grand, slow hunts of medieval nobles.",
+    "The Norman Hound is thought to be one of the ancestors of the old English Southern Hound and the Talbot, a white hound that became a famous symbol in English heraldry.",
+    "Several English pubs are still called The Talbot, after the white hound descended from Norman-type hunting dogs.",
+    "Norman Hounds are thought to have hunted deer and boar in the royal forests that William the Conqueror and his sons set aside for hunting.",
+  ],
+  "Rache": [
+    "Rache was a medieval English and Scottish word for a hunting hound that tracked by scent. In old Scots it was spelled ratch.",
+    "A female hunting hound was once called a brach, a word related to rache. Shakespeare uses it several times, including in King Lear.",
+    "In medieval hunts, the raches found and followed the scent of the deer or boar, while faster hounds and heavy dogs took over for the chase and the kill.",
+    "Medieval hunting books tell how raches were fed, kennelled and trained by hunt servants, and how their different voices in the pack helped the hunters follow the chase.",
+    "The word rache comes from Old English ræcc, meaning a hunting dog, and is one of the oldest English words for a type of dog.",
+  ],
+  "Medieval Greyhound": [
+    "The Book of St Albans, printed in 1486, describes the perfect Medieval Greyhound: headed like a snake, necked like a drake, footed like a cat, tailed like a rat.",
+    "In medieval Britain, owning a Greyhound was a sign of high rank. Knights and nobles were often painted or carved with Greyhounds at their side.",
+    "The Greyhound appears on the coats of arms of many noble families, and was one of the royal badges of King Henry VII.",
+    "Medieval Greyhounds wore fine collars, some decorated with silver, gold or velvet, as a sign of their owner's wealth.",
+    "Myth: The name Greyhound means the dogs were always grey. The truth: Nobody is sure where the name comes from. It may come from an Old English word meaning dog-hound, and Greyhounds come in many colours.",
+  ],
+  "Alaunt war dogs": [
+    "In The Canterbury Tales, Geoffrey Chaucer describes a king's chariot guarded by 20 or more white alaunts, as big as young bulls, wearing muzzles and collars of gold.",
+    "In the 1380s, the French nobleman Gaston Phoebus wrote a famous hunting book describing three kinds of alaunt: the gentle alaunt, the alaunt veautre used for boar, and the butcher's alaunt that guarded meat.",
+    "Gaston Phoebus warned that alaunts could be headstrong and dangerous if badly trained, but said a good one was the best of all dogs for holding a dangerous animal.",
+    "The Alano Español, a Spanish breed of catch dog still kept today, is thought by many to be a descendant of the medieval alaunt.",
+    "Alaunts were named after the Alans, horse-riding people from the steppe who brought their big dogs west into Europe around 1,600 years ago.",
+  ],
+  "Chien-gris": [
+    "The Chien-gris, meaning grey dog in French, was a hunting hound kept in the royal kennels of the kings of France during the Middle Ages.",
+    "The Chien-gris was prized for hunting deer. French kings kept packs of them for centuries, until newer types of hound took their place.",
+    "By the 1500s and 1600s the Chien-gris had become rare, and it later disappeared as a separate type of hound.",
+    "Like many old hound types, the Chien-gris faded away as fashions in hunting changed and breeders crossed hounds to make faster packs.",
+    "The Chien-gris is one of the hounds that helped shape later French scenthounds, which in turn influenced hunting hounds across Europe and in Britain.",
+  ],
+  "Zhokhov Island sled dogs": [
+    "Zhokhov Island lies in the Arctic Ocean, north of Siberia. About 9,500 years ago, people there were already using dogs to pull sledges across the ice.",
+    "Studies of the Zhokhov Island dog bones suggest their owners chose dogs of a certain size, about 16 to 25kg, which is the ideal weight for pulling sledges without overheating.",
+    "The Zhokhov Island people seem to have kept some larger dogs too, perhaps for hunting polar bears and reindeer.",
+    "A 2020 study of the DNA of a Zhokhov Island dog found that modern sled dogs, such as Greenland sledge dogs and Siberian Huskies, are closely related to it.",
+    "The Zhokhov Island sled dogs show that dogs had already been bred for special jobs, like pulling sledges, around 9,500 years ago.",
+  ],
+  "Taimyr wolf": [
+    "The Taimyr wolf is known from a single small bone found on the Taimyr Peninsula in northern Siberia and dated to about 35,000 years ago.",
+    "In 2015, scientists read the DNA of the Taimyr wolf bone and found it came from a population of wolves that split off around the time wolves and dogs went their separate ways.",
+    "The Taimyr wolf's DNA suggested that dogs may have split from wolves earlier than many scientists had thought, perhaps more than 27,000 years ago.",
+    "Some northern dogs, such as Siberian Huskies and Greenland sledge dogs, still carry a small amount of DNA from ancient wolves like the Taimyr wolf.",
+    "The Taimyr wolf lived in a cold world of mammoths, woolly rhinos and cave lions, on the huge grasslands of the last Ice Age.",
+  ],
+  "Early Mesoamerican dogs": [
+    "Dogs reached Mexico and Central America with the first people who travelled south through the Americas, thousands of years ago.",
+    "In western Mexico, potters of the Colima culture, around 2,000 years ago, made many clay figures of plump little dogs, which were often placed in tombs.",
+    "The Aztecs kept several kinds of dog, including the hairless Xoloitzcuintli and a small dog called the Techichi, and believed dogs could guide souls to the afterlife.",
+    "The Maya of Mexico and Central America kept dogs too, and dog bones have been found at many Maya sites, some in special burials.",
+    "Some of the ancient dogs of Mexico were hairless, a trait still seen today in the Mexican Hairless Dog, the Xoloitzcuintli.",
+  ],
+  "Ancient Melitaean dogs": [
+    "The Melitaean dogs are named after Melita, an ancient place name. Some think it meant the island of Malta, others the island of Mljet in Croatia.",
+    "The Greek writer Aristotle mentioned the little Melitaean dogs over 2,300 years ago, describing them as well-proportioned despite being small.",
+    "Small, fluffy dogs like the Melitaean dogs appear on ancient Greek vases, often with children or women.",
+    "In ancient Rome, little Melitaean dogs were fashionable lapdogs, and rich Roman ladies are said to have carried them in their sleeves or on their laps.",
+    "The Roman writer Strabo described the small Melitaean dogs as a favourite pet, and they are thought to be the ancestors of today's Maltese.",
+  ],
+  "Portuguese fishing dogs": [
+    "Portuguese fishing dogs helped fishermen by diving into the sea to herd fish into nets, fetch broken nets and lost gear, and swim messages between boats.",
+    "Portuguese fishing dogs were often clipped with the back half of the body shaved and the front left furry, to help them swim while keeping their chest warm.",
+    "The Portuguese fishing dog is known today as the Portuguese Water Dog, or Cão de Água, which means water dog in Portuguese.",
+    "By the 1930s, as fishing boats changed, the Portuguese Water Dog had almost died out. A businessman, Vasco Bensaude, rescued the breed by collecting and breeding the last dogs.",
+    "Portuguese Water Dogs have webbed feet and a waterproof coat, and can dive underwater, a rare skill for a dog.",
+  ],
+  "Corded herding dogs": [
+    "Corded herding dogs, such as the Hungarian Komondor and Puli, have coats that naturally twist into long cords, like dreadlocks.",
+    "A corded coat protected herding dogs from bad weather and from the teeth of wolves, and helped the white Komondor blend in with a flock of sheep.",
+    "The Komondor was bred to guard sheep on its own, deciding for itself when a threat was coming, rather than waiting for a shepherd's orders.",
+    "The cords of a Komondor's coat take about two years to form, and a full-grown coat can reach the ground and take days to dry after a bath.",
+    "The Puli, a smaller corded dog, was used to herd sheep in Hungary, and is said to be so agile that it can jump onto a sheep's back to turn the flock.",
+  ],
+  "Ancient Chinese court dogs": [
+    "Ancient Chinese court dogs were treated like royalty. Emperor Ling of the Han dynasty, who ruled in the 100s AD, is said to have given his dogs official ranks and titles.",
+    "In the Chinese imperial court, the smallest dogs were called sleeve dogs, because courtiers carried them inside the wide sleeves of their robes.",
+    "Legend says that stealing one of the emperor's palace dogs in ancient China was punishable by death. It is a famous story, though historians are not sure it was really the law.",
+    "The Pekingese is descended from ancient Chinese court dogs. For centuries, they were kept only inside the palaces of the emperors in Beijing.",
+    "When British soldiers looted the Summer Palace in Beijing in 1860, they took five small palace dogs to Britain. One, named Looty, was given to Queen Victoria.",
+  ],
+  "Old Mastiffs of the East": [
+    "Great stone carvings from the palace of the Assyrian king Ashurbanipal, about 2,650 years old, show huge mastiff-like hunting dogs. They are now in the British Museum.",
+    "The Assyrian palace carvings show the big dogs on leads, being led out for a royal lion hunt, with heavy heads and powerful bodies.",
+    "Tiny clay models of mastiff-like dogs, each with its name written on it, were buried under an Assyrian palace doorway as guardians. Names included ones meaning Don't think, bite!",
+    "The Tibetan Mastiff is thought to descend from ancient guard dogs of the East, and in Tibet it still guards flocks and homes from wolves and snow leopards.",
+    "Ancient writers described huge dogs from India and the East that were said to fight lions. The stories were exaggerated, but they show how impressive these dogs seemed.",
+  ],
+  "Medieval British Mastiff": [
+    "Legend says that at the Battle of Agincourt in 1415, the knight Sir Piers Legh was wounded, and his Mastiff stood over him and guarded him for hours.",
+    "The Mastiffs of Lyme Hall in Cheshire, home of the Legh family, were kept for hundreds of years and were said to descend from Sir Piers Legh's loyal Mastiff at Agincourt.",
+    "In medieval England, farmers and householders kept mastiffs as guard dogs, often chained up by day and let loose at night to deter thieves.",
+    "In some medieval royal forests, farmers' mastiffs had their front toes cut, an old law called lawing, so they could not chase the king's deer.",
+    "The word mastiff probably comes from an old French word meaning tame, or a house dog, because mastiffs lived at home as guards.",
+  ],
+  "Medieval Bloodhound": [
+    "Medieval Bloodhounds were called sleuth hounds in Scotland, from sleuth, an old word for a trail. That is why a detective is still sometimes called a sleuth.",
+    "Legend says that Robert the Bruce was once chased by his enemies with a Bloodhound, and escaped by wading down a stream so the dog lost his scent.",
+    "Medieval Bloodhounds were used not only for hunting deer, but also for tracking outlaws and cattle thieves along the border between England and Scotland.",
+    "The name Bloodhound may mean a hound of pure blood, bred carefully by nobles, rather than a dog that likes blood.",
+    "Medieval Bloodhounds could follow a trail that was days old, a skill that later made the Bloodhound famous with police around the world.",
+  ],
+  "Central Asian Tazi hounds": [
+    "In Kazakhstan, the Tazy hound is so valued that it is treated as a national treasure, and there are programmes to protect the breed.",
+    "In Central Asia, Tazi hounds have long hunted alongside golden eagles. The hound chases the fox or hare, and the eagle swoops down to catch it.",
+    "The Tazi hounds of Central Asia have long, silky ears and feathered tails, and are built to run fast over open steppe.",
+    "In Kazakh tradition, a good Tazy was so valuable that it was said to be worth the same as a fine horse.",
+    "Tazi hounds are thought to be relatives of the Saluki and the Afghan Hound, part of a family of ancient sighthounds stretching from the Middle East to Central Asia.",
   ],
 };
 
