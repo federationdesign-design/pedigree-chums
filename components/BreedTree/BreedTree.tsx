@@ -17,7 +17,7 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
 import { breedInfo, breedInfoLong } from "../../data/breedInfo";
-import { allDogFacts, factHeadFor, dogsForFact } from "../../data/dogFacts";
+import { allDogFacts, factHeadFor, dogsForFact, factsAboutDog } from "../../data/dogFacts";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 /* The pit's own stylesheet, imported so the learn area's collect flourish IS the
@@ -5792,7 +5792,22 @@ export default function BreedTree({
     document.addEventListener("pointerdown", onDown, true);
     return () => document.removeEventListener("pointerdown", onDown, true);
   }, [learnNode, learnCard]);
-  const showFact = () => {
+  // Build the facts-by-dog index in the background, a moment after the pit loads,
+  // so the first chain or chum does not wait the third of a second it takes.
+  useEffect(() => {
+    const warm = () => { factsAboutDog(""); };
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const id = ric ? ric(warm, { timeout: 4000 }) : window.setTimeout(warm, 1500);
+    return () => {
+      const cic = (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback;
+      if (ric && cic) cic(id); else window.clearTimeout(id);
+    };
+  }, []);
+  /* prefer: the dogs this fact should be about, most wanted first (27 September
+     2026, owner: a chum collect shows a fact about that chum, a chain one about a
+     dog in it). The first of them with an unseen fact wins, picked at random from
+     its facts; if none has one, the random deck as before. */
+  const showFact = (prefer: string[] = []) => {
     const host = chainCountRef.current?.parentElement;
     if (!host) return;
     const fd = factDeckRef.current;
@@ -5812,9 +5827,16 @@ export default function BreedTree({
       if (!fresh.length) { seen.clear(); fresh = pool; }
       fd.deck = shuffledFacts(fresh);
     }
-    // A fact seen on another level since this deck was dealt is skipped.
-    let fact = fd.deck.pop();
-    while (fact && seen.has(factHash(fact)) && fd.deck.length) fact = fd.deck.pop();
+    let fact: string | undefined;
+    for (const dogName of prefer) {
+      const unseen = factsAboutDog(dogName).filter((t) => !seen.has(factHash(t)));
+      if (unseen.length) { fact = unseen[Math.floor(Math.random() * unseen.length)]; break; }
+    }
+    // Otherwise the random deck. A fact seen on another level since it was dealt is skipped.
+    if (!fact) {
+      fact = fd.deck.pop();
+      while (fact && seen.has(factHash(fact)) && fd.deck.length) fact = fd.deck.pop();
+    }
     if (!fact) return;
     seen.add(factHash(fact));
     saveFactsSeen(seen);
@@ -6369,7 +6391,7 @@ export default function BreedTree({
     // Counted straight away, so the box pops and the number
     // climbs as the card sets off, not when it lands.
     const cm = chumList[i];
-    if (cm) { onChumCollected?.(cm.name); showFact(); }
+    if (cm) { onChumCollected?.(cm.name); showFact([cm.name]); }
     // Hearts from the card as it goes. See heartBurst.
     {
       const card = chumsGRef.current?.children[i] as Element | undefined;
@@ -14823,7 +14845,8 @@ export default function BreedTree({
          collect their chums, and each collect shows its own fact. See showFact. */
       if (ch.kind === DOG && ch.cards.length) {
         const dn = dogNode(ch.cards[0]);
-        if (dn) showFact();
+        // The chained dog first, then the dogs in its family tree (its lifted layer).
+        if (dn) showFact([dn.data.name, ...(dn.data.children ?? []).map((c) => c.name)]);
       }
       /* Hearts from each of a dog chain's circles as they lift, up to 18 in all.
          geo is in the pit's own SVG space, so it is mapped to the screen the way

@@ -557,6 +557,22 @@ const SUBJECT_PICTURE: Record<string, string> = {
   Setter: "English Setter", Collie: "Rough Collie", "Collie or working dog": "Old working collies",
 };
 let cache: string[] | null = null;
+/* FACTS BY DOG, 27 September 2026 (owner: a fact shown for a chum collect or a
+   chain should be about that chum or a dog in the chain). Built once, the first
+   time it is asked for, from the same dogsForFact that picks each fact's
+   pictures, so "about this dog" means exactly "shows this dog". */
+let byDog: Map<string, string[]> | null = null;
+export function factsAboutDog(name: string): string[] {
+  if (!byDog) {
+    byDog = new Map();
+    for (const f of allDogFacts()) for (const d of dogsForFact(f)) {
+      const list = byDog.get(d.name) ?? [];
+      if (!list.includes(f)) list.push(f);
+      byDog.set(d.name, list);
+    }
+  }
+  return byDog.get(name) ?? [];
+}
 // Every fact in the pool, each once, longer than a scrap.
 export function allDogFacts(): string[] {
   if (cache) return cache;
