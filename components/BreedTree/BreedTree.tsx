@@ -496,11 +496,16 @@ const TOY_SLIPPER_GONE_KEY = "pc-minipit-slipper-gone";
 const LOGO_SRC = "/PC-logo.svg";
 const LOGO_ASPECT = 595.3 / 356.5; // the artwork's own viewBox
 const LOGO_BIG_MULT = 6.8;         // PackPit's LOGO_W = BIG * 6.8
-/* The collider is smaller than the drawing: the mark sits in about 85% of the
-   box across and 70% down it, so a corner of empty space does not take hits.
-   PackPit line 548. */
-const LOGO_BODY_W = 0.85;
-const LOGO_BODY_H = 0.7;
+/* THE LOGO'S COLLIDER FOLLOWS THE BONE, 27 September 2026 (owner, J18-309: the
+   dog circles should flow round the bone, not a rectangle). It was one box, 85% by
+   70% of the artwork, so its empty corners pushed dogs away from space the bone
+   never fills. Now it is a compound of the bone's four knuckles (circles) and one
+   bar under the lettering, measured off /PC-logo.svg in its own 595.3 x 356.5
+   viewBox units: [x, y, r] for each knuckle, and the bar as centre, width,
+   height and tilt. The spark and ray decorations are left out, as they fall away
+   with the first hits anyway. */
+const LOGO_KNUCKLES: [number, number, number][] = [[96, 70, 62], [48, 188, 50], [534, 126, 60], [500, 268, 58]];
+const LOGO_BAR = { x: 292, y: 168, w: 440, h: 150, a: -0.1 };
 /* THE SIX STAGES OF DAMAGE, stage 2 of the logo job (31 August 2026).
    Index 0 is the art after the FIRST hit, so the list is read as
    LOGO_STAGE_SRC[hits - 1] and an unhit logo keeps LOGO_SRC. Five entries for
@@ -10208,18 +10213,28 @@ export default function BreedTree({
       const isMenuKind = (k: string) => k === "leave" || k === "restart";
       for (const u of uiBodies as any[]) {
         const p = pxFromWorld(u.x, u.y);
-        /* Every UI object here is a circle except the logo, which is a wide
-           rectangle. Its collider is inset to the artwork's own bounds, the
-           main pit's 85% by 70%, so the empty corners of the box do not take
-           hits that the drawing never touches. */
-        const um = u.kind === "logo" && u.w && u.h
-          ? Bodies.rectangle(
-              p.x, p.y,
-              Math.max(2, u.w * LOGO_BODY_W * pxPerWorld),
-              Math.max(2, u.h * LOGO_BODY_H * pxPerWorld),
-              { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012, collisionFilter: { group: LOGO_GROUP } },
-            )
-          : Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
+        /* Every UI object here is a circle except the logo, which is the bone:
+           four knuckle circles and a bar, one compound body (see LOGO_KNUCKLES).
+           Collisions report the PART that was hit, so every part carries the same
+           plugin and collision group as the whole, as the floor slabs do.
+           setCentre pins the body's position to the artwork's centre, so the
+           drawing, which is placed from the body's position, does not shift by
+           the parts' centre of mass. */
+        let um;
+        if (u.kind === "logo" && u.w && u.h) {
+          const lk = (u.w * pxPerWorld) / 595.3;
+          const at = (vx: number, vy: number) => ({ x: p.x + (vx - 595.3 / 2) * lk, y: p.y + (vy - 356.5 / 2) * lk });
+          const partOpts = { restitution: 0.3, frictionAir: 0.012, density: 0.0012, collisionFilter: { group: LOGO_GROUP } };
+          const parts = LOGO_KNUCKLES.map(([vx, vy, vr]) => { const q = at(vx, vy); return Bodies.circle(q.x, q.y, Math.max(2, vr * lk), partOpts); });
+          const bq = at(LOGO_BAR.x, LOGO_BAR.y);
+          parts.push(Bodies.rectangle(bq.x, bq.y, Math.max(2, LOGO_BAR.w * lk), Math.max(2, LOGO_BAR.h * lk), { ...partOpts, angle: LOGO_BAR.a }));
+          for (const pt of parts) pt.plugin = { ui: u };
+          um = MBody.create({ parts, restitution: 0.3, frictionAir: 0.012, collisionFilter: { group: LOGO_GROUP } });
+          MBody.setCentre(um, { x: p.x, y: p.y });
+          if (u.fixed) MBody.setStatic(um, true);
+        } else {
+          um = Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
+        }
         um.plugin = { ui: u };
         u.mb = um;
         u.mbIn = !isMenuKind(u.kind);
