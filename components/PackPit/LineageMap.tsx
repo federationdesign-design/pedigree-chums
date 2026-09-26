@@ -1539,15 +1539,22 @@ export default function LineageMap({
     if (bounded) return { chum: [], alive: [], extinct: [] };
     const seenImg = new Set<string>();
     const all: { name: string; img: string; status: BreedTag | null }[] = [];
+    /* NOT FOR HIDDEN COPIES, 26 September 2026 (owner: a dog could not be completed,
+       one frame never filled). A frame for a picture that only a hidden copy carries
+       can never be filled, because a hidden copy never gets a card, so Complete never
+       showed (Roman shepherd dogs). Hidden copies are skipped, their children are
+       still walked, exactly as the circles are drawn. Matched on the picture AS SHOWN
+       (packArt), the same key the cards use. */
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
-      if (k.img && !seenImg.has(k.img)) { seenImg.add(k.img); all.push({ name: k.name, img: packArt(k.name) ?? k.img, status: nodeStatus(k.name, k.note) }); }
+      const shownImg = k.img ? packArt(k.name) ?? k.img : null;
+      if (shownImg && !hiddenIds.has(k._id) && !seenImg.has(shownImg)) { seenImg.add(shownImg); all.push({ name: k.name, img: shownImg, status: nodeStatus(k.name, k.note) }); }
       walk(k);
     });
     if (root) walk(root);
     const chum = all.filter((s) => PACK_BREEDS.has(s.name)); // ancestors that are themselves one of the 54 pack dogs
     const rest = all.filter((s) => !PACK_BREEDS.has(s.name));
     return { chum, alive: rest.filter((s) => isAlive(s.status)), extinct: rest.filter((s) => !isAlive(s.status)) };
-  }, [root, bounded]);
+  }, [root, bounded, hiddenIds]);
 
   /* FRAMES SIZED BY SHARE, STAGE 1, 21 September 2026 (owner: on desktop the frames in
      the lifted layer should reflect the size of the images, so a 100% node gets a bigger
@@ -1583,13 +1590,14 @@ export default function LineageMap({
   // duplicate, so its frame becomes a stack the extra copies can be dropped onto
   const dupTotal = useMemo(() => {
     const m = new Map<string, number>();
+    // Hidden copies never get a card, so they are not duplicates either (see frameSlots).
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
-      if (k.img) { const img = packArt(k.name) ?? k.img; m.set(img, (m.get(img) ?? 0) + 1); }
+      if (k.img && !hiddenIds.has(k._id)) { const img = packArt(k.name) ?? k.img; m.set(img, (m.get(img) ?? 0) + 1); }
       walk(k);
     });
     if (root) walk(root);
     return m;
-  }, [root]);
+  }, [root, hiddenIds]);
   // Stage 1: genetic-mix model. Walk the whole tree; each appearance of a breed
   // contributes its cumulative share (leaves / root leaves, which already honours
   // non-binary splits). Sum a breed's appearances, then normalise so every breed
@@ -2525,7 +2533,11 @@ export default function LineageMap({
   // Cards to draw: nodes that are picked and currently live in the open tree,
   // plus any pinned (dragged) card, which persists even after its branch closes.
   // Keyed by id so a live card that gets dragged keeps the same element.
-  const liveById = new Map(shown.filter((n) => n._parent && n.img).map((n) => [n._id, n as Node]));
+  /* NEVER A CARD FOR A HIDDEN COPY, 26 September 2026 (owner: after AUTO, extra
+     pictures sat loose in the lift). Opening a circle popped every child, echo copies
+     included; their circles are not drawn, so their cards sat on the empty spot.
+     The picking paths skip them now, and this is the net behind them. */
+  const liveById = new Map(shown.filter((n) => n._parent && n.img && !hiddenIds.has(n._id)).map((n) => [n._id, n as Node]));
   const cardIds = new Set<string>([
     ...[...picked].filter((id) => liveById.has(id)),
     ...pinned.keys(),
@@ -3322,7 +3334,7 @@ export default function LineageMap({
     // than repeating or corrupting a step.
     // For instructional cards: show first child icon on first double-click
     if (INSTR_NAMES.has(breed.name)) {
-      const firstUnpicked = shown.filter((n) => n.img && !picked.has(n._id) && n._parent);
+      const firstUnpicked = shown.filter((n) => n.img && !picked.has(n._id) && n._parent && !hiddenIds.has(n._id));
       if (firstUnpicked.length > 0) {
         const n = firstUnpicked[0];
         const sh = n._parent ? Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100) : 50;
@@ -3376,7 +3388,7 @@ export default function LineageMap({
     if (hideLeafImages) { interacted.current = true; setIdleHint(false); return; }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
     // card, pop them all (a staggered ripple, +50 each) before any collapse begins.
-    const toPop = shown.filter((n) => n._parent && n.img && !picked.has(n._id));
+    const toPop = shown.filter((n) => n._parent && n.img && !picked.has(n._id) && !hiddenIds.has(n._id));
     if (toPop.length) {
       setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; });
       toPop.forEach((n, i) => {
