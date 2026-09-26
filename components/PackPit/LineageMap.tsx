@@ -3829,10 +3829,15 @@ export default function LineageMap({
             const size = R * 2.6;
             const wordY0 = R * 0.78;              // the word's own chord check, at its lowest
             const chord = 2 * Math.sqrt(Math.max(0, R * R - wordY0 * wordY0));
-            const fs = Math.max(10, Math.min(R * 0.2, (chord * 0.92) / (0.68 * band.label.length)));
-            const wordY = WORD_Y;
+            const fitFs = Math.max(10, Math.min(R * 0.2, (chord * 0.92) / (0.68 * band.label.length)));
+            /* TWICE THE SIZE, 27 September 2026 (owner, J18-255: fine if it runs past the
+               circle). So the word is drawn OUTSIDE the circle's clip, below, and grows
+               UPWARD from where its foot sat, so it stays clear of the buttons. */
+            const fs = fitFs * 2;
+            const wordY = WORD_Y + fitFs / 2 - fs / 2;
             return (
-              <g key={`liquid-${breed.name}`} clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }} aria-hidden="true">
+              <g key={`liquid-${breed.name}`} style={{ pointerEvents: "none" }} aria-hidden="true">
+              <g clipPath={`url(#${clip})`}>
                 <g className={styles.fluidRise} style={{ transform: `translateY(${surface}px)` }}>
                   <rect
                     className={`${styles.fluidTurn} ${styles.bandFill}`}
@@ -3845,6 +3850,7 @@ export default function LineageMap({
                     opacity={LIQUID_OPACITY}
                   />
                 </g>
+              </g>
                 <g className={styles.fluidRise} style={{ transform: `translateY(${wordY}px)` }}>
                   <text
                     x={0}
