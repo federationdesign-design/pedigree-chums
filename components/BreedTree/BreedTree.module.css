@@ -2962,8 +2962,9 @@
    chatbot (owner, 26 September 2026). */
 .factClose {
   position: absolute;
-  top: calc(12px * var(--fact-k, 1));
-  right: calc(12px * var(--fact-k, 1));
+  /* 5px more room above and to the right (owner, 27 September 2026). */
+  top: calc(12px * var(--fact-k, 1) + 5px);
+  right: calc(12px * var(--fact-k, 1) + 5px);
   width: calc(30px * var(--fact-k, 1));
   height: calc(30px * var(--fact-k, 1));
   border: none;
