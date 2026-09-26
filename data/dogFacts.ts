@@ -136,7 +136,7 @@ export const EXTINCT_REWRITES: Record<string, string> = {
   "Old Scotch Collie": "The Old Scotch Collie was the Scottish shepherd's sheepdog, herding on the hills long before there were dog shows. The Border Collie grew from it.",
   "Old Cumberland herding dogs": "Northern English herding dogs from Cumberland worked the same Border country and fed into the Border Collie.",
   "Brabant Bullenbeisser": "The Brabant Bullenbeisser, which means bull-biter, was a strong, sporty German dog with a square body and a slightly turned-up nose. Dog experts name it as the Boxer's direct ancestor.",
-  "Great Bullenbeisser (Danziger Bullenbeisser)": "The Great Bullenbeisser was a big, heavy German dog, weighing up to 50 kilos, trained to grab boar, bears and bulls and hold on. The smaller Brabant Bullenbeisser, the Boxer's ancestor, came from it.",
+  "Great Bullenbeisser (Danziger Bullenbeisser)": "The Great Bullenbeisser was a big, heavy German dog, weighing up to 50kg, trained to grab boar, bears and bulls and hold on. The smaller Brabant Bullenbeisser, the Boxer's ancestor, came from it.",
   "Medieval Alaunts dogs": "Medieval Alaunts were big, brave European dogs that came from the dogs the Alans brought west from the steppe, the huge grasslands of Asia. They were trained to grab large animals in hunts and battles, and they led to the German Bullenbeisser, the Boxer's ancestor.",
   "Early Boar hunting dogs": "Big, rough hunting dogs of northern Europe appear in Roman writings about the Germanic tribes. They were bred to grab and hold wild boar and bears rather than chase them. Mixed with the Alaunts, they made the German bull-biting dogs behind the Boxer.",
   "German Bullenbeisser dogs": "German Bullenbeissers, which means bull-biters, were dogs trained to grab boar, bears and bulls and hold on. The bigger ones hunted boar, and the smaller Brabant line became the Boxer.",
@@ -201,8 +201,8 @@ export function factHeadFor(fact: string): string {
    Odin from Good Dog Bad Dog. Left out on purpose: the grimmer Victorian figures
    and film release details that date quickly. */
 const ARTICLE_FACTS: string[] = [
-  "A guide dog costs more than 55,000 pounds over its life, from being born to retiring.",
-  "Training a medical alert dog costs about 29,000 pounds, yet the dogs are given free to the people who need them, paid for almost entirely by donations.",
+  "A guide dog costs more than £55,000 over its life, from being born to retiring.",
+  "Training a medical alert dog costs about £29,000, yet the dogs are given free to the people who need them, paid for almost entirely by donations.",
   "Guide dogs are trained to refuse to walk on if it would be unsafe, even when their owner has told them to go.",
   "Guide dogs learn to cope with kerbs, traffic, buses, shops, other dogs, cats and birds, so they are not trained in an empty field.",
   "In a survey by the charity Guide Dogs, 95 out of every 100 people with sight loss said they had been forced into the road by cars parked on the pavement.",
@@ -225,7 +225,7 @@ const ARTICLE_FACTS: string[] = [
   "After the war, the soldier Khan had saved asked to see him again at a parade in 1947, and Khan's family gave the dog to him.",
   "A search dog called Appollo was the first search dog to arrive at Ground Zero after the attacks on New York in 2001.",
   "In December 1944, a shepherd called John Dagg and his sheepdog climbed through fog and snow in the Cheviot Hills to reach the crew of a crashed American bomber.",
-  "When Britain first issued dog licences in 1867, 830,000 were bought, at five shillings each.",
+  "When Britain first issued dog licences in 1867, 830,000 were bought, at five shillings (25p) each.",
   "The animal long called the Egyptian jackal turned out, when scientists tested its DNA, to be a kind of wolf.",
   "Dogs were the first animals ever to live with people. Scientists have found dogs living alongside hunters in Europe and western Asia 14,000 to 16,000 years ago, before farming began.",
   "The word dog first appears in Old English as docga. The older word was hund, which gave us the word hound.",
