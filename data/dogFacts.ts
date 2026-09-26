@@ -270,7 +270,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 14 (J18-274): Boston Terrier, 7 new facts (3 existing, 10 in all).
    Batch 15 (J18-275): Pomeranian, 7 new facts (3 existing, 10 in all).
    Batch 16 (J18-276): Yorkshire Terrier, 7 new facts (3 existing, 10 in all).
-   Batch 17 (J18-277): Border Terrier, 7 new facts (3 existing, 10 in all). */
+   Batch 17 (J18-277): Border Terrier, 7 new facts (3 existing, 10 in all).
+   Batch 18 (J18-278): Papillon, 6 new facts (4 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -459,6 +460,15 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The Border Terrier's breed standard describes its head as being like an otter's: broad and flat on top, with a short, strong muzzle. Along with its small V-shaped ears that fold forward and its bright, keen expression, that otter head is what makes a Border Terrier easy to recognise.",
     "In about 1896, the huntsman Jacob Robson wrote that the best Border Terriers weighed about 15 to 18 pounds, roughly 7 to 8kg. Anything bigger, he said, could not follow its fox underground so well. The breed's wiry, weatherproof coat kept it dry in the rain and wind of the hills.",
     "A Border Terrier's coat comes in a few set colours: red, wheaten, grizzle and tan, or blue and tan. Grizzle means a mix of dark and light hairs, which gives a slightly grey, pepper-and-salt look. The rough outer coat is usually tidied by hand-stripping, pulling out the old hairs, rather than clipping.",
+  ],
+  // Batch 18 (J18-278): 6 new, 10 in all.
+  Papillon: [
+    "The Papillon only got its butterfly name in the late 1800s, when a type with big, upright, fringed ears became fashionable. People said the ears looked like a butterfly's open wings, and the white stripe, or blaze, down the middle of the Papillon's face looked like the butterfly's body. Before that, it was simply called a dwarf spaniel.",
+    "Not every Papillon has butterfly ears. The older type, with soft drooping ears, is called the Phalène, French for moth, because a resting moth folds its wings down. Both kinds can be born in the same litter of Papillon puppies. In some countries they are counted as two breeds, in others as two versions of one.",
+    "Legend: Marie Antoinette, Queen of France, walked to the guillotine in 1793 clutching her little Papillon, and the dog was saved and cared for in a Paris house still called the Papillon House. What we know: it is a famous story, but historians think it is almost certainly untrue. Papillon experts themselves point out that she would hardly have taken a beloved dog to her execution.",
+    "The Papillon was a favourite of the French royal court. Madame de Pompadour, the powerful friend of King Louis XV, is said to have kept two, called Inès and Mimi. Little dwarf spaniels were even sent to the French court from Italy and Spain, travelling all the way on the backs of mules.",
+    "In his 1994 book The Intelligence of Dogs, the psychologist Stanley Coren ranked the Papillon eighth of all the breeds he studied for learning and obeying commands. It was the only toy breed in his top ten, beating many far bigger working dogs, and Papillons today are stars at dog agility.",
+    "The Papillon was once also called the Squirrel Spaniel, because its long, feathered tail curls up over its back like a squirrel's. The breed was slow to catch on in Britain, but the Papillon Club was formed in England in 1924, and today these tiny spaniels are popular all over the country.",
   ],
 };
 
@@ -1069,6 +1079,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The first Border Terrier ever registered with the Kennel Club", q: "What was the first Border Terrier registered with the Kennel Club called?", options: ["The Moss Trooper", "The Border Reiver", "The Fox Hunter"], answer: 0, evidence: "The Moss Trooper" },
   { match: "The Border Terrier's breed standard describes its head", q: "Which animal's head is the Border Terrier's said to be like?", options: ["An otter's", "A fox's", "A seal's"], answer: 0, evidence: "like an otter's" },
   { match: "A Border Terrier's coat comes in a few set colours", q: "What does grizzle mean in a Border Terrier's coat?", options: ["A mix of dark and light hairs", "A curly coat", "A bald patch"], answer: 0, evidence: "mix of dark and light hairs" },
+  // Batch 18 (J18-278): Papillon.
+  { match: "The Papillon only got its butterfly name in the late 1800s", q: "Which part of the Papillon's face looks like a butterfly's body?", options: ["The white stripe, or blaze", "Its nose", "Its whiskers"], answer: 0, evidence: "blaze" },
+  { match: "Not every Papillon has butterfly ears", q: "What is a Papillon with drooping ears called?", options: ["A Phalène, or moth", "A Chenille, or caterpillar", "A Bourdon, or bumblebee"], answer: 0, evidence: "Phalène, French for moth" },
+  { match: "Legend: Marie Antoinette, Queen of France, walked to the guillotine", q: "What do historians think of the story of Marie Antoinette's Papillon?", options: ["It is almost certainly untrue", "It is proven true", "It was really a cat"], answer: 0, evidence: "almost certainly untrue" },
+  { match: "The Papillon was a favourite of the French royal court", q: "Who is said to have kept Papillons called Inès and Mimi?", options: ["Madame de Pompadour", "Madame Tussaud", "Madame Curie"], answer: 0, evidence: "Madame de Pompadour" },
+  { match: "The Papillon was once also called the Squirrel Spaniel", q: "Why was the Papillon once called the Squirrel Spaniel?", options: ["Its tail curls over its back", "It climbs trees", "It eats nuts"], answer: 0, evidence: "curls up over its back" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
