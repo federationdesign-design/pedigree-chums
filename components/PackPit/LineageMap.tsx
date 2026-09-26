@@ -183,8 +183,7 @@ const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","M
    `fg` matters as much as `bg` to any consumer. It is the ink measured against
    that background, and it is the reason the pair can be used anywhere: white on
    the purple and the royal blue, black on the green, the orange and the yellow. */
-// The crisp ring's strength while the liquid fills it (see the crisp ring).
-const LIFT_TRACK_OPACITY = 0.3;
+// LIFT_TRACK_OPACITY (the ring faint while its band filled) went with the ring-band liquid, 27 September 2026 (J18-246).
 export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon", { bg: string; fg: string; label: string }> = {
   extremelyRare: { bg: "#4d2e91", fg: "#ffffff", label: "EXTREMELY RARE" }, // purple
   rare:          { bg: "#2547c4", fg: "#ffffff", label: "RARE" },           // royal blue
@@ -235,13 +234,7 @@ export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common
 // sweeps. Slow enough to watch it travel round, not a flash. Dial both here.
 const RARITY_DRAW = "0.9s";
 const RARITY_DRAW_DELAY = "0.2s";
-// The rarity band slides up from below the circle to arrive as the ring closes.
-// Ring closes at RARITY_DRAW_DELAY + RARITY_DRAW = 0.2 + 0.9 = 1.1s, so the 0.45s
-// band waits 0.65s and the two finish together. If you re-dial the ring, move
-// BAND_SLIDE_DELAY with it (delay = ring close - BAND_SLIDE_DUR) so they still
-// land as one.
-const BAND_SLIDE_DUR = "0.45s";
-const BAND_SLIDE_DELAY = "0.65s";
+// BAND_SLIDE_DUR and BAND_SLIDE_DELAY went with the angled rarity band, 27 September 2026 (J18-246).
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 /* ROOT + 96 -> ROOT + 72, the first ring 25% shorter, 16 September 2026 (owner:
    the connectors coming off the central chum card are too long). Only the 96 is
@@ -3795,7 +3788,6 @@ export default function LineageMap({
                   r={r0}
                   fill="none"
                   stroke={hex}
-                  strokeOpacity={frameTotal > 0 && !doneRing ? LIFT_TRACK_OPACITY : 1}
                   strokeWidth={ringW}
                   strokeLinecap="round"
                   pathLength={1}
@@ -3806,251 +3798,69 @@ export default function LineageMap({
               </>
             );
           })() : null}
-          {/* Green progress arc: the SAME band, start point and reveal trick as the
-              rarity ring, laid over it so filling frames turn a slice of the ring
-              #22c55e, the app's "placed" green (the one a framed node goes, :2029).
-              It shows filled.size/frameTotal of the loop from six o'clock via the
-              same pathLength-1 + dashoffset, so ring and arc read as one. --green-off
-              is 1 - progress (1 hides it, 0 closes the loop to full green). Rendered
-              hidden from the start (even at zero filled) so it is there to transition
-              as the first card lands. It grows with a transition per landing, and on
-              a re-lift with frames already filled it draws on sharing the rarity
-              ring's 0.2s delay and 0.9s sweep, so the lift replays cleanly. Keyed on
-              the dog, like the rarity ring, so that draw-on remounts per lift. */}
-          {/* THE RING FILLS LIKE LIQUID, 25 September 2026 (owner: the arc that
-              swept round the ring looked angular). The ring band now fills from
-              the bottom up: a big rounded square, turning slowly, rises inside a
-              clip that is exactly the ring's band, so its corner rolls past like a
-              fluid surface (the "fluid radius" technique). The level is the share
-              of frames filled and eases up as each card lands. The colour is the
-              dog's own tier colour, as the arc was, and green the moment the last
-              frame lands (doneRing), when the fluid tops the ring. The picture
-              inside is never covered: only the band is clipped in. */}
-          {rarityTier && frameTotal > 0 ? (() => {
-            const mid = R + rootRingW / 2;
-            const half = (rootRingW + 6) / 2;
-            const outer = mid + half;
-            const inner = Math.max(0, mid - half);
-            const share = doneRing ? 1 : Math.max(0, Math.min(1, filled.size / frameTotal));
-            // The fluid's top edge, from the ring's foot (outer) up to its crown (-outer).
-            const level = outer - share * 2 * outer - (doneRing ? outer * 0.3 : 0);
-            const size = outer * 2.6;
-            const clipId = `fluid-${breed.name.replace(/[^a-z0-9]/gi, "")}`;
-            return (
-              <g key={`fluid-${breed.name}`} aria-hidden="true">
-                <defs>
-                  <clipPath id={clipId}>
-                    <path
-                      clipRule="evenodd"
-                      d={`M ${outer} 0 A ${outer} ${outer} 0 1 0 ${-outer} 0 A ${outer} ${outer} 0 1 0 ${outer} 0 Z M ${inner} 0 A ${inner} ${inner} 0 1 1 ${-inner} 0 A ${inner} ${inner} 0 1 1 ${inner} 0 Z`}
-                    />
-                  </clipPath>
-                </defs>
-                <g clipPath={`url(#${clipId})`}>
-                  <g className={styles.fluidRise} style={{ transform: `translateY(${level}px)` }}>
-                    <rect
-                      className={styles.fluidTurn}
-                      x={-size / 2}
-                      y={0}
-                      width={size}
-                      height={size}
-                      rx={size * 0.3}
-                      fill={doneRing ? "#22c55e" : RARITY_BAND[rarityTier].bg}
-                    />
-                  </g>
-                </g>
-              </g>
-            );
-          })() : null}
-          {/* Rarity band: a coloured strip across the bottom of the circle, on the
-              artwork just above the Learn button. Clipped to the same circle so it
-              never spills past the rim, but its top edge is a straight DIAGONAL
-              chord (jaunty, right side higher), not a level segment. The label sits
-              on a straight baseline tilted to match. Stays as long as the card is up. */}
-          {rarityTier ? (() => {
+          {/* THE WHOLE CIRCLE FILLS WITH LIQUID, 27 September 2026 (owner, J18-246).
+              REPLACES two things: the 25 September liquid that filled only the ring's
+              band, and the angled rarity band across the foot of the picture (with its
+              label, which the Complete button always overlapped: that known clash goes
+              with it). Owner's picks: see-through liquid, and the liquid carries the
+              rarity word.
+                THE LIQUID. The dog's tier colour at LIQUID_OPACITY over the picture, so
+              the dog stays visible through it; the fluid-radius technique (a big
+              rounded square, turning slowly, eased to each new level by .fluidRise)
+              gives the moving surface. It rises with the share of frames filled, from
+              LIQUID_START_Y (just clear of the Learn and Complete buttons, so the word
+              is always readable) to over the top, and goes green and full on doneRing,
+              as the ring does. Clipped to the picture's circle.
+                THE WORD. The tier label in Luckiest Guy, white with a black outline like
+              the dog's name, so it reads on every tier colour and on the picture. It
+              rides just under the surface, level, and stops at WORD_TOP_Y so it never
+              climbs into the name; the liquid carries on up past it. */}
+          {rarityTier && circular ? (() => {
             const band = RARITY_BAND[rarityTier];
-            const TILT = RARITY_TILT;             // shared with the dog name (see RARITY_TILT); steeper negative rides the right side higher (jauntier)
-            const bandTop = R * 0.40;             // top edge of the wedge (chord); LOWER value lifts the band up
-            // Label position knobs, fractions of R so they scale with the circle.
-            // (In the tilted frame: labelX runs mostly left/right, labelY up/down.)
-            const labelX = R * 0;                 // + moves the word RIGHT, - left
-            const labelY = R * 0.566;             // + moves the word DOWN, - up
-            // Fit-to-chord at the WORD's line (narrower than the top of the wedge),
-            // so a long label never runs past the rim on the small phone card.
-            const chord = 2 * Math.sqrt(Math.max(0, R * R - labelY * labelY));
-            /* TWO LIMITS, AND THEY GOVERN DIFFERENT TIERS (owner, 18 September
-               2026, measured on a 390 phone where R is 85 and the chord 140.1).
-
-               THE CAP, 0.22 -> 0.208, one point down. It bound FOUR of the five
-               tiers at 18.7px: rare, common, uncommon and very common all drew at
-               exactly the same size whatever their length, because their width fit
-               came out above it. They now draw at 17.7.
-
-               THE WIDTH CONSTANT, 0.6 -> 0.68, and this is what EXTREMELY RARE
-               needed. It is the only tier the fit governs rather than the cap, at
-               15.3px, so taking a point off the cap would have done nothing for
-               it. 0.6 em a character is too generous for Luckiest Guy, a wide
-               display face whose caps average nearer 0.68, which is why the fit
-               said 15.3 would sit inside the chord when it does not. Extremely
-               rare now comes out at 13.5 and very common at 17.2, which is under
-               the new cap, so it becomes width-fitted too.
-
-               THE COMPLETE BUTTON OVERLAPS THE LABEL. KNOWN, MEASURED AND
-               ACCEPTED (owner, 18 September 2026). Written down so nobody spends
-               an afternoon rediscovering it.
-
-               THE GEOMETRY, on a 390 phone where R is 85:
-                 the label's centre lands at (21.1, 43.2), which is already BELOW
-                 the button, whose visible bottom is at +37.2 (the chumBase rect
-                 runs to +42 local, not the chumPill's +34: an earlier note of
-                 mine said +31.1 and was wrong)
-                 the baseline then RISES TO THE RIGHT AT 26 DEGREES, RARITY_TILT,
-                 and climbs back into the button's box after only 13.8 UNITS of
-                 half-width
-                 the button's box is x +/-76.5, y -21.0 to +37.2
-
-               SO NO READABLE FONT SIZE CLEARS IT. That 13.8 units is the entire
-               budget and every tier shares it whatever its length: at 0.68 em a
-               character it buys about four letters. To clear the box, RARE would
-               need 10.1px, COMMON 6.8, UNCOMMON 5.1, VERY COMMON 3.7 and
-               EXTREMELY RARE 2.9, against a floor of 9 in this very expression.
-               Four of the five would be a smudge.
-
-               STILL ACCEPTED AS OF 18 SEPTEMBER, after a reversal that was
-               reversed again. Two changes were considered and measured:
-                 THE LABEL ONE POINT SMALLER. Shipped, for its own sake, and it
-                 clears nothing: see the note on the cap above.
-                 RAISING THE BAND BY 5 UNITS. NOT shipped, because it goes the
-                 wrong way. The label already sits BELOW the button, its centre at
-                 y 43.2 against the button's bottom at 37.19, so raising moves it
-                 INTO the box: the half-width budget falls from 13.8 to 3.6.
-               What would actually clear it is a DROP of about 19 units, labelY
-               from R*0.566 to about R*0.788, which puts the band 79% of the way
-               down the radius and narrows the chord from 140.1 to 104.6, taking
-               EXTREMELY RARE from 13.5 to about 10.1 against the floor of 9 in the
-               same expression. Declined as a worse trade than the overlap.
-
-               THE THREE THINGS THAT WOULD FIX IT, all declined by the owner as
-               changes to a signed-off layout: move the Complete button, push
-               labelY down while doneRing is true, or cut the tilt (flat clears by
-               10.9 with no size change at all, and anything at 8 degrees or less
-               clears). The overlap stays. Do not shrink the label to dodge it. */
-            /* THE CAP COMES DOWN ONE MORE POINT, 0.208 -> 0.196, 18 September
-               2026 (owner), 17.68 to 16.68 on a 390 phone. Wanted for its own
-               sake: the text reads a little smaller.
-
-               IT CLEARS NOTHING, and that is measured rather than hoped. The cap
-               only binds the SHORT labels: a width-fitted one has a half-width of
-               0.46 * chord whatever its character count, so EXTREMELY RARE does
-               not move at all and stays at 13.5. Per tier, half-width before and
-               after: RARE 24.0 -> 22.7, COMMON 36.1 -> 34.0, UNCOMMON 48.1 ->
-               45.3, VERY COMMON 64.5 -> 62.3, EXTREMELY RARE 64.5 unchanged. The
-               budget before the label enters the Complete button's box is 13.8, so
-               every tier still crosses it. See the accepted-overlap note below. */
-            const fs = Math.max(9, Math.min(R * 0.196, (chord * 0.92) / (0.68 * band.label.length)));
-            // rect and text share one rotate(): the rect's top edge becomes the
-            // diagonal chord, the text baseline tilts with it. The rect is drawn
-            // oversized so the tilt never exposes a corner; the circle clip cuts it.
+            const LIQUID_OPACITY = 0.5;
+            const LIQUID_START_Y = R * 0.5;       // the surface with nothing filled (down is +)
+            const LIQUID_FULL_Y = -R * 1.15;      // the surface when full: over the top, wobble included
+            const WORD_TOP_Y = R * 0.05;          // the word's highest centre, clear of the name
+            const share = doneRing ? 1 : frameTotal > 0 ? Math.max(0, Math.min(1, filled.size / frameTotal)) : 0;
+            const surface = LIQUID_START_Y + share * (LIQUID_FULL_Y - LIQUID_START_Y);
+            const size = R * 2.6;
+            const wordY0 = R * 0.78;              // the word's own chord check, at its lowest
+            const chord = 2 * Math.sqrt(Math.max(0, R * R - wordY0 * wordY0));
+            const fs = Math.max(10, Math.min(R * 0.2, (chord * 0.92) / (0.68 * band.label.length)));
+            const wordY = Math.max(WORD_TOP_Y, surface + fs * 0.8);
             return (
-              <g clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }}>
-                {/* The slide group carries the CSS translate ONLY; the tilt stays
-                    on the inner group, because a CSS transform here would override
-                    that rotate attribute. Sitting inside the clip, the band rises
-                    up from below and the circle rim reveals it entering. --band-slide
-                    is R so it starts a full radius below, clipped out of sight. */}
-                <g
-                  className={styles.bandSlide}
-                  style={{ ["--band-slide" as string]: `${R}px`, ["--band-dur" as string]: BAND_SLIDE_DUR, ["--band-delay" as string]: BAND_SLIDE_DELAY }}
-                >
-                  <g transform={`rotate(${TILT})`}>
-                    {/* At 100% (every frame filled) the band flips to the done-green,
-                        which is now the RING'S OWN #22c55e (owner, 9 Sept 2026). It was
-                        a softer #69d176, on the reasoning that a large fill wants a
-                        gentler green than a thin ring. On the device the two read as
-                        two different greens on one circle, which is worse than either
-                        being slightly off on its own. One green now, shared with the
-                        ring above and with the placed-node fill at :2574.
-                        THE LABEL WENT WHITE ON REQUEST EARLIER TODAY AND HAS HAD TO
-                        COME BACK. White on #22c55e was 2.2:1, poor but visible. On
-                        #ffed00 it is 1.21:1, which is not a contrast problem, it is
-                        an invisible label. Navy on this lemon is 9.89:1. The same
-                        measurement and the same conclusion are already written up
-                        against the pit's own learnt chip in BreedTree, where the
-                        ring and the figure had to move to navy for exactly this
-                        reason when that chip went lemon on 31 Aug. .bandFill eases
-                        the swap. */}
-                    {/* GREEN WHEN THE DOG IS DONE, 18 September 2026 (owner), the
-                        same #22c55e the three ring layers take and from the same
-                        doneRing flag, so the card and its rim finish together.
-                        `packed` comes with the flag, which the band did not read
-                        before: packing the cards away is the other way to finish
-                        and a band that took framesDone alone would disagree with
-                        the rim it sits under.
-
-                        IT ALREADY CHANGED ON COMPLETION and the owner could not
-                        see it. The done colour was #ffed00 lemon, and since very
-                        common became #ffd23e that is two nearly identical yellows,
-                        so on the top tier the band appeared to keep its rarity
-                        colour. The same trap the ring fell into twice: the fix was
-                        invisible because the symptom matched the bug.
-
-                        THE INK IS CHOSEN PER STATE, 18 September 2026 (owner),
-                        after a full audit rather than another one-at-a-time fix.
-
-                        THIS LABEL HAS BEEN FLIPPED THREE TIMES: navy, then white,
-                        then white again, each time on how ONE tier looked. Every
-                        flip broke the tiers nobody was looking at. ALL TWELVE
-                        PAIRS ARE MEASURED HERE SO IT IS NOT FLIPPED A FOURTH.
-
-                          state            bg        white   black
-                          extremely rare   #4d2e91    9.93    2.12
-                          rare             #2547c4    7.56    2.78
-                          uncommon         #5dbf86    2.27    9.26
-                          common           #f47421    2.85    7.37
-                          very common      #ffd23e    1.44   14.54
-                          done green       #22c55e    2.28    9.22
-
-                        WORST CASE BY RULE: white everywhere 1.44, black
-                        everywhere 2.12, INK PER STATE 7.37. Per state is more
-                        than three times better than either flat rule and is the
-                        only one that passes AA on all six. Its worst pair is black
-                        on the common orange at 7.37, and five of the six clear AAA.
-
-                        SO THE FIVE TIERS TAKE band.fg, which is what RARITY_BAND
-                        always held and what these numbers vindicate: white on the
-                        two dark tiers, black on the other three. The done green is
-                        the only state the table did not already answer, and black
-                        at 9.22 against white's 2.28 answered it.
-
-                        REVERSED 20 September 2026 (owner: when the circle turns
-                        green, the word common should change to white). The ink on
-                        the done green is now WHITE. The measurement above has not
-                        changed and is left standing: white on #22c55e is 2.28:1,
-                        which is under the 3:1 large-text line, where the black it
-                        replaces was 9.22:1. It is the owner's call, made on the
-                        device, and it is recorded here so it is not quietly
-                        "fixed" back later. The other four tiers still take band.fg
-                        from the table and are untouched.
-
-                        COMMON GOES WHITE TOO, 23 September 2026 (owner). Same kind
-                        of call and recorded the same way: white on the common
-                        orange #f47421 measures 2.85:1 where the black it replaces
-                        was 7.37:1. Asked for explicitly after an audit that put
-                        both figures in front of the owner. Only the lifted card's
-                        BAND LABEL changes; RARITY_BAND.common.fg is untouched, so
-                        every other consumer of the table keeps its black.
-
-                        THE FILLS ARE NOT DARKENED, and that was the other route.
-                        To carry white they would need uncommon 32% darker,
-                        common 23%, very common 45% (#ffd23e to #8c7322, which stops
-                        being yellow at all) and the done green 31%. But bg drives
-                        five things, and only this one wants dark: the crisp rarity
-                        ring, its glow bands, seenFill, the twins in the pit and the
-                        progress arc all sit on dark grounds and want the fills
-                        LIGHTER. One element against three, and the ink is free. */}
-                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: doneRing ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#ffffff" : rarityTier === "veryCommon" ? "#ffffff" : band.fg }}>{band.label}</text>
-                  </g>
+              <g key={`liquid-${breed.name}`} clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }} aria-hidden="true">
+                <g className={styles.fluidRise} style={{ transform: `translateY(${surface}px)` }}>
+                  <rect
+                    className={`${styles.fluidTurn} ${styles.bandFill}`}
+                    x={-size / 2}
+                    y={0}
+                    width={size}
+                    height={size}
+                    rx={size * 0.3}
+                    style={{ fill: doneRing ? "#22c55e" : band.bg }}
+                    opacity={LIQUID_OPACITY}
+                  />
+                </g>
+                <g className={styles.fluidRise} style={{ transform: `translateY(${wordY}px)` }}>
+                  <text
+                    x={0}
+                    y={0}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    style={{
+                      fontFamily: '"Luckiest Guy", system-ui, sans-serif',
+                      fontSize: `${fs}px`,
+                      fontWeight: 400,
+                      fill: "#ffffff",
+                      stroke: "#000000",
+                      strokeWidth: Math.max(2, fs * 0.14),
+                      paintOrder: "stroke",
+                      strokeLinejoin: "round",
+                    }}
+                  >
+                    {band.label}
+                  </text>
                 </g>
               </g>
             );
