@@ -15430,6 +15430,32 @@ export default function BreedTree({
               ) : null
             )}
           </defs>
+          {/* THE LOGO BEHIND THE DIAGRAM, 27 September 2026 (owner: the logo sat on
+              top of the learn area's circles and made the diagram hard to use).
+              An SVG has no z-index: what is drawn first sits at the back. This
+              pre-drop logo used to be drawn with the in-pit controls, after the
+              circles; it is now the first thing drawn. Same artwork, position and
+              size as before (the sums are unchanged); the falling logo during
+              play is untouched. */}
+          {/* Reads the stage size during render, exactly as the in-pit controls block
+              this was moved out of does (and is flagged for); moved, not new. */}
+          {/* eslint-disable-next-line react-hooks/refs */}
+          {dockAside && !displayOnly && !dropped && (() => {
+            const st = stageRef.current;
+            const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
+            const asp = aspect; // the view's own shape, so logo and viewBox agree
+            const vbWf = asp >= 1 ? SIZE * asp : SIZE;
+            const vbHf = asp >= 1 ? SIZE : SIZE / asp;
+            const xMinF = asp >= 1 ? -vbWf * (centred ? 0.5 : SHIFT) : -vbWf / 2;
+            const lw = Math.min(84 * upp * LOGO_BIG_MULT, (vbWf - 8) * LOGO_PIT_FRACTION) * LOGO_SHRINK;
+            const lh = lw / LOGO_ASPECT;
+            return (
+              <g style={{ pointerEvents: "none" }} aria-hidden="true"
+                transform={`translate(${xMinF + vbWf / 2},${-vbHf / 2 + vbHf * 0.2})`}>
+                <image href={LOGO_SRC} x={-lw / 2} y={-lh / 2} width={lw} height={lh} preserveAspectRatio="xMidYMid meet" />
+              </g>
+            );
+          })()}
 
           {/* CLUSTER MARKER, decoration only. A dashed white ring around
               the cluster and a dashed line reaching to the level portrait at top
@@ -16873,20 +16899,8 @@ export default function BreedTree({
                   so gating on !started left the diagram screen with no logo at
                   all until the circles fell. `dropped` flips at the very moment
                   the physics logo is built, so one hands straight to the other. */}
-              {!dropped && (() => {
-                const asp = aspect; // the view's own shape, so logo and viewBox agree
-                const vbWf = asp >= 1 ? SIZE * asp : SIZE;
-                const vbHf = asp >= 1 ? SIZE : SIZE / asp;
-                const xMinF = asp >= 1 ? -vbWf * (centred ? 0.5 : SHIFT) : -vbWf / 2;
-                const lw = Math.min(84 * upp * LOGO_BIG_MULT, (vbWf - 8) * LOGO_PIT_FRACTION) * LOGO_SHRINK;
-                const lh = lw / LOGO_ASPECT;
-                return (
-                  <g style={{ pointerEvents: "none" }} aria-hidden="true"
-                    transform={`translate(${xMinF + vbWf / 2},${-vbHf / 2 + vbHf * 0.2})`}>
-                    <image href={LOGO_SRC} x={-lw / 2} y={-lh / 2} width={lw} height={lh} preserveAspectRatio="xMidYMid meet" />
-                  </g>
-                );
-              })()}
+              {/* The pre-drop logo is drawn at the START of the SVG now, behind the
+                  circles: see "THE LOGO BEHIND THE DIAGRAM" after the defs. */}
               {started && (() => {
                 const lb = ub?.find((u) => u.kind === "logo");
                 if (!lb || !lb.w || !lb.h) return null;
