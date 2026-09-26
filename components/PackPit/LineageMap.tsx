@@ -3817,7 +3817,7 @@ export default function LineageMap({
               climbs into the name; the liquid carries on up past it. */}
           {rarityTier && circular ? (() => {
             const band = RARITY_BAND[rarityTier];
-            const LIQUID_OPACITY = 0.5;
+            const LIQUID_OPACITY = 1; // solid, 27 September 2026 (owner, J18-250): was 0.5, see-through
             const LIQUID_START_Y = R * 0.5;       // the surface with nothing filled (down is +)
             const LIQUID_FULL_Y = -R * 1.15;      // the surface when full: over the top, wobble included
             const WORD_TOP_Y = R * 0.05;          // the word's highest centre, clear of the name
