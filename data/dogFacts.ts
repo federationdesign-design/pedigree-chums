@@ -260,7 +260,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 4 (J18-257): Maltipoo, 9 new facts (1 existing, 10 in all).
    Batch 5 (J18-258): Goldendoodle, 9 new facts (1 existing, 10 in all).
    Batch 6 (J18-261): Labradoodle, 9 new facts (1 existing, 10 in all).
-   Batch 7 (J18-265): Doberman, 9 new facts (2 existing, 11 in all). */
+   Batch 7 (J18-265): Doberman, 9 new facts (2 existing, 11 in all).
+   Batch 8 (J18-266): Miniature Schnauzer, 8 new facts (2 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -344,6 +345,17 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "Many people picture the Dobermann with tall, pointed ears and a very short tail, but those come from cutting them when the dog is a puppy. In Britain it is against the law to crop a dog's ears, and tail docking has been banned for pet dogs since 2007, so British Dobermanns keep their natural floppy ears and long tails.",
     "The town of Apolda in Germany is proud of the dog it gave the world. A statue of Louis Dobermann, who was born there in 1834 and died there in 1894, stands in the town. Apolda held its first dog market in 1863, and Dobermann's early guard dogs were shown there long before the breed first appeared at a proper dog show in the 1890s.",
     "A Dobermann's short, smooth coat comes in black, blue, fawn or red, always with rust-coloured markings on the face, chest and legs. That sleek coat helps it look powerful and alert, which was the point: Louis Dobermann wanted a dog whose looks alone would make anyone think twice before causing trouble.",
+  ],
+  // Batch 8 (J18-266): 8 new, 10 in all.
+  "Miniature Schnauzer": [
+    "The first recorded Miniature Schnauzer was a black female called Findel, in Germany in 1888. The breed was first shown as a breed of its own in 1899. German farmers wanted a smaller version of their Standard Schnauzer: a tough, clever little ratter that could keep barns and stables free of rats and mice while living happily alongside the farm family.",
+    "Nobody wrote down exactly how the Miniature Schnauzer was made, but most experts think German breeders crossed small Standard Schnauzers with smaller breeds such as the Affenpinscher, and perhaps the Poodle and the Miniature Pinscher. At first the little dogs were not even called Schnauzers: they were known as Wire-haired Pinschers.",
+    "The Miniature Schnauzer is named after its face. In German, schnauze means snout, and schnauz means a big bushy moustache, like a walrus's. The name seems to have stuck after a wire-haired dog called Schnauzer won its class at a dog show in Hanover in 1879, and the Miniature Schnauzer's bristly beard and eyebrows still show why.",
+    "The Miniature Schnauzer is the smallest of three Schnauzer breeds. The Standard Schnauzer is the oldest and the original, the Miniature was bred down from it to catch rats, and the Giant Schnauzer was bred up from it in Bavaria to help drive cattle. All three share the same whiskery face and wiry coat.",
+    "Where a Miniature Schnauzer is shown depends on the country. In America it is judged with the terriers, but in Britain, Australia and New Zealand it is in the Utility group. Experts point out it is not really a terrier at all: it does not come from the British terriers and does not have a typical terrier's temper, coat or head.",
+    "A Miniature Schnauzer's most famous colour is salt and pepper, a grey made of hairs banded in black and white. It can also be black and silver or solid black. Pure white and patched Miniature Schnauzers are bred too, but not every kennel club accepts those colours.",
+    "People often say the Miniature Schnauzer's ancestors appear in old art. The painter Albrecht Dürer drew a scruffy dog that looks like a Schnauzer around 1500. But a famous statue in Stuttgart of a night watchman with a Schnauzer at his feet, dated 1620, turns out to be no proof at all: its sculptor was born in 1853.",
+    "Miniature Schnauzers first arrived in the United States in 1925, and the American Kennel Club recognised the breed the following year. Many people believe almost every pedigree Miniature Schnauzer in America goes back to the handful of dogs imported in those first years. Today it is one of the most popular breeds there.",
   ],
 };
 
@@ -894,6 +906,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "a Doberman called Kurt served with the United States Marines", q: "What is the statue of Kurt on Guam called?", options: ["Always Faithful", "Forever Brave", "Good Boy"], answer: 0, evidence: "Always Faithful" },
   { match: "The Dobermann came fifth, behind only the Border Collie", q: "Where did the Dobermann come in Stanley Coren's ranking of quick learners?", options: ["Fifth", "First", "Fiftieth"], answer: 0, evidence: "came fifth" },
   { match: "In Britain it is against the law to crop a dog's ears", q: "Why do British Dobermanns keep their floppy ears?", options: ["Cropping ears is against the law", "They are a different breed", "Their ears never grow"], answer: 0, evidence: "against the law to crop" },
+  // Batch 8 (J18-266): Miniature Schnauzer.
+  { match: "The first recorded Miniature Schnauzer was a black female called Findel", q: "What was the name of the first recorded Miniature Schnauzer?", options: ["Findel", "Fritz", "Frieda"], answer: 0, evidence: "called Findel" },
+  { match: "The Miniature Schnauzer is named after its face", q: "What does the German word schnauze mean?", options: ["Snout", "Sausage", "Snow"], answer: 0, evidence: "schnauze means snout" },
+  { match: "Where a Miniature Schnauzer is shown depends on the country", q: "In which group is the Miniature Schnauzer shown in Britain?", options: ["Utility", "Terrier", "Toy"], answer: 0, evidence: "Utility group" },
+  { match: "A Miniature Schnauzer's most famous colour is salt and pepper", q: "What is the Miniature Schnauzer's famous grey colour called?", options: ["Salt and pepper", "Fish and chips", "Bread and butter"], answer: 0, evidence: "salt and pepper" },
+  { match: "People often say the Miniature Schnauzer's ancestors appear in old art", q: "Why is the Stuttgart statue no proof that Schnauzers are old?", options: ["Its sculptor was born in 1853", "It is made of chocolate", "It shows a cat"], answer: 0, evidence: "born in 1853" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
