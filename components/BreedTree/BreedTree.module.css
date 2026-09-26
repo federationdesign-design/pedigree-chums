@@ -2784,14 +2784,18 @@
   left: 50%;
   top: 18%;
   z-index: 80;
-  width: min(86vw, 560px);
-  padding: 14px 18px 16px;
+  /* SIZES RUN OFF --fact-k, 25 September 2026 (owner): 1 on phones and tablets,
+     1.5 on desktop (see the media query after .factSkip), so the whole card grows
+     together. 10px more above the title: the top padding was 14px. */
+  --fact-k: 1;
+  width: min(86vw, calc(560px * var(--fact-k)));
+  padding: calc(24px * var(--fact-k)) calc(18px * var(--fact-k)) calc(16px * var(--fact-k));
   /* LIQUID GLASS, 25 September 2026 (owner, from a CodePen "liquid glass" set):
      a light blur of the pit behind, a little brighter and more saturated, a 25%
      white tint, a bright inner edge (the specular) and a soft shadow. The pen's
      SVG lens warp is left out: it only works reliably in Chrome. The text keeps
      a dark shadow so white reads on the lighter glass. */
-  border-radius: 2rem;
+  border-radius: calc(2rem * var(--fact-k));
   background: rgba(255, 255, 255, 0.25);
   border: none;
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1),
@@ -2807,12 +2811,13 @@
 }
 .factHead {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.3rem, 5vw, 1.9rem);
+  /* Half as big again (owner, 25 September 2026): was clamp(1.3rem, 5vw, 1.9rem). */
+  font-size: calc(clamp(1.95rem, 7.5vw, 2.85rem) * var(--fact-k));
   color: #ffed00;
-  margin-bottom: 6px;
+  margin-bottom: calc(6px * var(--fact-k));
   transform: rotate(-2deg);
 }
-.factBody { font-size: clamp(1rem, 3.6vw, 1.25rem); font-weight: 700; line-height: 1.35; }
+.factBody { font-size: calc(clamp(1rem, 3.6vw, 1.25rem) * var(--fact-k)); font-weight: 700; line-height: 1.35; }
 .factWord {
   display: inline-block;
   opacity: 0;
@@ -2837,8 +2842,8 @@
 /* THE FACT CARD'S TIME BAR AND SKIP, 25 September 2026 (owner). The bar empties
    over the fact's own duration (inline animation-duration); the skip button is the
    only part of the card that takes taps. */
-.factFoot { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-.factBar { flex: 1 1 auto; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
+.factFoot { display: flex; align-items: center; gap: calc(10px * var(--fact-k)); margin-top: calc(12px * var(--fact-k)); }
+.factBar { flex: 1 1 auto; height: calc(6px * var(--fact-k)); border-radius: 999px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
 .factBarFill {
   height: 100%;
   width: 100%;
@@ -2850,8 +2855,8 @@
 @keyframes factBarDrain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 .factSkip {
   flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
+  width: calc(32px * var(--fact-k));
+  height: calc(32px * var(--fact-k));
   border-radius: 50%;
   border: 2px solid #ffffff;
   background: rgba(10, 58, 87, 0.55);
@@ -2865,6 +2870,12 @@
   text-shadow: none;
 }
 .factSkip:hover, .factSkip:focus-visible { background: rgba(10, 58, 87, 0.8); }
+.factSkip svg { width: calc(16px * var(--fact-k)); height: calc(16px * var(--fact-k)); }
+/* The whole fact card one and a half times the size on desktop (owner, 25
+   September 2026): wide screens with a mouse or trackpad. */
+@media (min-width: 1024px) and (hover: hover) {
+  .factPop { --fact-k: 1.5; }
+}
 @media (prefers-reduced-motion: reduce) { .factBarFill { animation-timing-function: linear; } }
 
 /* A fact closed early, when its dog is completed (owner, 25 September 2026). */
