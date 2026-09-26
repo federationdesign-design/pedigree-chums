@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ukBreeds, type UKBreed } from "../../data/uk-breeds";
 import { breeds as packBreeds } from "../../data/breeds";
-import { getLineage, type LineageNode } from "../../data/lineage";
+import { getLineage, LINEAGE_ROOTS, type LineageNode } from "../../data/lineage";
 import { resolveLineageName } from "../../data/lineageNames";
 import LineageModal from "../../components/LineageModal/LineageModal";
 import { resetToys } from "../../components/BreedTree/BreedTree";
@@ -98,17 +98,19 @@ export function stripMatches(rowStrip: string, era: string): boolean {
    instead costs a second render and trips react-hooks/set-state-in-effect.
    buildActive inside the component is now a one-line call to this, so the tap
    path and the deep link build the level identically. */
-/* EVERY DOG A PIT CAN HOLD (owner, 24 September 2026): the unique names below the
-   level dog, across every playable level, from the same getLineage expansion the
-   pit itself draws. The denominator of the dogs-found counter. Worked out once,
-   the first time it is asked for. 126 across 98 levels when written. */
+/* EVERY ANCESTOR IN THE FRAMEWORK, 25 September 2026 (owner: count the dogs we
+   have, not the levels). The unique names below the root of EVERY lineage record,
+   from the same getLineage expansion the pit draws: 208 when written. It was only
+   the history levels' ancestors (141), so the foreign ancestors found on the chum
+   levels never counted. A level's own dog is not in it unless it is someone's
+   ancestor too, because the counter counts dogs found in the pits. The
+   denominator of the dogs-found counter. Worked out once, when first asked. */
 let pitAncestorNames: Set<string> | null = null;
 function allPitAncestors(): Set<string> {
   if (pitAncestorNames) return pitAncestorNames;
   const names = new Set<string>();
-  for (const b of ukBreeds) {
-    if (levelCardKind(b.name) !== "play") continue;
-    const lin = getLineage(resolveLineageName(b.name));
+  for (const root of LINEAGE_ROOTS) {
+    const lin = getLineage(root);
     if (!lin) continue;
     const walk = (n: LineageNode, depth: number) => {
       if (depth > 0) names.add(n.name);
