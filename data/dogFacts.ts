@@ -271,7 +271,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 15 (J18-275): Pomeranian, 7 new facts (3 existing, 10 in all).
    Batch 16 (J18-276): Yorkshire Terrier, 7 new facts (3 existing, 10 in all).
    Batch 17 (J18-277): Border Terrier, 7 new facts (3 existing, 10 in all).
-   Batch 18 (J18-278): Papillon, 6 new facts (4 existing, 10 in all). */
+   Batch 18 (J18-278): Papillon, 6 new facts (4 existing, 10 in all).
+   Batch 19 (J18-279): Beagle, 6 new facts (4 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -469,6 +470,15 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The Papillon was a favourite of the French royal court. Madame de Pompadour, the powerful friend of King Louis XV, is said to have kept two, called Inès and Mimi. Little dwarf spaniels were even sent to the French court from Italy and Spain, travelling all the way on the backs of mules.",
     "In his 1994 book The Intelligence of Dogs, the psychologist Stanley Coren ranked the Papillon eighth of all the breeds he studied for learning and obeying commands. It was the only toy breed in his top ten, beating many far bigger working dogs, and Papillons today are stars at dog agility.",
     "The Papillon was once also called the Squirrel Spaniel, because its long, feathered tail curls up over its back like a squirrel's. The breed was slow to catch on in Britain, but the Papillon Club was formed in England in 1924, and today these tiny spaniels are popular all over the country.",
+  ],
+  // Batch 19 (J18-279): 6 new, 10 in all.
+  Beagle: [
+    "Long ago there were Beagles so small they were called Glove Beagles, because they could sit on a hunter's glove. Kings Edward II and Henry VII kept packs of them. Queen Elizabeth I had Pocket Beagles, only 20 to 23cm tall, which rode along in saddlebags on the hunt and were let loose to chase through thick bushes where bigger hounds could not go.",
+    "Queen Elizabeth I called her little Pocket Beagles her singing Beagles, because of their musical, baying voices. She is said to have entertained guests at royal dinners by letting the tiny hounds trot about the table among the plates and cups.",
+    "The word Beagle first appears in English writing around 1475, but nobody knows for certain where it comes from. For hundreds of years it was used for almost any small hunting hound, and those early Beagles looked quite different from the Beagle we know today.",
+    "The modern Beagle began with a pack kept by the Reverend Phillip Honeywood in Essex in the 1830s. His Beagles were chosen for their hunting skill rather than their looks, and they were small and pure white. A later breeder, Thomas Johnson, made them more alike in looks, and bred both smooth-coated and rough-coated Beagles. The rough-coated kind has since died out.",
+    "The famous ship HMS Beagle was named after the dog. On its voyage from 1831 to 1836 it carried the young naturalist Charles Darwin, whose discoveries led to his ideas about evolution. In 2003 a British spacecraft sent to land on Mars was named Beagle 2 after the ship, and so, in the end, after the Beagle.",
+    "A Beagle's nose is so good that Beagles are used around the world as detection dogs at airports, sniffing travellers' bags for food, plants and meat that are not allowed into the country because they could carry pests or diseases. Their small size and friendly nature mean they do not frighten passengers.",
   ],
 };
 
@@ -1085,6 +1095,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Legend: Marie Antoinette, Queen of France, walked to the guillotine", q: "What do historians think of the story of Marie Antoinette's Papillon?", options: ["It is almost certainly untrue", "It is proven true", "It was really a cat"], answer: 0, evidence: "almost certainly untrue" },
   { match: "The Papillon was a favourite of the French royal court", q: "Who is said to have kept Papillons called Inès and Mimi?", options: ["Madame de Pompadour", "Madame Tussaud", "Madame Curie"], answer: 0, evidence: "Madame de Pompadour" },
   { match: "The Papillon was once also called the Squirrel Spaniel", q: "Why was the Papillon once called the Squirrel Spaniel?", options: ["Its tail curls over its back", "It climbs trees", "It eats nuts"], answer: 0, evidence: "curls up over its back" },
+  // Batch 19 (J18-279): Beagle.
+  { match: "Long ago there were Beagles so small they were called Glove Beagles", q: "How tall were Queen Elizabeth I's Pocket Beagles?", options: ["20 to 23cm", "1 metre", "5cm"], answer: 0, evidence: "20 to 23cm" },
+  { match: "Queen Elizabeth I called her little Pocket Beagles her singing Beagles", q: "What did Queen Elizabeth I call her Pocket Beagles?", options: ["Her singing Beagles", "Her dancing Beagles", "Her flying Beagles"], answer: 0, evidence: "singing Beagles" },
+  { match: "The modern Beagle began with a pack kept by the Reverend Phillip Honeywood", q: "What colour were Reverend Honeywood's Beagles?", options: ["Pure white", "Jet black", "Bright orange"], answer: 0, evidence: "pure white" },
+  { match: "The famous ship HMS Beagle was named after the dog", q: "Which scientist sailed on HMS Beagle?", options: ["Charles Darwin", "Isaac Newton", "Albert Einstein"], answer: 0, evidence: "Charles Darwin" },
+  { match: "A Beagle's nose is so good that Beagles are used around the world as detection dogs", q: "Where do Beagles sniff bags for food that is not allowed in?", options: ["At airports", "At bakeries", "At schools"], answer: 0, evidence: "at airports" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
