@@ -1021,6 +1021,9 @@ const FACT_CLEAR_PAD = 24;
 const FACT_CLEAR_CHECKS_MS = [0, 120, 400, 900, 1500];
 // How close to a side of the window a dragged fact card's centre may go (owner, 27 September 2026).
 const FACT_DRAG_EDGE_PX = 60;
+// Fitting a long fact card to a phone (J18-262): the gap kept at the screen's edge, and the shrink.
+const FACT_FIT_PAD = 12;
+const FACT_FIT_K = 0.88;
 // Up to this many dog pictures are shown twice the size.
 const FACT_DOGS_BIG_UPTO = 3; // each word arrives this long after the one before
 /* RANDOM FACTS, 25 September 2026 (owner: random dog facts from everything the
@@ -6076,6 +6079,27 @@ export default function BreedTree({
       return p;
     };
     if (factPosRef.current) putAt(factPosRef.current);
+    /* FIT THE CARD TO A PHONE, 27 September 2026 (owner, J18-262: a long fact with
+       several pictures and a quiz ran off a small screen). Phones only (desktop is
+       the keep-clear placement's job). Measured once the card is built, in three
+       steps, each only if the card still does not fit below its own top:
+         1. the picture row goes (the least important part);
+         2. everything shrinks a touch, via --fact-k (FACT_FIT_K);
+         3. the card moves up to FACT_FIT_PAD from the top of the screen.
+       The card's pop-in animation moves and scales it, so it is switched off
+       (animationName only, so the inline duration survives) while measuring and
+       switched back on after, which simply starts the pop-in from the top. */
+    if (!window.matchMedia?.("(min-width: 1024px) and (hover: hover)").matches) {
+      el.style.animationName = "none";
+      const fits = () => el.getBoundingClientRect().bottom <= window.innerHeight - FACT_FIT_PAD;
+      if (!fits()) {
+        const pics = el.querySelector(`.${styles.factDogs}`) as HTMLElement | null;
+        if (pics) pics.style.display = "none";
+      }
+      if (!fits()) el.style.setProperty("--fact-k", String(FACT_FIT_K));
+      if (!fits()) { el.style.top = `${FACT_FIT_PAD}px`; el.style.bottom = "auto"; }
+      el.style.animationName = "";
+    }
     el.addEventListener("pointerdown", (e) => {
       if ((e.target as Element).closest("button")) return;
       e.stopPropagation();
