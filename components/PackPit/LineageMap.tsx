@@ -1771,21 +1771,44 @@ export default function LineageMap({
       const maxR: number[] = [];
       const scan = (n: Node, d: number) => { for (const k of kidsOf(n)) { maxR[d + 1] = Math.max(maxR[d + 1] ?? 0, rOfT(k)); scan(k, d + 1); } };
       scan(root, 0);
-      const ringR: number[] = [0];
-      for (let d = 1; d < maxR.length; d++) ringR[d] = d === 1 ? liftR + pokeFirst + maxR[1] : ringR[d - 1] + maxR[d - 1] + maxR[d] + poke;
-      const place = (n: Node, d: number, w0: number, w1: number) => {
+      /* CROWDED RINGS MOVE OUT, 27 September 2026 (owner, J18-300: on dogs with four
+         or more layers the outer rings overlapped although there was room further
+         out). Each dog keeps its wedge of the arc, but a ring is now pushed out
+         until every circle on it fits inside its own wedge with the usual daylight
+         (poke) to spare: the arc a wedge gives on a ring is its angle times the
+         ring's radius, so a ring must be at least (2r + poke) / angle for its
+         tightest dog. Every ring beyond moves out with it, keeping its own gap.
+         Shallow trees already fit and are unchanged. First pass: the wedges. */
+      const wedges: { k: Node; d: number; a: number; f: number }[] = [];
+      const deal = (n: Node, d: number, w0: number, w1: number) => {
         const all = kidsOf(n);
         const tot = all.reduce((sum, k) => sum + Math.max(1, k._leaves), 0);
         let at = w0;
         for (const k of all) {
           const f = (Math.max(1, k._leaves) / tot) * (w1 - w0);
-          const a = at + f / 2;
-          tidy.set(k._id, { x: Math.cos(a) * ringR[d + 1], y: Math.sin(a) * ringR[d + 1], a });
-          place(k, d + 1, at, at + f);
+          wedges.push({ k, d: d + 1, a: at + f / 2, f });
+          deal(k, d + 1, at, at + f);
           at += f;
         }
       };
-      place(root, 0, c0 - SPREAD1 / 2, c0 + SPREAD1 / 2);
+      deal(root, 0, c0 - SPREAD1 / 2, c0 + SPREAD1 / 2);
+      const fitR: number[] = [];
+      for (const w of wedges) fitR[w.d] = Math.max(fitR[w.d] ?? 0, (2 * rOfT(w.k) + poke) / Math.max(w.f, 1e-6));
+      /* CAPPED AT HALF AS BIG AGAIN. Measured over all 54 chums before shipping: the
+         deepest trees (12 layers, hundreds of distant ancestors) give their smallest
+         branches such thin wedges that fitting them in full would make the tree six
+         times the size. So no ring moves out more than RING_GROW_CAP times where the
+         fixed rings put it. Trees up to about eight layers then fit, or nearly;
+         the deepest ones get as much room as the cap allows. */
+      const RING_GROW_CAP = 1.5;
+      const fixedR: number[] = [0];
+      const ringR: number[] = [0];
+      for (let d = 1; d < maxR.length; d++) {
+        fixedR[d] = d === 1 ? liftR + pokeFirst + maxR[1] : fixedR[d - 1] + maxR[d - 1] + maxR[d] + poke;
+        const base = d === 1 ? fixedR[1] : ringR[d - 1] + maxR[d - 1] + maxR[d] + poke;
+        ringR[d] = Math.max(base, Math.min(fitR[d] ?? 0, fixedR[d] * RING_GROW_CAP));
+      }
+      for (const w of wedges) tidy.set(w.k._id, { x: Math.cos(w.a) * ringR[w.d], y: Math.sin(w.a) * ringR[w.d], a: w.a });
     }
 
     // Balloon tree.
