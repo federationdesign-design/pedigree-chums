@@ -165,9 +165,11 @@ const ZOOM_PAD = 1.1;
 // it goes", and it is the body that has to fit between the pit walls.
 // Mobile only: above 640px the layout does not run relayoutMobile, so the size
 // has nowhere to land and the slider stays hidden.
-/* 5 -> 9 on 9 Sept 2026 (owner). Only the STARTING point moves; the slider still
-   runs 0 to 10 and every stop behaves as it did. */
-const DIFF_DEFAULT = 9;
+/* 5 -> 9 on 9 Sept 2026 (owner), back to 5 on 27 September 2026 (owner: 9 is
+   nearly the hardest). Only the STARTING point moves; the slider still runs 0 to
+   10 and every stop behaves as it did. The /play pages still open their first
+   level at 0 (startDifficulty in BreedStrip), which this does not change. */
+const DIFF_DEFAULT = 5;
 
 /* THE DIFFICULTY NOW CARRIES BETWEEN LEVELS, 9 Sept 2026 (owner).
    It used to reset on every level because LineageModal is keyed on the level and
