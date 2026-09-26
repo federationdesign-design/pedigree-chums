@@ -275,7 +275,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 19 (J18-279): Beagle, 6 new facts (4 existing, 10 in all).
    Batch 20 (J18-281): Shih Tzu, 6 new facts (4 existing, 10 in all).
    Batch 21 (J18-283): Whippet, 5 new facts (7 existing, 12 in all).
-   Batch 22 (J18-284): French Bulldog, 6 new facts (4 existing, 10 in all). */
+   Batch 22 (J18-284): French Bulldog, 6 new facts (4 existing, 10 in all).
+   Batch 23 (J18-285): Weimaraner, 5 new facts (6 existing, 11 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -508,6 +509,14 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The French Bulldog's bat ears were won in a row. At a big American dog show in 1897, the judge would only choose French Bulldogs with folded rose ears, like an English Bulldog's. Their American owners were furious, set up the world's first French Bulldog club, and insisted on the tall bat ears, which became the breed's trademark.",
     "There was one French Bulldog on the Titanic, a dog called Gamin de Pycombe. A young banker, Robert Daniel, had just bought him in England for the large sum of £150. Robert Daniel survived the sinking in 1912, but his French Bulldog did not.",
     "In Britain, the Kennel Club first recognised the breed in the early 1900s under its French name, the Bouledogue Français. In 1912 the name was changed to the French Bulldog, the name we use today. More than a century later, the French Bulldog became one of the most popular dogs in Britain.",
+  ],
+  // Batch 23 (J18-285): 5 new, 11 in all.
+  Weimaraner: [
+    "The Weimaraner was created at the court of Grand Duke Karl August of Weimar, in Germany, in the early 1800s. He was a keen hunter who wanted a dog brave enough for big game such as bears, boars and wolves. The Weimaraner's famous grey colour was not planned: it seems to have simply turned up along the way.",
+    "The Weimaraner is nicknamed the Grey Ghost, for its sleek silver-grey coat and the silent way it moves through woods and fields. Its coat can be anything from mouse-grey to silver. Weimaraner puppies are even born with faint stripes, which fade within a few days.",
+    "For a long time the Weimaraner was a closely guarded secret. From 1897, the German Weimaraner Club allowed nobody to buy one unless they joined the club, and breeding was strictly controlled. If a Weimaraner was ever sold to someone outside the club, it was secretly neutered first, so the buyer could never breed from it.",
+    "In 1928 an American hunter, Howard Knight, was allowed to join the German Weimaraner Club, the first outsider ever accepted. He promised to protect the breed, but the club still sent him two neutered Weimaraners. He kept trying, and in 1938 he finally received dogs he could breed from, which began the breed in America.",
+    "After the Second World War, soldiers brought Weimaraners home from Germany, and the breed at last spread around the world. The Kennel Club in Britain recognised the Weimaraner in 1955. In America it became a star when President Dwight D. Eisenhower took his Weimaraner, Heidi, to live in the White House.",
   ],
 };
 
@@ -1148,6 +1157,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The French Bulldog's bat ears were won in a row", q: "Which ears did the American owners insist on?", options: ["Tall bat ears", "Folded rose ears", "Long floppy ears"], answer: 0, evidence: "tall bat ears" },
   { match: "There was one French Bulldog on the Titanic", q: "What was the French Bulldog on the Titanic called?", options: ["Gamin de Pycombe", "Pierre le Chien", "Boule de Neige"], answer: 0, evidence: "Gamin de Pycombe" },
   { match: "In Britain, the Kennel Club first recognised the breed in the early 1900s", q: "In which year was the name changed to French Bulldog?", options: ["1912", "1812", "2012"], answer: 0, evidence: "In 1912" },
+  // Batch 23 (J18-285): Weimaraner.
+  { match: "The Weimaraner was created at the court of Grand Duke Karl August", q: "Which big animals were early Weimaraners bred to hunt?", options: ["Bears, boars and wolves", "Mice and rats", "Ducks and geese"], answer: 0, evidence: "bears, boars and wolves" },
+  { match: "The Weimaraner is nicknamed the Grey Ghost", q: "What is the Weimaraner's nickname?", options: ["The Grey Ghost", "The Silver Bullet", "The Grey Wolf"], answer: 0, evidence: "Grey Ghost" },
+  { match: "For a long time the Weimaraner was a closely guarded secret", q: "What did you have to do to buy a Weimaraner in Germany from 1897?", options: ["Join the Weimaraner Club", "Hunt a bear", "Live in Weimar"], answer: 0, evidence: "joined the club" },
+  { match: "In 1928 an American hunter, Howard Knight", q: "In which year did Howard Knight finally get Weimaraners he could breed from?", options: ["1938", "1838", "2038"], answer: 0, evidence: "in 1938" },
+  { match: "After the Second World War, soldiers brought Weimaraners home", q: "Which American president had a Weimaraner called Heidi?", options: ["Dwight D. Eisenhower", "Abraham Lincoln", "Barack Obama"], answer: 0, evidence: "Eisenhower" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
