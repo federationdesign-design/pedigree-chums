@@ -1032,6 +1032,8 @@ const HEART_MS = 1600;
 const BONES_BASE = 5;
 const BONES_GROW = 1.3;
 const BONES_MAX = 400;
+// How high the bones fly, as a share of the original CodePen height.
+const BONES_RISE = 0.5;
 const heartBurst = (host: Element | null | undefined, x: number, y: number, count: number, size = 13) => {
   if (!host || typeof window === "undefined") return;
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
@@ -1047,7 +1049,8 @@ const heartBurst = (host: Element | null | undefined, x: number, y: number, coun
        back to 80%. Each bone also turns as it goes, a random way and amount. */
     const unit = 26 * 0.55;
     const dx = (Math.random() * 11 - 6) * unit;
-    const dy = (10 + Math.random() * 7) * unit;
+    // Half the height, 25 September 2026 (owner); the sideways spread is unchanged.
+    const dy = (10 + Math.random() * 7) * unit * BONES_RISE;
     const spin = (Math.random() < 0.5 ? -1 : 1) * (180 + Math.random() * 360);
     const tilt = Math.random() * 360;
     const anim = el.animate([
