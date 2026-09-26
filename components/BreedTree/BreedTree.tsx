@@ -5764,6 +5764,23 @@ export default function BreedTree({
     el.classList.add(styles.factClosing);
     window.setTimeout(() => el.remove(), 260);
   };
+  /* THE FACT CLOSES WHEN THE LIFT IS USED, 26 September 2026 (owner: players go
+     straight to the lifted dog before the fact has gone). While the lifted layer
+     is open, the first press anywhere but the fact card itself closes the fact,
+     with the same quick fade as closeFact. Listening starts once the lift is open,
+     so the press that opened it does not count. */
+  useEffect(() => {
+    if (!(learnNode && learnCard)) return;
+    const onDown = (e: PointerEvent) => {
+      const el = factElRef.current;
+      if (!el || el.contains(e.target as globalThis.Node)) return;
+      factElRef.current = null;
+      el.classList.add(styles.factClosing);
+      window.setTimeout(() => el.remove(), 260);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    return () => document.removeEventListener("pointerdown", onDown, true);
+  }, [learnNode, learnCard]);
   const showFact = () => {
     const host = chainCountRef.current?.parentElement;
     if (!host) return;

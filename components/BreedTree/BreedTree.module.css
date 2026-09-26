@@ -2876,7 +2876,8 @@
 @media (min-width: 1024px) and (hover: hover) {
   /* In the BOTTOM third on desktop, still centred (owner, 26 September 2026);
      phones keep it near the top. */
-  .factPop { --fact-k: 1.5; top: auto; bottom: 8vh; }
+  /* 1.35, a tenth smaller than 1.5 (owner, 26 September 2026). */
+  .factPop { --fact-k: 1.35; top: auto; bottom: 8vh; }
 }
 @media (prefers-reduced-motion: reduce) { .factBarFill { animation-timing-function: linear; } }
 
@@ -2897,10 +2898,11 @@
   animation: factDogsIn 420ms ease-out forwards;
 }
 @keyframes factDogsIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.factDog { margin: 0; width: calc(66px * var(--fact-k, 1)); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* Bigger pictures, 26 September 2026 (owner): 64px, was 52px. */
+.factDog { margin: 0; width: calc(78px * var(--fact-k, 1)); display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .factDog img {
-  width: calc(52px * var(--fact-k, 1));
-  height: calc(52px * var(--fact-k, 1));
+  width: calc(64px * var(--fact-k, 1));
+  height: calc(64px * var(--fact-k, 1));
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ffffff;
