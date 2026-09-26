@@ -2916,3 +2916,27 @@
 }
 @media (prefers-reduced-motion: reduce) { .factDogs { animation: none; opacity: 1; } }
 
+/* The fact card's close cross, top right (owner, 26 September 2026). The card is
+   position: fixed, so this sits against its corner. The card's only other tappable
+   part is the pause button. */
+.factClose {
+  position: absolute;
+  top: calc(10px * var(--fact-k, 1));
+  right: calc(10px * var(--fact-k, 1));
+  width: calc(32px * var(--fact-k, 1));
+  height: calc(32px * var(--fact-k, 1));
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: rgba(10, 58, 87, 0.55);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  text-shadow: none;
+}
+.factClose:hover, .factClose:focus-visible { background: rgba(10, 58, 87, 0.8); }
+.factClose svg { width: calc(14px * var(--fact-k, 1)); height: calc(14px * var(--fact-k, 1)); }
+

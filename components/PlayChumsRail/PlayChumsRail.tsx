@@ -49,7 +49,7 @@ export default async function PlayChumsRail({ hide = [], films, anchorId = "play
             <div key={b.slug} className={styles.card} data-play-card>
               {/* THE LAST FRAME OF THE CHUM'S OWN INTRO CLIP. The frame already
                   carries the dog's name. A tap on the picture plays the game. */}
-              <Link href={`/play/${b.slug}?from=home`} tabIndex={-1} aria-hidden="true">
+              <Link href={`/play/${b.slug}?from=home&intro=1`} tabIndex={-1} aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className={styles.img} src={poster} alt="" loading="lazy" width={480} height={682} />
               </Link>
@@ -57,9 +57,12 @@ export default async function PlayChumsRail({ hide = [], films, anchorId = "play
                   PLAY GAME with the joystick and the level's circle count on
                   every card, and WATCH VIDEO with the film's length above it on
                   the chums that have a film. */}
+              {/* intro=1 on both play links (owner, 26 September 2026): the level opens
+                  with its intro film and 3, 2, 1 countdown on every screen, where the
+                  dog has one; otherwise it goes straight to the game. See PlayIntro. */}
               <div className={styles.actions}>
                 {vimeoId ? <WatchVideoRow name={b.name} slug={b.slug} vimeoId={vimeoId} poster={poster} seconds={secs.get(b.slug) ?? null} /> : null}
-                <Link href={`/play/${b.slug}?from=home`} className={styles.row} aria-label={`Play the ${b.name} game, ${circles} dogs`}>
+                <Link href={`/play/${b.slug}?from=home&intro=1`} className={styles.row} aria-label={`Play the ${b.name} game, ${circles} dogs`}>
                   <span className={styles.rowLabel}>Play game</span>
                   <span className={`${styles.dot} ${styles.dotPlay}`} aria-hidden="true">🕹️</span>
                   <span className={`${styles.dot} ${styles.dotDogs}`} aria-hidden="true">

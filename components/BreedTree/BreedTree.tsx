@@ -5865,10 +5865,12 @@ export default function BreedTree({
     foot.appendChild(pause);
     const skip = document.createElement("button");
     skip.type = "button";
-    skip.className = styles.factSkip;
-    skip.setAttribute("aria-label", "Skip this fact");
-    skip.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 5l9 7-9 7z" fill="currentColor"/><rect x="16" y="5" width="3" height="14" rx="1" fill="currentColor"/></svg>';
-    foot.appendChild(skip);
+    // A CLOSE CROSS IN THE TOP-RIGHT CORNER, 26 September 2026 (owner): was a
+    // skip arrow beside the time bar. It does the same thing, closes the fact.
+    skip.className = styles.factClose;
+    skip.setAttribute("aria-label", "Close this fact");
+    skip.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+    el.appendChild(skip);
     el.appendChild(foot);
     el.style.animationDuration = `${ms}ms`;
     host.appendChild(el);
@@ -7656,6 +7658,7 @@ export default function BreedTree({
        it is dimmed to the circles' own FACE_STANDDOWN_OPACITY. It uses the SVG
        opacity attribute, so any style the page sets later still wins. */
     const chumListBox = foundListRef.current?.getBoundingClientRect() ?? null;
+    const chumFactBox = factElRef.current?.getBoundingClientRect() ?? null;
     for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef], [btnBodiesRef, btnsGRef], [logoPieceBodiesRef, logoPiecesGRef]] as const) {
       const list = (listRef as typeof rodBodiesRef).current;
       const gg = (gRef as typeof rodsGRef).current;
@@ -7675,9 +7678,10 @@ export default function BreedTree({
         // armed (yellow), resting on the floor (red), else white. The grace
         // clears a lifted card only after CHUM_FLOOR_GRACE_MS with no contact.
         if (el && gRef === chumsGRef) {
-          if (chumListBox) {
+          if (chumListBox || chumFactBox) {
             const cb = el.getBoundingClientRect();
-            const behind = cb.right > chumListBox.left && cb.left < chumListBox.right && cb.bottom > chumListBox.top && cb.top < chumListBox.bottom;
+            const over = (bx: DOMRect | null) => !!bx && cb.right > bx.left && cb.left < bx.right && cb.bottom > bx.top && cb.top < bx.bottom;
+            const behind = over(chumListBox) || over(chumFactBox);
             if (behind) el.setAttribute("opacity", String(FACE_STANDDOWN_OPACITY));
             else el.removeAttribute("opacity");
           } else if (el.hasAttribute("opacity")) el.removeAttribute("opacity");
@@ -7767,7 +7771,10 @@ export default function BreedTree({
        circle is tested for overlap with the box in screen pixels. Null when the
        list is shut, so the test costs nothing then. */
     const listBox = foundListRef.current?.getBoundingClientRect() ?? null;
-    const listCtm = listBox ? cg?.ownerSVGElement?.getScreenCTM() ?? null : null;
+    /* AND BEHIND THE FACT CARD, 26 September 2026 (owner): the same see-through
+       dimming as behind the found list, for the "Did you know?" card. */
+    const factBox = factElRef.current?.getBoundingClientRect() ?? null;
+    const listCtm = listBox || factBox ? cg?.ownerSVGElement?.getScreenCTM() ?? null : null;
     /* No chain, no lead face. Written once per pass rather than per circle, and
        before the loop, so a chain that ended between frames cannot leave the copy
        stranded on screen. */
@@ -8401,11 +8408,12 @@ export default function BreedTree({
           }
           const resisting = resistNodeRef.current === d;
           let behindList = false;
-          if (listBox && listCtm) {
+          if ((listBox || factBox) && listCtm) {
             const cx = listCtm.a * tx + listCtm.e;
             const cy = listCtm.d * ty + listCtm.f;
             const rr = drawR(d, v, k) * listCtm.a;
-            behindList = cx + rr > listBox.left && cx - rr < listBox.right && cy + rr > listBox.top && cy - rr < listBox.bottom;
+            const under = (bx: DOMRect | null) => !!bx && cx + rr > bx.left && cx - rr < bx.right && cy + rr > bx.top && cy - rr < bx.bottom;
+            behindList = under(listBox) || under(factBox);
           }
           // Flashing its join face? Read against the sim's own frame clock.
           const joinFlash = (joinFlashRef.current.get(d) ?? 0) > nowFx;
