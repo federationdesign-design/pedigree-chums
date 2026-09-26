@@ -1019,6 +1019,8 @@ const FACT_DOG_WAVE_MS = 130;
 // and when to look again, since the lift opens just after a chain's fact appears.
 const FACT_CLEAR_PAD = 24;
 const FACT_CLEAR_CHECKS_MS = [0, 120, 400, 900, 1500];
+// How close to a side of the window a dragged fact card's centre may go (owner, 27 September 2026).
+const FACT_DRAG_EDGE_PX = 60;
 // Up to this many dog pictures are shown twice the size.
 const FACT_DOGS_BIG_UPTO = 3; // each word arrives this long after the one before
 /* RANDOM FACTS, 25 September 2026 (owner: random dog facts from everything the
@@ -5827,6 +5829,8 @@ export default function BreedTree({
   useEffect(() => { onScoreRef.current = onScore; }, [onScore]);
   // Facts shown since the last quiz; a quiz shows on the QUIZ_EVERY-th, if it has one.
   const factsSinceQuizRef = useRef(QUIZ_EVERY - 1);
+  // Where the player last dragged the fact card to, if anywhere (see showFact).
+  const factPosRef = useRef<{ left: number; top: number } | null>(null);
   const showFact = (prefer: string[] = []) => {
     const host = chainCountRef.current?.parentElement;
     if (!host) return;
@@ -6041,6 +6045,54 @@ export default function BreedTree({
     el.style.animationDuration = `${ms}ms`;
     host.appendChild(el);
     factElRef.current = el;
+    /* THE CARD CAN BE DRAGGED, 27 September 2026 (owner: move it out of the way).
+       A press anywhere on the card but its buttons picks it up; it follows the
+       pointer and stays where it is let go. The next fact opens in the same spot
+       (factPosRef), for the rest of the level, so a player who moves it once is not
+       fighting it on every fact; the desktop keep-clear placement stands aside once
+       a spot has been chosen. left is the card's centre (it wears translate(-50%)),
+       and the pointer's travel is divided by the card's on-screen scale in case its
+       host is scaled. A spot is kept on screen: the centre within FACT_DRAG_EDGE_PX
+       of each side, the top within the window. */
+    const keepOn = (left: number, top: number) => ({
+      left: Math.min(window.innerWidth - FACT_DRAG_EDGE_PX, Math.max(FACT_DRAG_EDGE_PX, left)),
+      top: Math.min(window.innerHeight - FACT_DRAG_EDGE_PX, Math.max(0, top)),
+    });
+    const putAt = (pos: { left: number; top: number }) => {
+      const p = keepOn(pos.left, pos.top);
+      el.style.left = `${p.left}px`;
+      el.style.top = `${p.top}px`;
+      el.style.bottom = "auto";
+      return p;
+    };
+    if (factPosRef.current) putAt(factPosRef.current);
+    el.addEventListener("pointerdown", (e) => {
+      if ((e.target as Element).closest("button")) return;
+      e.stopPropagation();
+      e.preventDefault();
+      const cs = getComputedStyle(el);
+      const k = el.offsetWidth ? el.getBoundingClientRect().width / el.offsetWidth : 1;
+      const x0 = e.clientX, y0 = e.clientY;
+      const l0 = parseFloat(cs.left) || 0, t0 = parseFloat(cs.top) || 0;
+      let moved = false;
+      el.setPointerCapture?.(e.pointerId);
+      el.classList.add(styles.factDragging);
+      const move = (ev: PointerEvent) => {
+        const dx = (ev.clientX - x0) / (k || 1), dy = (ev.clientY - y0) / (k || 1);
+        if (!moved && Math.hypot(dx, dy) < 4) return;
+        moved = true;
+        factPosRef.current = putAt({ left: l0 + dx, top: t0 + dy });
+      };
+      const up = () => {
+        el.classList.remove(styles.factDragging);
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerup", up);
+        el.removeEventListener("pointercancel", up);
+      };
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerup", up);
+      el.addEventListener("pointercancel", up);
+    });
     /* KEEP CLEAR OF THE LIFTED DOG, desktop only, 26 September 2026 (owner: the card
        often sat on top of the dog being completed). The card finds the lifted dog
        (data-lift-root) and moves into the biggest clear space: below it if there
@@ -6049,6 +6101,8 @@ export default function BreedTree({
     if (window.matchMedia?.("(min-width: 1024px) and (hover: hover)").matches) {
       const place = () => {
         if (factElRef.current !== el) return;
+        // A spot the player has chosen by dragging wins (owner, 27 September 2026).
+        if (factPosRef.current) return;
         const lift = document.querySelector("[data-lift-root]");
         if (!lift) { el.style.top = ""; el.style.bottom = ""; el.style.left = ""; el.style.width = ""; return; }
         const L = lift.getBoundingClientRect();

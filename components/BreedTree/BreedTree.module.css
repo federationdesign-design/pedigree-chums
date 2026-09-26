@@ -3106,3 +3106,11 @@
 .foundDetailMix li > span:last-child { font-family: var(--font-display), system-ui, sans-serif; font-size: 200%; line-height: 1; align-self: center; }
 .foundListHead { padding-top: 10px; }
 .foundList { padding-left: 22px; }
+
+/* THE FACT CARD CAN BE DRAGGED, 27 September 2026 (owner). The whole card takes a
+   press now (it was pointer-events: none, its buttons excepted), shows a grab
+   hand, and does not select text or scroll the page while held. The desktop
+   keep-clear move (transition on top and left) is switched off mid-drag so the
+   card sticks to the pointer. */
+.factPop { pointer-events: auto; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.factDragging { cursor: grabbing; transition: none !important; }
