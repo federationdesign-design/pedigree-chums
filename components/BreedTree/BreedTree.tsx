@@ -969,6 +969,14 @@ const FACE_FLIP_SHARE = 0.4;
    bright cyan instead. See paintChainCount. */
 const CHAIN_COUNT_FROM = [227, 68, 46] as const; // h, s%, l%
 const CHAIN_COUNT_TO = [132, 79, 42] as const;
+/* THE CHAIN COUNTER'S BANDS, 25 September 2026 (owner: red, then orange, yellow
+   and blue, and green at the end). Clear bands rather than a blend, because a
+   blend from yellow to blue runs through a muddy green that would look like the
+   finish; the main counter fades between them over its 0.3s transition. Green is
+   only ever the completed chain. Used by the chain counter and its mini pops;
+   the dogs-found counter keeps CHAIN_COUNT_FROM/TO. */
+const chainBand = (t: number): string =>
+  t >= 1 ? "#22c55e" : t < 0.25 ? "#ef4444" : t < 0.5 ? "#f47421" : t < 0.75 ? "#ffd23e" : "#1497d6";
 // Bombs going off this close together count as one string. See onRoundStats.
 const BOMB_STRING_GAP_MS = 300;
 /* DOG FACTS INSTEAD OF PRAISE, 25 September 2026 (owner). A chain completed or
@@ -13887,14 +13895,13 @@ export default function BreedTree({
       const rPx = geo.h * Math.hypot(ctm.a, ctm.b);
       const held = dogChainNodesRef.current.size;
       const t = Math.max(0, Math.min(1, held / total));
-      const hsl = CHAIN_COUNT_FROM.map((c, j) => c + (CHAIN_COUNT_TO[j] - c) * t);
       const el = document.createElement("div");
       el.className = styles.chainPop;
       el.textContent = `${held}/${total}`;
       el.setAttribute("aria-hidden", "true");
       el.style.left = `${sp.x}px`;
       el.style.top = `${sp.y + rPx + CHAIN_POP_BELOW_PX}px`;
-      el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
+      el.style.background = chainBand(t);
       el.style.animationDuration = `${CHAIN_POP_MS}ms`;
       /* INSIDE THE GAME, NOT ON THE PAGE (25 September 2026: it never showed).
          Appended to document.body it sat at z-index 62 on the page, behind the
@@ -13918,8 +13925,7 @@ export default function BreedTree({
          throughout, by request; the CSS gives it a navy shadow to hold it on the
          brighter green end. */
       const t = Math.max(0, Math.min(1, held / total));
-      const hsl = CHAIN_COUNT_FROM.map((c, j) => c + (CHAIN_COUNT_TO[j] - c) * t);
-      el.style.background = `hsl(${hsl[0].toFixed(0)}, ${hsl[1].toFixed(0)}%, ${hsl[2].toFixed(0)}%)`;
+      el.style.background = chainBand(t);
       el.style.display = "block";
       // Pinned top right by CSS, not measured (owner, 24 September 2026). See .chainCount.
     };
