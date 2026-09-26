@@ -247,6 +247,28 @@ const ARTICLE_FACTS: string[] = [
 // Any facts written straight in here join the pool too.
 export const EXTRA_FACTS: string[] = [];
 
+/* TEN FACTS FOR EVERY CHUM, brief 5, from 27 September 2026 (owner: a returning
+   player meets the same chums level after level, so each needs at least ten
+   facts; target library about 3,000). Researched one chum per batch, thinnest
+   first, each checked against sources listed in that batch's review document,
+   never over 150 words, and each names its dog. Keyed by the pack name, which
+   becomes each fact's FACT_SUBJECT so its picture leads and it is chosen when
+   that chum is caught or chained.
+   Batch 1 (J18-241): Jackapoo, 9 new facts (1 existing, 10 in all). */
+export const CHUM_FACTS: Record<string, string[]> = {
+  Jackapoo: [
+    "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
+    "The Jackapoo goes by at least ten names. Jack-a-poo, Jackadoodle, Jackapoodle, Jackpoo, Poojack and Poo-Jack are all the same cross of a Jack Russell Terrier and a Poodle. A pure breed has a breed club that settles on one official name, but the Jackapoo has no such club, so breeders and owners made up their own, joining the Jack from one parent to the poo or doodle from the other.",
+    "A Jackapoo's Poodle parent is almost always a Miniature or Toy Poodle, not a Standard. Poodles come in three sizes, and a Standard Poodle is far taller than a Jack Russell Terrier, so the small sizes are used to keep the Jackapoo little. Even so, a Jackapoo can stand anywhere from about 24 to 38cm tall and weigh from 5 to 12kg, depending mostly on the size of its Poodle parent.",
+    "The Jack Russell side of the Jackapoo is named after a real man. John Russell, known as Jack, was a student at Oxford who loved fox hunting. The story goes that in 1819, near the village of Marston, he met a milkman with a little white terrier with tan patches over her eyes and ears, and bought her on the spot. She was called Trump, and Russell began his famous line of hunting terriers with her. He later had to sell his dogs more than once when money ran short, so nobody today can prove their dog descends from Trump.",
+    "Why are so many Jack Russells white? Hunters chasing a fox wanted a terrier they could never mistake for the fox itself, so John Russell chose mostly white dogs, starting with his terrier Trump. A Jackapoo does not always keep that white coat. It can take its looks from either parent, and its Poodle side comes in many solid colours, from black and brown to apricot and cream.",
+    "The Jackapoo is not recognised as a breed by the Kennel Club or any other major kennel club, so there is no official description of how one should look. Puppies in the same litter can turn out quite differently, some with a short, rough terrier coat and some curly like a Poodle. In 2009 an American club for crossbreeds, the International Designer Canine Association, did add the Jackapoo to its list, but that is not the same as being a recognised breed.",
+    "Breeders describe Jackapoos by generation. A first-generation, or F1, Jackapoo has one Jack Russell Terrier parent and one Poodle parent. Puppies from two Jackapoos are called F2, and a Jackapoo bred back to a Poodle is usually called F1b. Every puppy inherits a random mix of genes from both sides, so no breeder can promise exactly how a Jackapoo puppy will turn out.",
+    "The man behind the Jackapoo's terrier side had little time for dog shows. John Russell was a founding member of the Kennel Club in 1873 and judged Fox Terriers at a show at Crystal Palace in London in 1874, but he never showed his own dogs. He said his working terriers were as different from the show dogs as a wild rose is from a garden rose. What mattered to him was a dog that could do its job, not one that won prizes.",
+    "The Poodle half of a Jackapoo comes from one of the quickest learners of all dogs. In his 1994 book The Intelligence of Dogs, the psychologist Stanley Coren ranked breeds by how fast they learned and obeyed commands, using reports from obedience judges. The Poodle came second, behind only the Border Collie. A Jackapoo can pick up that quickness along with the Jack Russell's energy, which is why owners are advised to keep one busy with games and training.",
+  ],
+};
+
 const firstSentence = (t: string): string => {
   const m = t.match(/^[\s\S]*?[.!?](?=\s|$)/);
   return (m ? m[0] : t).trim();
@@ -712,6 +734,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Eddie is Martin Crane's Jack Russell Terrier", q: "In Frasier, what does Eddie do that drives Frasier mad?", options: ["Stares at him", "Sings", "Steals his hat"], answer: 0, evidence: "staring at Frasier" },
   { match: "Boxers come from the German Bullenbeisser", q: "What does Bullenbeisser mean?", options: ["Bull-biter", "Bear-hugger", "Boar-chaser"], answer: 0, evidence: "bull-biter" },
   { match: "The Irish Setter was bred from older Irish setting dogs", q: "What colour is the Irish Setter?", options: ["Red", "Blue", "Green"], answer: 0, evidence: "red gundog" },
+  // Batch 1 (J18-241): Jackapoo. Each answer is in its fact (evidence).
+  { match: "The Jack Russell side of the Jackapoo is named after a real man", q: "What was the name of the terrier Jack Russell bought from a milkman?", options: ["Trump", "Tramp", "Trumpet"], answer: 0, evidence: "She was called Trump" },
+  { match: "A Jackapoo's Poodle parent is almost always", q: "Which Poodles are usually crossed to make a Jackapoo?", options: ["Miniature or Toy Poodles", "Standard Poodles", "Mammoth Poodles"], answer: 0, evidence: "Miniature or Toy Poodle" },
+  { match: "Why are so many Jack Russells white?", q: "Why did John Russell choose mostly white terriers?", options: ["So hunters would not mistake them for the fox", "So they would show up in the snow", "Because white dogs were in fashion"], answer: 0, evidence: "never mistake for the fox" },
+  { match: "The Poodle half of a Jackapoo comes from one of the quickest learners", q: "Where did the Poodle come in Stanley Coren's ranking of quick learners?", options: ["Second", "First", "Tenth"], answer: 0, evidence: "The Poodle came second" },
+  { match: "The Jackapoo goes by at least ten names", q: "Why does the Jackapoo have so many names?", options: ["It has no breed club to choose one", "It was named by a computer", "Every owner must invent one"], answer: 0, evidence: "no such club" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
@@ -750,7 +778,8 @@ export function allDogFacts(): string[] {
     return f;
   });
   for (const [name, text] of Object.entries(EXTINCT_REWRITES)) FACT_SUBJECT.set(text.trim(), name);
-  const pool = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
+  const chumLines = Object.entries(CHUM_FACTS).flatMap(([name, list]) => list.map((f) => { FACT_SUBJECT.set(f.trim(), name); return f; }));
+  const pool = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...chumLines, ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
   // The richer versions (FACT_ENRICH), keeping each fact's own dog (FACT_SUBJECT).
   cache = pool.map((f) => {
     const rich = FACT_ENRICH[f];
