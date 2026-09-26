@@ -278,7 +278,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 22 (J18-284): French Bulldog, 6 new facts (4 existing, 10 in all).
    Batch 23 (J18-285): Weimaraner, 5 new facts (6 existing, 11 in all).
    Batch 24 (J18-286): Rottweiler, 5 new facts (6 existing, 11 in all).
-   Batch 25 (J18-287): Basset Hound, 6 new facts (5 existing, 11 in all). */
+   Batch 25 (J18-287): Basset Hound, 6 new facts (5 existing, 11 in all).
+   Batch 26 (J18-288): Bichon Frise, 4 new facts (11 existing, most through the Cavachon; 15 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -536,6 +537,13 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "In the 1890s, worried that British Basset Hounds were too closely related, Sir Everett Millais crossed one with a Bloodhound called Inoculation, using artificial insemination, one of the earliest times this was done with dogs. The Bloodhound blood gave the Basset Hound its long, low ears and sad, noble face.",
     "Princess Alexandra, later Queen Alexandra, made the Basset Hound fashionable. In the 1880s she set up a pack at Sandringham, the royal estate in Norfolk, and showed her Bassets at dog shows. Soon even people in Britain who never went hunting wanted a Basset Hound.",
     "Fred Basset is a Basset Hound in a British newspaper comic strip, created by the cartoonist Alex Graham in 1963. Fred's thoughts appear in bubbles as he watches the odd behaviour of his human family, and the strip has been printed in newspapers around the world.",
+  ],
+  // Batch 26 (J18-288): 4 new, 15 in all.
+  "Bichon Frise": [
+    "The Bichon Frise's full French name is Bichon à Poil Frisé, meaning the bichon with curly hair. Bichon may come from barbichon, a little Barbet, or may simply be an old French word for a small dog. In 1933, when the breed was going by two names, Ténériffe and Bichon, the new name Bichon Frise was chosen to describe its curly coat.",
+    "The Bichon Frise nearly disappeared twice, after the First and Second World Wars. A few French and Belgian breeders gathered the little white dogs from the streets and saved the breed. The first Bichon Frise entered in the French stud book, in October 1934, was a female called Ida.",
+    "The Bichon Frise reached America in 1956, when Hélène and François Picault from Dieppe in France arrived with six Bichons and bred the first American litter. The breed came to Britain in the late 1950s and was recognised by the Kennel Club in the 1970s. Today it is one of the best-loved small dogs in both countries.",
+    "Little white dogs like the Bichon Frise appear in paintings by great artists over hundreds of years, including the Spanish painter Francisco Goya and the English painter Sir Joshua Reynolds. In the 1800s the Bichon came back into fashion in France under the Emperor Napoleon III, when it was known as the Ténériffe.",
   ],
 };
 
@@ -1194,6 +1202,11 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Sir Everett Millais, son of the famous painter", q: "Who is called the father of the Basset Hound in England?", options: ["Sir Everett Millais", "Charles Dickens", "Lord Nelson"], answer: 0, evidence: "Sir Everett Millais" },
   { match: "In the 1890s, worried that British Basset Hounds were too closely related", q: "What was the Bloodhound in the 1890s Basset Hound cross called?", options: ["Inoculation", "Injection", "Medicine"], answer: 0, evidence: "called Inoculation" },
   { match: "Princess Alexandra, later Queen Alexandra, made the Basset Hound fashionable", q: "Where did Princess Alexandra keep her pack of Basset Hounds?", options: ["Sandringham", "Balmoral", "Windsor Castle"], answer: 0, evidence: "at Sandringham" },
+  // Batch 26 (J18-288): Bichon Frise.
+  { match: "The Bichon Frise's full French name is Bichon à Poil Frisé", q: "What does frisé mean in the Bichon Frise's name?", options: ["Curly", "Frozen", "Fluffy"], answer: 0, evidence: "curly" },
+  { match: "The Bichon Frise nearly disappeared twice", q: "What was the first Bichon Frise in the French stud book called?", options: ["Ida", "Fifi", "Belle"], answer: 0, evidence: "called Ida" },
+  { match: "The Bichon Frise reached America in 1956", q: "How many Bichons did the Picaults bring to America in 1956?", options: ["Six", "Sixty", "One"], answer: 0, evidence: "six Bichons" },
+  { match: "Little white dogs like the Bichon Frise appear in paintings", q: "Which Spanish painter put little white dogs like the Bichon Frise in his pictures?", options: ["Francisco Goya", "Pablo Picasso", "Salvador Dalí"], answer: 0, evidence: "Francisco Goya" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
