@@ -261,7 +261,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 5 (J18-258): Goldendoodle, 9 new facts (1 existing, 10 in all).
    Batch 6 (J18-261): Labradoodle, 9 new facts (1 existing, 10 in all).
    Batch 7 (J18-265): Doberman, 9 new facts (2 existing, 11 in all).
-   Batch 8 (J18-266): Miniature Schnauzer, 8 new facts (2 existing, 10 in all). */
+   Batch 8 (J18-266): Miniature Schnauzer, 8 new facts (2 existing, 10 in all).
+   Batch 9 (J18-267): Lurcher, 8 new facts (2 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -356,6 +357,17 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "A Miniature Schnauzer's most famous colour is salt and pepper, a grey made of hairs banded in black and white. It can also be black and silver or solid black. Pure white and patched Miniature Schnauzers are bred too, but not every kennel club accepts those colours.",
     "People often say the Miniature Schnauzer's ancestors appear in old art. The painter Albrecht Dürer drew a scruffy dog that looks like a Schnauzer around 1500. But a famous statue in Stuttgart of a night watchman with a Schnauzer at his feet, dated 1620, turns out to be no proof at all: its sculptor was born in 1853.",
     "Miniature Schnauzers first arrived in the United States in 1925, and the American Kennel Club recognised the breed the following year. Many people believe almost every pedigree Miniature Schnauzer in America goes back to the handful of dogs imported in those first years. Today it is one of the most popular breeds there.",
+  ],
+  // Batch 9 (J18-267): 8 new, 10 in all.
+  Lurcher: [
+    "The word Lurcher was first written down with its dog meaning in 1668. It probably comes from an old verb, to lurch, a form of lurk, meaning to lurk about or to steal. Many people also say it comes from the Romani word lur, meaning thief. Either way, the name suits a dog that was famous for sneaking off with the rich man's rabbits.",
+    "For centuries the Lurcher was known as the poacher's dog. From 1389 until 1831, English law let only people who owned enough land keep dogs for hunting. Poor families who hunted on someone else's land needed a dog that was fast, clever and quiet, and a Lurcher could slip out at night and bring home a rabbit or hare for the pot.",
+    "The story goes that poachers crossed Greyhounds with scruffy farm dogs so that a Lurcher would not look like a Greyhound, the dog of the rich, and would not attract a gamekeeper's attention. Historians point out there is little written proof of this, but the idea of the Lurcher as the ordinary family's hunting dog has stuck.",
+    "The most popular Lurcher of all is a Greyhound crossed with a Collie. The Greyhound gives it speed, and the sheepdog gives it brains and a willingness to listen, which a Greyhound on its own is not famous for. Terriers, Whippets, Deerhounds and Salukis have all gone into Lurchers too, depending on what each owner wanted the dog to do.",
+    "Gypsy and Traveller families in Britain and Ireland have kept Lurchers for hundreds of years, as hunting dogs and as companions on the road. Many of them prized a smooth-coated Lurcher that was mostly Greyhound, because it could run all day, and looked down on dogs with too little sighthound in them.",
+    "A Lurcher can be almost any size or colour. Because it is a cross rather than a breed, one can be as small as a Whippet and another as big as a Deerhound, though most are about the size of a Greyhound. Coats range from sleek and smooth to rough and wiry, depending on the dogs in its family.",
+    "The Lurcher differs from its cousin the Longdog in one simple way. A Longdog is a cross of two sighthounds, such as a Greyhound and a Saluki. A Lurcher is a sighthound crossed with a different kind of dog, such as a Collie or a terrier. Neither is recognised as a breed by the Kennel Club, and neither has an official standard.",
+    "Hare coursing, the old sport of racing dogs after hares, is now against the law in England, Scotland and Wales. So most Lurchers today are family pets rather than hunters. They are known as gentle, easy-going dogs indoors, happy to sprint round a field and then curl up on the sofa for the rest of the day.",
   ],
 };
 
@@ -912,6 +924,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Where a Miniature Schnauzer is shown depends on the country", q: "In which group is the Miniature Schnauzer shown in Britain?", options: ["Utility", "Terrier", "Toy"], answer: 0, evidence: "Utility group" },
   { match: "A Miniature Schnauzer's most famous colour is salt and pepper", q: "What is the Miniature Schnauzer's famous grey colour called?", options: ["Salt and pepper", "Fish and chips", "Bread and butter"], answer: 0, evidence: "salt and pepper" },
   { match: "People often say the Miniature Schnauzer's ancestors appear in old art", q: "Why is the Stuttgart statue no proof that Schnauzers are old?", options: ["Its sculptor was born in 1853", "It is made of chocolate", "It shows a cat"], answer: 0, evidence: "born in 1853" },
+  // Batch 9 (J18-267): Lurcher.
+  { match: "The word Lurcher was first written down with its dog meaning in 1668", q: "What did the old English verb to lurch mean?", options: ["To lurk about or to steal", "To sneeze loudly", "To dance a jig"], answer: 0, evidence: "lurk about or to steal" },
+  { match: "For centuries the Lurcher was known as the poacher's dog", q: "Until which year could only landowners legally keep hunting dogs in England?", options: ["1831", "1931", "1731"], answer: 0, evidence: "until 1831" },
+  { match: "The most popular Lurcher of all is a Greyhound crossed with a Collie", q: "Which dog is most often crossed with a Greyhound to make a Lurcher?", options: ["A Collie", "A Pug", "A Chihuahua"], answer: 0, evidence: "crossed with a Collie" },
+  { match: "The Lurcher differs from its cousin the Longdog in one simple way", q: "What is a Longdog?", options: ["A cross of two sighthounds", "A very long Dachshund", "A Lurcher that has grown up"], answer: 0, evidence: "cross of two sighthounds" },
+  { match: "Hare coursing, the old sport of racing dogs after hares", q: "Is hare coursing allowed in England today?", options: ["Yes", "No"], answer: 1, evidence: "against the law" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
