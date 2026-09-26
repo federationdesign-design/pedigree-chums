@@ -996,7 +996,9 @@ const FACT_BASE_MS = 4400;
 const FACT_MS_PER_CHAR = 90;
 const FACT_MIN_MS = 8000;
 const FACT_MAX_MS = 18000;
-const FACT_WORD_MS = 60; // each word arrives this long after the one before
+const FACT_WORD_MS = 60;
+// The dog pictures pop in one after another, this far apart. See showFact.
+const FACT_DOG_WAVE_MS = 130; // each word arrives this long after the one before
 /* RANDOM FACTS, 25 September 2026 (owner: random dog facts from everything the
    site holds, not facts about the dog just chained). The pool is allDogFacts
    (data/dogFacts.ts: the history page's facts, the chatbot's breed lines, the
@@ -5814,6 +5816,31 @@ export default function BreedTree({
     el.setAttribute("role", "status");
     const headText = factHeadFor(fact);
     el.setAttribute("aria-label", `${headText} ${fact}`);
+    /* THE DOGS IN THE FACT, 26 September 2026 (owner): pictures of the dogs a fact
+       is about, each with its name, from dogsForFact (named dogs first, else the
+       group or trait, cartoon and real in turn). Rounded rectangles ABOVE the
+       title, and the first thing to appear: they pop in one after another. */
+    const factDogs = dogsForFact(fact);
+    if (factDogs.length) {
+      const row = document.createElement("div");
+      row.className = styles.factDogs;
+      factDogs.forEach((dg, di) => {
+        const fig = document.createElement("figure");
+        fig.className = styles.factDog;
+        fig.style.animationDelay = `${di * FACT_DOG_WAVE_MS}ms`;
+        const im = document.createElement("img");
+        im.src = encodeURI(dg.img);
+        im.alt = dg.name;
+        im.loading = "eager";
+        im.decoding = "async";
+        const cap = document.createElement("figcaption");
+        cap.textContent = dg.name;
+        fig.appendChild(im);
+        fig.appendChild(cap);
+        row.appendChild(fig);
+      });
+      el.appendChild(row);
+    }
     const head = document.createElement("div");
     head.className = styles.factHead;
     head.textContent = headText;
@@ -5831,30 +5858,6 @@ export default function BreedTree({
       body.appendChild(document.createTextNode(" "));
     });
     el.appendChild(body);
-    /* THE DOGS IN THE FACT, 26 September 2026 (owner): round pictures of the dogs a
-       fact is about, each with its name, from dogsForFact (named dogs first, else
-       the group or trait the fact describes). They fade in once the words are in. */
-    const factDogs = dogsForFact(fact);
-    if (factDogs.length) {
-      const row = document.createElement("div");
-      row.className = styles.factDogs;
-      row.style.animationDelay = `${150 + fact.split(/\s+/).length * FACT_WORD_MS}ms`;
-      for (const dg of factDogs) {
-        const fig = document.createElement("figure");
-        fig.className = styles.factDog;
-        const im = document.createElement("img");
-        im.src = encodeURI(dg.img);
-        im.alt = dg.name;
-        im.loading = "eager";
-        im.decoding = "async";
-        const cap = document.createElement("figcaption");
-        cap.textContent = dg.name;
-        fig.appendChild(im);
-        fig.appendChild(cap);
-        row.appendChild(fig);
-      }
-      el.appendChild(row);
-    }
     /* THE TIME LEFT AND A SKIP, 25 September 2026 (owner). A bar along the foot
        empties over exactly the time the fact is on screen, and a skip button
        beside it takes the fact away at once. The button is the card's only

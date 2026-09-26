@@ -414,7 +414,7 @@ function famousFacts(): string[] {
         breeds. Flat faces come from the breed data's own skull field.
    At most FACT_DOGS_MAX, in the order they appear. */
 export type FactDog = { name: string; img: string };
-export const FACT_DOGS_MAX = 6;
+export const FACT_DOGS_MAX = 5; // five, 26 September 2026 (owner; was six)
 let dogIndex: { names: string[]; img: Map<string, string> } | null = null;
 function buildDogIndex() {
   if (dogIndex) return dogIndex;
@@ -435,20 +435,31 @@ function buildDogIndex() {
   return dogIndex;
 }
 const PACK = (pred: (name: string) => boolean) => () => breeds.filter((b) => !!b.slug && !!b.image && pred(b.name)).map((b) => b.name);
-const FACT_GROUPS: { re: RegExp; dogs: () => string[] }[] = [
-  { re: /\bflat[- ]faced|brachycephalic|short[- ]nosed|flat faces?\b/i, dogs: () => breeds.filter((b) => !!b.slug && !!b.image && b.skull === "flat").map((b) => b.name) },
-  { re: /\bspitz|curl(?:y|ed)[- ]tail|pointed ears|prick(?:ed)? ears|sled/i, dogs: () => ["Siberian Husky", "Pomeranian"] },
-  { re: /\bsighthounds?\b|\bcoursing\b/i, dogs: () => ["Greyhound", "Whippet", "Afghan Hound", "Irish Wolfhound"] },
-  { re: /\bscent ?hounds?\b|by smell|\bhounds?\b/i, dogs: () => ["Beagle", "Bloodhound", "Basset Hound"] },
-  { re: /\bterriers?\b/i, dogs: PACK((n) => /Terrier/.test(n)) },
-  { re: /\bspaniels?\b/i, dogs: PACK((n) => /Spaniel/.test(n)) },
-  { re: /\bretrievers?\b|\bgundogs?\b/i, dogs: PACK((n) => /Retriever|Labrador/.test(n)) },
-  { re: /\bsheepdogs?\b|\bherding\b|\bherders?\b|\bcollies?\b|\bshepherd'?s? dogs?\b/i, dogs: () => ["Border Collie", "Old English Sheepdog", "German Shepherd", "Corgi"] },
-  { re: /\blapdogs?\b|\btoy dogs?\b|\btoy breeds?\b|\bcompanion\b/i, dogs: () => ["Pug", "Chihuahua", "Pomeranian", "Cavalier King Charles Spaniel", "Yorkshire Terrier"] },
-  { re: /\bguard dogs?\b|\bmastiffs?\b/i, dogs: () => ["Mastiff", "Rottweiler", "Doberman Pinscher", "Great Dane"] },
-  { re: /\bwater dogs?\b/i, dogs: () => ["Poodle", "Labrador", "Golden Retriever"] },
+/* A MIX OF CARTOON AND REAL, 26 September 2026 (owner): a group or trait shows the
+   pack's cartoon dogs and real historic dogs in turn (see dogsForFact). */
+const FACT_GROUPS: { re: RegExp; dogs: () => string[]; hist: string[] }[] = [
+  { re: /\bflat[- ]faced|brachycephalic|short[- ]nosed|flat faces?\b/i, dogs: () => breeds.filter((b) => !!b.slug && !!b.image && b.skull === "flat").map((b) => b.name), hist: ["Asian flat-faced toy dogs", "Ancient Chinese toy dogs"] },
+  { re: /\bspitz|curl(?:y|ed)[- ]tail|pointed ears|prick(?:ed)? ears|sled/i, dogs: () => ["Siberian Husky", "Pomeranian"], hist: ["Chukchi sled dogs", "Ancient Arctic Spitz", "Ancient Spitz dogs"] },
+  { re: /\bsighthounds?\b|\bcoursing\b/i, dogs: () => ["Greyhound", "Whippet", "Afghan Hound", "Irish Wolfhound"], hist: ["Medieval Greyhound", "Celtic Coursing Hound", "Ancient eastern sighthounds"] },
+  { re: /\bscent ?hounds?\b|by smell|\bhounds?\b/i, dogs: () => ["Beagle", "Bloodhound", "Basset Hound"], hist: ["Talbot", "Southern Hound", "St Hubert Hound"] },
+  { re: /\bterriers?\b/i, dogs: PACK((n) => /Terrier/.test(n)), hist: ["Black and Tan Terrier", "English White Terrier", "Earth Dog"] },
+  { re: /\bspaniels?\b/i, dogs: PACK((n) => /Spaniel/.test(n)), hist: ["Land Spaniels", "Norfolk Spaniel", "English Water Spaniel"] },
+  { re: /\bretrievers?\b|\bgundogs?\b/i, dogs: PACK((n) => /Retriever|Labrador/.test(n)), hist: ["Wavy-Coated Retriever", "St John's Water Dog"] },
+  { re: /\bsheepdogs?\b|\bherding\b|\bherders?\b|\bcollies?\b|\bshepherd'?s? dogs?\b/i, dogs: () => ["Border Collie", "Old English Sheepdog", "German Shepherd", "Corgi"], hist: ["Old Scotch Collie", "Old Welsh Grey Sheepdog", "Shepherd's Dogs"] },
+  { re: /\blapdogs?\b|\btoy dogs?\b|\btoy breeds?\b|\bcompanion\b/i, dogs: () => ["Pug", "Chihuahua", "Pomeranian", "Cavalier King Charles Spaniel", "Yorkshire Terrier"], hist: ["Old Toy Spaniels", "Continental toy Spaniels", "Old European lapdogs"] },
+  { re: /\bguard dogs?\b|\bmastiffs?\b/i, dogs: () => ["Mastiff", "Rottweiler", "Doberman Pinscher", "Great Dane"], hist: ["Ancient Mastiff", "Old British Bandogs", "Old English Bulldog"] },
+  { re: /\bwater dogs?\b/i, dogs: () => ["Poodle", "Labrador", "Golden Retriever"], hist: ["St John's Water Dog", "Old European water dogs", "Tweed Water Spaniel"] },
 ];
 const escRe = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// A name as a pattern that also takes its plural: -s, or -ies for a -y name (Huskies).
+const namePat = (n: string) => (/y$/.test(n) ? `${escRe(n.slice(0, -1))}(?:y|ies)` : `${escRe(n)}s?`);
+/* EVERYDAY SHORT NAMES, 26 September 2026: the names people use, pointing at the
+   breed, for facts that say "Huskies" or "Westies". */
+const FACT_ALIASES: Record<string, string> = {
+  Husky: "Siberian Husky", Westie: "West Highland Terrier", Staffie: "Staffordshire Bull Terrier",
+  Staffy: "Staffordshire Bull Terrier", Yorkie: "Yorkshire Terrier", Lab: "Labrador", Frenchie: "French Bulldog",
+  Dobermann: "Doberman Pinscher", Doberman: "Doberman Pinscher", Alsatian: "German Shepherd",
+};
 export function dogsForFact(fact: string): FactDog[] {
   const { names, img } = buildDogIndex();
   let rest = fact;
@@ -457,16 +468,29 @@ export function dogsForFact(fact: string): FactDog[] {
     // Short names (Pug, Cur) match only with their capital, so an ordinary word
     // cannot set them off; longer names match in any case.
     const flags = n.length <= 4 ? "" : "i";
-    const re = new RegExp(`\\b${escRe(n)}s?\\b`, flags);
+    const re = new RegExp(`\\b${namePat(n)}\\b`, flags);
     const m = re.exec(rest);
     if (!m) continue;
     found.push({ name: n, at: m.index });
-    rest = rest.replace(new RegExp(`\\b${escRe(n)}s?\\b`, "g" + flags), (x) => " ".repeat(x.length));
+    rest = rest.replace(new RegExp(`\\b${namePat(n)}\\b`, "g" + flags), (x) => " ".repeat(x.length));
+  }
+  // Then the everyday short names, on what is left.
+  for (const [short, full] of Object.entries(FACT_ALIASES)) {
+    const re = new RegExp(`\\b${namePat(short)}\\b`);
+    const m = re.exec(rest);
+    if (!m || !img.has(full)) continue;
+    found.push({ name: full, at: m.index });
+    rest = rest.replace(new RegExp(`\\b${namePat(short)}\\b`, "g"), (x) => " ".repeat(x.length));
   }
   let out = found.sort((a, b) => a.at - b.at).map((f) => f.name);
   if (!out.length) {
     const g = FACT_GROUPS.find((gr) => gr.re.test(fact));
-    if (g) out = g.dogs();
+    if (g) {
+      // Cartoon and real in turn: pack, historic, pack, historic...
+      const a = g.dogs(), b = g.hist;
+      out = [];
+      for (let i = 0; i < Math.max(a.length, b.length); i++) { if (a[i]) out.push(a[i]); if (b[i]) out.push(b[i]); }
+    }
   }
   return [...new Set(out)].filter((n) => img.has(n)).slice(0, FACT_DOGS_MAX).map((n) => ({ name: n, img: img.get(n)! }));
 }
