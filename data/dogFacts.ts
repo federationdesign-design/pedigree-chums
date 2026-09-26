@@ -620,6 +620,9 @@ const FACT_SUBJECT = new Map<string, string>();
    Fact card only: the history page and the learn box keep their own text. Each
    was checked against sources before it went in (see the batch review notes). */
 const FACT_ENRICH: Record<string, string> = {
+  // The Greyhound's speed, and whether a Longdog beats it (owner, 27 September 2026, J18-249).
+  "A Longdog is not a breed, but a cross between two sighthounds, usually made to be as fast as possible for chasing.":
+    "A Longdog is not a breed, but a cross between two sighthounds, dogs that hunt by spotting their prey and outrunning it. Usually one parent is a Greyhound, the fastest dog in the world over a short sprint, which can reach about 69km/h (43mph) in a race. The other parent is often a Saluki, a Deerhound or a Whippet. So a Longdog is not usually faster than a Greyhound. The second parent is added for other gifts: the stamina to keep running for longer, or the agility to turn sharply after a hare. The Saluki, for example, is thought to beat the Greyhound over longer distances.",
   // More context for a reader who knows nothing about Corgis (owner, 27 September 2026, J18-248).
   "The Pembroke kept the Welsh cattle dog's job, but grew into a slightly different kind of Corgi from the Cardigan.":
     "Wales has two kinds of Corgi, the Cardigan and the Pembroke, named after the old Welsh counties of Cardiganshire and Pembrokeshire where each was found. Both were cattle dogs, small farm dogs that moved cows along by nipping at their heels. The Cardigan is thought to be the older of the two. The Pembroke is usually said to come from little spitz-type dogs brought to Pembrokeshire by Flemish weavers who settled there in the 1100s. You can tell them apart by the tail: the Cardigan has a long one, while many Pembrokes have only a short one, and the Cardigan is the bigger dog. The Kennel Club counted them as one breed until 1934. The Pembroke is the Corgi Queen Elizabeth II loved.",
@@ -764,6 +767,7 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "so linked with the Canary Island of Tenerife", q: "Which island gave the Bichon Tenerife its name?", options: ["Tenerife", "Malta", "Jersey"], answer: 0, evidence: "Canary Island of Tenerife" },
   { match: "King Henri III, who ruled from 1574 to 1589", q: "How did King Henri III carry his little dogs?", options: ["In a basket round his neck", "In his crown", "In a wheelbarrow"], answer: 0, evidence: "basket hung round his neck" },
   { match: "Wales has two kinds of Corgi, the Cardigan and the Pembroke", q: "Until which year did the Kennel Club count the two Corgis as one breed?", options: ["1934", "1834", "1994"], answer: 0, evidence: "until 1934" },
+  { match: "A Longdog is not a breed, but a cross between two sighthounds, dogs that hunt", q: "How fast can a Greyhound run in a race?", options: ["About 69km/h (43mph)", "About 29km/h (18mph)", "About 150km/h (93mph)"], answer: 0, evidence: "about 69km/h (43mph)" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
