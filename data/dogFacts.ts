@@ -272,7 +272,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 16 (J18-276): Yorkshire Terrier, 7 new facts (3 existing, 10 in all).
    Batch 17 (J18-277): Border Terrier, 7 new facts (3 existing, 10 in all).
    Batch 18 (J18-278): Papillon, 6 new facts (4 existing, 10 in all).
-   Batch 19 (J18-279): Beagle, 6 new facts (4 existing, 10 in all). */
+   Batch 19 (J18-279): Beagle, 6 new facts (4 existing, 10 in all).
+   Batch 20 (J18-281): Shih Tzu, 6 new facts (4 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -479,6 +480,15 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The modern Beagle began with a pack kept by the Reverend Phillip Honeywood in Essex in the 1830s. His Beagles were chosen for their hunting skill rather than their looks, and they were small and pure white. A later breeder, Thomas Johnson, made them more alike in looks, and bred both smooth-coated and rough-coated Beagles. The rough-coated kind has since died out.",
     "The famous ship HMS Beagle was named after the dog. On its voyage from 1831 to 1836 it carried the young naturalist Charles Darwin, whose discoveries led to his ideas about evolution. In 2003 a British spacecraft sent to land on Mars was named Beagle 2 after the ship, and so, in the end, after the Beagle.",
     "A Beagle's nose is so good that Beagles are used around the world as detection dogs at airports, sniffing travellers' bags for food, plants and meat that are not allowed into the country because they could carry pests or diseases. Their small size and friendly nature mean they do not frighten passengers.",
+  ],
+  // Batch 20 (J18-281): 6 new, 10 in all.
+  "Shih Tzu": [
+    "The Shih Tzu is sometimes called the chrysanthemum dog, because the hair on its face grows out in every direction, like the petals of a chrysanthemum flower. Its name comes from the Chinese word for lion, and it was bred to look like the little lions of Chinese and Buddhist art.",
+    "In the Chinese emperor's palace, Shih Tzus were bred by court servants who competed to produce the most beautiful dog. If the emperor liked one, its picture was painted on the palace hangings and its breeder was said to have made the book. As a reward, he could be given the income from farmland growing rice.",
+    "The Shih Tzu owes a great deal to the Empress Dowager Cixi, who ruled China in the late 1800s. In her palace, the Forbidden City in Beijing, she kept kennels of Pugs, Pekingese and Shih Tzus, and oversaw their breeding. After she died in 1908 her kennels were broken up, and careful breeding of the Shih Tzu in China faded away.",
+    "Every Shih Tzu in the world today descends from just 14 dogs. After the Communist revolution in China, the little palace dogs were seen as symbols of royal power, and the breed is believed to have died out there. Luckily, a handful had already been taken to England and Norway, and one Pekingese was later added, making 14 in all.",
+    "The first Shih Tzus came to England with Lady Brownrigg, who brought them back from China around 1930. At first the Kennel Club muddled them up with a Tibetan breed and called them Apsos. In 1935 the Shih Tzu Club in England wrote the breed's first European standard, and the dogs were officially named Shih Tzu.",
+    "In 1952 a newcomer to the breed in England crossed a Shih Tzu with a Pekingese without telling anyone first, and when it came out it caused an uproar among breeders. But with so few Shih Tzus in the world, the new blood is now thought to have helped keep the breed healthier.",
   ],
 };
 
@@ -1101,6 +1111,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The modern Beagle began with a pack kept by the Reverend Phillip Honeywood", q: "What colour were Reverend Honeywood's Beagles?", options: ["Pure white", "Jet black", "Bright orange"], answer: 0, evidence: "pure white" },
   { match: "The famous ship HMS Beagle was named after the dog", q: "Which scientist sailed on HMS Beagle?", options: ["Charles Darwin", "Isaac Newton", "Albert Einstein"], answer: 0, evidence: "Charles Darwin" },
   { match: "A Beagle's nose is so good that Beagles are used around the world as detection dogs", q: "Where do Beagles sniff bags for food that is not allowed in?", options: ["At airports", "At bakeries", "At schools"], answer: 0, evidence: "at airports" },
+  // Batch 20 (J18-281): Shih Tzu.
+  { match: "The Shih Tzu is sometimes called the chrysanthemum dog", q: "Why is the Shih Tzu called the chrysanthemum dog?", options: ["Its face hair grows out like petals", "It smells of flowers", "It likes to eat flowers"], answer: 0, evidence: "like the petals" },
+  { match: "In the Chinese emperor's palace, Shih Tzus were bred by court servants", q: "What could the breeder of the emperor's favourite Shih Tzu be given?", options: ["Income from rice farmland", "A golden crown", "A pet tiger"], answer: 0, evidence: "growing rice" },
+  { match: "The Shih Tzu owes a great deal to the Empress Dowager Cixi", q: "Which empress kept Shih Tzus in the Forbidden City?", options: ["Empress Dowager Cixi", "Queen Victoria", "Catherine the Great"], answer: 0, evidence: "Empress Dowager Cixi" },
+  { match: "Every Shih Tzu in the world today descends from just 14 dogs", q: "From how many dogs does every Shih Tzu today descend?", options: ["14", "140", "4"], answer: 0, evidence: "just 14 dogs" },
+  { match: "The first Shih Tzus came to England with Lady Brownrigg", q: "What did the Kennel Club first wrongly call Lady Brownrigg's Shih Tzus?", options: ["Apsos", "Pugs", "Poodles"], answer: 0, evidence: "called them Apsos" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
