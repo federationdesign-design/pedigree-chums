@@ -277,7 +277,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 21 (J18-283): Whippet, 5 new facts (7 existing, 12 in all).
    Batch 22 (J18-284): French Bulldog, 6 new facts (4 existing, 10 in all).
    Batch 23 (J18-285): Weimaraner, 5 new facts (6 existing, 11 in all).
-   Batch 24 (J18-286): Rottweiler, 5 new facts (6 existing, 11 in all). */
+   Batch 24 (J18-286): Rottweiler, 5 new facts (6 existing, 11 in all).
+   Batch 25 (J18-287): Basset Hound, 6 new facts (5 existing, 11 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -526,6 +527,15 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "When railways arrived in the mid-1800s, cattle no longer needed to be walked to market, and the Rottweiler almost vanished. At a dog show in Heilbronn in 1882, only one Rottweiler turned up, and not a very good one. A few people who loved the breed kept it going.",
     "The Rottweiler was saved by a new job. In the years before the First World War, police forces needed strong, clever dogs, and in 1910 the German Police Dog Association made the Rottweiler one of its official police breeds. In the two world wars, Rottweilers served as messenger, ambulance, cart-pulling and guard dogs.",
     "Rottweilers were first shown in Britain at Crufts in 1936, and the Kennel Club gave the breed its own separate register in 1966. Today, besides being family pets, Rottweilers work as search and rescue dogs, police dogs and even guide dogs, and some still herd cattle as their ancestors did.",
+  ],
+  // Batch 25 (J18-287): 6 new, 11 in all.
+  "Basset Hound": [
+    "The Basset Hound's name comes from the French word bas, meaning low, so basset means something like the rather low one. The breed is said to have been started by monks in France in the Middle Ages, who wanted a hound that could hunt through thick undergrowth with its nose close to the ground.",
+    "The first Basset Hounds known in Britain arrived in 1866, when Lord Galway was given a pair by a French count. He named them Basset and Belle. In a letter that year, Lord Galway used the words Basset Hound, the first time the name appears in British writing for this breed.",
+    "Sir Everett Millais, son of the famous painter John Everett Millais, is called the father of the Basset Hound in England. He showed his first Basset, a dog called Model, in 1875. In 1880 he gathered so many Bassets at the Wolverhampton dog show that the Kennel Club recognised the breed that same year.",
+    "In the 1890s, worried that British Basset Hounds were too closely related, Sir Everett Millais crossed one with a Bloodhound called Inoculation, using artificial insemination, one of the earliest times this was done with dogs. The Bloodhound blood gave the Basset Hound its long, low ears and sad, noble face.",
+    "Princess Alexandra, later Queen Alexandra, made the Basset Hound fashionable. In the 1880s she set up a pack at Sandringham, the royal estate in Norfolk, and showed her Bassets at dog shows. Soon even people in Britain who never went hunting wanted a Basset Hound.",
+    "Fred Basset is a Basset Hound in a British newspaper comic strip, created by the cartoonist Alex Graham in 1963. Fred's thoughts appear in bubbles as he watches the odd behaviour of his human family, and the strip has been printed in newspapers around the world.",
   ],
 };
 
@@ -1178,6 +1188,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "When railways arrived in the mid-1800s, cattle no longer needed", q: "How many Rottweilers came to the Heilbronn dog show in 1882?", options: ["Only one", "About a hundred", "Over a thousand"], answer: 0, evidence: "only one Rottweiler" },
   { match: "The Rottweiler was saved by a new job", q: "What job saved the Rottweiler in 1910?", options: ["Police dog", "Circus dog", "Sheepdog"], answer: 0, evidence: "police breeds" },
   { match: "Rottweilers were first shown in Britain at Crufts in 1936", q: "In which year were Rottweilers first shown at Crufts?", options: ["1936", "1836", "2006"], answer: 0, evidence: "in 1936" },
+  // Batch 25 (J18-287): Basset Hound.
+  { match: "The Basset Hound's name comes from the French word bas", q: "What does the French word bas mean?", options: ["Low", "Big", "Sad"], answer: 0, evidence: "meaning low" },
+  { match: "The first Basset Hounds known in Britain arrived in 1866", q: "What were Lord Galway's first two Basset Hounds called?", options: ["Basset and Belle", "Bill and Ben", "Bob and Bess"], answer: 0, evidence: "Basset and Belle" },
+  { match: "Sir Everett Millais, son of the famous painter", q: "Who is called the father of the Basset Hound in England?", options: ["Sir Everett Millais", "Charles Dickens", "Lord Nelson"], answer: 0, evidence: "Sir Everett Millais" },
+  { match: "In the 1890s, worried that British Basset Hounds were too closely related", q: "What was the Bloodhound in the 1890s Basset Hound cross called?", options: ["Inoculation", "Injection", "Medicine"], answer: 0, evidence: "called Inoculation" },
+  { match: "Princess Alexandra, later Queen Alexandra, made the Basset Hound fashionable", q: "Where did Princess Alexandra keep her pack of Basset Hounds?", options: ["Sandringham", "Balmoral", "Windsor Castle"], answer: 0, evidence: "at Sandringham" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
