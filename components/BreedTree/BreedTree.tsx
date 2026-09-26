@@ -18297,9 +18297,10 @@ export default function BreedTree({
                     const toggle = (kind: "info" | "zoom" | "mix") => setFoundDetail((cur) => (cur?.name === d.name && cur.kind === kind ? null : { name: d.name, kind }));
                     return (
                       <li key={d.name} className={styles.foundListRow}>
+                        {/* The "i" before the name, 27 September 2026 (owner, J18-305). */}
+                        {info ? <button type="button" className={`${styles.foundIconInfo} ${styles.foundIconInfoLead}`} aria-label={`About the ${d.name}`} aria-pressed={open === "info"} onClick={() => toggle("info")}>i</button> : null}
                         <span className={styles.foundListName}>{d.name}</span>
                         <span className={styles.foundListIcons}>
-                          {info ? <button type="button" className={styles.foundIconInfo} aria-label={`About the ${d.name}`} aria-pressed={open === "info"} onClick={() => toggle("info")}>i</button> : null}
                           {img ? (
                             <button type="button" className={styles.foundIconZoom} aria-label={`See the ${d.name}`} aria-pressed={open === "zoom"} onClick={() => toggle("zoom")}>
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" /></svg>
