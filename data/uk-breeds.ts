@@ -71,7 +71,11 @@ export type UKBreed = {
    inferring the split from a merged class list. */
 export const ukBreeds: UKBreed[] = [
   // Ancient, then Medieval: split into two strips (owner request, 4 August)
-  { name: "Irish Wolfhound", strip: "ancient", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/woldhound-square.jpg", tag: "endangered" },
+  // J18-307 (owner, 27 September 2026): the Irish Wolfhound moves to the late 1800s,
+  // when Captain Graham rebuilt it (Irish Wolfhound Club, 1885). Its ancient place on
+  // the timeline goes to the extinct Ancient wolf hound it was rebuilt from.
+  { name: "Irish Wolfhound", strip: "late1800", era: "late 1800s", anchor: 1885, note: "Towering hound rebuilt in the 1800s from the last of the old Irish wolfhounds.", image: "/woldhound-square.jpg", tag: "endangered" },
+  { name: "Ancient wolf hound", strip: "ancient", era: "Ancient", anchor: 100, note: "The huge ancient Irish hound that hunted wolves and guarded halls, ancestor of the Irish Wolfhound.", image: "/history/breeds/ancient-wolf-hound.jpg", tag: "extinct" },
   // Owner research (4 August): the modern Mastiff and Greyhound are living
   // breeds superseded on the early timelines by the ancient-type records.
   // Each moves to its modern formalisation point: the Mastiff to 1883, when

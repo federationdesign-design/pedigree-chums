@@ -2360,9 +2360,33 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* THE IRISH WOLFHOUND IS A 1800s BREED, 27 September 2026 (owner, J18-307). The
+     breed we know was rebuilt from the 1860s by Captain George Augustus Graham, who
+     gathered the last dogs of the old type and crossed them with Scottish Deerhounds,
+     Great Danes, a Borzoi and a Tibetan dog; he founded the Irish Wolfhound Club in
+     1885. The old type is now its own extinct ancestor, the Ancient wolf hound, which
+     keeps the Celtic Hound and Ancient Molossers the Wolfhound used to carry. Split
+     chosen by the owner (option 1): 50 / 30 / 10 / 5 / 5. No sourced figures exist,
+     so it is editorial, as the site's disclaimer says. */
   "Irish Wolfhound": {
     name: "Irish Wolfhound",
-    note: "A towering ancient hound bred to hunt wolves and guard halls, and one of the tallest dogs in the world.",
+    note: "A towering hound rebuilt in the 1800s from the last of the old Irish wolfhounds, and one of the tallest dogs in the world.",
+    children: [
+      { name: "Ancient wolf hound", note: "The old war and hunting hound of ancient Ireland, whose last survivors Captain Graham rebuilt the breed from. Now extinct.", img: "/history/breeds/ancient-wolf-hound.jpg", value: 50 },
+      { name: "Scottish Deerhound", note: "Graham's main outcross, for size, coat and the rough-ground stamina of a coursing hound.", img: "/history/breeds/Medieval-Scottish-Deerhound.jpg", value: 30 },
+      { name: "Great Dane", note: "Crossed in for extra height and bone.", img: "/great-dane-square.jpg", value: 10 },
+      { name: "Borzoi", note: "The Russian wolfhound, a single dog crossed in for speed and grace.", img: "/history/breeds/borzoi.jpg", value: 5 },
+      { name: "Tibetan village dogs", note: "A big Tibetan dog Graham used once as an outcross, often said to be a Tibetan mastiff. Now extinct as a type.", img: "/history/breeds/tibetan-village-dogs.jpg", value: 5 }
+    ]
+  },
+
+  /* THE ANCIENT WOLF HOUND, 27 September 2026 (owner, J18-307): the old Irish hound
+     the Irish Wolfhound was rebuilt from. It carries the Wolfhound's former ancestry
+     unchanged (Celtic Hound 60, Ancient Molossers 40). */
+  "Ancient wolf hound": {
+    name: "Ancient wolf hound",
+    note: "The huge war and hunting hound of ancient Ireland, used against wolves, deer and boar, whose last survivors were used to rebuild the Irish Wolfhound. Now extinct.",
+    img: "/history/breeds/ancient-wolf-hound.jpg",
     children: [
       { name: "Celtic Hound", note: "The ancient sighthound stock the Celts brought across Europe.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
       { name: "Ancient Molossers", note: "Big mastiff-type blood for the bulk to bring down a wolf. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 40 }
@@ -3754,7 +3778,9 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Medieval British Mastiff", note: "The heavy Molosser war and hunting dogs that gave it bulk and bone. Now extinct.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
       { name: "Alaunt war dogs", note: "The fierce Alaunt catch dogs that gave it a fearless front. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 25 },
-      { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 30 },
+      // J18-307: the ancient Irish hound, not the modern Irish Wolfhound, which was itself
+      // rebuilt with Great Dane blood; pointing here also avoids a Dane-Wolfhound loop.
+      { name: "Ancient wolf hound", note: "Tall ancient Irish coursing hounds crossed in for height, reach and the speed to pull down boar. Now extinct.", img: "/history/breeds/ancient-wolf-hound.jpg", value: 30 },
       { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed. Now extinct.", img: "/history/breeds/Old-German-boarhounds.jpg", value: 20 }
     ]
   },
