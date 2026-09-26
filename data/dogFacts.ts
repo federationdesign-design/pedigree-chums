@@ -266,7 +266,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 10 (J18-268): Cockapoo, 8 new facts (2 existing, 10 in all).
    Batch 11 (J18-270): Staffordshire Bull Terrier, 8 new facts (2 existing, 10 in all).
    Batch 12 (J18-271): Irish Setter, 8 new facts (2 existing, 10 in all).
-   Batch 13 (J18-272): Italian Greyhound, 7 new facts (3 existing, 10 in all). */
+   Batch 13 (J18-272): Italian Greyhound, 7 new facts (3 existing, 10 in all).
+   Batch 14 (J18-274): Boston Terrier, 7 new facts (3 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -415,6 +416,16 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "The Italian Greyhound nearly vanished in the 1900s. The upheaval of the two world wars left so few in Europe that breeders had to work hard to build the numbers back up, while American breeders brought dogs over from Europe to keep the breed going there. The Italian Greyhound Club in Britain, founded in 1900, helped keep the breed going.",
     "A story is told that in the 1800s an African chief was so charmed by an Italian Greyhound that he offered 200 cattle in exchange for a single dog. Whether or not it happened exactly like that, it shows how rare and precious these little hounds once seemed to people who had never seen anything like them.",
     "The Italian Greyhound gets its name from Renaissance Italy, where the little hound was a favourite of rich and noble families such as the Medici. Small, slender hounds much like it appear in paintings by famous artists over hundreds of years, sitting beside their owners or curled up at their feet.",
+  ],
+  // Batch 14 (J18-274): 7 new, 10 in all.
+  "Boston Terrier": [
+    "Nearly every Boston Terrier goes back to one dog from England. Around 1870, a Boston man called Robert Hooper bought a dog named Judge, a cross of a Bulldog and an English White Terrier, a British breed that is now extinct. Judge was a dark brindle dog with a white stripe down his face, and he became the father of the Boston Terrier.",
+    "In 1893 the Boston Terrier became the first breed made in the United States to be recognised by the American Kennel Club. Its fans had first called their club the American Bull Terrier Club, and the dogs were nicknamed roundheads, before the name was changed to honour the city of Boston.",
+    "The Boston Terrier is nicknamed the American Gentleman. Partly that is its neat black-and-white coat, which looks like a smart tuxedo, and partly its polite, friendly manners. Its coat can be black, brindle or seal, a black with a reddish shine, but always with white markings.",
+    "The city of Boston is proud of its dog. In 1979 Massachusetts made the Boston Terrier its official state dog, and Boston University has had a Boston Terrier called Rhett as its mascot since 1922.",
+    "The deaf and blind American writer Helen Keller owned a Boston Terrier called Sir Thomas, nicknamed Phiz, a present from her classmates at Radcliffe College. The dog was said to be fussy about who he made friends with, but he took to Helen Keller straight away.",
+    "The first Boston Terriers were much bigger and heavier than today's, with longer snouts, and some were used for fighting. Breeders made them smaller and flatter-faced to be friendly pets. That flat face gives the Boston Terrier its sweet look, but it can also make breathing harder, so a good breeder chooses dogs that breathe easily.",
+    "Despite its name, the Boston Terrier is not really a terrier at all: it was never bred to dig after foxes or rats. In 1923, when the American Kennel Club set up a new group called Non-Sporting, for dogs that did not fit the hunting, herding or terrier groups, the Boston Terrier was the first breed put in it.",
   ],
 };
 
@@ -1001,6 +1012,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Myth: The Cave canem, beware of the dog", q: "What does Cave canem mean?", options: ["Beware of the dog", "Dogs live in caves", "Feed the dog"], answer: 0, evidence: "beware of the dog" },
   { match: "A story is told that in the 1800s an African chief", q: "What did the African chief offer for one Italian Greyhound?", options: ["200 cattle", "2 goats", "A gold crown"], answer: 0, evidence: "200 cattle" },
   { match: "The Italian Greyhound gets its name from Renaissance Italy", q: "Where does the Italian Greyhound get its name from?", options: ["Renaissance Italy", "Modern Rome", "An Italian restaurant"], answer: 0, evidence: "Renaissance Italy" },
+  // Batch 14 (J18-274): Boston Terrier.
+  { match: "Nearly every Boston Terrier goes back to one dog from England", q: "What was the name of the dog behind nearly all Boston Terriers?", options: ["Judge", "Mayor", "Captain"], answer: 0, evidence: "named Judge" },
+  { match: "In 1893 the Boston Terrier became the first breed made in the United States", q: "In which year did the American Kennel Club recognise the Boston Terrier?", options: ["1893", "1993", "1793"], answer: 0, evidence: "In 1893" },
+  { match: "The Boston Terrier is nicknamed the American Gentleman", q: "What is the Boston Terrier's nickname?", options: ["The American Gentleman", "The Boston Bruiser", "The Tea Party Terrier"], answer: 0, evidence: "American Gentleman" },
+  { match: "The city of Boston is proud of its dog", q: "What is the name of Boston University's Boston Terrier mascot?", options: ["Rhett", "Scarlett", "Rex"], answer: 0, evidence: "called Rhett" },
+  { match: "The deaf and blind American writer Helen Keller owned a Boston Terrier", q: "Who gave Helen Keller her Boston Terrier?", options: ["Her college classmates", "The President", "A circus owner"], answer: 0, evidence: "her classmates" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
