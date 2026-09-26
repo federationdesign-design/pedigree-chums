@@ -17,7 +17,7 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
 import { breedInfo, breedInfoLong } from "../../data/breedInfo";
-import { allDogFacts, factHeadFor } from "../../data/dogFacts";
+import { allDogFacts, factHeadFor, dogsForFact } from "../../data/dogFacts";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 /* The pit's own stylesheet, imported so the learn area's collect flourish IS the
@@ -5814,6 +5814,30 @@ export default function BreedTree({
       body.appendChild(document.createTextNode(" "));
     });
     el.appendChild(body);
+    /* THE DOGS IN THE FACT, 26 September 2026 (owner): round pictures of the dogs a
+       fact is about, each with its name, from dogsForFact (named dogs first, else
+       the group or trait the fact describes). They fade in once the words are in. */
+    const factDogs = dogsForFact(fact);
+    if (factDogs.length) {
+      const row = document.createElement("div");
+      row.className = styles.factDogs;
+      row.style.animationDelay = `${150 + fact.split(/\s+/).length * FACT_WORD_MS}ms`;
+      for (const dg of factDogs) {
+        const fig = document.createElement("figure");
+        fig.className = styles.factDog;
+        const im = document.createElement("img");
+        im.src = encodeURI(dg.img);
+        im.alt = dg.name;
+        im.loading = "eager";
+        im.decoding = "async";
+        const cap = document.createElement("figcaption");
+        cap.textContent = dg.name;
+        fig.appendChild(im);
+        fig.appendChild(cap);
+        row.appendChild(fig);
+      }
+      el.appendChild(row);
+    }
     /* THE TIME LEFT AND A SKIP, 25 September 2026 (owner). A bar along the foot
        empties over exactly the time the fact is on screen, and a skip button
        beside it takes the fact away at once. The button is the card's only

@@ -15,6 +15,8 @@ import { SECTIONS } from "./historySections";
 import famousDogs from "./famousDogs";
 import { breedInfo } from "./breedInfo";
 import { breeds } from "./breeds";
+import { getLineage, LINEAGE_ROOTS, type LineageNode } from "./lineage";
+import { packArt } from "./packArt";
 
 // The chatbot's breed lines, as approved there (pick-a-chum lib/assembler.ts).
 const CHATBOT_FACTS = [
@@ -398,6 +400,70 @@ function famousFacts(): string[] {
     }
   }
   return out;
+}
+
+/* THE DOGS IN A FACT, 26 September 2026 (owner: show round pictures of the dogs a
+   fact is about). Two ways in:
+     1. names: every dog with a picture (the 54 pack breeds and every lineage dog)
+        is matched against the fact's words, longest name first so "Italian
+        Greyhound" wins over "Greyhound", and each match is removed before the
+        next so a name is never counted twice;
+     2. groups and traits, only when no dog is named: a keyword list (terriers,
+        sighthounds, flat faces, curly tails and so on) tied to well-known pack
+        breeds. Flat faces come from the breed data's own skull field.
+   At most FACT_DOGS_MAX, in the order they appear. */
+export type FactDog = { name: string; img: string };
+export const FACT_DOGS_MAX = 6;
+let dogIndex: { names: string[]; img: Map<string, string> } | null = null;
+function buildDogIndex() {
+  if (dogIndex) return dogIndex;
+  const img = new Map<string, string>();
+  for (const b of breeds.filter((x) => !!x.slug && !!x.image)) img.set(b.name, packArt(b.name) ?? b.image);
+  for (const r of LINEAGE_ROOTS) {
+    const l = getLineage(r);
+    if (!l) continue;
+    const w = (x: LineageNode) => { if (x.img && !img.has(x.name)) img.set(x.name, packArt(x.name) ?? x.img); for (const k of x.children ?? []) w(k); };
+    w(l);
+  }
+  const names = [...img.keys()].filter((n) => n.length >= 3).sort((a, b) => b.length - a.length);
+  dogIndex = { names, img };
+  return dogIndex;
+}
+const PACK = (pred: (name: string) => boolean) => () => breeds.filter((b) => !!b.slug && !!b.image && pred(b.name)).map((b) => b.name);
+const FACT_GROUPS: { re: RegExp; dogs: () => string[] }[] = [
+  { re: /\bflat[- ]faced|brachycephalic|short[- ]nosed|flat faces?\b/i, dogs: () => breeds.filter((b) => !!b.slug && !!b.image && b.skull === "flat").map((b) => b.name) },
+  { re: /\bspitz|curl(?:y|ed)[- ]tail|pointed ears|prick(?:ed)? ears|sled/i, dogs: () => ["Siberian Husky", "Pomeranian"] },
+  { re: /\bsighthounds?\b|\bcoursing\b/i, dogs: () => ["Greyhound", "Whippet", "Afghan Hound", "Irish Wolfhound"] },
+  { re: /\bscent ?hounds?\b|by smell|\bhounds?\b/i, dogs: () => ["Beagle", "Bloodhound", "Basset Hound"] },
+  { re: /\bterriers?\b/i, dogs: PACK((n) => /Terrier/.test(n)) },
+  { re: /\bspaniels?\b/i, dogs: PACK((n) => /Spaniel/.test(n)) },
+  { re: /\bretrievers?\b|\bgundogs?\b/i, dogs: PACK((n) => /Retriever|Labrador/.test(n)) },
+  { re: /\bsheepdogs?\b|\bherding\b|\bherders?\b|\bcollies?\b|\bshepherd'?s? dogs?\b/i, dogs: () => ["Border Collie", "Old English Sheepdog", "German Shepherd", "Corgi"] },
+  { re: /\blapdogs?\b|\btoy dogs?\b|\btoy breeds?\b|\bcompanion\b/i, dogs: () => ["Pug", "Chihuahua", "Pomeranian", "Cavalier King Charles Spaniel", "Yorkshire Terrier"] },
+  { re: /\bguard dogs?\b|\bmastiffs?\b/i, dogs: () => ["Mastiff", "Rottweiler", "Doberman Pinscher", "Great Dane"] },
+  { re: /\bwater dogs?\b/i, dogs: () => ["Poodle", "Labrador", "Golden Retriever"] },
+];
+const escRe = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+export function dogsForFact(fact: string): FactDog[] {
+  const { names, img } = buildDogIndex();
+  let rest = fact;
+  const found: { name: string; at: number }[] = [];
+  for (const n of names) {
+    // Short names (Pug, Cur) match only with their capital, so an ordinary word
+    // cannot set them off; longer names match in any case.
+    const flags = n.length <= 4 ? "" : "i";
+    const re = new RegExp(`\\b${escRe(n)}s?\\b`, flags);
+    const m = re.exec(rest);
+    if (!m) continue;
+    found.push({ name: n, at: m.index });
+    rest = rest.replace(new RegExp(`\\b${escRe(n)}s?\\b`, "g" + flags), (x) => " ".repeat(x.length));
+  }
+  let out = found.sort((a, b) => a.at - b.at).map((f) => f.name);
+  if (!out.length) {
+    const g = FACT_GROUPS.find((gr) => gr.re.test(fact));
+    if (g) out = g.dogs();
+  }
+  return [...new Set(out)].filter((n) => img.has(n)).slice(0, FACT_DOGS_MAX).map((n) => ({ name: n, img: img.get(n)! }));
 }
 
 let cache: string[] | null = null;
