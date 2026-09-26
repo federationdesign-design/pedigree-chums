@@ -2606,9 +2606,14 @@
   border-radius: 26px;
   /* LIQUID GLASS, 25 September 2026 (owner): the fact card's glass (see
      .factPop), replacing the clear 10px blur and white edge. */
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(4px) saturate(120%) brightness(1.15);
-  -webkit-backdrop-filter: blur(4px) saturate(120%) brightness(1.15);
+  /* A STRONGER BLUR, 25 September 2026 (owner: the fact card's glass reads better).
+     The list is wide and sits right over big, high-contrast dog cards, which a
+     4px blur leaves sharp enough to fight the text; 12px turns them into soft
+     colour. The frost is a touch thicker too. The dimmed faces behind the list
+     (behindList in the sim) are separate and unchanged. */
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px) saturate(120%) brightness(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(120%) brightness(1.15);
   border: none;
   /* NAVY, 24 September 2026 (owner: the white was hard to read over the pit).
      The navy shadow the white text wore would smear navy text, so it becomes a
@@ -2656,11 +2661,12 @@
   /* The pill carries its own rarity colours, so no glass shadow on its text. */
   text-shadow: none;
   align-self: center;
-  /* Twice the size, 25 September 2026 (owner): was 10px on 3px 8px. */
-  font-size: 20px;
+  /* Twice the size, then 25% smaller, 25 September 2026 (owner): was 10px on
+     3px 8px, then 20px on 6px 16px. */
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  padding: 6px 16px;
+  padding: 4.5px 12px;
   border-radius: 999px;
   white-space: nowrap;
 }
