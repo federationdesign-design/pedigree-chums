@@ -265,7 +265,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 9 (J18-267): Lurcher, 8 new facts (2 existing, 10 in all).
    Batch 10 (J18-268): Cockapoo, 8 new facts (2 existing, 10 in all).
    Batch 11 (J18-270): Staffordshire Bull Terrier, 8 new facts (2 existing, 10 in all).
-   Batch 12 (J18-271): Irish Setter, 8 new facts (2 existing, 10 in all). */
+   Batch 12 (J18-271): Irish Setter, 8 new facts (2 existing, 10 in all).
+   Batch 13 (J18-272): Italian Greyhound, 7 new facts (3 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -404,6 +405,16 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "Two Irish Setters have lived in the White House. President Harry Truman had one called Mike, and President Richard Nixon had one called King Timahoe, named after a village in County Kildare in Ireland. The breed's glossy red coat made it a favourite with photographers.",
     "Irish Setters were among the first dogs to star at British dog shows. In 1860, a show in Birmingham gave Irish Setters their very own section, one of the first times the breed was judged on its own. In Ireland they were working dogs, galloping back and forth across the moors and wetlands ahead of the hunter to find game birds.",
     "An Irish Setter's rich red coat comes from the same kind of gene that gives many people red hair. The dog has two copies of a version of the gene that turns dark colour off in its coat, leaving only red. That is why two red Irish Setters always have red puppies, and why the breed never throws a black or brown one.",
+  ],
+  // Batch 13 (J18-272): 7 new, 10 in all.
+  "Italian Greyhound": [
+    "King Frederick the Great of Prussia loved his Italian Greyhounds so much that he asked to be buried beside them at Sanssouci, his summer palace. His wish was ignored when he died in 1786, and for two centuries he lay elsewhere. Finally, in 1991, his body was moved to Sanssouci and buried near the graves of eleven of his greyhounds.",
+    "Frederick the Great's Italian Greyhounds lived like royalty. His favourite, Biche, was painted by the court painter wearing a collar with the king's name on it, and his dogs went with him on his military campaigns. The servant who looked after them was told to address each dog politely, with the formal German word Sie, as if speaking to a lady or gentleman.",
+    "The Italian Greyhound was a favourite of British royalty for centuries. Anne of Denmark, the wife of King James I, kept them in the early 1600s, and the breed was known in England by the reign of Charles I. Later, Queen Victoria kept Italian Greyhounds too, which helped make the little hound fashionable in Victorian Britain.",
+    "Myth: The Cave canem, beware of the dog, signs in the doorways of Pompeii were warnings not to tread on tiny Italian Greyhounds. The truth: there is no evidence for this charming story. The most famous Cave canem mosaic, in Pompeii's House of the Tragic Poet, shows a big, snarling guard dog on a chain, not a little hound.",
+    "The Italian Greyhound nearly vanished in the 1900s. The upheaval of the two world wars left so few in Europe that breeders had to work hard to build the numbers back up, while American breeders brought dogs over from Europe to keep the breed going there. The Italian Greyhound Club in Britain, founded in 1900, helped keep the breed going.",
+    "A story is told that in the 1800s an African chief was so charmed by an Italian Greyhound that he offered 200 cattle in exchange for a single dog. Whether or not it happened exactly like that, it shows how rare and precious these little hounds once seemed to people who had never seen anything like them.",
+    "The Italian Greyhound gets its name from Renaissance Italy, where the little hound was a favourite of rich and noble families such as the Medici. Small, slender hounds much like it appear in paintings by famous artists over hundreds of years, sitting beside their owners or curled up at their feet.",
   ],
 };
 
@@ -984,6 +995,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "Nearly every Irish Setter alive today goes back to one dog, Champion Palmerston", q: "Which dog is the father of nearly every modern Irish Setter?", options: ["Champion Palmerston", "Big Red", "King Timahoe"], answer: 0, evidence: "Champion Palmerston" },
   { match: "When solid red became the fashion, the old Irish Red and White Setter", q: "Where did Rev. Noble Huston record his setter puppies?", options: ["In his parish register", "In a cookbook", "On the church door"], answer: 0, evidence: "parish register" },
   { match: "Two Irish Setters have lived in the White House", q: "Which president owned an Irish Setter called King Timahoe?", options: ["Richard Nixon", "Abraham Lincoln", "Barack Obama"], answer: 0, evidence: "Richard Nixon" },
+  // Batch 13 (J18-272): Italian Greyhound.
+  { match: "King Frederick the Great of Prussia loved his Italian Greyhounds so much", q: "In which year was Frederick the Great finally buried beside his greyhounds?", options: ["1991", "1791", "1891"], answer: 0, evidence: "in 1991" },
+  { match: "Frederick the Great's Italian Greyhounds lived like royalty", q: "How did Frederick's dog servant have to speak to the dogs?", options: ["Politely, like a lady or gentleman", "In a whisper", "In Latin"], answer: 0, evidence: "formal German word Sie" },
+  { match: "Myth: The Cave canem, beware of the dog", q: "What does Cave canem mean?", options: ["Beware of the dog", "Dogs live in caves", "Feed the dog"], answer: 0, evidence: "beware of the dog" },
+  { match: "A story is told that in the 1800s an African chief", q: "What did the African chief offer for one Italian Greyhound?", options: ["200 cattle", "2 goats", "A gold crown"], answer: 0, evidence: "200 cattle" },
+  { match: "The Italian Greyhound gets its name from Renaissance Italy", q: "Where does the Italian Greyhound get its name from?", options: ["Renaissance Italy", "Modern Rome", "An Italian restaurant"], answer: 0, evidence: "Renaissance Italy" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
