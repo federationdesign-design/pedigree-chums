@@ -1113,8 +1113,11 @@ const BOMB_ADDS_SECS = 10;
 /* HALF ON THE EXTREME LEVELS, 25 September 2026 (owner): a bomb adds 5 seconds
    there, not 10. The table is the /play page's own, via ladderTableOf. */
 const BOMB_ADDS_SECS_EXTREME = 5;
-// A bomb the player did not set off (knocked, or chained by another blast).
-const BOMB_ADDS_SECS_UNAIDED = 2;
+/* A bomb the player did not set off (knocked, or chained by another blast).
+   CHANGED 27 September 2026 (owner): worth the full 10 everywhere but the Extreme
+   levels, where it adds only BOMB_ADDS_SECS_UNAIDED_EXTREME. It was 2 on every level. */
+const BOMB_ADDS_SECS_UNAIDED = 10;
+const BOMB_ADDS_SECS_UNAIDED_EXTREME = 2;
 /* VERY COMMON COMES IN THREE SHADES OF YELLOW (owner, 24 September 2026: "if we
    do have more than one instance of the very common rarity within the pit, it
    takes a different colour shade"). Every very-common file has a B and a C twin,
@@ -12059,7 +12062,12 @@ export default function BreedTree({
              (owner). wasHeld is true when the player dealt the final hit, a
              click or a hold on this bomb; a knock from the pit or a chain from
              another blast is false, and adds only BOMB_ADDS_SECS_UNAIDED. */
-          if (fullTriggeredRef.current) cdAddRef.current?.(!wasHeld ? BOMB_ADDS_SECS_UNAIDED : ladderTableOf(levelName) === LADDER_EXTREME ? BOMB_ADDS_SECS_EXTREME : BOMB_ADDS_SECS);
+          /* 27 September 2026 (owner): an unaided bomb now adds 10 too, except on
+             the Extreme levels, where it adds 2 (a held one there adds 5). */
+          if (fullTriggeredRef.current) {
+            const extreme = ladderTableOf(levelName) === LADDER_EXTREME;
+            cdAddRef.current?.(wasHeld ? (extreme ? BOMB_ADDS_SECS_EXTREME : BOMB_ADDS_SECS) : (extreme ? BOMB_ADDS_SECS_UNAIDED_EXTREME : BOMB_ADDS_SECS_UNAIDED));
+          }
           // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
           // once, near takes two hits, far takes one and only if already lit.
           const SHOVE_R = bsz * 5.5;
