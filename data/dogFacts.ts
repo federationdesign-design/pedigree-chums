@@ -262,7 +262,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 6 (J18-261): Labradoodle, 9 new facts (1 existing, 10 in all).
    Batch 7 (J18-265): Doberman, 9 new facts (2 existing, 11 in all).
    Batch 8 (J18-266): Miniature Schnauzer, 8 new facts (2 existing, 10 in all).
-   Batch 9 (J18-267): Lurcher, 8 new facts (2 existing, 10 in all). */
+   Batch 9 (J18-267): Lurcher, 8 new facts (2 existing, 10 in all).
+   Batch 10 (J18-268): Cockapoo, 8 new facts (2 existing, 10 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -368,6 +369,17 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "A Lurcher can be almost any size or colour. Because it is a cross rather than a breed, one can be as small as a Whippet and another as big as a Deerhound, though most are about the size of a Greyhound. Coats range from sleek and smooth to rough and wiry, depending on the dogs in its family.",
     "The Lurcher differs from its cousin the Longdog in one simple way. A Longdog is a cross of two sighthounds, such as a Greyhound and a Saluki. A Lurcher is a sighthound crossed with a different kind of dog, such as a Collie or a terrier. Neither is recognised as a breed by the Kennel Club, and neither has an official standard.",
     "Hare coursing, the old sport of racing dogs after hares, is now against the law in England, Scotland and Wales. So most Lurchers today are family pets rather than hunters. They are known as gentle, easy-going dogs indoors, happy to sprint round a field and then curl up on the sofa for the rest of the day.",
+  ],
+  // Batch 10 (J18-268): 8 new, 10 in all.
+  Cockapoo: [
+    "The Cockapoo is one of the oldest designer dogs of all. The first Cockapoos were recorded in the USA in the 1950s, probably by accident, when pet Cocker Spaniels and Poodles met. People liked the puppies so much that by the 1960s breeders were crossing the two on purpose, decades before the Labradoodle made Poodle crosses famous.",
+    "Disney may have helped create the Cockapoo. After the 1955 film Lady and the Tramp, whose heroine Lady is a Cocker Spaniel, Cocker Spaniels became hugely popular in America. Many families wanted the Cocker's sweet nature with the Poodle's low-shedding coat, and breeders were happy to cross the two to make Cockapoos.",
+    "There are two kinds of Cocker Spaniel, and so two kinds of Cockapoo. In America most Cockapoos have an American Cocker Spaniel parent, a smaller dog with a rounder head. In Britain the Cockapoo's Cocker parent is usually the English Cocker Spaniel, which is a separate breed. Some people call that cross an English Cockapoo.",
+    "The Cockapoo goes by several names. In Britain it is often spelled Cockerpoo, some call it the Cock-a-Poo, and in Australia and New Zealand it is known as the Spoodle. All of them mean the same thing: a dog with one Cocker Spaniel parent and one Poodle parent, or Cockapoo parents of its own.",
+    "Cockapoos arrived in Britain in the late 1990s and early 2000s, and demand shot up during the Covid lockdowns, when many families wanted a dog at home. Between 2019 and 2020 the average price of a Cockapoo puppy in the UK rose by 168%, and in 2022 it was one of the most expensive kinds of dog in the country, at an average of about £1,336.",
+    "Not every Cockapoo is a sofa dog. The Cocker Spaniel side was bred to flush birds for hunters, and in Britain some Cockapoos, often called Cockerpoos there, now work as gundogs on shoots, finding and fetching birds. Country magazines that once laughed at the cross as a passing fad have started taking them seriously.",
+    "Cockapoos come in different sizes, set mostly by which size of Poodle was the parent. Toy Cockapoos weigh about 3 to 5kg and Miniature Cockapoos about 6 to 8kg, while those with a Standard Poodle parent are bigger still. That is why two Cockapoos out on a walk can look quite different.",
+    "Cockapoo fans in America set up clubs in the late 1990s and early 2000s, including the Cockapoo Club of America and the American Cockapoo Club. They have written a standard for how a Cockapoo should look and behave, and hope the American Kennel Club will one day recognise it as a breed. For now, no major kennel club does.",
   ],
 };
 
@@ -930,6 +942,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The most popular Lurcher of all is a Greyhound crossed with a Collie", q: "Which dog is most often crossed with a Greyhound to make a Lurcher?", options: ["A Collie", "A Pug", "A Chihuahua"], answer: 0, evidence: "crossed with a Collie" },
   { match: "The Lurcher differs from its cousin the Longdog in one simple way", q: "What is a Longdog?", options: ["A cross of two sighthounds", "A very long Dachshund", "A Lurcher that has grown up"], answer: 0, evidence: "cross of two sighthounds" },
   { match: "Hare coursing, the old sport of racing dogs after hares", q: "Is hare coursing allowed in England today?", options: ["Yes", "No"], answer: 1, evidence: "against the law" },
+  // Batch 10 (J18-268): Cockapoo.
+  { match: "The Cockapoo is one of the oldest designer dogs of all", q: "When were the first Cockapoos recorded?", options: ["The 1950s", "The 1850s", "The 2010s"], answer: 0, evidence: "in the 1950s" },
+  { match: "Disney may have helped create the Cockapoo", q: "Which Disney film helped make Cocker Spaniels popular in America?", options: ["Lady and the Tramp", "101 Dalmatians", "The Fox and the Hound"], answer: 0, evidence: "Lady and the Tramp" },
+  { match: "The Cockapoo goes by several names", q: "What is the Cockapoo called in Australia and New Zealand?", options: ["The Spoodle", "The Cockaroo", "The Poodlecock"], answer: 0, evidence: "the Spoodle" },
+  { match: "Cockapoos arrived in Britain in the late 1990s", q: "By how much did the price of a Cockapoo puppy rise between 2019 and 2020?", options: ["168%", "16%", "1,680%"], answer: 0, evidence: "168%" },
+  { match: "Not every Cockapoo is a sofa dog", q: "What job do some Cockapoos now do on British shoots?", options: ["Gundogs", "Sheepdogs", "Sled dogs"], answer: 0, evidence: "work as gundogs" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
