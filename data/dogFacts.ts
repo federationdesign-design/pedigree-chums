@@ -273,7 +273,8 @@ export const EXTRA_FACTS: string[] = [];
    Batch 17 (J18-277): Border Terrier, 7 new facts (3 existing, 10 in all).
    Batch 18 (J18-278): Papillon, 6 new facts (4 existing, 10 in all).
    Batch 19 (J18-279): Beagle, 6 new facts (4 existing, 10 in all).
-   Batch 20 (J18-281): Shih Tzu, 6 new facts (4 existing, 10 in all). */
+   Batch 20 (J18-281): Shih Tzu, 6 new facts (4 existing, 10 in all).
+   Batch 21 (J18-283): Whippet, 5 new facts (7 existing, 12 in all). */
 export const CHUM_FACTS: Record<string, string[]> = {
   Jackapoo: [
     "The Jackapoo, a cross of the Jack Russell Terrier and the Poodle, is thought to have been first bred on purpose in the USA in the 1980s or 1990s. It was part of a wave of so-called designer dogs: puppies from two different pure breeds, mixed to make a family pet. That makes the Jackapoo unusual in its own family tree. Its Jack Russell parent was bred for hunting and its Poodle parent for fetching from water, but the Jackapoo was bred from the very start simply to be a companion.",
@@ -489,6 +490,14 @@ export const CHUM_FACTS: Record<string, string[]> = {
     "Every Shih Tzu in the world today descends from just 14 dogs. After the Communist revolution in China, the little palace dogs were seen as symbols of royal power, and the breed is believed to have died out there. Luckily, a handful had already been taken to England and Norway, and one Pekingese was later added, making 14 in all.",
     "The first Shih Tzus came to England with Lady Brownrigg, who brought them back from China around 1930. At first the Kennel Club muddled them up with a Tibetan breed and called them Apsos. In 1935 the Shih Tzu Club in England wrote the breed's first European standard, and the dogs were officially named Shih Tzu.",
     "In 1952 a newcomer to the breed in England crossed a Shih Tzu with a Pekingese without telling anyone first, and when it came out it caused an uproar among breeders. But with so few Shih Tzus in the world, the new blood is now thought to have helped keep the breed healthier.",
+  ],
+  // Batch 21 (J18-283): 5 new, 12 in all.
+  Whippet: [
+    "The Whippet was called the poor man's racehorse. In the coal-mining and mill towns of northern England in the 1800s, working families raced their Whippets in rag races: each owner stood at the finish line waving a rag, and the dogs sprinted flat out towards them. Until the First World War, Whippet racing was more popular than Greyhound racing.",
+    "Before it was called the Whippet, the breed was nicknamed the snap dog, for the speed with which it snapped up rabbits. For a long time the word whippet was used for any quick little dog. The name may come from an old word, wappet, meaning a small, yapping dog.",
+    "In a mining family, the Whippet was much more than a pet. It could win prize money at the races and catch a rabbit for the family's dinner, so it was looked after like a treasure. It was said that no racehorse got more care than a miner's Whippet, and it was not unusual for one to share its owner's meals and even his pillow.",
+    "The Whippet Club, set up in 1899, was the first Whippet breed club in the world. The Whippet had been recognised by the Kennel Club as a breed of its own only a few years before. Today there are eleven Whippet breed clubs in the UK, and the Whippet is one of the most popular hounds in the country.",
+    "A racing Whippet can reach about 56km/h (35mph), and Whippets have been timed running 200 yards in under 12 seconds. For its size, it is one of the fastest dogs there is. Yet at home the Whippet is famously calm and gentle, and very fond of a warm, soft bed.",
   ],
 };
 
@@ -1117,6 +1126,12 @@ const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
   { match: "The Shih Tzu owes a great deal to the Empress Dowager Cixi", q: "Which empress kept Shih Tzus in the Forbidden City?", options: ["Empress Dowager Cixi", "Queen Victoria", "Catherine the Great"], answer: 0, evidence: "Empress Dowager Cixi" },
   { match: "Every Shih Tzu in the world today descends from just 14 dogs", q: "From how many dogs does every Shih Tzu today descend?", options: ["14", "140", "4"], answer: 0, evidence: "just 14 dogs" },
   { match: "The first Shih Tzus came to England with Lady Brownrigg", q: "What did the Kennel Club first wrongly call Lady Brownrigg's Shih Tzus?", options: ["Apsos", "Pugs", "Poodles"], answer: 0, evidence: "called them Apsos" },
+  // Batch 21 (J18-283): Whippet.
+  { match: "The Whippet was called the poor man's racehorse", q: "In a rag race, what did Whippets run towards?", options: ["Their owner waving a rag", "A sausage on a string", "A moving car"], answer: 0, evidence: "waving a rag" },
+  { match: "Before it was called the Whippet, the breed was nicknamed the snap dog", q: "What was the Whippet's old nickname?", options: ["The snap dog", "The zoom dog", "The flash dog"], answer: 0, evidence: "snap dog" },
+  { match: "In a mining family, the Whippet was much more than a pet", q: "What could a miner's Whippet catch for the family's dinner?", options: ["A rabbit", "A fish", "A chicken"], answer: 0, evidence: "catch a rabbit" },
+  { match: "The Whippet Club, set up in 1899", q: "When was the world's first Whippet breed club set up?", options: ["1899", "1999", "1799"], answer: 0, evidence: "set up in 1899" },
+  { match: "A racing Whippet can reach about 56km/h", q: "About how fast can a racing Whippet run?", options: ["About 56km/h (35mph)", "About 10km/h (6mph)", "About 150km/h (93mph)"], answer: 0, evidence: "56km/h (35mph)" },
 ];
 export function quizFor(fact: string): FactQuiz | null {
   const low = fact.toLowerCase();
