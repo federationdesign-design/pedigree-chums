@@ -2965,3 +2965,34 @@
 .factClose:hover, .factClose:focus-visible { transform: scale(1.1); }
 .factClose img { width: 100%; height: 100%; display: block; }
 
+/* THE FACT QUIZ, 27 September 2026 (owner). Under the fact, after its words have
+   arrived; buttons in the training-pill style, green for right, red for wrong. */
+.factQuiz {
+  margin-top: calc(12px * var(--fact-k, 1));
+  opacity: 0;
+  animation: factDogsIn 420ms ease-out forwards;
+  pointer-events: auto;
+}
+@keyframes factDogsIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.factQuizQ { margin: 0 0 calc(8px * var(--fact-k, 1)); font-weight: 800; font-size: calc(clamp(0.95rem, 3.4vw, 1.15rem) * var(--fact-k, 1)); color: #ffed00; }
+.factQuizRow { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(8px * var(--fact-k, 1)); }
+.factQuizBtn {
+  font: inherit;
+  font-weight: 800;
+  font-size: calc(clamp(0.85rem, 3vw, 1rem) * var(--fact-k, 1));
+  padding: calc(6px * var(--fact-k, 1)) calc(14px * var(--fact-k, 1));
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  background: rgba(10, 58, 87, 0.55);
+  color: #ffffff;
+  cursor: pointer;
+  text-shadow: none;
+  transition: transform 0.12s ease, background 0.2s ease;
+}
+.factQuizBtn:hover:not(:disabled), .factQuizBtn:focus-visible { transform: scale(1.05); background: rgba(10, 58, 87, 0.8); }
+.factQuizBtn:disabled { cursor: default; opacity: 0.75; }
+.factQuizRight { background: #22c55e !important; border-color: #22c55e !important; opacity: 1 !important; }
+.factQuizWrong { background: #ef4444 !important; border-color: #ef4444 !important; opacity: 1 !important; }
+.factQuizNote { min-height: 1.2em; margin: calc(8px * var(--fact-k, 1)) 0 0; font-weight: 800; }
+@media (prefers-reduced-motion: reduce) { .factQuiz { animation: none; opacity: 1; } }
+

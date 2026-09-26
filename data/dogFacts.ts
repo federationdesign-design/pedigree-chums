@@ -418,7 +418,7 @@ function famousFacts(): string[] {
    At most FACT_DOGS_MAX, in the order they appear. */
 export type FactDog = { name: string; img: string };
 export const FACT_DOGS_MAX = 5; // five, 26 September 2026 (owner; was six)
-let dogIndex: { names: string[]; img: Map<string, string>; shortOf: Map<string, string> } | null = null;
+let dogIndex: { names: string[]; img: Map<string, string>; shortOf: Map<string, string>; hist: Map<string, string>; canon: Map<string, string>; pack: Set<string> } | null = null;
 function buildDogIndex() {
   if (dogIndex) return dogIndex;
   const img = new Map<string, string>();
@@ -448,11 +448,36 @@ function buildDogIndex() {
     if (!LAST.test(n)) continue;
     const short = n.replace(LAST, "");
     const words = short.split(/\s+/);
+    // Never a short form starting "The" ("The First Setters" would become "The First").
+    if (/^The\b/.test(short)) continue;
     const ok = words.length >= 2 || (words.length === 1 && short.length >= 6 && !COMMON.has(short) && (firstWordCount.get(short) ?? 0) === 1);
     if (ok && !img.has(short) && !shortOf.has(short)) shortOf.set(short, n);
   }
   const names = [...img.keys(), ...shortOf.keys()].filter((n) => n.length >= 3).sort((a, b) => b.length - a.length);
-  dogIndex = { names, img, shortOf };
+  /* REAL AND CARTOON, 27 September 2026 (owner: a Westie fact showed the Westie's
+     cartoon twice, under two names, and never its real historic picture). */
+  const pack = new Set(breeds.filter((x) => !!x.slug && !!x.image).map((x) => x.name));
+  const isCartoon = (src: string) => /-square\.|\/faces\/|^\/breeds\//.test(src) || [...pack].some((p) => packArt(p) === src);
+  // A pack breed's real picture: the lineage's own picture of it, or the history
+  // page's, whichever is not the cartoon.
+  const hist = new Map<string, string>();
+  for (const b of ukBreeds) if (b.image && !isCartoon(b.image)) hist.set(b.name, b.image);
+  for (const r of LINEAGE_ROOTS) {
+    const l = getLineage(r);
+    if (!l) continue;
+    const w = (x: LineageNode) => { if (x.img && !isCartoon(x.img) && !hist.has(x.name)) hist.set(x.name, x.img); for (const k of x.children ?? []) w(k); };
+    w(l);
+  }
+  // Two names for one dog: a name whose cartoon is a pack breed's cartoon IS that
+  // pack breed ("West Highland White Terrier" is the pack's "West Highland Terrier").
+  const canon = new Map<string, string>();
+  for (const n of img.keys()) {
+    if (pack.has(n)) continue;
+    const art = packArt(n);
+    const p = art ? [...pack].find((pk) => packArt(pk) === art) : undefined;
+    if (p) canon.set(n, p);
+  }
+  dogIndex = { names, img, shortOf, hist, canon, pack };
   return dogIndex;
 }
 const PACK = (pred: (name: string) => boolean) => () => breeds.filter((b) => !!b.slug && !!b.image && pred(b.name)).map((b) => b.name);
@@ -482,7 +507,7 @@ const FACT_ALIASES: Record<string, string> = {
   Dobermann: "Doberman Pinscher", Doberman: "Doberman Pinscher", Alsatian: "German Shepherd",
 };
 export function dogsForFact(fact: string): FactDog[] {
-  const { names, img, shortOf } = buildDogIndex();
+  const { names, img, shortOf, hist, canon, pack } = buildDogIndex();
   let rest = fact;
   const found: { name: string; at: number }[] = [];
   for (const n of names) {
@@ -504,6 +529,7 @@ export function dogsForFact(fact: string): FactDog[] {
     rest = rest.replace(new RegExp(`\\b${namePat(short)}\\b`, "g"), (x) => " ".repeat(x.length));
   }
   let out = found.sort((a, b) => a.at - b.at).map((f) => f.name);
+  let groupMode = false;
   // The dog the fact is about always leads (FACT_SUBJECT), under its own name or
   // the nearest one with a picture ("German Shepherd Dog" is the pack's "German Shepherd").
   allDogFacts();
@@ -517,18 +543,33 @@ export function dogsForFact(fact: string): FactDog[] {
   if (!out.length && !STORY_DOGS.some((d) => d.re.test(fact))) {
     const g = FACT_GROUPS.find((gr) => gr.re.test(fact));
     if (g) {
-      // Cartoon and real in turn: pack, historic, pack, historic...
-      const a = g.dogs(), b = g.hist;
+      // Real and cartoon in turn, the real (older) dog first: historic, pack, historic...
+      const a = g.hist, b = g.dogs();
       out = [];
       for (let i = 0; i < Math.max(a.length, b.length); i++) { if (a[i]) out.push(a[i]); if (b[i]) out.push(b[i]); }
+      groupMode = true;
     }
   }
   const story = STORY_DOGS.filter((d) => d.re.test(fact));
   const lead: FactDog[] = [];
   for (const d of story) { lead.push({ name: d.name, img: d.img }); for (const r of d.related) if (img.has(r)) lead.push({ name: r, img: img.get(r)! }); }
-  const named: FactDog[] = [...new Set(out)].filter((n) => img.has(n)).map((n) => ({ name: n, img: img.get(n)! }));
-  const seenNames = new Set<string>();
-  return [...lead, ...named].filter((d) => (seenNames.has(d.name) ? false : (seenNames.add(d.name), true))).slice(0, FACT_DOGS_MAX);
+  /* Each dog once, under its pack name if it has one. A pack breed shows its real
+     historic picture FIRST and its cartoon after, the older dog before the chum
+     (owner, 27 September 2026); in a group fallback, where the list already
+     alternates real and cartoon dogs, each pack breed shows just its cartoon. */
+  const pics = (n: string): FactDog[] => {
+    const c = canon.get(n) ?? n;
+    if (pack.has(c)) {
+      const cartoon = { name: c, img: packArt(c) ?? img.get(c)! };
+      const real = hist.get(c) ?? hist.get(n);
+      return real && !groupMode ? [{ name: c, img: real }, cartoon] : [cartoon];
+    }
+    return img.has(n) ? [{ name: n, img: hist.get(n) ?? img.get(n)! }] : [];
+  };
+  const named: FactDog[] = [...new Set(out.map((n) => canon.get(n) ?? n))].flatMap(pics);
+  const leadPics: FactDog[] = lead.flatMap((d) => (img.has(d.name) || canon.has(d.name) ? pics(d.name) : [d]));
+  const seenImgs = new Set<string>();
+  return [...leadPics, ...named].filter((d) => (seenImgs.has(d.img) ? false : (seenImgs.add(d.img), true))).slice(0, FACT_DOGS_MAX);
 }
 
 /* THE DOG EACH FACT IS ABOUT, 27 September 2026 (owner: a Dandie Dinmont fact
@@ -537,6 +578,26 @@ export function dogsForFact(fact: string): FactDog[] {
    its breed write-up, its extinct-ancestor entry or its famous dog. dogsForFact
    puts this dog first, whatever the name matching finds. */
 const FACT_SUBJECT = new Map<string, string>();
+/* RICHER FACTS, researched batch by batch, 27 September 2026 (owner: every fact
+   should teach something real about the dog, its history and what we asked it to
+   do, the way the Manchester Terrier fact explains rat-baiting; never over 150
+   words). Keyed by the fact as it was; the fact card shows the richer version.
+   Fact card only: the history page and the learn box keep their own text. Each
+   was checked against sources before it went in (see the batch review notes). */
+const FACT_ENRICH: Record<string, string> = {
+  "The Mastiff is today's version of Britain's very old, heavy guard dogs.":
+    "The Mastiff is Britain's ancient giant guard dog. When the Romans invaded in 55 BC, they found the Britons already had huge, brave mastiff-type dogs that beat the Romans' own dogs in fights, and some were shipped to Rome to fight wild animals in the Colosseum. Over the centuries Mastiffs guarded estates, helped gamekeepers and hunted wolves. By the end of the Second World War, only one Mastiff was left in Britain, a female called Nydia of Frithend, and the breed was saved by fourteen dogs sent back from America.",
+  "The Westie was bred from the white puppies born among Scotland's old Highland terriers.":
+    "The Westie was bred in Argyll, in the west of Scotland, from the white puppies born among the old Highland terriers. The story goes that Colonel Edward Donald Malcolm of Poltalloch shot one of his own reddish terriers by mistake, thinking it was a fox coming out of the bushes, and decided to breed only white dogs that could never be confused with a fox. At first they were called Poltalloch Terriers, and they appeared at Crufts as West Highland White Terriers in 1907.",
+  "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog.":
+    "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog, based on J. M. Barrie's own black-and-white Newfoundland, Luath. In the first stage play in 1904, Nana was played by an actor in a dog costume modelled on Luath's coat, and the actor, Arthur Lupino, visited Barrie's home to study how Luath moved. Barrie's earlier dog was a Saint Bernard called Porthos, which may be why Disney made Nana a Saint Bernard in its film.",
+  "Boxers were bred to hold large animals until help arrived. Determination, disguised as permanent surprise.":
+    "Boxers come from the German Bullenbeisser, meaning bull-biter, a dog that grabbed bears, wild boar and deer and held on until the hunters arrived. Crossed with British Bulldogs, they became the Boxer, first shown at a dog show in Munich in the 1890s. Boxers were among the first dogs Germany used as police dogs, and in the First World War they carried messages and packs and stood guard. Soldiers took Boxers home after the Second World War, which made them popular around the world.",
+  "Cocker Spaniels were bred to flush woodcock from thick cover. That explains the hedge inspections.":
+    "The Cocker Spaniel is named after the woodcock, a bird it was bred to flush out of thick undergrowth for hunters. For centuries, Britain's land spaniels were bred together and only sorted afterwards by size, so a cocker was simply a spaniel weighing under 25 pounds (about 11kg), while bigger ones became springers. The Kennel Club only recognised the Cocker as a breed of its own in 1893. That old woodcock job is why Cockers still love pushing their noses into hedges.",
+  "The Buckhound was a big British hunting dog, kept in packs to hunt fallow deer.":
+    "The Buckhound was a big British hunting dog, kept in packs to hunt fallow deer. The royal pack, the Royal Buckhounds, was set up under Edward III in the 1300s and kept by kings and queens for over 500 years. Queen Anne, when she became too ill to ride, had paths cut through Windsor Forest so she could follow the hunt in a carriage. Later, the deer was often released from a cart and caught again unharmed, and in 1901 Edward VII disbanded the pack to save money.",
+};
 /* THE GOOD DOG BAD DOG DOGS, 26 September 2026 (owner: a Gelert fact showed no
    Gelert). A fact naming one of the articles' dogs shows the article's own picture
    of it first, then its related dog: Gelert and the Irish Wolfhound, Lassie and the
@@ -556,6 +617,51 @@ const SUBJECT_PICTURE: Record<string, string> = {
   Deerhound: "Scottish Deerhound", "White English Terrier": "English White Terrier", "Farm and kitchen curs": "Cur",
   Setter: "English Setter", Collie: "Rough Collie", "Collie or working dog": "Old working collies",
 };
+/* QUIZ QUESTIONS, 27 September 2026 (owner: a multiple-choice or yes/no question
+   under some facts, worth points; only where a real question exists, never made
+   up). Every answer is in the fact itself: `evidence` is the words in the fact
+   that prove it, checked when the pool is built, so a fact reworded later simply
+   loses its question rather than showing a wrong one. `match` picks the fact. */
+export type FactQuiz = { q: string; options: string[]; answer: number };
+const FACT_QUIZ: (FactQuiz & { match: string; evidence: string })[] = [
+  { match: "Perdita is Pongo's partner", q: "What is the name of the wicked woman who wants to make the puppies into a fur coat?", options: ["Cruella de Vil", "Crumbella de Ville", "Cruellie de Spot"], answer: 0, evidence: "Cruella de Vil" },
+  { match: "Snoopy is Charlie Brown's pet", q: "Who is Snoopy's owner?", options: ["Charlie Brown", "Charlie Green", "Charlie Bone"], answer: 0, evidence: "Charlie Brown" },
+  { match: "Shep was a Border Collie on the BBC", q: "Which presenter made \"Get down, Shep!\" famous?", options: ["John Noakes", "John Nokes-a-lot", "Joan Oaks"], answer: 0, evidence: "John Noakes" },
+  { match: "Balto was the Siberian Husky", q: "Which town did Balto's team race the medicine to?", options: ["Nome", "Gnome", "Home"], answer: 0, evidence: "Nome" },
+  { match: "In 1925, sled dog teams raced medicine", q: "Did Togo's team run the shortest part of the journey?", options: ["Yes", "No"], answer: 1, evidence: "longest and most dangerous" },
+  { match: "Lassie first appeared in a magazine story", q: "Who first wrote about Lassie?", options: ["Eric Knight", "Eric Night-Night", "Erica Knit"], answer: 0, evidence: "Eric Knight" },
+  { match: "Greyfriars Bobby was a real little terrier", q: "Which city did Greyfriars Bobby live in?", options: ["Edinburgh", "Edin-burger", "Edenbury"], answer: 0, evidence: "Edinburgh" },
+  { match: "Scooby-Doo is a cowardly", q: "What kind of dog is Scooby-Doo?", options: ["Great Dane", "Great Pain", "Grate Dean"], answer: 0, evidence: "Great Dane" },
+  { match: "Santa's Little Helper is the family's pet", q: "What kind of dog is Santa's Little Helper?", options: ["Greyhound", "Grayhund", "Greyhoof"], answer: 0, evidence: "Greyhound" },
+  { match: "Myth: Dalmatian puppies are born with their spots", q: "What colour are Dalmatian puppies when they are born?", options: ["Pure white", "Spotty", "Jet black"], answer: 0, evidence: "pure white" },
+  { match: "Myth: Basenjis cannot make any noise", q: "What sound can a Basenji make instead of barking?", options: ["A yodel", "A moo", "A quack"], answer: 0, evidence: "yodelling" },
+  { match: "Myth: Dachshunds were bred to look like sausages", q: "What does Dachshund mean in German?", options: ["Badger dog", "Sausage dog", "Hot dog"], answer: 0, evidence: "badger dog" },
+  { match: "The Turnspit Dog had one of the strangest jobs", q: "What did the Turnspit Dog run inside?", options: ["A wheel", "A barrel", "A teapot"], answer: 0, evidence: "wheel" },
+  { match: "Waldi, a stripy Dachshund", q: "Which Olympic Games had Waldi as its mascot?", options: ["Munich 1972", "London 2012", "Paris 1924"], answer: 0, evidence: "1972 Olympic Games in Munich" },
+  { match: "Smoky was a tiny Yorkshire Terrier", q: "What did Smoky pull through a narrow pipe?", options: ["A telegraph wire", "A sausage", "A kite string"], answer: 0, evidence: "telegraph wire" },
+  { match: "Rin Tin Tin was a German Shepherd puppy", q: "Where was Rin Tin Tin rescued from?", options: ["A battlefield in France", "A Hollywood car park", "A London zoo"], answer: 0, evidence: "battlefield in France" },
+  { match: "The Dickin Medal is known as the animals'", q: "The Dickin Medal is known as the animals' what?", options: ["Victoria Cross", "Olympic gold", "Blue Peter badge"], answer: 0, evidence: "Victoria Cross" },
+  { match: "Crumstone Irma, a search dog in the London Blitz", q: "How many people did Crumstone Irma help find?", options: ["191", "19", "1,091"], answer: 0, evidence: "191" },
+  { match: "a Labrador called Daisy kept pawing", q: "Which charity did Dr Claire Guest go on to start?", options: ["Medical Detection Dogs", "Dogs With Sniffers", "The Nose Knows"], answer: 0, evidence: "Medical Detection Dogs" },
+  { match: "A guide dog costs more than", q: "Does a guide dog cost more than \u00a355,000 over its life?", options: ["Yes", "No"], answer: 0, evidence: "more than \u00a355,000" },
+  { match: "Myth: Saint Bernards carried little barrels", q: "Did the monks' real rescue dogs carry barrels of brandy?", options: ["Yes", "No"], answer: 1, evidence: "did not carry them" },
+  { match: "Myth: The Labrador comes from Labrador", q: "Where did the Labrador's ancestors really come from?", options: ["Newfoundland", "Labrador", "New Zealand"], answer: 0, evidence: "Newfoundland" },
+  { match: "Legend: The Chow Chow got its blue-black tongue", q: "What colour is a Chow Chow's tongue?", options: ["Blue-black", "Pink", "Green"], answer: 0, evidence: "blue-black" },
+  { match: "Myth: Dogs only see in black and white", q: "Which colours can dogs see best?", options: ["Blues and yellows", "Reds and greens", "Only black and white"], answer: 0, evidence: "blues and yellows" },
+  { match: "Myth: One dog year is the same as seven", q: "Is one dog year really the same as seven human years?", options: ["Yes", "No"], answer: 1, evidence: "Myth: One dog year" },
+  { match: "Mick the Miller was a racing Greyhound", q: "Which race did Mick the Miller win in 1929 and 1930?", options: ["The English Greyhound Derby", "The Grand National", "The Boat Race"], answer: 0, evidence: "English Greyhound Derby" },
+  { match: "Only about one dog in fifty passes", q: "How many dogs pass the tests to become digital detection dogs?", options: ["About one in fifty", "Every single one", "About half"], answer: 0, evidence: "one dog in fifty" },
+  { match: "a star of rat-baiting, a cruel Victorian contest", q: "Where were rat-baiting contests usually held?", options: ["In pubs", "In churches", "In schools"], answer: 0, evidence: "cellars of pubs" },
+  { match: "Uggie was a Jack Russell Terrier", q: "What kind of film was The Artist, starring Uggie?", options: ["A silent film", "A musical", "A cartoon"], answer: 0, evidence: "silent film" },
+  { match: "Endal was a British Labrador assistance dog", q: "What did Endal do when his owner was knocked out?", options: ["Put him in the recovery position", "Sang to him", "Ran away"], answer: 0, evidence: "recovery position" },
+  { match: "Marley & Me is a 2005 book", q: "Who wrote Marley & Me?", options: ["John Grogan", "John Groan", "Joan Grogger"], answer: 0, evidence: "John Grogan" },
+  { match: "Legend: Prince Llywelyn killed his loyal dog Gelert", q: "Who probably made up Gelert's grave?", options: ["A local innkeeper", "A king", "A wizard"], answer: 0, evidence: "local innkeeper" },
+];
+export function quizFor(fact: string): FactQuiz | null {
+  const low = fact.toLowerCase();
+  const hit = FACT_QUIZ.find((z) => fact.includes(z.match) && low.includes(z.evidence.toLowerCase()));
+  return hit ? { q: hit.q, options: hit.options, answer: hit.answer } : null;
+}
 let cache: string[] | null = null;
 /* FACTS BY DOG, 27 September 2026 (owner: a fact shown for a chum collect or a
    chain should be about that chum or a dog in the chain). Built once, the first
@@ -588,6 +694,14 @@ export function allDogFacts(): string[] {
     return f;
   });
   for (const [name, text] of Object.entries(EXTINCT_REWRITES)) FACT_SUBJECT.set(text.trim(), name);
-  cache = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
+  const pool = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
+  // The richer versions (FACT_ENRICH), keeping each fact's own dog (FACT_SUBJECT).
+  cache = pool.map((f) => {
+    const rich = FACT_ENRICH[f];
+    if (!rich) return f;
+    const subj = FACT_SUBJECT.get(f);
+    if (subj) FACT_SUBJECT.set(rich, subj);
+    return rich;
+  });
   return cache;
 }

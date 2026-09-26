@@ -17,7 +17,7 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
 import { breedInfo, breedInfoLong } from "../../data/breedInfo";
-import { allDogFacts, factHeadFor, dogsForFact, factsAboutDog } from "../../data/dogFacts";
+import { allDogFacts, factHeadFor, dogsForFact, factsAboutDog, quizFor } from "../../data/dogFacts";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 /* The pit's own stylesheet, imported so the learn area's collect flourish IS the
@@ -998,8 +998,15 @@ const BOMB_STRING_GAP_MS = 300;
 const FACT_BASE_MS = 4400;
 const FACT_MS_PER_CHAR = 90;
 const FACT_MIN_MS = 8000;
-const FACT_MAX_MS = 18000;
+// 60s, 27 September 2026 (owner: facts can now run to 150 words, about 45 seconds
+// to read; the old 18s cut them off). The pause button still stops the clock.
+const FACT_MAX_MS = 60000;
 const FACT_WORD_MS = 60;
+/* The fact quiz (see showFact): about one fact in three, points for a right answer,
+   and extra time on the card while it is up. */
+const QUIZ_EVERY = 3;
+const QUIZ_POINTS = 500;
+const QUIZ_EXTRA_MS = 10000;
 // The dog pictures pop in one after another, this far apart. See showFact.
 const FACT_DOG_WAVE_MS = 130;
 // Keeping the fact card clear of the lifted dog (desktop): the gap left around it,
@@ -5807,6 +5814,11 @@ export default function BreedTree({
      2026, owner: a chum collect shows a fact about that chum, a chain one about a
      dog in it). The first of them with an unseen fact wins, picked at random from
      its facts; if none has one, the random deck as before. */
+  // The latest onScore, for the quiz buttons, which live outside React's renders.
+  const onScoreRef = useRef(onScore);
+  useEffect(() => { onScoreRef.current = onScore; }, [onScore]);
+  // Facts shown since the last quiz; a quiz shows on the QUIZ_EVERY-th, if it has one.
+  const factsSinceQuizRef = useRef(QUIZ_EVERY - 1);
   const showFact = (prefer: string[] = []) => {
     const host = chainCountRef.current?.parentElement;
     if (!host) return;
@@ -5841,7 +5853,12 @@ export default function BreedTree({
     seen.add(factHash(fact));
     saveFactsSeen(seen);
     factElRef.current?.remove();
-    const ms = Math.max(FACT_MIN_MS, Math.min(FACT_MAX_MS, FACT_BASE_MS + fact.length * FACT_MS_PER_CHAR));
+    /* A QUIZ, about one fact in three (owner, 27 September 2026): only a fact with a
+       real question (quizFor), and only once two facts have gone by without one. */
+    const quiz = quizFor(fact);
+    const withQuiz = !!quiz && factsSinceQuizRef.current >= QUIZ_EVERY - 1;
+    factsSinceQuizRef.current = withQuiz ? 0 : factsSinceQuizRef.current + 1;
+    const ms = Math.max(FACT_MIN_MS, Math.min(FACT_MAX_MS, FACT_BASE_MS + fact.length * FACT_MS_PER_CHAR)) + (withQuiz ? QUIZ_EXTRA_MS : 0);
     const el = document.createElement("div");
     el.className = styles.factPop;
     el.setAttribute("role", "status");
@@ -5894,6 +5911,46 @@ export default function BreedTree({
       body.appendChild(document.createTextNode(" "));
     });
     el.appendChild(body);
+    if (withQuiz && quiz) {
+      const box = document.createElement("div");
+      box.className = styles.factQuiz;
+      box.style.animationDelay = `${300 + fact.split(/\s+/).length * FACT_WORD_MS}ms`;
+      const qp = document.createElement("p");
+      qp.className = styles.factQuizQ;
+      qp.textContent = quiz.q;
+      const row = document.createElement("div");
+      row.className = styles.factQuizRow;
+      const note = document.createElement("p");
+      note.className = styles.factQuizNote;
+      note.setAttribute("aria-live", "polite");
+      // The options in a random order, keeping yes before no.
+      const order = quiz.options.map((_, oi) => oi);
+      if (quiz.options.length > 2) order.sort(() => Math.random() - 0.5);
+      const btns: HTMLButtonElement[] = [];
+      for (const oi of order) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = styles.factQuizBtn;
+        b.textContent = quiz.options[oi];
+        b.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (box.dataset.done) return;
+          box.dataset.done = "1";
+          const right = oi === quiz.answer;
+          for (const other of btns) other.disabled = true;
+          b.classList.add(right ? styles.factQuizRight : styles.factQuizWrong);
+          if (!right) btns[order.indexOf(quiz.answer)]?.classList.add(styles.factQuizRight);
+          note.textContent = right ? `Correct! +${QUIZ_POINTS}` : `Not quite: it was ${quiz.options[quiz.answer]}.`;
+          if (right) onScoreRef.current?.(QUIZ_POINTS);
+        });
+        btns.push(b);
+        row.appendChild(b);
+      }
+      box.appendChild(qp);
+      box.appendChild(row);
+      box.appendChild(note);
+      el.appendChild(box);
+    }
     /* THE TIME LEFT AND A SKIP, 25 September 2026 (owner). A bar along the foot
        empties over exactly the time the fact is on screen, and a skip button
        beside it takes the fact away at once. The button is the card's only
