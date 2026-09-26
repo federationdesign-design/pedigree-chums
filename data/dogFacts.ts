@@ -18,6 +18,7 @@ import { breeds } from "./breeds";
 import { ukBreeds } from "./uk-breeds";
 import { getLineage, LINEAGE_ROOTS, type LineageNode } from "./lineage";
 import { packArt } from "./packArt";
+import { TOPIC_FACTS } from "./topicFacts"; // J18-295
 
 // The chatbot's breed lines, as approved there (pick-a-chum lib/assembler.ts).
 const CHATBOT_FACTS = [
@@ -1261,7 +1262,7 @@ export function allDogFacts(): string[] {
   });
   for (const [name, text] of Object.entries(EXTINCT_REWRITES)) FACT_SUBJECT.set(text.trim(), name);
   const chumLines = Object.entries(CHUM_FACTS).flatMap(([name, list]) => list.map((f) => { FACT_SUBJECT.set(f.trim(), name); return f; }));
-  const pool = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...chumLines, ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
+  const pool = [...new Set([...history, ...CHATBOT_FACTS, ...famousFacts(), ...breedLines, ...Object.values(EXTINCT_REWRITES), ...MYTHS.map((m) => `${MYTH_LEAD[m.kind][0]} ${m.claim} ${MYTH_LEAD[m.kind][1]} ${m.truth}`), ...ARTICLE_FACTS, ...chumLines, ...Object.values(TOPIC_FACTS).flat(), ...EXTRA_FACTS].map((f) => f.trim()))].filter((f) => f.length > 20);
   // The richer versions (FACT_ENRICH), keeping each fact's own dog (FACT_SUBJECT).
   cache = pool.map((f) => {
     const rich = FACT_ENRICH[f];
