@@ -6577,7 +6577,10 @@ export default function BreedTree({
     // Counted straight away, so the box pops and the number
     // climbs as the card sets off, not when it lands.
     const cm = chumList[i];
-    if (cm) { onChumCollected?.(cm.name); showFact([cm.name]); }
+    /* NO FACT FOR A SINGLE CHUM, 27 September 2026 (owner, J18-260): a chum fact
+       shows only when a chain of chums is collected, and chainClearRef shows it,
+       once, for the whole chain. A card taken on its own shows none. */
+    if (cm) onChumCollected?.(cm.name);
     // Hearts from the card as it goes. See heartBurst.
     {
       const card = chumsGRef.current?.children[i] as Element | undefined;
@@ -6600,6 +6603,11 @@ export default function BreedTree({
     chainClearRef.current = (cards: number[]) => {
       if (armedChumRef.current != null && cards.includes(armedChumRef.current)) setArmedChum(null);
       for (const i of cards) collectChum(i);
+      // One fact for the chain, about one of its chums (J18-260).
+      if (cards.length >= 2) {
+        const names = cards.map((i) => chumList[i]?.name).filter((n): n is string => !!n);
+        if (names.length) showFact(names);
+      }
     };
     /* Is the tap allowed right now? Off the chain flag it always is, and the
        pit behaves as it always has. Under the flag it unlocks only for the last
