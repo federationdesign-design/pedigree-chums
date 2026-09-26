@@ -658,13 +658,16 @@ const PIT_BONE_MATCH = 0.56;
    logo still moves the bone on either screen. */
 // 1.2, 26 September 2026 (owner: the bone still looked smaller than the falling
 // logo on desktop). Was 1, the measured silhouette match.
-const PIT_BONE_MATCH_DESKTOP = 1.2;
+// 1.32, a tenth bigger again, 26 September 2026 (owner); it was 1.2.
+const PIT_BONE_MATCH_DESKTOP = 1.32;
 /* DESKTOP-ONLY SIZE-UPS, 26 September 2026 (owner). Phones keep their sizes. The
    chum cards are already at CHUM_MAX on desktop, so this goes on top of the cap;
    the balls are the yellow and pink tennis balls only (the rock and fork share
    ballDia and are left alone). */
 const CHUM_DESKTOP_K = 1.1;
 const BALL_DESKTOP_K = 1.15;
+// The slipper, 15% bigger on desktop (owner, 26 September 2026), on top of its caps.
+const SLIPPER_DESKTOP_K = 1.15;
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
@@ -10239,7 +10242,7 @@ export default function BreedTree({
           : kind === "bowl" ? Math.min(BIGT * 9.38 * (isNarrow ? 0.85 : 1), wPx * BOWL_PIT_FRACTION)
           // The main pit's own slipper width, clamped to this pit: see the note
           // at TOY_SLIPPER_SRC.
-          : kind === "slipper" ? Math.min(BIGT * (isNarrow ? 6.65 : 8.31), wPx * BOWL_PIT_FRACTION)
+          : kind === "slipper" ? Math.min(BIGT * (isNarrow ? 6.65 : 8.31), wPx * BOWL_PIT_FRACTION) * (isMobileRef.current ? 1 : SLIPPER_DESKTOP_K)
           : BIGT * 0.6 * 2;
         const hgt = kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
           : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
