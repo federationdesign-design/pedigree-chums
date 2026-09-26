@@ -100,16 +100,21 @@ export function stripMatches(rowStrip: string, era: string): boolean {
    path and the deep link build the level identically. */
 /* EVERY ANCESTOR IN THE FRAMEWORK, 25 September 2026 (owner: count the dogs we
    have, not the levels). The unique names below the root of EVERY lineage record,
-   from the same getLineage expansion the pit draws: 208 when written. It was only
+   from the same getLineage expansion the pit draws: 195 when written. It was only
    the history levels' ancestors (141), so the foreign ancestors found on the chum
    levels never counted. A level's own dog is not in it unless it is someone's
    ancestor too, because the counter counts dogs found in the pits. The
    denominator of the dogs-found counter. Worked out once, when first asked. */
+/* NOT THE HOW-TO-PLAY GUIDE, 25 September 2026: its steps ("Shuffle well", "Call
+   out" and so on) are stored as lineage records too, so they were counted as dogs,
+   208 instead of 195. */
+const RULE_TREES = new Set(["Deal the cards", "Find more chums", "Match to your chum", "Most chums wins", "Spot real dogs"]);
 let pitAncestorNames: Set<string> | null = null;
 function allPitAncestors(): Set<string> {
   if (pitAncestorNames) return pitAncestorNames;
   const names = new Set<string>();
   for (const root of LINEAGE_ROOTS) {
+    if (RULE_TREES.has(root)) continue;
     const lin = getLineage(root);
     if (!lin) continue;
     const walk = (n: LineageNode, depth: number) => {
