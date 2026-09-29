@@ -4,6 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import PlayChumsRail from "../../components/PlayChumsRail/PlayChumsRail";
 import PlayLadder from "../../components/PlayLadder/PlayLadder";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
+import MyProgress from "../../components/MyProgress/MyProgress";
 import styles from "./play.module.css";
 
 /* THE PLAY PAGE (owner, 24 September 2026): the homepage's chum slider on its
@@ -25,6 +26,8 @@ export default function PlayPage() {
             it turns the level tables white with navy text. */}
         <ArticleTextToggle centered labelOn="Switch to white tables with navy text" labelOff="Switch back to the glass tables" />
       </section>
+      {/* MY PROGRESS, the save codes panel (owner, J18-316, 29 September 2026). */}
+      <MyProgress />
       {/* TWO ROWS (owner, 24 September 2026): the chums with a film to watch on
           top, the rest below. */}
       <PlayChumsRail films="with" anchorId="play-chums-films" label="Chums with a film to watch" />
