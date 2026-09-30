@@ -12,6 +12,19 @@ export const metadata: Metadata = {
 };
 
 const ESSAYS = [
+  /* ODIN (owner, J18-317, 30 September 2026): the article was live at
+     /good-dog-bad-dog/odin from 23 September but had no card here. Listed first
+     as the newest essay, tied to the film's release. */
+  {
+    slug: "odin",
+    tag: "Good dog", tagStyle: "tagGood",
+    breed: "German Shepherd",
+    author: "Heart of the Beast",
+    title: "Odin: Why a Dog Will Not Leave You",
+    summary: "Brad Pitt's new film strands a man and a three-legged German Shepherd in Alaska. The dogs who really did save their humans, and the science of why a dog attaches to one person and stays.",
+    image: "/obin-uber-hero-img.jpg",
+    imageAlt: "A black and tan German Shepherd in a red neckerchief looks towards the camera in a forest clearing, a bearded man in a blue bandana crouched beside him.",
+  },
   {
     slug: "argos",
     tag: "Good dog", tagStyle: "tagGood",

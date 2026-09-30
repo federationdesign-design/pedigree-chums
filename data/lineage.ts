@@ -2450,7 +2450,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.",
         img: "/history/breeds/old-gaulish-coursinghounds.jpg",
         children: [
-          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 20 },
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts-2dogs.jpg", value: 20 },
           { name: "Gaulish coursing Hounds", note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.", img: "/history/breeds/old-gaulish-coursinghounds.jpg", value: 20 },
         ],
       },
@@ -2612,7 +2612,7 @@ const LINEAGE: Record<string, LineageNode> = {
           { name: "Laconian tracking Hounds", note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.", img: "/history/greek-harehound.jpg", value: 20 },
         ],
       },
-      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 20 },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts-2dogs.jpg", value: 20 },
     ],
   },
   // Playable (owner instruction, 4 August), same shape and rules. Grafted
@@ -2646,7 +2646,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 33 },
       { name: "Celtic Hound", note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound. Now extinct.", img: "/history/breeds/celtic-hound-remake.jpg", value: 33 },
-      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 34 },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts-2dogs.jpg", value: 34 },
     ],
   },
   /* ITS OWN RECORD, 15 September 2026 (owner: on level 08 the Roman shepherd
@@ -2806,7 +2806,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
         img: "/history/breeds/celtic-herdsmen-dogs.jpg",
         children: [
-          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts-2dogs.jpg", value: 25 },
           { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 25 },
         ],
       },
@@ -3100,7 +3100,7 @@ const LINEAGE: Record<string, LineageNode> = {
           { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 60 },
         ],
       },
-      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 40 },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts-2dogs.jpg", value: 40 },
     ],
   },
 
@@ -3215,7 +3215,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An ancient running hound of the Celts, the deep root behind the Greyhound, Wolfhound and Deerhound.",
     children: [
       { name: "Ancient eastern sighthounds", note: "The slender coursing dogs of Egypt and the Near East. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 55 },
-      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 }
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts-2dogs.jpg", value: 45 }
     ]
   },
 
