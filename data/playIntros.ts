@@ -53,6 +53,7 @@ export const CHUM_VIMEO: Record<string, string> = {
   "staffordshire-bull-terrier": "1221597339",
   "border-collie": "1218974120",
   "french-bulldog": "1229938542",
+  "basset-hound": "1231967836", // added 1 October 2026 (owner, J18-318)
 };
 
 /* A Vimeo film's length in whole seconds, from Vimeo's public oEmbed endpoint,
