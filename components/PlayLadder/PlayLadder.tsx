@@ -134,9 +134,12 @@ function Ladder({ title, colour, rows, all }: { title: string; colour: string; r
       <header className={styles.head}>
         {/* THE TOP CHUM'S PRINTED CARD, from the pack (owner, 24 September 2026),
             with the Chum Finder's flash across its foot carrying the chum's
-            status in its status colour. The level's name sits under it. */}
+            status in its status colour. The level's name sits under it.
+            ?intro=1 (owner, J18-325, 1 October 2026): the top chum's intro clip
+            and its difficulty slider play first on every screen size, as after a
+            slider film. Without it, desktop went straight into the game. */}
         {top ? (
-          <Link href={`/play/${top.slug}`} className={styles.topCard} aria-label={`Play the ${top.name}, the top of ${title}`}>
+          <Link href={`/play/${top.slug}?intro=1`} className={styles.topCard} aria-label={`Play the ${top.name}, the top of ${title}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={bust(breedCard[top.slug] ?? top.image)} alt="" loading="lazy" width={821} height={1122} />
             {topStatus ? (
