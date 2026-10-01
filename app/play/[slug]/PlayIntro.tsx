@@ -4,6 +4,7 @@ import { cloneElement, isValidElement, useEffect, useRef, useState, type ReactEl
 import Nav from "../../../components/Nav/Nav";
 import heroBtn from "../../britains-dog-history-2/history2.module.css";
 import { resetToys } from "../../../components/BreedTree/BreedTree";
+import pit from "../../../components/BreedTree/BreedTree.module.css";
 
 /* THE CHUM'S INTRO VIDEO BEFORE ITS GAME, phones only (owner, 24 September 2026:
    a five second clip per chum, trialled on the Labrador first).
@@ -24,6 +25,15 @@ import { resetToys } from "../../../components/BreedTree/BreedTree";
 const MOBILE_QUERY = "(max-width: 640px)";
 // How many seconds before the clip ends the "Game starts in..." countdown shows.
 const INTRO_COUNTDOWN_S = 3;
+/* THE DIFFICULTY ON THE INTRO SCREEN (owner, J18-321, 1 October 2026): the round
+   starts straight from the clip, so the pit's own slider, which lives on the start
+   screen, is never seen here. This one is set while the clip plays and the round
+   opens at that value. It starts at 0, the easiest, which is what the /play pages
+   have always opened on. It is the pit's own track, thumb and fill (the same CSS
+   classes), and it writes the pit's own sessionStorage key, so the value carries
+   on to the next level exactly as the pit's slider does. Phones only, as in the
+   pit: the size it sets has no effect on the desktop layout. */
+const DIFF_KEY = "pc-mini-pit-difficulty";
 
 export default function PlayIntro({ video, children }: { video?: string; children: ReactNode }) {
   // Unknown until the browser has been asked, so nothing is drawn for that frame.
@@ -42,6 +52,21 @@ export default function PlayIntro({ video, children }: { video?: string; childre
      INTRO_COUNTDOWN_S seconds of the clip, top left, "Game starts in... 3, 2, 1".
      Read off the clip's own clock as it plays, so it lands on the real end. */
   const [secsLeft, setSecsLeft] = useState<number | null>(null);
+  const [mobile, setMobile] = useState(false);
+  const [diff, setDiff] = useState(0);
+  const [diffDragging, setDiffDragging] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const setDiffFromY = (clientY: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const l = Math.min(10, Math.max(0, Math.round((1 - (clientY - r.top) / Math.max(r.height, 1)) * 10)));
+    setDiff(l);
+  };
+  // Saved for the round and the levels after it, as the pit's own slider does.
+  useEffect(() => {
+    try { sessionStorage.setItem(DIFF_KEY, String(diff)); } catch { /* private mode */ }
+  }, [diff]);
 
   /* A FRESH SET OF TOYS ON EVERY CHUM PLAY PAGE (owner, 24 September 2026). A toy
      thrown clear of the pit is retired for the whole visit, so after a few levels
@@ -55,6 +80,7 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       const mobile = window.matchMedia(MOBILE_QUERY).matches;
+      setMobile(mobile);
       /* STRAIGHT FROM A FILM, THE INTRO PLAYS EVERYWHERE (owner, 25 September
          2026). A slider film that finishes sends the player here with ?intro=1,
          and then the clip and its 3, 2, 1 countdown play on a desktop too. Any
@@ -74,7 +100,7 @@ export default function PlayIntro({ video, children }: { video?: string; childre
 
   if (phase === "decide") return null;
   if (phase === "game") {
-    type StripProps = { arrivalDelayMs?: number; playOnArrival?: boolean; autoLearn?: boolean; learnBackHref?: string };
+    type StripProps = { arrivalDelayMs?: number; arrivalDifficulty?: number; playOnArrival?: boolean; autoLearn?: boolean; learnBackHref?: string };
     if (learn && isValidElement(children)) {
       return cloneElement(children as ReactElement<StripProps>, {
         playOnArrival: false,
@@ -86,8 +112,14 @@ export default function PlayIntro({ video, children }: { video?: string; childre
         learnBackHref: fromHome ? "/home#play-chums" : undefined,
       });
     }
+    /* The difficulty only travels when the intro was shown on a phone; otherwise
+       the page opens as it always has. */
+    const diffProp = mobile && video ? { arrivalDifficulty: diff } : {};
     if (watched && isValidElement(children)) {
-      return cloneElement(children as ReactElement<StripProps>, { arrivalDelayMs: 0 });
+      return cloneElement(children as ReactElement<StripProps>, { arrivalDelayMs: 0, ...diffProp });
+    }
+    if (isValidElement(children)) {
+      return cloneElement(children as ReactElement<StripProps>, diffProp);
     }
     return <>{children}</>;
   }
@@ -143,6 +175,62 @@ export default function PlayIntro({ video, children }: { video?: string; childre
           {/* ONE LINE, WHITE, ONE SIZE (owner, 24 September 2026): the number sits
               on the same line as the words, in their colour and size. */}
           <div style={{ fontSize: 22, whiteSpace: "nowrap" }}>Game starts in... {secsLeft}</div>
+        </div>
+      ) : null}
+      {mobile ? (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "absolute",
+            left: 18,
+            top: "50%",
+            transform: "translateY(-50%)",
+            height: "38vh",
+            width: 44,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 10,
+            color: "#ffffff",
+            fontFamily: "var(--font-display), system-ui, sans-serif",
+            fontSize: 16,
+            lineHeight: 1,
+            textShadow: "0 2px 0 rgba(10, 58, 87, 0.7), 0 0 10px rgba(10, 58, 87, 0.6)",
+          }}
+        >
+          <span aria-hidden="true">Hard</span>
+          <div
+            ref={trackRef}
+            className={pit.diffTrack}
+            role="slider"
+            tabIndex={0}
+            aria-label="Difficulty"
+            aria-valuemin={0}
+            aria-valuemax={10}
+            aria-valuenow={diff}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              e.currentTarget.setPointerCapture(e.pointerId);
+              setDiffDragging(true);
+              setDiffFromY(e.clientY);
+            }}
+            onPointerMove={(e) => { if (diffDragging) setDiffFromY(e.clientY); }}
+            onPointerUp={(e) => {
+              setDiffDragging(false);
+              try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* already gone */ }
+            }}
+            onPointerCancel={() => setDiffDragging(false)}
+            onKeyDown={(e) => {
+              const step = e.key === "ArrowUp" || e.key === "ArrowRight" ? 1 : e.key === "ArrowDown" || e.key === "ArrowLeft" ? -1 : 0;
+              if (!step) return;
+              e.preventDefault();
+              setDiff((d) => Math.min(10, Math.max(0, d + step)));
+            }}
+          >
+            <div className={pit.diffFill} style={{ height: `${diff * 10}%` }} />
+            <div className={`${pit.diffThumb}${diffDragging ? " " + pit.diffThumbBig : ""}`} style={{ bottom: `${diff * 10}%` }} />
+          </div>
+          <span aria-hidden="true">Easy</span>
         </div>
       ) : null}
       {/* TWO BUTTONS IN THE HISTORY HERO'S STYLE (owner, 24 September 2026),

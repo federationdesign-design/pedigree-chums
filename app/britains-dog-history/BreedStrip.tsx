@@ -172,6 +172,7 @@ export default function BreedStrip({
   autoLearn,
   playOnArrival,
   arrivalDelayMs,
+  arrivalDifficulty,
   learnBackHref,
   closeHref,
   only,
@@ -200,6 +201,10 @@ export default function BreedStrip({
      not given. The /play page's intro clip passes 0 when it was watched to the
      end, so the round starts the moment it finishes (owner, 24 September 2026). */
   arrivalDelayMs?: number;
+  /* The difficulty playOnArrival opens on, 0 to 10. 0 if not given. The /play
+     page's intro clip passes the value set on its own slider (owner, J18-321,
+     1 October 2026). */
+  arrivalDifficulty?: number;
   // Where the learn area's red back square goes instead of the start screen.
   learnBackHref?: string;
   /* WHERE CLOSING THE LEVEL GOES, and the signal that this is a per-level page
@@ -902,7 +907,7 @@ export default function BreedStrip({
       /* The ?play link opens on the easiest difficulty, the smallest circles
          (owner, 24 September 2026). The first level only; the slider's saved
          value then carries it on, and the player can still change it. */
-      startDifficulty={playOnArrival && active.name === initialLevel ? 0 : undefined}
+      startDifficulty={playOnArrival && active.name === initialLevel ? (arrivalDifficulty ?? 0) : undefined}
       learnBackHref={learnBackHref}
       /* The learn deep link, 24 September 2026 (owner): the roller lands here. */
       startInLearn={!!autoLearn && active.name === initialLevel}
