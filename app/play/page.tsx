@@ -26,11 +26,12 @@ export default function PlayPage() {
             it turns the level tables white with navy text. */}
         <ArticleTextToggle centered labelOn="Switch to white tables with navy text" labelOff="Switch back to the glass tables" />
       </section>
-      {/* MY PROGRESS, the save codes panel (owner, J18-316, 29 September 2026). */}
-      <MyProgress />
       {/* TWO ROWS (owner, 24 September 2026): the chums with a film to watch on
           top, the rest below. */}
       <PlayChumsRail films="with" anchorId="play-chums-films" label="Chums with a film to watch" />
+      {/* MY PROGRESS, the save codes panel (owner, J18-316), moved under the first
+          row of chums (owner, J18-320, 1 October 2026). */}
+      <MyProgress />
       <div className={styles.rowGap} />
       <PlayChumsRail films="without" anchorId="play-chums-more" label="More chums to play" />
       {/* THE LADDERS (owner, 24 September 2026): every chum's game in Easy,

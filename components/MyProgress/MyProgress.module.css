@@ -2,10 +2,10 @@
    The ladders' glass (PlayLadder.module.css .ladder): see-through with a blur, a
    faint outline and the same shadow. */
 .panel {
-  max-width: 980px;
-  margin: 0 auto clamp(24px, 3vw, 40px);
-  margin-inline: clamp(18px, 4vw, 48px);
-  padding: clamp(18px, 2.4vw, 28px);
+  /* FULL WIDTH (owner, J18-320): the same side margins as the chum rails above
+     and below it, so the panel lines up with the cards. */
+  margin: clamp(20px, 2.4vw, 32px) clamp(18px, 4vw, 48px) 0;
+  padding: clamp(16px, 2vw, 24px) clamp(18px, 2.4vw, 32px);
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 26px;
   backdrop-filter: blur(10px);
@@ -13,8 +13,15 @@
   box-shadow: 0 12px 32px rgba(10, 58, 87, 0.32);
   color: #ffffff;
 }
-@media (min-width: 1076px) {
-  .panel { margin-inline: auto; }
+/* Figures left, save and load right. */
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: clamp(16px, 2.4vw, 36px);
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .body { grid-template-columns: 1fr; }
 }
 .title {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
@@ -23,14 +30,14 @@
   line-height: 1;
   text-transform: uppercase;
   text-align: center;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   text-shadow: 0 2px 0 rgba(10, 58, 87, 0.5);
 }
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
-  margin: 0 0 22px;
+  margin: 0;
 }
 @media (max-width: 640px) {
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -51,11 +58,11 @@
 }
 .row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(14px, 2vw, 28px);
+  grid-template-columns: 1fr;
+  gap: 18px;
 }
-@media (max-width: 760px) {
-  .row { grid-template-columns: 1fr; }
+@media (min-width: 600px) and (max-width: 960px) {
+  .row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .block { min-width: 0; }
 .label { display: block; font-weight: 700; font-size: 1rem; margin: 0 0 8px; }

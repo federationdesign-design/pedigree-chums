@@ -229,6 +229,10 @@ export default function MyProgress() {
     <section className={styles.panel} aria-labelledby="my-progress-title">
       <h2 id="my-progress-title" className={styles.title}>My progress</h2>
 
+      {/* FULL WIDTH, TWO COLUMNS (owner, J18-320, 1 October 2026): the figures on
+          the left, the save code and the load box in a column beside them, so the
+          panel is shorter. They stack again on narrower screens. */}
+      <div className={styles.body}>
       <dl className={styles.stats}>
         {stats.map((s) => (
           <div key={s.label} className={styles.stat}>
@@ -281,6 +285,7 @@ export default function MyProgress() {
           </div>
           {loadMsg && <p className={styles.msg} aria-live="polite">{loadMsg}</p>}
         </div>
+      </div>
       </div>
     </section>
   );
