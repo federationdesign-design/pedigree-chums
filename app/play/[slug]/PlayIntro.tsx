@@ -31,8 +31,12 @@ const INTRO_COUNTDOWN_S = 3;
    opens at that value. It starts at 0, the easiest, which is what the /play pages
    have always opened on. It is the pit's own track, thumb and fill (the same CSS
    classes), and it writes the pit's own sessionStorage key, so the value carries
-   on to the next level exactly as the pit's slider does. Phones only, as in the
-   pit: the size it sets has no effect on the desktop layout. */
+   on to the next level exactly as the pit's slider does.
+   ON DESKTOP TOO (owner, J18-322): the pit's slider shows on every screen size
+   (it is gated on dockAside, which the mini pit always sets), so this does too.
+   An earlier note in BreedTree says phones only; the code says otherwise.
+   LOW ON THE SCREEN (owner, J18-322): it stands just above the Skip and Learn
+   buttons rather than at mid-height. */
 const DIFF_KEY = "pc-mini-pit-difficulty";
 
 export default function PlayIntro({ video, children }: { video?: string; children: ReactNode }) {
@@ -52,7 +56,8 @@ export default function PlayIntro({ video, children }: { video?: string; childre
      INTRO_COUNTDOWN_S seconds of the clip, top left, "Game starts in... 3, 2, 1".
      Read off the clip's own clock as it plays, so it lands on the real end. */
   const [secsLeft, setSecsLeft] = useState<number | null>(null);
-  const [mobile, setMobile] = useState(false);
+  // True once the clip has been chosen to play, phone or desktop.
+  const [introShown, setIntroShown] = useState(false);
   const [diff, setDiff] = useState(0);
   const [diffDragging, setDiffDragging] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -80,13 +85,14 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       const mobile = window.matchMedia(MOBILE_QUERY).matches;
-      setMobile(mobile);
       /* STRAIGHT FROM A FILM, THE INTRO PLAYS EVERYWHERE (owner, 25 September
          2026). A slider film that finishes sends the player here with ?intro=1,
          and then the clip and its 3, 2, 1 countdown play on a desktop too. Any
          other arrival keeps the phones-only rule above. */
       const fromFilm = new URLSearchParams(window.location.search).get("intro") === "1";
-      setPhase(video && (mobile || fromFilm) ? "video" : "game");
+      const show = !!video && (mobile || fromFilm);
+      setIntroShown(show);
+      setPhase(show ? "video" : "game");
     });
     return () => cancelAnimationFrame(id);
   }, [video]);
@@ -112,9 +118,9 @@ export default function PlayIntro({ video, children }: { video?: string; childre
         learnBackHref: fromHome ? "/home#play-chums" : undefined,
       });
     }
-    /* The difficulty only travels when the intro was shown on a phone; otherwise
-       the page opens as it always has. */
-    const diffProp = mobile && video ? { arrivalDifficulty: diff } : {};
+    /* The difficulty only travels when the intro was shown; otherwise the page
+       opens as it always has. */
+    const diffProp = introShown ? { arrivalDifficulty: diff } : {};
     if (watched && isValidElement(children)) {
       return cloneElement(children as ReactElement<StripProps>, { arrivalDelayMs: 0, ...diffProp });
     }
@@ -177,15 +183,16 @@ export default function PlayIntro({ video, children }: { video?: string; childre
           <div style={{ fontSize: 22, whiteSpace: "nowrap" }}>Game starts in... {secsLeft}</div>
         </div>
       ) : null}
-      {mobile ? (
+      {introShown ? (
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
             position: "absolute",
             left: 18,
-            top: "50%",
-            transform: "translateY(-50%)",
-            height: "38vh",
+            /* Just above the Skip and Learn row: that row sits 18px up and is
+               about 62px tall, so 96px leaves a 16px gap. */
+            bottom: "calc(96px + env(safe-area-inset-bottom, 0px))",
+            height: "min(34vh, 300px)",
             width: 44,
             display: "flex",
             flexDirection: "column",
