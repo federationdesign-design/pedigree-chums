@@ -5,6 +5,8 @@ import Nav from "../../../components/Nav/Nav";
 import heroBtn from "../../britains-dog-history-2/history2.module.css";
 import { resetToys } from "../../../components/BreedTree/BreedTree";
 import pit from "../../../components/BreedTree/BreedTree.module.css";
+import IntroGuide, { introGuideSeen } from "../../../components/IntroGuide/IntroGuide";
+import how from "../../../components/IntroGuide/IntroGuide.module.css";
 
 /* THE CHUM'S INTRO VIDEO BEFORE ITS GAME, phones only (owner, 24 September 2026:
    a five second clip per chum, trialled on the Labrador first).
@@ -58,6 +60,10 @@ export default function PlayIntro({ video, children }: { video?: string; childre
   const [secsLeft, setSecsLeft] = useState<number | null>(null);
   // True once the clip has been chosen to play, phone or desktop.
   const [introShown, setIntroShown] = useState(false);
+  /* HOW TO PLAY (owner, J18-323, 1 October 2026): the panels open over the clip on
+     a player's first game, and the yellow ? reopens them. The clip is paused while
+     they are open and carries on, countdown and all, when they close. */
+  const [howOpen, setHowOpen] = useState(false);
   const [diff, setDiff] = useState(0);
   const [diffDragging, setDiffDragging] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -92,6 +98,7 @@ export default function PlayIntro({ video, children }: { video?: string; childre
       const fromFilm = new URLSearchParams(window.location.search).get("intro") === "1";
       const show = !!video && (mobile || fromFilm);
       setIntroShown(show);
+      if (show && !introGuideSeen()) setHowOpen(true);
       setPhase(show ? "video" : "game");
     });
     return () => cancelAnimationFrame(id);
@@ -101,8 +108,9 @@ export default function PlayIntro({ video, children }: { video?: string; childre
     if (phase !== "video") return;
     const v = vidRef.current;
     if (!v) return;
+    if (howOpen) { v.pause(); return; }
     v.play().catch(() => setPhase("game"));
-  }, [phase]);
+  }, [phase, howOpen]);
 
   if (phase === "decide") return null;
   if (phase === "game") {
@@ -170,7 +178,7 @@ export default function PlayIntro({ video, children }: { video?: string; childre
           style={{
             position: "absolute",
             top: "calc(22px + env(safe-area-inset-top, 0px))",
-            left: 18,
+            left: 74, // clear of the ? button (J18-323)
             color: "#ffffff",
             fontFamily: "var(--font-display), system-ui, sans-serif",
             lineHeight: 1,
@@ -240,6 +248,15 @@ export default function PlayIntro({ video, children }: { video?: string; childre
           <span aria-hidden="true">Easy</span>
         </div>
       ) : null}
+      <button
+        type="button"
+        className={how.help}
+        aria-label="How to play"
+        onClick={(e) => { e.stopPropagation(); setHowOpen(true); }}
+      >
+        ?
+      </button>
+      {howOpen ? <IntroGuide onClose={() => setHowOpen(false)} /> : null}
       {/* TWO BUTTONS IN THE HISTORY HERO'S STYLE (owner, 24 September 2026),
           the same classes as its First dog and First era, so they cannot drift:
           green SKIP VIDEO starts the round, blue LEARN opens the learn area.

@@ -1,0 +1,140 @@
+/* The intro guide, how to play panels (owner, J18-323). Styles from the signed-off mock-up. The
+   diagrams arrive as SVG strings, so their animation classes are :global inside
+   .art; the keyframes stay local to this module. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: rgba(10, 58, 87, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  cursor: default;
+}
+.panel {
+  width: 100%;
+  max-width: 340px;
+  background: #ffffff;
+  color: var(--navy, #0a3a57);
+  border: 4px solid var(--navy, #0a3a57);
+  border-radius: 24px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 8px 0 var(--navy, #0a3a57);
+  text-align: center;
+}
+.art {
+  height: 180px;
+  border-radius: 16px;
+  background: #4fb3f0;
+  border: 3px solid var(--navy, #0a3a57);
+  margin: 0 0 14px;
+  overflow: hidden;
+  position: relative;
+}
+.art :global(svg) { width: 100%; height: 100%; display: block; }
+.art :global(text) { font-family: var(--font-display), system-ui, sans-serif; }
+.title {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(22px, 7vw, 28px);
+  line-height: 1;
+  margin: 0 0 8px;
+}
+.text {
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 600;
+  margin: 0 auto 14px;
+  max-width: 28ch;
+}
+.dots { display: flex; justify-content: center; gap: 8px; margin: 0 0 14px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #c7dbe8; border: 2px solid var(--navy, #0a3a57); }
+.dotOn { background: #ffed00; }
+.row { display: flex; gap: 10px; }
+.skip, .next {
+  flex: 1;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 18px;
+  padding: 13px 8px 9px;
+  border-radius: 14px;
+  border: 3px solid var(--navy, #0a3a57);
+  color: var(--navy, #0a3a57);
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--navy, #0a3a57);
+}
+.skip { background: #ffffff; }
+.next { background: #ffed00; }
+.skip:focus-visible, .next:focus-visible { outline: 3px solid #0b78bd; outline-offset: 3px; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* The ? button that reopens the panels, on the intro screen. */
+.help {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 3px solid var(--navy, #0a3a57);
+  background: #ffed00;
+  color: var(--navy, #0a3a57);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  padding-top: 4px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.5);
+}
+.help:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; }
+
+@keyframes slide{0%,15%{transform:translateY(0)}45%,60%{transform:translateY(-92px)}90%,100%{transform:translateY(0)}}
+@keyframes grow{0%,15%{r:16}45%,60%{r:30}90%,100%{r:16}}
+@keyframes tap{0%,20%{transform:translate(0,0) scale(1)}30%{transform:translate(0,0) scale(.85)}40%,100%{transform:translate(0,0) scale(1)}}
+@keyframes burst{0%,30%{opacity:0;transform:translate(0,0) scale(.3)}45%{opacity:1}70%,100%{opacity:1;transform:var(--to) scale(1)}}
+@keyframes ring{0%,30%{opacity:1}36%,100%{opacity:0}}
+@keyframes draw{0%,10%{stroke-dashoffset:300}60%,100%{stroke-dashoffset:0}}
+@keyframes pop{0%,58%{opacity:0;transform:scale(.6)}68%{opacity:1;transform:scale(1.15)}76%,100%{opacity:1;transform:scale(1)}}
+@keyframes rise{0%{transform:translateY(40px)}60%,100%{transform:translateY(0)}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.25}}
+.art :global(.a-slide){animation:slide 3.2s ease-in-out infinite}
+.art :global(.a-grow){animation:grow 3.2s ease-in-out infinite}
+.art :global(.a-tap){animation:tap 2.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.art :global(.a-burst){animation:burst 2.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.art :global(.a-ring){animation:ring 2.6s ease-out infinite}
+.art :global(.a-draw){stroke-dasharray:300;animation:draw 2.8s ease-in-out infinite}
+.art :global(.a-pop){animation:pop 2.8s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.art :global(.a-rise){animation:rise 2.4s ease-out infinite alternate}
+.art :global(.a-blink){animation:blink 1s steps(1) infinite}
+@keyframes flipc{0%,20%{transform:scaleX(1)}32%{transform:scaleX(0)}44%,100%{transform:scaleX(1)}}
+@keyframes faceA{0%,31%{opacity:1}32%,100%{opacity:0}}
+@keyframes faceB{0%,31%{opacity:0}32%,100%{opacity:1}}
+@keyframes dim{0%,31%{opacity:0}45%,100%{opacity:.35}}
+.art :global(.a-flip){animation:flipc 3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.art :global(.a-flip) :global(.face-a){animation:faceA 3s steps(1) infinite}
+.art :global(.a-flip) :global(.face-b){animation:faceB 3s steps(1) infinite}
+.art :global(.a-dim){animation:dim 3s ease-in-out infinite;opacity:0}
+@keyframes lift{0%,22%{transform:translate(0,0) scale(1)}42%,100%{transform:translate(0,-58px) scale(1.9)}}
+@keyframes flip2{0%,46%{transform:scaleX(1)}56%{transform:scaleX(0)}66%,100%{transform:scaleX(1)}}
+@keyframes fa2{0%,55%{opacity:1}56%,100%{opacity:0}}
+@keyframes fb2{0%,55%{opacity:0}56%,100%{opacity:1}}
+@keyframes dim2{0%,46%{opacity:0}60%,100%{opacity:.35}}
+@keyframes tapfade{0%,8%{opacity:0;transform:scale(1)}14%{opacity:1}20%{transform:scale(.85)}24%{opacity:1;transform:scale(1)}30%,100%{opacity:0}}
+@keyframes place{0%,15%{transform:translate(0,0)}55%,100%{transform:translate(0,-78px)}}
+@keyframes f1{0%,30%{opacity:0}34%,100%{opacity:1}}
+@keyframes f2{0%,48%{opacity:0}52%,100%{opacity:1}}
+@keyframes f3{0%,66%{opacity:0}70%,100%{opacity:1}}
+@keyframes press{0%,10%{transform:scale(1)}16%{transform:scale(.8)}22%,100%{transform:scale(1)}}
+@keyframes fly{0%,26%{transform:translate(0,0) scale(1);opacity:1}62%{transform:translate(-116px,96px) scale(.22);opacity:1}70%,100%{transform:translate(-116px,96px) scale(.22);opacity:0}}
+.art :global(.a-lift){animation:lift 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.art :global(.a-lift) :global(.a-flip){animation:flip2 3.4s ease-in-out infinite}
+.art :global(.a-lift) :global(.face-a){animation:fa2 3.4s steps(1) infinite}
+.art :global(.a-lift) :global(.face-b){animation:fb2 3.4s steps(1) infinite}
+.art :global(.a-dim){animation:dim2 3.4s ease-in-out infinite!important}
+.art :global(.a-tapfade){animation:tapfade 3.4s ease-out infinite;transform-box:fill-box;transform-origin:center;opacity:0}
+.art :global(.a-place){animation:place 3s ease-in-out infinite}
+.art :global(.a-fill1){animation:f1 3.6s steps(1) infinite;opacity:0}
+.art :global(.a-fill2){animation:f2 3.6s steps(1) infinite;opacity:0}
+.art :global(.a-fill3){animation:f3 3.6s steps(1) infinite;opacity:0}
+.art :global(.a-press){animation:press 3.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.art :global(.a-fly){animation:fly 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:reduce){.art :global([class*="a-"]){animation:none!important}}
