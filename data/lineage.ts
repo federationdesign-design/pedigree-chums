@@ -1757,13 +1757,19 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old scenting Hounds", note: "The heavy tracking hounds of the old hunt. Now extinct.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
     ]
   },
-  /* OLD GERMAN RATTERS, 24 September 2026 (owner, Group 2). Speculative: the farm ratters grew out of the earth and vermin dogs and the farm stock. NOT the German Pinscher, which descends from these and would make a loop. */
+  /* OLD GERMAN RATTERS, 24 September 2026 (owner, Group 2). Speculative: the farm ratters grew out of the earth and vermin dogs and the farm stock.
+     1 October 2026 (owner, J18-324): the earth-dog parent was Early Badger hunting
+     dogs, a Welsh, Cardiganshire ancestor, which put a British dog behind the German
+     ratters and so behind the Schnauzers, against the fact that the Schnauzer does
+     not come from the British dogs. Replaced by a continental ancestor of its own,
+     Old European earth dogs, a bare leaf. Early Badger hunting dogs now feeds only
+     the Cardigan Corgi line. NOT the German Pinscher, which descends from these and would make a loop. */
   "Old German Ratters": {
     name: "Old German Ratters",
     note: "Quick vermin dogs of the German farms. Now extinct.",
     img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg",
     children: [
-      { name: "Early Badger hunting dogs", note: "The old European earth and vermin dogs they grew from. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 50 },
+      { name: "Old European earth dogs", note: "The short-legged earth dogs of the Continent they grew from, bred to go to ground after fox and badger. Now extinct.", img: "/history/breeds/old-european-earth-dogs.jpg", value: 50 },
       { name: "Old German farm guards", note: "The farm dogs they worked beside and were bred among. Now extinct.", img: "/history/breeds/Old-German-farm-guards.jpg", value: 50 }
     ]
   },

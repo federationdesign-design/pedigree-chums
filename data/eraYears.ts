@@ -81,6 +81,7 @@ export const ERA_YEARS: Record<string, string> = {
   "Old Desert coursing dogs": "c. 3000 BC",
   "Old European lapdogs": "c. 500 BC",
   "Old European water dogs": "c. 1500",
+  "Old European earth dogs": "c. 1400",
   "Old German Ratters": "c. 1500",
   "Old German boarhounds": "c. 1500",
   "Old German farm guards": "c. 1700",

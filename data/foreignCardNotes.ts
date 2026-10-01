@@ -47,6 +47,7 @@ export const FOREIGN_CARD_NOTES: Record<string, string> = {
   "Old Desert coursing dogs": "Early slender desert chasing dogs.",
   "Old European lapdogs": "Small companions behind Europe's toy breeds.",
   "Old European water dogs": "The curly Barbet, root of the bichons.",
+  "Old European earth dogs": "Short-legged continental earth dogs bred for fox and badger.",
   "Old German Ratters": "Quick German farm ratters.",
   "Old German boarhounds": "Regional German boar-hunting packs.",
   "Old German farm guards": "Local German farm and guard stock.",

@@ -41,6 +41,7 @@ const PROGENITOR_STATUS: Record<string, BreedTag> = {
   "Old English Bulldog":             "extinct",
   "Old German boarhounds":           "extinct",
   "Old German farm guards":          "extinct",
+  "Old European earth dogs":         "extinct",
   "Old German hunting dogs":         "extinct",
   "Old German Ratters":     "extinct",
   "Early Germanic hunting dogs":     "extinct",
