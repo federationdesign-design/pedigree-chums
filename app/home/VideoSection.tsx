@@ -41,11 +41,14 @@ export default function VideoSection() {
           in Batch 2). They have sound, so they
           cannot autoplay: the standard Vimeo player shows each video's Vimeo
           thumbnail, with controls and click to play (sound on), unlike the muted
-          background embed above. */}
+          background embed above.
+          loop=0 (owner, J18-319, 1 October 2026): the Vimeo films loop by
+          default, so each is told to stop on its last frame, as the /play cards
+          already do. */}
       <div className={styles.portraitPair}>
         <div className={styles.portraitCol}>
           <iframe
-            src="https://player.vimeo.com/video/1218972477?title=0&byline=0&portrait=0&dnt=1"
+            src="https://player.vimeo.com/video/1218972477?title=0&byline=0&portrait=0&dnt=1&loop=0"
             title="Pedigree Chums"
             allow="fullscreen; picture-in-picture"
             frameBorder="0"
@@ -54,7 +57,7 @@ export default function VideoSection() {
         </div>
         <div className={styles.portraitCol}>
           <iframe
-            src="https://player.vimeo.com/video/1218974120?title=0&byline=0&portrait=0&dnt=1"
+            src="https://player.vimeo.com/video/1218974120?title=0&byline=0&portrait=0&dnt=1&loop=0"
             title="Pedigree Chums"
             allow="fullscreen; picture-in-picture"
             frameBorder="0"
@@ -63,7 +66,7 @@ export default function VideoSection() {
         </div>
         <div className={styles.portraitCol}>
           <iframe
-            src="https://player.vimeo.com/video/1221597339?title=0&byline=0&portrait=0&dnt=1"
+            src="https://player.vimeo.com/video/1221597339?title=0&byline=0&portrait=0&dnt=1&loop=0"
             title="Pedigree Chums"
             allow="fullscreen; picture-in-picture"
             frameBorder="0"
