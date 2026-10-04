@@ -704,6 +704,10 @@
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
 }
+/* Films shown under 1200px only (owner, J18-327). */
+@media (min-width: 1200px) {
+  .portraitNarrowOnly { display: none; }
+}
 .portraitFrame {
   position: absolute;
   inset: 0;
