@@ -2817,7 +2817,10 @@
   margin-bottom: calc(6px * var(--fact-k));
   transform: rotate(-2deg);
 }
-.factBody { font-size: calc(clamp(1rem, 3.6vw, 1.25rem) * var(--fact-k)); font-weight: 700; line-height: 1.35; }
+/* Dark blue, not white (owner, J18-332, 5 October 2026). The card's dark shadow,
+   made for white text, gives way to a soft light glow so the blue reads cleanly
+   over the blurred pit behind it. */
+.factBody { font-size: calc(clamp(1rem, 3.6vw, 1.25rem) * var(--fact-k)); font-weight: 700; line-height: 1.35; color: var(--navy, #0a3a57); text-shadow: 0 0 6px rgba(255, 255, 255, 0.7), 0 0 2px rgba(255, 255, 255, 0.6); }
 .factWord {
   display: inline-block;
   opacity: 0;
