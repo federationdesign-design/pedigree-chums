@@ -27,7 +27,9 @@ export const metadata: Metadata = {
 // Yorkshire Terrier shown from 2 October 2026 (owner, J18-327): it now has a film.
 const HOME_HIDDEN_CHUMS = ["bichon-frise", "bulldog", "beagle", "miniature-schnauzer", "border-terrier",
   // The Pug has its intro video for the /play page only (owner, 24 September 2026).
-  "pug"];
+  "pug",
+  // Boxer and Westie, the first two cards, hidden on the homepage (owner, J18-331, 4 October 2026).
+  "boxer", "west-highland-terrier"];
 
 export default function HomePage() {
   return (
