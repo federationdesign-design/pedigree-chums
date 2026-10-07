@@ -6,7 +6,17 @@ import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
 import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
-import { BreedFacts, RescueRoll, GazeLoop } from "../../../components/BeastPanels/BeastPanels";
+import { RescueRoll, GazeLoop } from "../../../components/BeastPanels/BeastPanels";
+import RunningCostCard from "../../../components/RunningCostCard/RunningCostCard";
+import SuitabilityRadar from "../../../components/SuitabilityRadar/SuitabilityRadar";
+import TrainingCard from "../../../components/TrainingCard/TrainingCard";
+import GroomingCard from "../../../components/GroomingCard/GroomingCard";
+import ExerciseCard from "../../../components/ExerciseCard/ExerciseCard";
+import runningCosts from "../../../data/runningCosts";
+import suitabilityScores from "../../../data/suitabilityScores";
+import trainingDifficulty from "../../../data/trainingDifficulty";
+import groomingNeeds from "../../../data/groomingNeeds";
+import exerciseNeeds from "../../../data/exerciseNeeds";
 
 /* ODIN, 23 September 2026 (owner), written to publish alongside the release of
    Heart of the Beast on 25 September.
@@ -125,6 +135,7 @@ const BODY: Block[] = [
   "The miracle is not simply that the dog stays. It is that two species built a relationship in which, sometimes, leaving feels harder than staying. If the dog keeps its side of that bargain, we owe it ours.",
 ];
 
+const GSD = "german-shepherd"; // the breed cards in the sidebar (J18-336)
 const HEADLINE = "Odin: Why a Dog Will Not Leave You";
 const ARTICLE_JSONLD = {
   "@context": "https://schema.org",
@@ -223,8 +234,23 @@ export default function HeartOfTheBeastPage() {
           </article>
 
           <aside className={styles.sidebar}>
-            {/* The German Shepherd panel, moved here from the reading column (owner, J18-334). */}
-            <BreedFacts />
+            {/* THE GERMAN SHEPHERD (owner, J18-336, 7 October 2026): the same breed
+                cards as the Gelert page, for the German Shepherd, replacing the
+                "Meet the German Shepherd" panel. Its introduction keeps a box of
+                its own above them. */}
+            <div className={styles.sidebarCard}>
+              <div style={{ padding: "18px 20px" }}>
+                <p style={cardBodyLast}>
+                  Odin is not a breed chosen for the poster. Everything the film asks of him is on this dog&rsquo;s job
+                  description, including the line about bonding to one handler.
+                </p>
+              </div>
+            </div>
+            {runningCosts[GSD] && <div className={styles.sidebarCard}><RunningCostCard config={runningCosts[GSD]} /></div>}
+            {suitabilityScores[GSD] && <div className={styles.sidebarCard}><SuitabilityRadar score={suitabilityScores[GSD]} breedName="German Shepherd" /></div>}
+            {trainingDifficulty[GSD] && <div className={styles.sidebarCard}><TrainingCard data={trainingDifficulty[GSD]} /></div>}
+            {groomingNeeds[GSD] && <div className={styles.sidebarCard}><GroomingCard data={groomingNeeds[GSD]} /></div>}
+            {exerciseNeeds[GSD] && <div className={styles.sidebarCard}><ExerciseCard data={exerciseNeeds[GSD]} /></div>}
             {/* The rescue dogs, moved here from the reading column (owner, J18-335). */}
             <RescueRoll side />
 
