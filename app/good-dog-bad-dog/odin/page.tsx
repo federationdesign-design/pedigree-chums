@@ -205,19 +205,7 @@ export default function HeartOfTheBeastPage() {
                   return (
                     <React.Fragment key={i}>
                       {block}
-                  <div className={styles.sidebarCard}>
-                    <div style={{ padding: "18px 20px" }}>
-                      <p style={cardTitle}>The film</p>
-                      <p style={cardBody}>
-                        <strong>Heart of the Beast</strong>, Paramount, released 25 September 2026. Directed by David
-                        Ayer, written by Cameron Alexander. Brad Pitt plays James Belmont; Odin is played by a German
-                        Shepherd called Uber, with other dogs from the same family covering parts of the role.
-                      </p>
-                      <p style={cardBodyLast}>
-                        Rated PG-13 in the United States for violence, peril and injury images. Running time 101 minutes.
-                      </p>
-                    </div>
-                  </div>
+                      <FilmCard />
                     </React.Fragment>
                   );
                 }
@@ -274,6 +262,47 @@ export default function HeartOfTheBeastPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+/* THE FILM CARD in the Argos page's style (owner, J18-333, 7 October 2026): the
+   same layout as NolanFilmCard on /good-dog-bad-dog/argos, title, credit line,
+   three figures, the red panel and the cast pills. No star rating, as Argos's is
+   our own score and none has been given here; a US certificate, as no UK one is
+   held. Facts as before: Paramount, released 25 September 2026, David Ayer,
+   PG-13 for violence, peril and injury images, 101 minutes. */
+function FilmCard() {
+  return (
+    <div className={styles.sidebarCard}>
+      <div style={{ padding: "16px 20px 4px" }}>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 2px", lineHeight: 1 }}>Heart of the Beast</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", textAlign: "center" }}>David Ayer · Paramount · 2026</p>
+      </div>
+      <div style={{ padding: "12px 30px 4px 30px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, margin: "4px 0 16px" }}>
+          {([
+            { label: "Runtime", value: <>101 <span style={{ fontSize: "75%" }}>min</span></> },
+            { label: "Released", value: "Sept 25" },
+            { label: "US cert", value: "PG-13" },
+          ] as { label: string; value: React.ReactNode }[]).map(({ label, value }) => (
+            <div key={label} style={{ textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", marginBottom: 3 }}>{label}</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "3.4rem", color: "#fff", lineHeight: 1 }}>{value}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: "#ef4444", borderRadius: 8, padding: "26px 30px", marginBottom: 16, textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "1.05rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>Parental guidance advised</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "0.98rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>Rated PG-13 in the United States for violence, peril and injury images.</p>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+          {["Brad Pitt", "Uber as Odin"].map(name => (
+            <span key={name} style={{ fontFamily: "var(--font-body)", fontSize: "1.04rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--navy)", background: "var(--yellow)", borderRadius: 999, padding: "8px 20px", display: "inline-block" }}>{name}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ height: 16 }} />
+    </div>
   );
 }
 
