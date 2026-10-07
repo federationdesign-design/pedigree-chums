@@ -238,9 +238,15 @@ export default function HeartOfTheBeastPage() {
                 cards as the Gelert page, for the German Shepherd, replacing the
                 "Meet the German Shepherd" panel. Its introduction keeps a box of
                 its own above them. */}
+            {/* Styled as the Argos page's first box (owner, J18-337): the dog's
+                name, the film as subtitle, centred text. */}
             <div className={styles.sidebarCard}>
-              <div style={{ padding: "18px 20px" }}>
-                <p style={cardBodyLast}>
+              <div style={{ padding: "16px 20px 4px" }}>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 4px" }}>Odin</p>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Heart of the Beast</p>
+              </div>
+              <div style={{ padding: "9px 25px 16px 25px" }}>
+                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>
                   Odin is not a breed chosen for the poster. Everything the film asks of him is on this dog&rsquo;s job
                   description, including the line about bonding to one handler.
                 </p>
