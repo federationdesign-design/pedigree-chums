@@ -18,6 +18,31 @@
 
 /* The era-page panel heading: centred, big, in the display face (owner,
    23 Sept 2026). */
+/* DARK BLUE PANELS (owner, J18-334): the sidebar-card blue of the Good Dog Bad
+   Dog essays, for the German Shepherd panel and the rescue dogs. */
+.panelNavy {
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+}
+/* In the right-hand column: no outer margin (the column spaces its cards), a
+   smaller radius to sit with the other sidebar cards, and a title that fits. */
+.panelSide {
+  margin: 0;
+  border-radius: 16px;
+  padding: 24px 20px 20px;
+}
+.titleSide { font-size: clamp(28px, 2.6vw, 38px); }
+.colsStack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+/* One rescue dog to a panel, closer together than the full panels. */
+.dogPanel {
+  margin: 16px 0;
+  padding: 22px clamp(20px, 3vw, 34px);
+  border-radius: 24px;
+}
 .title {
   margin: 0 0 clamp(10px, 1.6vw, 18px);
   text-align: center;

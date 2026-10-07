@@ -10,77 +10,41 @@ import styles from "./BeastPanels.module.css";
    Built to match the Anubis essay's map panels and the era pages: the same blue
    container, the same navy pills, the same small print under a rule.
 
-   BreedFacts   the German Shepherd, using the figures the chum page already
-                carries, so the article and the chum page can never disagree.
-   RescueRoll   a sliding gallery of the three Dickin Medal dogs. Drawn cards, not
-                photographs, because the photographs are PDSA's and this can go
-                live without waiting on permission.
+   BreedFacts   the German Shepherd's character, as the chum page carries it,
+                in the right-hand column (J18-334).
+   RescueRoll   the three Dickin Medal dogs, each in its own panel (J18-334).
+                Text cards, not photographs, because the photographs are PDSA's
+                and this can go live without waiting on permission.
    GazeLoop     the 2015 oxytocin study as a circuit: the dog's gaze closes the
                 loop, and the wolf control group shows it open.
 
-   All three are client components only because the roll and the loop have a
-   selected state; there is no data fetching and no effects. */
+   Client components only because the loop has a selected state; there is no
+   data fetching and no effects. */
 
 /* ---------------------------------------------------------------- BreedFacts */
 
-/* Figures copied from data/breeds.ts (German Shepherd) and data/breed-info.json,
-   and the training card from data/trainingDifficulty.ts, so a reader sees the
-   same numbers here as on /chums/german-shepherd. */
-const SPECS: [string, string][] = [
-  ["Size", "Large"],
-  ["Height", "77cm"],
-  ["Weight", "22 to 40kg"],
-  ["Top speed", "48km/h"],
-  ["Life span", "up to 13 years"],
-  ["Recognised", "1899"],
-  ["Look for", "Sloped back"],
-  ["Coat", "Short, thick, black and tan"],
-];
+/* Figures copied from data/breed-info.json, so a reader sees the same character
+   here as on /chums/german-shepherd.
+
+   CHARACTER ONLY, IN THE RIGHT-HAND COLUMN (owner, J18-334, 7 October 2026): the
+   "The dog" table and the Training tab are gone, so the tab pills went with them;
+   the temperament chips lose their "Temperament" heading; the panel is the dark
+   blue of the essay's sidebar cards and sits in that column, its three lists
+   stacked rather than side by side. */
 const TEMPERAMENT = ["Loyal", "Obedient", "Curious", "Alert", "Confident"];
 const PROS = ["Highly trainable", "Versatile working dog", "Loyal", "Natural protector"];
 const CONS = ["Heavy shedding", "Needs lots of exercise", "Can develop anxiety", "Prone to hip dysplasia"];
-const TRAINING = {
-  label: "Highly trainable",
-  traits: [
-    "Focused, driven and quick to learn when properly motivated",
-    "Bonds deeply with one handler, which aids consistency",
-    "Excels at complex multi-step tasks",
-  ],
-  goodFor: "Police, military, search and rescue, protection sport",
-  watchOut: "Needs firm, consistent handling from day one. Inconsistency creates anxiety.",
-};
 
 export function BreedFacts() {
-  const [tab, setTab] = useState<"specs" | "character" | "training">("specs");
-
   return (
-    <section className={styles.panel} aria-labelledby="gsd-title">
-      <h2 id="gsd-title" className={`display ${styles.title}`}>
+    <section className={`${styles.panel} ${styles.panelNavy} ${styles.panelSide}`} aria-labelledby="gsd-title">
+      <h2 id="gsd-title" className={`display ${styles.title} ${styles.titleSide}`}>
         Meet the <span className="display-yellow">German Shepherd</span>
       </h2>
       <p className={styles.intro}>
         Odin is not a breed chosen for the poster. Everything the film asks of him is on this dog&rsquo;s job
         description, including the line about bonding to one handler.
       </p>
-
-      <div className={styles.tabs} role="tablist" aria-label="German Shepherd facts">
-        {([
-          ["specs", "The dog"],
-          ["character", "Character"],
-          ["training", "Training"],
-        ] as const).map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={tab === id}
-            className={`${styles.tab}${tab === id ? " " + styles.tabOn : ""}`}
-            onClick={() => setTab(id)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
 
       <div className={styles.card}>
         <div className={styles.cardTop}>
@@ -104,68 +68,32 @@ export function BreedFacts() {
           </div>
         </div>
 
-        {tab === "specs" && (
-          <dl className={styles.specs}>
-            {SPECS.map(([k, v]) => (
-              <div key={k} className={styles.spec}>
-                <dt className={styles.specKey}>{k}</dt>
-                <dd className={styles.specVal}>{v}</dd>
-              </div>
+        <div className={styles.colsStack}>
+          <ul className={styles.chips} aria-label="Temperament">
+            {TEMPERAMENT.map((t) => (
+              <li key={t} className={styles.chip}>{t}</li>
             ))}
-          </dl>
-        )}
-
-        {tab === "character" && (
-          <div className={styles.cols}>
-            <div>
-              <p className={styles.colHead}>Temperament</p>
-              <ul className={styles.chips}>
-                {TEMPERAMENT.map((t) => (
-                  <li key={t} className={styles.chip}>{t}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className={styles.colHead}>Pros</p>
-              <ul className={styles.bullets}>
-                {PROS.map((t) => (
-                  <li key={t} className={styles.pro}>{t}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className={styles.colHead}>Cons</p>
-              <ul className={styles.bullets}>
-                {CONS.map((t) => (
-                  <li key={t} className={styles.con}>{t}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {tab === "training" && (
+          </ul>
           <div>
-            <p className={styles.trainLabel}>{TRAINING.label}</p>
+            <p className={styles.colHead}>Pros</p>
             <ul className={styles.bullets}>
-              {TRAINING.traits.map((t) => (
-                <li key={t}>{t}</li>
+              {PROS.map((t) => (
+                <li key={t} className={styles.pro}>{t}</li>
               ))}
             </ul>
-            <p className={styles.cardBody}>
-              <strong>Good for:</strong> {TRAINING.goodFor}
-            </p>
-            <p className={styles.cardBody}>
-              <strong>Watch out:</strong> {TRAINING.watchOut}
-            </p>
           </div>
-        )}
+          <div>
+            <p className={styles.colHead}>Cons</p>
+            <ul className={styles.bullets}>
+              {CONS.map((t) => (
+                <li key={t} className={styles.con}>{t}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <p className={styles.note}>
-        Figures as shown on the German Shepherd chum page. Heights and weights are breed-standard ranges, not
-        measurements of any one dog.
-      </p>
+      <p className={styles.note}>As shown on the German Shepherd chum page.</p>
     </section>
   );
 }
@@ -212,40 +140,40 @@ const RESCUES: Rescue[] = [
   },
 ];
 
+/* THREE CONTAINERS, NOT ONE ROLL (owner, J18-334, 7 October 2026): the title and
+   introduction in one dark blue panel, then each dog in its own dark blue panel,
+   in the essay's sidebar-card blue. The sideways roll showed two dogs at a time on
+   desktop and hid the third; now all three are always in view. */
 export function RescueRoll() {
   return (
-    <section className={styles.panel} aria-labelledby="rescue-title">
-      <h2 id="rescue-title" className={`display ${styles.title}`}>
-        The Dogs Who <span className="display-yellow">Would Not Leave</span>
-      </h2>
-      <p className={styles.intro}>
-        Britain has a medal for this. Swipe through three of the dogs who earned it, none of whom were doing
-        anything they had been told to do.
-      </p>
-
-      {/* A plain snap-scrolling row: the next card peeks in as the swipe cue, and
-          nothing here fights the page's own vertical scroll. */}
-      <div className={styles.roll}>
-        {RESCUES.map((r) => (
-          <article key={r.id} className={styles.rollCard}>
-            <p className={styles.cardHead}>
-              <span className={styles.cardPlace}>{r.where}</span>
-              <span className={styles.cardWhen}>{r.when}</span>
-            </p>
-            <p className={styles.cardFigure}>{r.name}</p>
-            <p className={styles.rollBreed}>{r.breed}</p>
-            <p className={styles.cardBody}>{r.body}</p>
-            <p className={styles.rollCitation}>{r.citation}</p>
-          </article>
-        ))}
-      </div>
-
-      <p className={styles.note}>
-        Citations from the PDSA Dickin Medal roll. Rip is often credited with more than a hundred lives and Judy
-        with being the only dog registered as a prisoner of war; neither detail is in the citations, so neither is
-        relied on here.
-      </p>
-    </section>
+    <>
+      <section className={`${styles.panel} ${styles.panelNavy}`} aria-labelledby="rescue-title">
+        <h2 id="rescue-title" className={`display ${styles.title}`}>
+          The Dogs Who <span className="display-yellow">Would Not Leave</span>
+        </h2>
+        <p className={styles.intro}>
+          Britain has a medal for this. Here are three of the dogs who earned it, none of whom were doing
+          anything they had been told to do.
+        </p>
+        <p className={styles.note}>
+          Citations from the PDSA Dickin Medal roll. Rip is often credited with more than a hundred lives and Judy
+          with being the only dog registered as a prisoner of war; neither detail is in the citations, so neither is
+          relied on here.
+        </p>
+      </section>
+      {RESCUES.map((r) => (
+        <article key={r.id} className={`${styles.panel} ${styles.panelNavy} ${styles.dogPanel}`}>
+          <p className={styles.cardHead}>
+            <span className={styles.cardPlace}>{r.where}</span>
+            <span className={styles.cardWhen}>{r.when}</span>
+          </p>
+          <p className={styles.cardFigure}>{r.name}</p>
+          <p className={styles.rollBreed}>{r.breed}</p>
+          <p className={styles.cardBody}>{r.body}</p>
+          <p className={styles.rollCitation}>{r.citation}</p>
+        </article>
+      ))}
+    </>
   );
 }
 
