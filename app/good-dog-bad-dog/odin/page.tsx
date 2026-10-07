@@ -209,14 +209,6 @@ export default function HeartOfTheBeastPage() {
                     </React.Fragment>
                   );
                 }
-                if (typeof b === "string" && b.startsWith("Three dogs, three increasingly complicated")) {
-                  return (
-                    <React.Fragment key={i}>
-                      {block}
-                      <RescueRoll />
-                    </React.Fragment>
-                  );
-                }
                 if (typeof b === "string" && b.startsWith("The evidence is not perfect.")) {
                   return (
                     <React.Fragment key={i}>
@@ -233,6 +225,8 @@ export default function HeartOfTheBeastPage() {
           <aside className={styles.sidebar}>
             {/* The German Shepherd panel, moved here from the reading column (owner, J18-334). */}
             <BreedFacts />
+            {/* The rescue dogs, moved here from the reading column (owner, J18-335). */}
+            <RescueRoll side />
 
             <div className={styles.sidebarCard}>
               <div style={{ padding: "18px 20px" }}>

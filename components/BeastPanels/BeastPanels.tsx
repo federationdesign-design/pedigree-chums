@@ -144,11 +144,14 @@ const RESCUES: Rescue[] = [
    introduction in one dark blue panel, then each dog in its own dark blue panel,
    in the essay's sidebar-card blue. The sideways roll showed two dogs at a time on
    desktop and hid the third; now all three are always in view. */
-export function RescueRoll() {
+/* side (owner, J18-335): set when the panels sit in the right-hand column, where
+   they take the sidebar card size, as the German Shepherd panel does. */
+export function RescueRoll({ side = false }: { side?: boolean }) {
+  const sideCls = side ? ` ${styles.panelSide}` : "";
   return (
     <>
-      <section className={`${styles.panel} ${styles.panelNavy}`} aria-labelledby="rescue-title">
-        <h2 id="rescue-title" className={`display ${styles.title}`}>
+      <section className={`${styles.panel} ${styles.panelNavy}${sideCls}`} aria-labelledby="rescue-title">
+        <h2 id="rescue-title" className={`display ${styles.title}${side ? " " + styles.titleSide : ""}`}>
           The Dogs Who <span className="display-yellow">Would Not Leave</span>
         </h2>
         <p className={styles.intro}>
@@ -162,7 +165,7 @@ export function RescueRoll() {
         </p>
       </section>
       {RESCUES.map((r) => (
-        <article key={r.id} className={`${styles.panel} ${styles.panelNavy} ${styles.dogPanel}`}>
+        <article key={r.id} className={`${styles.panel} ${styles.panelNavy} ${styles.dogPanel}${sideCls}`}>
           <p className={styles.cardHead}>
             <span className={styles.cardPlace}>{r.where}</span>
             <span className={styles.cardWhen}>{r.when}</span>

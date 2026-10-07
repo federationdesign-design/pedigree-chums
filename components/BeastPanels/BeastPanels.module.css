@@ -43,6 +43,12 @@
   padding: 22px clamp(20px, 3vw, 34px);
   border-radius: 24px;
 }
+/* In the right-hand column the column's own gap spaces the dogs (J18-335). */
+.dogPanel.panelSide {
+  margin: 0;
+  padding: 20px;
+  border-radius: 16px;
+}
 .title {
   margin: 0 0 clamp(10px, 1.6vw, 18px);
   text-align: center;
