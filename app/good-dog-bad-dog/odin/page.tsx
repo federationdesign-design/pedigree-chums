@@ -26,10 +26,15 @@ import exerciseNeeds from "../../../data/exerciseNeeds";
    /good-dog-bad-dog/odin, with a permanent redirect in next.config.ts, because
    the article is about the dog and the film is only the way in.
 
-   THREE STRANDS, as agreed: the film, the dogs who would not leave, and the
-   science underneath both. The argument is that the rescue dog and the dog at
-   your door are running the same programme, so the heroism is not a fluke of
-   temperament in a few remarkable animals.
+   REWORKED TO THE SERIES THEME, 10 October 2026 (owner, J18-338): the article now
+   asks what the film's picture of the German Shepherd says about the real breed,
+   as the other Good Dog, Bad Dog essays do for theirs. UK instances only (no Rin
+   Tin Tin): the Alsatian renaming and 1920s breed boom (Country Life), the Hull
+   dock police (British Transport Police history), the 1931 Wallasey guide dogs,
+   the German Shepherd Dickin Medal dogs Irma, Jet of Iada and Antis, PD Finn and
+   Finn's Law, and the Crufts 2016 sloping-back row. Plain language throughout:
+   the brain-anatomy paragraph is rewritten for children. The film strand and the
+   science (attachment, stress odour, the gaze loop) are kept.
 
    FILM FACTS are from reviews published 22 and 23 September 2026 (Variety,
    Deadline, IndieWire, Daily Beast) and the film's own listing: David Ayer
@@ -37,9 +42,8 @@ import exerciseNeeds from "../../../data/exerciseNeeds";
    Shepherd called Uber playing Odin, the three legs and prosthetic, the titanium
    teeth, and the fifty-eight miles to the nearest road.
 
-   RESCUE DOGS are quoted from the PDSA Dickin Medal citations. Two widely
-   repeated details are deliberately not relied on: Rip's hundred lives and Judy's
-   registration as a prisoner of war, neither of which is in a citation.
+   RESCUE DOGS are German Shepherds only (owner, J18-338): Irma, Jet of Iada and
+   Antis from the PDSA Dickin Medal roll, and the police dog Finn.
 
    SCIENCE: Nagasawa et al., Science, 2015, for the oxytocin-gaze loop and the
    wolf control group; Wilson et al., PLOS ONE, 2022, Queen's University Belfast,
@@ -55,12 +59,12 @@ import exerciseNeeds from "../../../data/exerciseNeeds";
 export const metadata: Metadata = {
   title: "Odin: Why a Dog Will Not Leave You | Pedigree Chums",
   description:
-    "Brad Pitt's new film strands a man and a three-legged German Shepherd in Alaska. The dogs who really did save their humans, and the science of why a dog attaches to one person and stays.",
+    "Brad Pitt's new film strands a man and a three-legged German Shepherd in Alaska. How Britain went from fearing the Alsatian to trusting it, the German Shepherds who really did save their people, and why the breed attaches to one person and stays.",
   alternates: { canonical: "/good-dog-bad-dog/odin" },
   openGraph: {
     title: "Odin: Why a Dog Will Not Leave You",
     description:
-      "One man, one dog, fifty-eight miles. The real rescues behind the film, and what the science says about why dogs stay.",
+      "One man, one German Shepherd, fifty-eight miles. The breed's real British story, and what the science says about why it stays.",
     url: `${SITE_URL}/good-dog-bad-dog/odin`,
     images: ["/obin-uber-hero-img.jpg"],
     type: "article",
@@ -71,68 +75,74 @@ type Block = string | { h: string } | { quote: string };
 
 const BODY: Block[] = [
   "Somewhere over the Alaskan mountains, a small plane comes down. When the noise stops there are two survivors: a retired Special Forces officer called James Belmont, and a German Shepherd called Odin. The nearest road is fifty-eight miles away. Neither of them is in any condition to walk it.",
-  "That is Heart of the Beast, David Ayer's survival film, with Brad Pitt as the man and a German Shepherd named Uber playing the dog. Odin is not a pet who happens to be along for the trip. He is a retired combat dog, raised by Belmont from a puppy, and he carries the evidence of that life with him: titanium teeth, three legs and a prosthetic where the fourth used to be.",
-  "Most of the film has very little dialogue, which works because the other main character cannot talk. But silence is not the same as nothing being said. A dog living beside a person is constantly receiving information that person does not know they are giving away.",
-  "Whether it means to or not, the film is really about three things: why a dog stays, how a dog knows something is wrong, and what humans owe an animal that has been shaped to do both. The film is fiction. The machinery underneath it is not.",
+  "That is Heart of the Beast, David Ayer's survival film, with Brad Pitt as the man and a German Shepherd named Uber playing the dog. Odin is a retired combat dog, raised by Belmont from a puppy, and he carries the evidence of that life with him: titanium teeth, three legs and a prosthetic where the fourth used to be.",
+  "Whether it means to or not, the film leans on a picture of the German Shepherd that most British viewers already carry in their heads: the police dog, the army dog, the guard at the gate, the dog that belongs to one person and nobody else. The film does not need to explain why Odin will not leave Belmont. It cast the breed that comes with that story already attached.",
+  "So this is a question about the breed as much as the film. Where did that picture come from, how much of it is true, and what has it cost the dogs who have had to live up to it?",
+
+  { h: "The wolf dog Britain was afraid of" },
+  "The German Shepherd was made in Germany in the 1890s by a cavalry officer, Max von Stephanitz, who wanted one clever, steady working dog for the farms and later for the army. The first ones reached Britain around 1911 and hardly anyone noticed them.",
+  "The First World War changed that. British soldiers came home talking about the German army's dogs: messengers, guards, and dogs trained to find the wounded on the battlefield. People wanted one. But a dog with German in its name was not an easy sell after the war, so in Britain it became the Alsatian Wolf Dog, named after the border region of Alsace.",
+  "The new name sold the dog and frightened people in the same breath. Through the 1920s the Alsatian became Britain's first great breed craze, and breeders rushed to meet demand. Rushed breeding meant nervous, unpredictable dogs, and the breed's reputation fell almost as fast as it had risen. To many people it was simply a wolf in the house, a dog that might attack without being told to. In 1928 Country Life magazine said Alsatians were like caviare: you either loved them or you could not stand them.",
+  "That is the Bad Dog half of this breed's story, and it has never completely gone away. The same reputation that makes a German Shepherd the obvious dog to cast as a fearless hero also makes some people cross the road when one comes towards them.",
+
+  { h: "How the breed won Britain back" },
+  "What rescued the German Shepherd's name in Britain was work, not films.",
+  "The railway police on the docks at Hull, who had used Airedale Terriers since 1908, had switched to Alsatians by 1923. In 1931 Britain's first four guide dogs, Flash, Judy, Meta and Folly, qualified in Wallasey on Merseyside, and all four were German Shepherds. In the Second World War, Alsatians guarded RAF airfields, carried messages and searched bombed buildings in London. Today the police dog that British forces send after a running suspect is still very often a German Shepherd, though the Belgian Malinois is catching up.",
+  "Each of those jobs asked for the same thing: a dog that would stay with one person and keep working when everything around it was frightening. By 1977 the breed's standing had recovered enough for the Kennel Club to let it be registered again under its proper name, the German Shepherd Dog.",
 
   { h: "One dog, one person" },
-  "Start with the thing the film gets right. Odin is not devoted to humanity. He is devoted to Belmont.",
-  "Anyone who has lived with a dog that has a particular person in the household knows the shape of it. The dog may like everyone, greet everyone, take food and walks from anyone. But one person becomes different. It knows their car, their footsteps, their key in the door, and it sleeps facing the place they are expected to come back through.",
-  "Dogs do more than tolerate human company. They form genuine attachment relationships with particular people, and researchers have tested it using versions of the strange situation, the experiment developed to study attachment between human infants and their caregivers. Dogs use their owner as a secure base. They behave differently when that person leaves, and differently again when they return.",
+  "Start with the thing the film gets right. Odin is not devoted to people in general. He is devoted to Belmont.",
+  "Not every dog is like this. A Labrador will usually go home with anyone holding a biscuit. But some breeds are known for attaching hardest to one person in the household, and the German Shepherd is the classic example, alongside breeds such as the Akita and the Shiba Inu. It is friendly enough with the family, often reserved with strangers, and plainly organised around one human: their car, their footsteps, their key in the door.",
+  "That is not an accident. Von Stephanitz bred his dogs to work all day beside a single shepherd, watching for every signal. The police and the army chose the breed for the same reason. A British police dog usually lives at home with its handler and works only with that handler, often for its whole career.",
+  "Part of the bond is built very early. Between about three and twelve weeks old, a puppy goes through what scientists call the socialisation window, when it learns who and what is safe. A German Shepherd puppy raised by one person through those weeks, as Odin was raised by Belmont, learns that this person is where safety lives.",
+  "People sometimes say the puppy comes to think the human is its mother. That is not quite right. But scientists have tested dogs with an experiment first designed for human babies and their parents, and dogs behave in a very similar way: they use their person as a safe base, they get upset when that person leaves, and they settle when that person comes back.",
   { quote: "Obedience is doing what someone asks. Attachment is what remains when nobody has asked for anything." },
-  "That is the first thing the film understands about Odin. Belmont is not merely his handler. He is where the dog expects the world to make sense.",
-  "There is a less comfortable side to it. The dog that settles when its person comes back is the same dog that comes apart when they disappear: the whining at the window, the refusal to eat, the pacing while somebody is in hospital. We enjoy the greeting at the door. The dog carries the waiting. The relationship gives the dog security, and it gives the dog something to lose. That is the first half of the bargain, and it matters later.",
+  "There is a harder side to it. The dog that settles when its person comes back is the same dog that comes apart when they disappear: the whining at the window, the refusal to eat, the pacing while someone is in hospital. The bond gives the dog security, and it gives the dog something to lose.",
 
   { h: "The dogs who would not leave" },
-  "A survival film with a dog in it works so easily because we have already watched versions of this happen for real. Britain even has a medal for some of them: the PDSA Dickin Medal, created during the Second World War for conspicuous gallantry by animals. The interesting part is not that dogs received medals. It is what the dogs were actually doing.",
-  "Rip was a stray, found in Poplar during the Blitz and adopted by an air raid patrol. Nobody had trained him. He simply began finding people in collapsed buildings, and the work helped prove that dogs could search bombed sites at all. Something in the dog was already useful; humans noticed afterwards and gave the job a name.",
-  "Sheila was a working border collie on a Northumberland hill farm. In December 1944 a US B-17 came down in the Cheviots in fog and snow, and her shepherd John Dagg climbed towards the wreck with her. In conditions where a man could barely see, she led him to four airmen sheltering in the hillside. They got them down, and shortly afterwards the bombs still aboard the aircraft went off. This was not an anonymous rescue dog searching for an anonymous victim. It was a working dog following the person it already worked beside: the partnership came first, and the rescue happened inside it.",
-  "Judy was a ship's dog who survived a sinking and then three years in Japanese prison camps in Sumatra. Her citation praises courage, endurance, intelligence and watchfulness, but the revealing part is not what she did for Frank Williams. It is what he said she did to him. She gave him something to protect. Now the relationship is running both ways: the dog is not simply saving the human, the human is being held together by the need to keep the dog alive.",
-  "Three dogs, three increasingly complicated versions of one relationship. And one thing worth noticing: we give medals for the dramatic moments when attachment saves us, and nothing at all for the thousands of ordinary days when the same attachment costs the dog something.",
+  "A survival film with a German Shepherd in it works so easily because the real stories are already on record. Britain even has a medal for some of them: the PDSA Dickin Medal, created during the Second World War for bravery by animals. Several German Shepherds have won it, and what they were doing tells you a lot about the breed.",
+  "Irma was an Alsatian who worked with her owner, Margaret Griffin, in the London Civil Defence during the Blitz. She is credited with helping to rescue 191 people from bombed buildings, working through the rubble alongside the rescue squads. She won the Dickin Medal in January 1945.",
+  "Jet of Iada, a black Alsatian born in Liverpool, was the first dog used officially for Civil Defence rescue in London, working with Corporal Wardle. He helped rescue dozens of people trapped under the ruins and won the Dickin Medal on the same day as Irma.",
+  "Antis is the closest real dog to Odin. Early in the Second World War, a Czech airman, Robert Bozdech, found him as a puppy in an abandoned farmhouse in no man's land in France, and raised him himself. Antis flew around thirty missions with Bozdech's RAF squadron from bases in England. Once, left behind on the quay at Gibraltar, he swam out to Bozdech's ship rather than be parted from him. In 1948 he guided Bozdech past guards and searchlights when he escaped from Czechoslovakia. He won the Dickin Medal in 1949.",
+  "And the bond is not only history. In October 2016, in Stevenage, a police German Shepherd called Finn caught a fleeing suspect who then stabbed him in the chest and head. Finn kept his grip until his handler, PC Dave Wardell, could disarm the man. He survived, and was back at work eleven weeks later.",
+  "Four German Shepherds, the same pattern each time. None of them was rescuing a stranger out of general goodness. Each was working beside one person, and the rescue happened inside that partnership.",
 
-  { h: "The part you cannot see" },
-  "So why does the dog notice that something is wrong? Because it is receiving a version of the world we barely experience. When Belmont talks to Odin, Odin is not only listening. He is reading: posture, breathing, movement, the direction of a gaze, routine, expression. And smell, especially smell.",
-  "The mammalian sense of smell takes an unusual route through the brain. Unlike vision or hearing, its first journey towards the cortex does not require the same obligatory relay through the thalamus, and olfactory pathways connect closely with the systems that handle emotion and memory. That is part of why a smell can feel less like information arriving and more like a feeling appearing fully formed. For a dog, that channel matters immeasurably more than it does for us.",
-  "So a person can begin changing before they consciously know they have changed. Heart rate shifts. Breathing alters. Sweat chemistry moves. The dog may already have the news.",
-  "There is experimental evidence for part of this. In 2022, researchers collected breath and sweat samples from people before and after a stressful task, then asked trained dogs to pick the stressed samples from the calm ones taken from the same people. The dogs performed far above chance. That does not mean they understood why anyone was stressed, and it certainly does not mean they read minds. It means stress changes us chemically and dogs can detect some of that change. The dog beside you may know your body has changed before you have said a word, and possibly before you have admitted it to yourself.",
-  "Which makes the silence in the film look less like a filmmaking trick. Dialogue was never the main channel.",
+  { h: "How a dog knows something is wrong" },
+  "So how does the dog notice that something is wrong? Because it is picking up far more than we realise. When Belmont talks to Odin, Odin is not only listening. He is reading the way Belmont stands, breathes, moves and looks. And above all, he is smelling him.",
+  "Smell is wired more directly than our other senses to the parts of the brain that deal with feelings and memories, which is why a smell can bring back a feeling in an instant. For a dog, whose nose is many thousands of times more sensitive than ours, that channel matters far more than it does for us.",
+  "There is evidence for this from the UK. In 2022, researchers at Queen's University Belfast collected breath and sweat samples from people before and after a stressful task, and trained dogs picked out the stressed samples far more often than chance. That does not mean the dogs understood why anyone was stressed, or could read minds. It means stress changes the way we smell, and dogs can notice the change, possibly before we have admitted it to ourselves.",
 
   { h: "The look" },
-  "Then there is the thing dogs do that almost nothing else does in quite the same way. They look at us. Not glance, not monitor. Look.",
-  "In 2015, researchers led by Miho Nagasawa studied prolonged gaze between dogs and their owners, and found that longer mutual gaze went with rises in oxytocin in both of them. Oxytocin is involved in social bonding, including between human parents and infants. Then they pushed it further: dogs given oxytocin gazed more at their owners, and the owners' oxytocin rose in turn. The relationship appeared capable of feeding itself. Dog looks at human. Human responds. Dog responds to the response.",
-  "The comparison with wolves is the interesting part. The same loop did not appear in wolves raised by people. A dog looking at you is not simply a tame wolf looking at you. Across thousands of years beside us, dogs became unusually good at getting inside human social circuitry, several times a day, for free, at the bottom of the stairs.",
-  "The evidence is not perfect. Oxytocin is not a love chemical, and the effect varies with the dog's sex, breed and history with the person. But the broader point survives the caution: dogs are not passive recipients of human affection. They maintain the bond themselves.",
-  "So attachment explains why the dog stays. Scent and behaviour explain how the dog knows. Gaze explains how the relationship keeps renewing itself. Humans have benefited enormously from all three.",
+  "Then there is the thing dogs do that almost no other animal does in quite the same way. They look at us. Not a glance. A proper look.",
+  "In 2015, a team in Japan studied dogs and their owners gazing at each other, and found that a long shared look raised oxytocin, a hormone linked with bonding, in both of them. When dogs were given extra oxytocin, they looked at their owners for longer, and the owners' oxytocin rose too. The bond seemed able to feed itself: the dog looks, the person responds, the dog responds to the response.",
+  "The team ran the same test with wolves raised by people, and the loop did not appear. Over thousands of years beside us, dogs became unusually good at plugging into human friendship, several times a day, for free, at the bottom of the stairs.",
+  "The evidence is not perfect. Oxytocin is not a love potion, and the effect varies between dogs. But the main point stands: dogs do not just receive our affection. They help keep the bond going themselves.",
 
   { h: "The bond they did not have to act" },
-  "Which brings us to the part of this that is not fiction at all.",
-  "Uber, the German Shepherd playing Odin, was a working search and rescue dog before he was ever a film dog. He had been on helicopters and been to real incidents. The film did not teach him to be steady in chaos; it hired him because he already was.",
-  "And over the shoot, in New Zealand, wet and cold for twelve hours a day, the thing the article has been describing happened to the actor. Pitt has said since that he wanted the dog to trust him and to feel safe with him, and that this was the first job before any acting could happen. Not a performance of a bond. The actual construction of one, in the order the mechanism requires: safety first, attention second, everything else after that.",
-  "David Ayer, directing, put it in one line. They found the relationship, he said, in the eyes.",
-  { quote: "That is the 2015 experiment, restaged by accident on a film set, by two people who were only trying to get a scene." },
-  "It shows in the working detail too. Pitt has described having to keep treats on him and break mid-scene to call the dog back, then drop straight back into the emotion, because the dog had wandered off after something more interesting. The dog was not acting. It was doing what it liked doing, near a man it had decided to be near, and the camera collected the result.",
-  "Pitt called it a moving experience and says the dog's expressions still get to him. He has three dogs of his own now, one of them a rescue taken on since filming.",
-  "Which is the whole argument, arriving from the least likely direction. You cannot spend months building trust with a dog and come away unchanged, because the loop does not care that one of you is being paid.",
+  "Which brings us to the part of Heart of the Beast that is not fiction at all.",
+  "Uber, the German Shepherd playing Odin, was a working search and rescue dog before he was a film dog. He had flown in helicopters and been to real incidents. The film did not teach him to stay calm in chaos; it hired him because he already could. In other words, the film cast exactly the dog that the breed's British history describes.",
+  "Over the shoot in New Zealand, wet and cold for twelve hours a day, the same bond started to form with the actor. Pitt has said his first job, before any acting, was getting the dog to trust him and feel safe with him. Safety first, attention second, everything else after that: the same order the science describes.",
+  "David Ayer, the director, put it in one line. They found the relationship, he said, in the eyes.",
+  "It shows in the working detail too. Pitt has described keeping treats in his pocket and breaking off mid-scene to call the dog back, because Uber had wandered off after something more interesting. The dog was not acting. It was doing what it liked doing, near a man it had decided to be near, and the camera collected the result.",
+
+  { h: "The other picture of the breed" },
+  "There is a second image of the German Shepherd in Britain, and it is not the one in the film.",
+  "At Crufts in 2016, the German Shepherd judged best of its breed had a steeply sloping back and struggled to walk steadily on its back legs. The footage was shown on television and caused an outcry. The vet who chaired the Kennel Club's own dog health group said he was appalled that the dog had been held up as a good example of the breed, and the RSPCA called for judges to put health first.",
+  "It showed how far one version of the breed had drifted from the other. The working German Shepherd, the police dog and the search dog, is bred to move freely and work all day. Some show lines were being bred for a look. Odin, Irma and Finn belong to the first kind. Anyone choosing a German Shepherd puppy in Britain today is choosing between both.",
 
   { h: "Is it courage if the dog cannot help it?" },
-  "This is where it gets awkward. We call Rip brave. We call Sheila brave. We call Judy brave. Odin is framed as heroic because he stays where leaving would be easier. But does courage require a choice?",
-  "A human hero can supposedly understand the danger, consider leaving and decide to stay. The dog in the rubble is not writing an ethical argument. Sheila did not understand the British Empire Medal. Judy did not know what a prisoner of war was. The dog has a person, something is wrong, and leaving does not feel like the correct response.",
-  { quote: "We are the ones who call that courage. The dog would just call it Tuesday, if it called it anything." },
-  "At first that sounds like it shrinks the achievement. Maybe the dog is not heroic at all. Maybe it is simply attached. But think about human courage for a moment. A parent running towards an injured child does not stop to calculate risk. Someone going into the water after a stranger often moves before thinking. A person who hears screaming inside a burning building can be running before the moral philosophy arrives.",
-  "Sometimes attachment is the mechanism that creates courage. Explaining the mechanism does not make the behaviour smaller; it may explain why it is so powerful. We like to imagine loyalty as a noble decision made from first principles. It is probably older than that, and messier: a body that has learned where safety lives, a nervous system that notices when that safety is threatened, a relationship so thoroughly installed that staying feels less like a decision than leaving would.",
-  "Which means the heroic dog and the dog waiting behind your front door are running versions of the same programme. One makes the news. The other happens every evening.",
+  "This is where it gets awkward. We call Irma brave. We call Finn brave. Odin is framed as a hero because he stays where leaving would be easier. But does courage need a choice?",
+  "A human hero can, in theory, understand the danger, think about leaving and decide to stay. Finn was not weighing up the risk in Stevenage. Irma did not know what a medal was. The dog has a person, something is wrong, and leaving does not feel like the right thing to do.",
+  "At first that sounds as if it shrinks the achievement. But think about human courage for a moment. A parent running towards an injured child does not stop to calculate the risk. Someone diving into the water after a stranger often moves before they think.",
+  "Sometimes attachment is what creates courage. Explaining how it works does not make the behaviour smaller; it may explain why it is so powerful. Loyalty is probably not a noble decision made from first principles. It is older and simpler than that: a body that has learned where safety lives, and a bond so deep that staying feels easier than leaving.",
+  "Which means the medal-winning dog and the German Shepherd waiting behind someone's front door are running versions of the same programme. One makes the news. The other happens every evening.",
 
-  { h: "The animal we made" },
-  "And now the uncomfortable part. Humans did not merely discover dogs behaving like this. We helped make them.",
-  "For thousands of years we favoured the animals that could live beside us: the ones that tolerated us, watched us, followed us, worked with us, came back when called, stayed near the camp, the livestock, the children, the person holding the lead. Generation after generation, the animals that succeeded beside humans reproduced inside a human world. Eventually we had something extraordinary: an animal unusually capable of making one human being the centre of its social universe.",
-  "Then we praised the result as loyalty. We gave it medals, built statues, made films.",
-  "There is nothing wrong with celebrating it. But the same attachment that makes a dog stay when we are in trouble makes the dog vulnerable to us when we are not. A dog cannot negotiate the terms. It cannot decide the workload has become unreasonable, or weigh another deployment against the arthritis ten years later. It cannot tell you in words that it has had enough. And the quality we admire most is often the reason it keeps going.",
-
-  { h: "The other half of the bargain" },
-  "Which brings us back to Odin's missing leg. The film puts the question on screen without needing to explain it. A working dog has given part of its body to the relationship, the work is supposedly over, and somebody has to answer what happens next: the prosthetic, the arthritis, the medication, the years after the useful part has ended. That is not a philosophical question for the dog. It is a practical one for the human.",
-  "We are very good at counting what dogs give us. Searches completed, people found, livestock moved, explosives detected, lives saved. We are much worse at counting what goes back the other way. A dog cannot retire itself, and it will keep turning up, because turning up is what the relationship taught it to do.",
-  "Somewhere on a fictional Alaskan mountain, a man survives because a three-legged dog will not leave him. Somewhere real tonight, someone will sleep a little more easily because a dog is lying across the end of the bed, listening. Neither dog thinks it is doing anything remarkable, which is exactly why it is.",
-  "The miracle is not simply that the dog stays. It is that two species built a relationship in which, sometimes, leaving feels harder than staying. If the dog keeps its side of that bargain, we owe it ours.",
+  { h: "What we owe the dog" },
+  "Humans did not simply discover dogs behaving like this. With the German Shepherd, we built it on purpose. For more than a century we chose the dogs that watched one person, followed one person and kept working for one person, and then we praised the result as loyalty. We gave it medals, put it on the docks and the airfields, and cast it in films.",
+  "There is nothing wrong with celebrating that. But the same bond that makes a dog stay when we are in trouble makes it vulnerable to us when we are not. A dog cannot decide the workload has become too much, or tell you in words that it has had enough. The quality we admire most is often the reason it keeps going.",
+  "Which brings us back to Odin's missing leg. The film puts the question on screen without needing to explain it: a working dog has given part of its body to the partnership, and somebody now has to look after it, the prosthetic, the stiff joints, the years after the useful part has ended.",
+  "Britain has started to answer that question. After Finn was stabbed, the law could only treat the attack on him as damage to property. His handler campaigned to change that, and in 2019 Finn's Law gave service animals such as police dogs and horses proper protection in their own right. Finn retired, lived out his days at home with the man he had protected, and died peacefully in 2023, aged fourteen.",
+  "The miracle is not simply that the dog stays. It is that people and German Shepherds built a partnership in which, sometimes, leaving feels harder than staying. If the dog keeps its side of that bargain, we owe it ours.",
 ];
 
 const GSD = "german-shepherd"; // the breed cards in the sidebar (J18-336)
@@ -146,7 +156,7 @@ const ARTICLE_JSONLD = {
       description: metadata.description,
       image: `${SITE_URL}/obin-uber-hero-img.jpg`,
       datePublished: "2026-09-24",
-      dateModified: "2026-09-24",
+      dateModified: "2026-10-10",
       publisher: { "@id": `${SITE_URL}/#organization` },
       mainEntityOfPage: `${SITE_URL}/good-dog-bad-dog/odin`,
     },
@@ -264,11 +274,14 @@ export default function HeartOfTheBeastPage() {
               <div style={{ padding: "18px 20px" }}>
                 <p style={cardTitle}>Sources</p>
                 <p style={{ ...cardBodyLast, fontSize: "0.8rem", color: "#aac4d4" }}>
-                  Nagasawa et al., Science (2015), on the oxytocin-gaze loop and the wolf control group. Wilson et
-                  al., PLOS ONE (2022), Queen&apos;s University Belfast, on the detection of stress odour. Topal et
-                  al., Journal of Comparative Psychology (1998), on attachment. PDSA Dickin Medal citations for
-                  Rip, Sheila and Judy. Film details and cast interviews from Variety, Collider, Entertainment Weekly and
-          People, published between August and 23 September 2026.
+                  Country Life, on the Alsatian in Britain and the 1920s breed boom. British Transport Police history,
+                  on the Hull dock dogs. PDSA Dickin Medal records for Irma, Jet of Iada and Antis. The Animal Welfare
+                  (Service Animals) Act 2019 (Finn&apos;s Law). Veterinary Times, March 2016, on the Crufts German
+                  Shepherd. The Association of Pet Behaviour Counsellors, on the socialisation window. Nagasawa et al.,
+                  Science (2015), on the oxytocin-gaze loop and the wolf control group. Wilson et al., PLOS ONE (2022),
+                  Queen&apos;s University Belfast, on the detection of stress odour. Topal et al., Journal of Comparative
+                  Psychology (1998), on attachment. Film details and cast interviews from Variety, Collider,
+                  Entertainment Weekly and People, published between August and 23 September 2026.
                 </p>
               </div>
             </div>
@@ -276,8 +289,9 @@ export default function HeartOfTheBeastPage() {
         </div>
 
         <div className={styles.verdict}>
-          <strong>The verdict:</strong> Not devotion as a virtue, but devotion as a mechanism. The dog stays
-          because staying is what the relationship is made of, and we get to call it bravery.
+          <strong>The verdict:</strong> Good dog, and earned the hard way. Britain once feared the Alsatian as a
+          wolf in the house; police work, guide dogs and the Blitz won it back. Odin stays because the breed was made
+          to stay with one person, and that bond is worth honouring, not just admiring.
         </div>
       </main>
       <Footer />

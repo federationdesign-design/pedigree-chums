@@ -110,33 +110,36 @@ type Rescue = {
   citation: string;
 };
 
+/* GERMAN SHEPHERDS ONLY (owner, J18-338, 10 October 2026): the Odin essay is about
+   the breed, so the roll is the German Shepherd Dickin Medal dogs, all UK. Rip,
+   Sheila and Judy were a mongrel, a Border Collie and a Pointer. */
 const RESCUES: Rescue[] = [
   {
-    id: "rip",
-    name: "Rip",
-    breed: "Mongrel, no training at all",
-    when: "1940",
-    where: "Poplar, east London",
-    body: "A stray, picked up after a raid by air raid warden Mr E. King and adopted as mascot of the Southill Street patrol. Nobody taught him anything. He began finding people under the rubble on his own, and Britain trained search dogs afterwards partly because he had shown it could be done.",
-    citation: "Dickin Medal, 1945: for locating many air-raid victims during the blitz of 1940.",
+    id: "irma",
+    name: "Irma",
+    breed: "Alsatian (German Shepherd)",
+    when: "1944 to 1945",
+    where: "London, the Blitz",
+    body: "She worked with her owner, Margaret Griffin, in the London Civil Defence, first carrying messages and then searching bombed buildings. She is credited with helping to rescue 191 people from the rubble.",
+    citation: "Dickin Medal, 12 January 1945: for the rescue of people trapped under blitzed buildings.",
   },
   {
-    id: "sheila",
-    name: "Sheila",
-    breed: "Border collie, a working farm dog",
-    when: "16 December 1944",
-    where: "The Cheviot Hills",
-    body: "A US bomber came down on the hill in fog and snow, still carrying its bombs. Shepherd John Dagg climbed to it with Sheila, who led him to four airmen sheltering in a crevice. They had barely reached the cottage when the bombs went off and blew in two of its windows.",
-    citation: "Dickin Medal, 2 July 1945. The first animal with no military connection to receive one.",
+    id: "jet",
+    name: "Jet of Iada",
+    breed: "Alsatian (German Shepherd), born in Liverpool",
+    when: "1944 to 1945",
+    where: "London, the Blitz",
+    body: "With Corporal Wardle, Jet was the first dog used officially for Civil Defence rescue work in London. He helped find dozens of people trapped under the ruins, and later helped rescuers after a mine explosion in Cumbria.",
+    citation: "Dickin Medal, 12 January 1945: for the rescue of people trapped under blitzed buildings.",
   },
   {
-    id: "judy",
-    name: "Judy",
-    breed: "Pointer, a ship's dog",
-    when: "1942 to 1945",
-    where: "Sumatra",
-    body: "She survived a sinking and then three years in Japanese prison camps. Her man, Frank Williams, said she was the reason he came through: not because she fed him or freed him, but because she gave him something to protect.",
-    citation: "Dickin Medal, May 1946: for magnificent courage and endurance in Japanese prison camps.",
+    id: "antis",
+    name: "Antis",
+    breed: "German Shepherd, an RAF squadron dog",
+    when: "1940 to 1948",
+    where: "France, England and Czechoslovakia",
+    body: "Found as a puppy by the Czech airman Robert Bozdech, he flew around thirty missions with him from England, swam out to his ship at Gibraltar rather than be left behind, and in 1948 guided him past searchlights to escape Czechoslovakia.",
+    citation: "Dickin Medal, 1949. He is buried in the PDSA animal cemetery at Ilford.",
   },
 ];
 
@@ -155,13 +158,12 @@ export function RescueRoll({ side = false }: { side?: boolean }) {
           The Dogs Who <span className="display-yellow">Would Not Leave</span>
         </h2>
         <p className={styles.intro}>
-          Britain has a medal for this. Here are three of the dogs who earned it, none of whom were doing
-          anything they had been told to do.
+          Britain has a medal for this. Here are three German Shepherds who earned it, each working beside
+          one person.
         </p>
         <p className={styles.note}>
-          Citations from the PDSA Dickin Medal roll. Rip is often credited with more than a hundred lives and Judy
-          with being the only dog registered as a prisoner of war; neither detail is in the citations, so neither is
-          relied on here.
+          From the PDSA Dickin Medal roll. In 1945 and 1949 the German Shepherd was still called the Alsatian in
+          Britain.
         </p>
       </section>
       {RESCUES.map((r) => (
